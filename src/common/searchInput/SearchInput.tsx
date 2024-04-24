@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SearchIcon } from 'common/icons';
+import { SearchIcon } from 'assets/icons';
 import { useTranslation } from 'react-i18next';
 import styles from './SearchInput.module.scss';
 import MUIOutlinedInput, { OutlinedInputProps } from './OutlinedInput';

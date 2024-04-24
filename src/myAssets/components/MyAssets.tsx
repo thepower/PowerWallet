@@ -1,11 +1,10 @@
 import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { isHub } from 'application/components/AppRoutes';
 import {
   CardLink, DeepPageTemplate, Tabs,
 } from 'common';
 import {
   BuySvg, FaucetSvg, LogoIcon, SendSvg,
-} from 'common/icons';
+} from 'assets/icons';
 import { getTokens } from 'myAssets/selectors/tokensSelectors';
 import { TokenType, updateTokensAmountsTrigger } from 'myAssets/slices/tokensSlice';
 import {
@@ -129,24 +128,18 @@ class MyAssets extends React.PureComponent<MyAssetsProps, MyAssetsState> {
               <FaucetSvg />
             </CardLink>
             <CardLink
-              isAnchor={isHub}
-              to={isHub
-                ? `${appEnvs.WALLET_THEPOWER_URL}${WalletRoutesEnum.myAssets}${WalletRoutesEnum.assetSelection}`
-                : `${WalletRoutesEnum.myAssets}${WalletRoutesEnum.assetSelection}`}
+              to={`${WalletRoutesEnum.myAssets}${WalletRoutesEnum.assetSelection}`}
               label={this.props.t('send')}
-              target={isHub ? '_blank' : '_self'}
+              target={'_self'}
               rel="noreferrer"
             >
               <SendSvg />
             </CardLink>
             <CardLink
               onClick={this.handleShowUnderConstruction}
-              isAnchor={isHub}
-              to={isHub
-                ? `${appEnvs.WALLET_THEPOWER_URL}${WalletRoutesEnum.buy}`
-                : WalletRoutesEnum.buy}
+              to={WalletRoutesEnum.buy}
               label={this.props.t('buy')}
-              target={isHub ? '_blank' : '_self'}
+              target={'_self'}
             >
               <BuySvg />
             </CardLink>

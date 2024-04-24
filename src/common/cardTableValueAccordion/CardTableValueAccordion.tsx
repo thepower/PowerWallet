@@ -8,7 +8,7 @@ import {
   AccordionDetailsClasses,
 } from '@mui/material';
 
-import { ChevronDownIcon } from 'common/icons/ChevronDown';
+import { ChevronDownIcon } from 'assets/icons/ChevronDown';
 import cn from 'classnames';
 import styles from './CardTableValueAccordion.module.scss';
 

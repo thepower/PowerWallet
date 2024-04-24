@@ -225,7 +225,7 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
       <header className={styles.header}>
         <div className={styles.headerCol}>
           <ThePowerLogoIcon className={styles.headerLogoIcon} />
-          <div className={styles.headerText}>POWER HUB</div>
+          <div className={styles.headerText}>POWER WALLET</div>
         </div>
       </header>
     </div>);

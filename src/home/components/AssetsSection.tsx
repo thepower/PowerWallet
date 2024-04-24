@@ -1,8 +1,7 @@
-import { isHub } from 'application/components/AppRoutes';
 import { ArrowLink, CardLink, CopyButton } from 'common';
 import {
   BuySvg, FaucetSvg, LogoIcon, SendSvg, WalletsSvg,
-} from 'common/icons';
+} from 'assets/icons';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
@@ -70,22 +69,16 @@ const AssetsSection = ({ walletAddress, setShowUnderConstruction, amounts }: Ass
             <FaucetSvg />
           </CardLink>
           <CardLink
-            isAnchor={isHub}
-            to={isHub
-              ? `${appEnvs.WALLET_THEPOWER_URL}${WalletRoutesEnum.myAssets}${WalletRoutesEnum.assetSelection}`
-              : `${WalletRoutesEnum.myAssets}${WalletRoutesEnum.assetSelection}`}
+            to={`${WalletRoutesEnum.myAssets}${WalletRoutesEnum.assetSelection}`}
             label={t('send')}
-            target={isHub ? '_blank' : '_self'}
+            target={'_self'}
           >
             <SendSvg />
           </CardLink>
           <CardLink
-            isAnchor={isHub}
-            to={isHub
-              ? `${appEnvs.WALLET_THEPOWER_URL}${WalletRoutesEnum.buy}`
-              : WalletRoutesEnum.buy}
+            to={WalletRoutesEnum.buy}
             label={t('buy')}
-            target={isHub ? '_blank' : '_self'}
+            target={'_self'}
             onClick={handleShowUnderConstruction}
           >
             <BuySvg />

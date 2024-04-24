@@ -107,7 +107,7 @@ export function* loginToWalletSaga({ payload }: { payload: LoginToWalletInputTyp
   }
 }
 
-export function* proceedToHubSaga() {
+export function* proceedToWalletSaga() {
   const { wif, address } = yield* select(getWalletData);
   yield* put(loginToWallet({ address, wif }));
   yield* put(push(WalletRoutesEnum.root));

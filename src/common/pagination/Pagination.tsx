@@ -6,7 +6,7 @@ import {
   ArrowLDisabled,
   ArrowR,
   ArrowRDisabled,
-} from '../icons';
+} from '../../assets/icons';
 import styles from './Pagination.module.scss';
 
 export interface PaginationProps {

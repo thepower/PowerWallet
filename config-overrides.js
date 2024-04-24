@@ -21,10 +21,6 @@ function myOverrides(config, env) {
     topLevelAwait: true,
   };
 
-  config.optimization.minimizer[0].options.minimizer.options.mangle = {
-    reserved: ['Buffer', 'BigInteger', 'Point', 'ECPubKey', 'ECKey', 'sha512_asm', 'asm', 'ECPair', 'HDNode', 'safari10'],
-  };
-
   return config;
 }
 

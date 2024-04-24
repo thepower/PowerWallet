@@ -39,8 +39,8 @@ export { branchCallFunction } from './utils/common';
 export { FileReaderType, getFileData } from './utils/files';
 
 // svg
-export { PELogo } from './icons/PELogo';
-export { PELogoWithTitle } from './icons/PELogoWithTitle';
-export { ClosedEyeIcon } from './icons/ClosedEyeIcon';
-export { EyeIcon } from './icons/EyeIcon';
-export { AttachIcon } from './icons/AttachIcon';
+export { PELogo } from '../assets/icons/PELogo';
+export { PELogoWithTitle } from '../assets/icons/PELogoWithTitle';
+export { ClosedEyeIcon } from '../assets/icons/ClosedEyeIcon';
+export { EyeIcon } from '../assets/icons/EyeIcon';
+export { AttachIcon } from '../assets/icons/AttachIcon';

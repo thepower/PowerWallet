@@ -6,7 +6,7 @@ import { setShowUnderConstruction } from '../../application/slice/applicationSli
 import { useAppDispatch } from '../../application/store';
 import ArrowLink from '../arrowLink/ArrowLink';
 import IconButton from '../iconButton/IconButton';
-import { BellIcon } from '../icons';
+import { BellIcon } from '../../assets/icons';
 import { LangSelect } from '../langSelect/LangSelect';
 import styles from './TopBar.module.scss';
 

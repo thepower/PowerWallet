@@ -1,6 +1,6 @@
 import React, { useCallback, useRef } from 'react';
 import cn from 'classnames';
-import { CopySvg } from '../icons';
+import { CopySvg } from '../../assets/icons';
 import styles from './CopyButton.module.scss';
 
 interface CopyButtonProps {

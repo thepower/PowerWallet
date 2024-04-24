@@ -1,7 +1,6 @@
 import { put, select } from 'typed-redux-saga';
 import { push, createMatchSelector } from 'connected-react-router';
 import { NetworkApi, WalletApi } from '@thepowereco/tssdk';
-import { isHub, isWallet } from 'application/components/AppRoutes';
 import { setDynamicApis, setTestnetAvailable, setNetworkChains } from '../slice/applicationSlice';
 import { CURRENT_NETWORK, getIsProductionOnlyDomains } from '../utils/applicationUtils';
 import { getKeyFromApplicationStorage } from '../utils/localStorageUtils';
@@ -24,7 +23,6 @@ export function* reInitApis({ payload }: { payload: number }) {
 
 export function* initApplicationSaga() {
   yield* reInitApis({ payload: defaultChain });
-  // let subChain = -1;
   let address = '';
   let wif = '';
 
@@ -39,50 +37,25 @@ export function* initApplicationSaga() {
 
   wif = yield getKeyFromApplicationStorage('wif');
 
-  // const sCAPPs: string = yield getKeyFromApplicationStorage('scapps');
-
-  // if (sCAPPs) {
-  //   setSCAPPs
-  // }
-
   const matchSelector = createMatchSelector({ path: WalletRoutesEnum.registrationForApps });
   const match = yield* select(matchSelector);
 
-  if (isWallet) {
-    if (address && wif) {
-      yield loginToWalletSaga({
-        payload: {
-          address,
-          wif,
-        },
-      });
-
-      yield* put(setWalletData({
+  if (address && wif) {
+    yield loginToWalletSaga({
+      payload: {
         address,
         wif,
-        logged: true,
-      }));
+      },
+    });
 
-      yield* put(push(window.location.pathname));
-    } else if (!match) {
-      yield* put(push(WalletRoutesEnum.signup));
-    }
-  } if (isHub) {
-    if (address) {
-      yield loginToWalletSaga({
-        payload: {
-          address,
-          wif,
-        },
-      });
+    yield* put(setWalletData({
+      address,
+      wif,
+      logged: true,
+    }));
 
-      yield* put(setWalletData({
-        address,
-        wif,
-        logged: true,
-      }));
-
-      yield* put(push(window.location.pathname));
-    }
+    yield* put(push(window.location.pathname));
+  } else if (!match) {
+    yield* put(push(WalletRoutesEnum.signup));
   }
 }

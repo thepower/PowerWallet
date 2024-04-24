@@ -6,12 +6,10 @@ import {
   ExportIcon,
   ImportIcon,
   ResetIcon,
-} from 'common/icons';
+} from 'assets/icons';
 import { CopyButton } from 'common';
 import { connect, ConnectedProps } from 'react-redux';
 import { Drawer } from '@mui/material';
-import { isHub, isWallet } from 'application/components/AppRoutes';
-import { clearApplicationStorage, getKeyFromApplicationStorage } from 'application/utils/localStorageUtils';
 import { WithTranslation, withTranslation } from 'react-i18next';
 import { getOpenedMenu, getWalletAddress } from '../selectors/accountSelectors';
 import globe from './globe.jpg';
@@ -47,7 +45,6 @@ type AccountProps = ConnectedProps<typeof connector> & WithTranslation & { class
 
 interface AccountState {
   accountFile: Maybe<File>;
-  isWifExists: boolean;
   openedImportAccountModal: boolean;
   openedExportAccountModal: boolean;
   openedResetAccountModal: boolean;
@@ -73,16 +70,10 @@ class AccountComponent extends React.PureComponent<AccountProps, AccountState> {
     super(props);
     this.state = {
       accountFile: null,
-      isWifExists: false,
       openedImportAccountModal: false,
       openedExportAccountModal: false,
       openedResetAccountModal: false,
     };
-  }
-
-  async componentDidMount() {
-    const wif = await getKeyFromApplicationStorage('wif');
-    this.setState({ isWifExists: !!wif });
   }
 
   handleCreateAccount = () => {
@@ -144,15 +135,10 @@ class AccountComponent extends React.PureComponent<AccountProps, AccountState> {
 
   handleResetAccount = () => {
     const { resetAccount } = this.props;
-    if (isWallet) {
-      resetAccount({
-        password: '',
-        additionalActionOnDecryptError: () => this.setState({ openedResetAccountModal: true }),
-      });
-    } else if (isHub) {
-      clearApplicationStorage();
-      window.location.reload();
-    }
+    resetAccount({
+      password: '',
+      additionalActionOnDecryptError: () => this.setState({ openedResetAccountModal: true }),
+    });
   };
 
   closeResetAccountModal = () => {
@@ -160,44 +146,28 @@ class AccountComponent extends React.PureComponent<AccountProps, AccountState> {
   };
 
   // eslint-disable-next-line react/sort-comp
-  getAccountActionsData:() => AccountActionType[] = () => {
-    const hubActions = this.state.isWifExists ? [{
-      title: this.props.t('resetAccount'),
-      action: this.handleResetAccount,
-      Icon: ResetIcon,
+  getAccountActionsData:() => AccountActionType[] = () => ([
+    {
+      title: this.props.t('createNewAccount'),
+      action: this.handleCreateAccount,
+      Icon: CreateIcon,
     },
     {
       title: this.props.t('exportAccount'),
       action: this.handleExportAccount,
       Icon: ExportIcon,
-    }] : [{
+    },
+    {
+      title: this.props.t('importAccount'),
+      action: this.handleOpenImportFile,
+      Icon: ImportIcon,
+    },
+    {
       title: this.props.t('resetAccount'),
       action: this.handleResetAccount,
       Icon: ResetIcon,
-    }];
-    return (isWallet ? [
-      {
-        title: this.props.t('createNewAccount'),
-        action: this.handleCreateAccount,
-        Icon: CreateIcon,
-      },
-      {
-        title: this.props.t('exportAccount'),
-        action: this.handleExportAccount,
-        Icon: ExportIcon,
-      },
-      {
-        title: this.props.t('importAccount'),
-        action: this.handleOpenImportFile,
-        Icon: ImportIcon,
-      },
-      {
-        title: this.props.t('resetAccount'),
-        action: this.handleResetAccount,
-        Icon: ResetIcon,
-      },
-    ] : hubActions);
-  };
+    },
+  ]);
 
   toggleAccountMenu = () => {
     this.props.toggleOpenedAccountMenu();

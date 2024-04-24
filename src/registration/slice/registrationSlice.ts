@@ -15,7 +15,7 @@ const createWallet = createAction<AddActionOnSuccessType<{
   randomChain: boolean,
 }>>(`${SLICE_NAME}/createWallet`);
 const loginToWalletFromRegistration = createAction<LoginToWalletInputType>(`${SLICE_NAME}/loginToWallet`);
-const proceedToHub = createAction(`${SLICE_NAME}/proceedToHub`);
+const proceedToWallet = createAction(`${SLICE_NAME}/proceedToWallet`);
 
 export type RegistrationState = {
   tab: LoginRegisterAccountTabs;
@@ -101,7 +101,7 @@ const {
 
 export {
   createWallet, generateSeedPhrase, loginToWalletFromRegistration,
-  proceedToHub, registrationReducer,
+  proceedToWallet, registrationReducer,
   seLoginAddress, setCreatingCurrentShard, setCreatingStep,
   setCurrentRegisterCreateAccountTab, setLoginConfirmedPassword,
   setLoginPassword, setLoginSeed, setPasswordNotEqual, setSeedPhrase,

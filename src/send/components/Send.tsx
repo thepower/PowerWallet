@@ -19,7 +19,7 @@ import { WalletRoutesEnum } from '../../application/typings/routes';
 import {
   Button, DeepPageTemplate, Divider, FullScreenLoader,
 } from '../../common';
-import { LogoIcon, MoneyBugIcon } from '../../common/icons';
+import { LogoIcon, MoneyBugIcon } from '../../assets/icons';
 import TxResult from '../../common/txResult/TxResult';
 import { checkIfLoading } from '../../network/selectors';
 import { getSentData } from '../selectors/sendSelectors';

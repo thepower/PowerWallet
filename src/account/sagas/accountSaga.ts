@@ -4,7 +4,6 @@ import fileSaver from 'file-saver';
 import { FileReaderType, getFileData } from 'common';
 import { push } from 'connected-react-router';
 import { toast } from 'react-toastify';
-import { isWallet } from 'application/components/AppRoutes';
 import i18n from 'locales/initTranslation';
 import { getCurrentShardSelector } from 'registration/selectors/registrationSelectors';
 import {
@@ -52,9 +51,7 @@ export function* loginToWalletSaga({ payload }: { payload?: LoginToWalletSagaInp
     } while (subChain.result !== 'found');
 
     yield setKeyToApplicationStorage('address', address);
-    if (isWallet) {
-      yield setKeyToApplicationStorage('wif', wif);
-    }
+    yield setKeyToApplicationStorage('wif', wif);
     yield* put(setWalletData({
       address: payload?.address!,
       wif: payload?.wif!,

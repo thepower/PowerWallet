@@ -2,7 +2,7 @@ import { Button } from 'common';
 import React from 'react';
 import { WithTranslation, withTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
-import { proceedToHub } from '../../../slice/registrationSlice';
+import { proceedToWallet } from '../../../slice/registrationSlice';
 import styles from '../../Registration.module.scss';
 import { RegistrationBackground } from '../../common/RegistrationBackground';
 import { RegistrationStatement } from '../../common/RegistrationStatement';
@@ -10,7 +10,7 @@ import { ExportAccountModal } from './ExportAccountModal';
 
 const mapStateToProps = () => ({});
 const mapDispatchToProps = {
-  proceedToHub,
+  proceedToWallet,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -37,8 +37,8 @@ class BackupComponent extends React.PureComponent<BackupProps, BackupState> {
     this.setState({ openedPasswordModal: false });
   };
 
-  handleProceedToHub = () => {
-    this.props.proceedToHub();
+  handleProceedToWallet = () => {
+    this.props.proceedToWallet();
   };
 
   render() {
@@ -59,7 +59,7 @@ class BackupComponent extends React.PureComponent<BackupProps, BackupState> {
           size="medium"
           variant="outlined"
           type="button"
-          onClick={this.handleProceedToHub}
+          onClick={this.handleProceedToWallet}
         >
           {this.props.t('skip')}
         </Button>

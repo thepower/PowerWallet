@@ -66,7 +66,7 @@ class RegistrationPageComponent extends React.PureComponent<RegistrationPageProp
 
   renderWelcome = () => (
     <>
-      <div className={styles.registrationTitle}>{'Power Hub'}</div>
+      <div className={styles.registrationTitle}>{'Power Wallet'}</div>
       <div className={styles.registrationDesc}>
         {this.props.t('registrationPageDesc')}
       </div>

@@ -6,7 +6,7 @@ import { BigNumber, formatFixed } from '@ethersproject/bignumber';
 
 import { Link } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { CheckedIcon, LogoIcon, UnCheckedIcon } from 'common/icons';
+import { CheckedIcon, LogoIcon, UnCheckedIcon } from 'assets/icons';
 import styles from './Asset.module.scss';
 
 type OwnProps = {

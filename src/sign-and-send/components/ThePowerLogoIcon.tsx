@@ -1,4 +1,4 @@
-import { SvgIcon } from 'common/icons/typings';
+import { SvgIcon } from 'assets/icons/typings';
 import React from 'react';
 
 /* eslint-disable max-len */

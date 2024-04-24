@@ -13,7 +13,7 @@ import {
   ModalLoader,
   OutlinedInput,
 } from 'common';
-import { CheckedIcon, ChevronDown, UnCheckedIcon } from 'common/icons';
+import { CheckedIcon, ChevronDown, UnCheckedIcon } from 'assets/icons';
 import { checkIfLoading } from 'network/selectors';
 import React from 'react';
 import { WithTranslation, withTranslation } from 'react-i18next';

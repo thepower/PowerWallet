@@ -8,7 +8,7 @@ import { WithTranslation, withTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { getWalletAddress } from '../../account/selectors/accountSelectors';
 import { RootState } from '../../application/store';
-import { FaucetSvg, SendSvg } from '../../common/icons';
+import { FaucetSvg, SendSvg } from '../../assets/icons';
 import { TransactionType } from '../slices/transactionsSlice';
 import styles from './Transaction.module.scss';
 import {

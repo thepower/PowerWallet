@@ -12,13 +12,3 @@ export enum WalletRoutesEnum {
   login = '/login',
   sso = '/sso',
 }
-
-export enum HubRoutesEnum {
-  myAssets = '/my-assets',
-  discover = '/discover',
-  myPlace = '/my-place',
-  build = '/build',
-  contribute = '/contribute',
-  sso = '/sso',
-  root = '/',
-}

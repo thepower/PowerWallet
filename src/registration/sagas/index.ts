@@ -4,18 +4,18 @@ import {
   createWallet,
   generateSeedPhrase,
   loginToWalletFromRegistration,
-  proceedToHub,
+  proceedToWallet,
 } from '../slice/registrationSlice';
 import {
   createWalletSaga,
   generateSeedPhraseSaga,
   loginToWalletSaga,
-  proceedToHubSaga,
+  proceedToWalletSaga,
 } from './registrationSaga';
 
 export default function* () {
   yield* takeLatest(generateSeedPhrase, manageSagaState(generateSeedPhraseSaga));
   yield* takeLatest(loginToWalletFromRegistration, manageSagaState(loginToWalletSaga));
   yield* takeLatest(createWallet, manageSagaState(createWalletSaga));
-  yield* takeLatest(proceedToHub, manageSagaState(proceedToHubSaga));
+  yield* takeLatest(proceedToWallet, manageSagaState(proceedToWalletSaga));
 }
