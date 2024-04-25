@@ -1,6 +1,9 @@
 import React from 'react';
 import {
-  Tab, Box, Tabs as MUITabs, TabsProps as MUITabsProps,
+  Tab,
+  Box,
+  Tabs as MUITabs,
+  TabsProps as MUITabsProps,
 } from '@mui/material';
 import classnames from 'classnames';
 import styles from './Tabs.module.scss';
@@ -59,8 +62,16 @@ class TabsComponent extends React.PureComponent<TabsProps> {
     } = this.props;
 
     return (
-      <Box className={classnames(styles.tabsHolder, tabsHolderClassName)} sx={this.boxSx}>
-        <MUITabs value={value} onChange={onChange} classes={this.getTabsClasses()}>
+      <Box
+        className={classnames(styles.tabsHolder, tabsHolderClassName)}
+        sx={this.boxSx}
+      >
+        <MUITabs
+          value={value}
+          onChange={onChange}
+          classes={this.getTabsClasses()}
+          centered
+        >
           {Object.keys(tabs).map(this.renderTab)}
         </MUITabs>
       </Box>

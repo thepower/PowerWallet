@@ -2,7 +2,7 @@ import {
   BreadcrumbsDataType,
   BreadcrumbsTypeEnum,
   Button,
-  LangSelect,
+  LangMenu,
   PELogoWithTitle,
   Wizard,
 } from 'common';
@@ -112,7 +112,7 @@ class RegistrationPageComponent extends React.PureComponent<RegistrationPageProp
 
     return <div className={styles.registrationPage}>
       <div className={styles.registrationPageCover} />
-      <LangSelect
+      <LangMenu
         className={styles.langSelect}
       />
       {enterButtonPressed ? this.renderRegistration() : this.renderWelcome()}

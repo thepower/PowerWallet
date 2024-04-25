@@ -57,7 +57,7 @@ export function* addTokenSaga({ payload: address }: ReturnType<typeof addTokenTr
     yield put(addToken({
       name, symbol, address, decimals, type: 'erc20', amount: balance, isShow: true,
     }));
-    yield* put(push(WalletRoutesEnum.myAssets));
+    yield* put(push(WalletRoutesEnum.root));
   } catch (error: any) {
     toast.error(`${i18n.t('somethingWentWrongCode')} ${error?.code}`);
   }

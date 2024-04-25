@@ -1,20 +1,23 @@
-import React from 'react';
+import React, {
+  useState, useEffect, useMemo, useCallback,
+} from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-
-import { Button, DeepPageTemplate } from 'common';
-
+import { Button, PageTemplate } from 'common';
 import { RootState } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import Asset from 'myAssets/components/Asset';
+import { Asset } from 'myAssets/components/Asset';
 import { getTokenByID, getTokens } from 'myAssets/selectors/tokensSelectors';
-import { getWalletNativeTokensAmountByID, getWalletNativeTokensAmounts } from 'myAssets/selectors/walletSelectors';
 import {
-  addTokenTrigger, toggleTokenShow,
-  TokenType,
+  getWalletNativeTokensAmountByID,
+  getWalletNativeTokensAmounts,
+} from 'myAssets/selectors/walletSelectors';
+import {
+  addTokenTrigger,
+  toggleTokenShow,
   updateTokensAmountsTrigger,
 } from 'myAssets/slices/tokensSlice';
 import { TokenPayloadType } from 'myAssets/types';
-import { WithTranslation, withTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styles from './AssetSelectionPage.module.scss';
 
@@ -31,78 +34,97 @@ const mapStateToProps = (state: RootState) => ({
   getWalletNativeTokensAmountByID: (symbol: string) => getWalletNativeTokensAmountByID(state, symbol),
 });
 
-interface AssetSelectionPageState {
-  selectedAsset: string;
-}
-
 const connector = connect(mapStateToProps, mapDispatchToProps);
-type AssetSelectionPageProps = ConnectedProps<typeof connector> & WithTranslation;
+type AssetSelectionPageProps = ConnectedProps<typeof connector>;
 
-class AssetSelectionPageComponent extends React.PureComponent<AssetSelectionPageProps, AssetSelectionPageState> {
-  constructor(props: AssetSelectionPageProps) {
-    super(props);
+const AssetSelectionPageComponent: React.FC<AssetSelectionPageProps> = ({
+  tokens: erc20Tokens,
+  getTokenByID,
+  getWalletNativeTokensAmountByID,
+  amounts,
+  updateTokensAmountsTrigger,
+}) => {
+  const [selectedAsset, setSelectedAsset] = useState<string>('');
+  const { t } = useTranslation();
 
-    this.state = {
-      selectedAsset: '',
-    };
-  }
+  useEffect(() => {
+    updateTokensAmountsTrigger();
+  }, []);
 
-  componentDidMount() {
-    this.props.updateTokensAmountsTrigger();
-  }
+  const onClickCheckBox = useCallback(
+    (value: string) => {
+      setSelectedAsset((prevState) => (prevState === value ? '' : value));
+    },
+    [setSelectedAsset],
+  );
 
-  onClickCheckBox = (value: string) => {
-    const { selectedAsset } = this.state;
-    this.setState({ selectedAsset: selectedAsset === value ? '' : value });
-  };
+  const nativeTokens = useMemo(
+    () => Object.entries(amounts).map(
+      ([symbol, amount]) => ({
+        type: 'native',
+        name: symbol,
+        address: symbol,
+        symbol,
+        decimals: '9',
+        amount,
+      } as TokenPayloadType),
+    ),
+    [amounts],
+  );
 
-  renderAssetsList = (assets: TokenType[]) => {
-    const { state, onClickCheckBox } = this;
-    return (
+  const tokens = useMemo(
+    () => [...nativeTokens, ...erc20Tokens],
+    [nativeTokens, erc20Tokens],
+  );
+
+  const renderAssetsList = useCallback(
+    () => (
       <ul className={styles.tokensList}>
-        {assets.map((token) => (
+        {tokens.map((token) => (
           <li key={token.address}>
             <Asset
               asset={token}
-              isCheckBoxChecked={token.type === 'native' ?
-                state.selectedAsset === token.symbol :
-                state.selectedAsset === token.address}
+              isCheckBoxChecked={
+                token.type === 'native'
+                  ? selectedAsset === token.symbol
+                  : selectedAsset === token.address
+              }
               onClickCheckBox={onClickCheckBox}
             />
-          </li>))}
-      </ul>);
-  };
+          </li>
+        ))}
+      </ul>
+    ),
+    [tokens, selectedAsset, onClickCheckBox],
+  );
 
-  render() {
-    const {
-      tokens: erc20Tokens, getTokenByID, getWalletNativeTokensAmountByID, amounts,
-    } = this.props;
-    const { selectedAsset } = this.state;
+  const nativeAssetAmount = getWalletNativeTokensAmountByID(selectedAsset);
+  const asset = getTokenByID(selectedAsset);
+  const assetIndetifier = nativeAssetAmount
+    ? selectedAsset
+    : asset?.address || '';
+  const assetType = nativeAssetAmount ? 'native' : asset?.type || '';
 
-    const nativeTokens = Object.entries(amounts).map(([symbol, amount]) => ({
-      type: 'native',
-      name: symbol,
-      address: symbol,
-      symbol,
-      decimals: '9',
-      amount,
-    }) as TokenPayloadType);
+  return (
+    <PageTemplate
+      topBarChild={t('assetSelection')}
+      backUrl="/"
+      backUrlText={t('myAssets')!}
+    >
+      <div className={styles.assetSelection}>
+        <div className={styles.tokens}>{renderAssetsList()}</div>
+        <Link to={`/${assetType}/${assetIndetifier}${WalletRoutesEnum.send}`}>
+          <Button
+            disabled={!asset && !nativeAssetAmount}
+            className={styles.assetSelectionFixedButton}
+            variant="filled"
+          >
+            {t('next')}
+          </Button>
+        </Link>
+      </div>
+    </PageTemplate>
+  );
+};
 
-    const nativeAssetAmount = getWalletNativeTokensAmountByID(selectedAsset);
-    const asset = getTokenByID(selectedAsset);
-    const assetIndetifier = nativeAssetAmount ? selectedAsset : asset?.address;
-    const assetType = nativeAssetAmount ? 'native' : asset?.type;
-    return (
-      <DeepPageTemplate topBarTitle={this.props.t('assetSelection')} backUrl="/my-assets" backUrlText={this.props.t('myAssets')!}>
-        <div className={styles.assetSelection}>
-          <div className={styles.tokens}>{this.renderAssetsList([...nativeTokens, ...erc20Tokens])}</div>
-          <Link to={`${WalletRoutesEnum.myAssets}/${assetType}/${assetIndetifier}${WalletRoutesEnum.send}`}>
-            <Button disabled={!asset && !nativeAssetAmount} className={styles.assetSelectionFixedButton} variant="filled">{this.props.t('next')}</Button>
-          </Link>
-        </div>
-      </DeepPageTemplate>
-    );
-  }
-}
-
-export const AssetSelectionPage = withTranslation()(connector(AssetSelectionPageComponent));
+export const AssetSelectionPage = connector(AssetSelectionPageComponent);

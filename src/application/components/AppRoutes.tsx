@@ -7,9 +7,8 @@ import { checkIfLoading } from 'network/selectors';
 import { AddAssetsPage } from 'myAssets/pages/AddAssets/AddAssetsPage';
 import { AssetTransactionsPage } from 'myAssets/pages/AssetTransactions/AssetTransactionsPage';
 import { AssetSelectionPage } from 'myAssets/pages/AssetSelection/AssetSelectionPage';
-import MyAssets from 'myAssets/components/MyAssets';
+import { MyAssets } from 'myAssets/components/MyAssets';
 import Send from 'send/components/Send';
-import { WalletHome } from 'home/components/pages/WalletHome';
 import SignAndSendPage from 'sign-and-send/components/SingAndSendPage';
 import WalletSSOPage from 'sso/components/pages/WalletSSOPage';
 import { RegistrationForAppsPage } from 'registration/components/RegistrationForAppsPage';
@@ -38,25 +37,22 @@ const AppRoutesComponent: React.FC = () => {
       <Route exact path={WalletRoutesEnum.signup} component={RegistrationPage} />
       <Route exact path={`${WalletRoutesEnum.registrationForApps}/:data`} component={RegistrationForAppsPage} />
       <Route exact path={WalletRoutesEnum.login} component={LoginPage} />
-      <Route path={`${WalletRoutesEnum.myAssets}/:type/:address${WalletRoutesEnum.send}`} component={Send} />
-      <Route exact path={`${WalletRoutesEnum.myAssets}${WalletRoutesEnum.add}`}>
+      <Route path={`/:type/:address${WalletRoutesEnum.send}`} component={Send} />
+      <Route exact path={`${WalletRoutesEnum.add}`}>
         <AddAssetsPage />
       </Route>
       <Route
-        path={`${WalletRoutesEnum.myAssets}/:type/:address${WalletRoutesEnum.transactions}`}
+        path={`/:type/:address${WalletRoutesEnum.transactions}`}
         component={AssetTransactionsPage}
       />
       <Route
-        path={`${WalletRoutesEnum.myAssets}${WalletRoutesEnum.assetSelection}`}
+        path={`${WalletRoutesEnum.assetSelection}`}
         component={AssetSelectionPage}
         exact
       />
-      <Route path={`${WalletRoutesEnum.myAssets}${WalletRoutesEnum.signAndSend}/:message`} component={SignAndSendPage} />
-      <Route exact path={WalletRoutesEnum.myAssets}>
-        <MyAssets />
-      </Route>
+      <Route path={`${WalletRoutesEnum.signAndSend}/:message`} component={SignAndSendPage} />
       <Route path={`${WalletRoutesEnum.sso}/:data`} component={WalletSSOPage} />
-      <Route exact path={WalletRoutesEnum.root} component={WalletHome} />
+      <Route exact path={WalletRoutesEnum.root} component={MyAssets} />
     </Switch>
   );
 };

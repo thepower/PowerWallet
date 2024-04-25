@@ -1,8 +1,8 @@
 import { push } from 'connected-react-router';
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
-import { DeepPageTemplate, FullScreenLoader } from 'common';
+import { PageTemplate, FullScreenLoader } from 'common';
 
 import { RootState } from 'application/store';
 
@@ -10,16 +10,21 @@ import { isEmpty } from 'lodash';
 import Transaction from 'myAssets/components/Transaction';
 import { getTokenByID } from 'myAssets/selectors/tokensSelectors';
 import { getGroupedWalletTransactions } from 'myAssets/selectors/transactionsSelectors';
-import { loadTransactionsTrigger, resetTransactionsState, TransactionType } from 'myAssets/slices/transactionsSlice';
+import {
+  loadTransactionsTrigger,
+  resetTransactionsState,
+} from 'myAssets/slices/transactionsSlice';
 import { setLastBlockToInitialLastBlock } from 'myAssets/slices/walletSlice';
 import { TokenKind } from 'myAssets/types';
 import { checkIfLoading } from 'network/selectors';
-import { WithTranslation, withTranslation } from 'react-i18next';
+import {
+  useTranslation,
+} from 'react-i18next';
 import { InView } from 'react-intersection-observer';
 import { RouteComponentProps } from 'react-router';
 import styles from './AssetTransactionsPage.module.scss';
 
-type OwnProps = RouteComponentProps<{ type: TokenKind, address: string }>;
+type OwnProps = RouteComponentProps<{ type: TokenKind; address: string }>;
 
 const mapDispatchToProps = {
   routeTo: push,
@@ -37,27 +42,37 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
-type AssetTransactionsPageProps = ConnectedProps<typeof connector> & WithTranslation;
+type AssetTransactionsPageProps = ConnectedProps<typeof connector>;
 
-class AssetTransactionsPageComponent extends React.PureComponent<AssetTransactionsPageProps> {
-  componentDidMount() {
-    this.props.setLastBlockToInitialLastBlock();
-    this.props.resetTransactionsState();
-  }
+const AssetTransactionsPageComponent: React.FC<AssetTransactionsPageProps> = ({
+  type,
+  address,
+  token,
+  loading,
+  transactions,
+  setLastBlockToInitialLastBlock,
+  resetTransactionsState,
+  loadTransactionsTrigger,
+}) => {
+  const { t } = useTranslation();
 
-  handleChangeView = (inView: boolean) => {
-    const { type, address } = this.props;
+  useEffect(() => {
+    setLastBlockToInitialLastBlock();
+    resetTransactionsState();
+  }, []);
+
+  const handleChangeView = (inView: boolean) => {
     if (inView) {
       if (type === 'native') {
-        this.props.loadTransactionsTrigger();
+        loadTransactionsTrigger();
       } else {
-        this.props.loadTransactionsTrigger({ tokenAddress: address });
+        loadTransactionsTrigger({ tokenAddress: address });
       }
     }
   };
 
-  renderTransactionsList = ([date, transactions]: [date: string, transactions: TransactionType[]]) => (
-    <li key={date}>
+  const renderTransactionsList = useCallback(() => (
+    Object.entries(transactions).map(([date, transactions]) => <li key={date}>
       <p className={styles.date}>{date}</p>
       <ul className={styles.transactionsList}>
         {transactions.map((trx) => (
@@ -66,33 +81,33 @@ class AssetTransactionsPageComponent extends React.PureComponent<AssetTransactio
           </li>
         ))}
       </ul>
-    </li>
-  );
+    </li>)
+  ), [JSON.stringify(transactions)]);
 
-  render() {
-    const {
-      transactions, token, address, type, loading,
-    } = this.props;
+  const tokenSymbol = type === 'native' ? address : token?.symbol;
 
-    const tokenSymbol = type === 'native' ? address : token?.symbol;
-
-    if (loading && isEmpty(transactions)) {
-      return <FullScreenLoader />;
-    }
-
-    return (
-      <DeepPageTemplate topBarTitle={`${tokenSymbol} ${this.props.t('transactions')}`} backUrl="/my-assets" backUrlText={this.props.t('myAssets')!}>
-        <div className={styles.AssetTransactionsPage}>
-          <div className={styles.transactions}>
-            <ul className={styles.groupByDates}>{Object.entries(transactions).map(this.renderTransactionsList)}</ul>
-          </div>
-          <InView onChange={this.handleChangeView}>
-            <div />
-          </InView>
-        </div>
-      </DeepPageTemplate>
-    );
+  if (loading && isEmpty(transactions)) {
+    return <FullScreenLoader />;
   }
-}
 
-export const AssetTransactionsPage = withTranslation()(connector(AssetTransactionsPageComponent));
+  return (
+    <PageTemplate
+      topBarChild={`${tokenSymbol} ${t('transactions')}`}
+      backUrl="/"
+      backUrlText={t('home')!}
+    >
+      <div className={styles.AssetTransactionsPage}>
+        <div className={styles.transactions}>
+          <ul className={styles.groupByDates}>
+            {renderTransactionsList()}
+          </ul>
+        </div>
+        <InView onChange={handleChangeView}>
+          <div />
+        </InView>
+      </div>
+    </PageTemplate>
+  );
+};
+
+export const AssetTransactionsPage = connector(AssetTransactionsPageComponent);

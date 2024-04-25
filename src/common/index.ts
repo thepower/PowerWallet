@@ -1,6 +1,5 @@
 // components
 export { default as CopyButton } from './copyButton/CopyButton';
-export { Page } from './page/Page';
 export { default as Button } from './button/Button';
 export { LinkBlock } from './linkBlock/LinkBlock';
 export { Modal } from './modal/Modal';
@@ -15,9 +14,8 @@ export { default as ArrowLink } from './arrowLink/ArrowLink';
 export { default as CardLink } from './cardLink/CardLink';
 export { default as IconButton } from './iconButton/IconButton';
 export { default as TopBar } from './topBar/TopBar';
-export { default as ShallowPageTemplate } from './shallowPageTemplate/ShallowPageTemplate';
 export { default as Divider } from './divider/Divider';
-export { default as DeepPageTemplate } from './deepPageTemplate/DeepPageTemplate';
+export { default as PageTemplate } from './pageTemplate/PageTemplate';
 export { default as SearchInput } from './searchInput/SearchInput';
 export { default as TxResult } from './txResult/TxResult';
 export { UnderConstruction } from './underConstruction/UnderConstruction';
@@ -25,7 +23,7 @@ export { Checkbox } from './checkbox/Checkbox';
 export { Switch } from './switch/Switch';
 export { Pagination } from './pagination/Pagination';
 export { PaginationList } from './pagination/PaginationList';
-export { LangSelect } from './langSelect/LangSelect';
+export { LangMenu } from './langMenu/LangMenu';
 
 // types
 export type { UnknownFunctionType } from './typings/common';

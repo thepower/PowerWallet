@@ -2,8 +2,10 @@
 @import '../../styles/variables';
 
 .bar {
-  position: relative;
-  z-index: 1;
+  position: sticky;
+  z-index: 300;
+
+  top: 0;
   display: flex;
   width: 100%;
   flex-direction: row;
@@ -17,28 +19,6 @@
   }
 }
 
-.deep,
-.shallow {
-  position: sticky;
-  z-index: 300;
-  top: 0;
-}
-
-.shallow {
-  @include mobile {
-    position: static;
-    height: $top-bar-mobile;
-    padding: 24px 15px 12px;
-  }
-}
-
-.childrenInsideBar {
-  flex: 1 1 auto;
-
-  @include mobile {
-    display: none;
-  }
-}
 
 .childrenOutsideBar {
   display: none;
@@ -52,29 +32,18 @@
   }
 }
 
-.accountHolder {
-  display: none;
-
-  @include mobile {
-    display: block;
-  }
-}
 
 .controlsSet {
   display: flex;
   align-items: center;
 }
 
-.mlA {
-  margin-left: auto;
-}
 
 .title {
-  position: absolute;
-  left: 50%;
-  color: #f5f5f7;
+
+  @include text-gradient();
   font-size: 24px;
-  font-weight: 500;
+  font-style: normal;
+  font-weight: 700;
   line-height: 28px;
-  transform: translateX(-50%);
 }

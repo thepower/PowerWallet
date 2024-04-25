@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, memo } from 'react';
 import { TokenType } from 'myAssets/slices/tokensSlice';
 import cn from 'classnames';
 import { Checkbox, Divider, Switch } from 'common';
@@ -18,20 +18,15 @@ type OwnProps = {
 
 type AssetProps = OwnProps;
 
-class Asset extends React.PureComponent<AssetProps> {
-  get formattedAmount() {
-    const { asset } = this.props;
-    const { amount, decimals, type } = asset;
+const AssetComponent: FC<AssetProps> = ({
+  asset, isCheckBoxChecked, onClickSwitch, onClickCheckBox,
+}) => {
+  const { amount, decimals, type } = asset;
+  const formattedAmount = type === 'erc20'
+    ? formatFixed(BigNumber.from(amount), decimals)
+    : amount;
 
-    return type === 'erc20'
-      ? formatFixed(BigNumber.from(amount), decimals)
-      : amount;
-  }
-
-  onClickAsset = () => {
-    const {
-      asset, onClickSwitch, onClickCheckBox,
-    } = this.props;
+  const onClickAsset = () => {
     if (onClickSwitch) {
       onClickSwitch(!asset.isShow);
     }
@@ -40,28 +35,21 @@ class Asset extends React.PureComponent<AssetProps> {
     }
   };
 
-  renderWrapper = (children: React.ReactNode) => {
-    const { asset, onClickSwitch, onClickCheckBox } = this.props;
+  const renderWrapper = (children: React.ReactNode) => (onClickSwitch || onClickCheckBox ?
+    <div onClick={onClickAsset} className={styles.asset}>{children}</div>
+    : <Link
+        to={`/${asset.type}/${asset.address}${WalletRoutesEnum.transactions}`}
+        className={styles.asset}
+    >
+      {children}
+    </Link>);
 
-    return onClickSwitch || onClickCheckBox ?
-      <div onClick={this.onClickAsset} className={styles.asset}>{children}</div>
-      : <Link
-          to={`${WalletRoutesEnum.myAssets}/${asset.type}/${asset.address}${WalletRoutesEnum.transactions}`}
-          className={styles.asset}
-      >
-        {children}
-      </Link>;
-  };
-
-  renderSymbol = () => {
-    const { onClickCheckBox, asset } = this.props;
+  const renderSymbol = () => {
     const { symbol } = asset;
-    return onClickCheckBox ? `${symbol} ${this.formattedAmount}` : symbol;
+    return onClickCheckBox ? `${symbol} ${formattedAmount}` : symbol;
   };
 
-  renderIcon = () => {
-    const { asset } = this.props;
-
+  const renderIcon = () => {
     switch (asset.address) {
       case 'SK':
         return <LogoIcon />;
@@ -71,12 +59,7 @@ class Asset extends React.PureComponent<AssetProps> {
     }
   };
 
-  renderRightCol = () => {
-    const {
-      asset, onClickSwitch, onClickCheckBox, isCheckBoxChecked,
-    } = this.props;
-    const { formattedAmount } = this;
-
+  const renderRightCol = () => {
     if (onClickSwitch) {
       return <Switch
         className={styles.assetSwitch}
@@ -98,31 +81,23 @@ class Asset extends React.PureComponent<AssetProps> {
     </span>;
   };
 
-  render() {
-    const { asset } = this.props;
-    const { renderRightCol, renderSymbol, renderIcon } = this;
-    const {
-      name,
-    } = asset;
+  return (
+    <>
+      {renderWrapper(
+        <div className={styles.row}>
+          <div className={cn(styles.icon)}>{renderIcon()}</div>
+          <div className={styles.info}>
+            <span className={styles.symbol}>{renderSymbol()}</span>
+            <span className={styles.name}>
+              {asset?.name}
+            </span>
+          </div>
+          {renderRightCol()}
+        </div>,
+      )}
+      <Divider className={styles.divider} />
+    </>
+  );
+};
 
-    return (
-      <>
-        {this.renderWrapper(
-          <div className={styles.row}>
-            <div className={cn(styles.icon)}>{renderIcon()}</div>
-            <div className={styles.info}>
-              <span className={styles.symbol}>{renderSymbol()}</span>
-              <span className={styles.name}>
-                {name}
-              </span>
-            </div>
-            {renderRightCol()}
-          </div>,
-        )}
-        <Divider className={styles.divider} />
-      </>
-    );
-  }
-}
-
-export default Asset;
+export const Asset = memo(AssetComponent);

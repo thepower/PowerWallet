@@ -26,3 +26,5 @@ export { ReactComponent as HeartIcon } from './heart.svg';
 export { ReactComponent as ShareIcon } from './share.svg';
 export { ReactComponent as RefreshIcon } from './refresh.svg';
 export { ReactComponent as SearchIcon } from './searchIcon.svg';
+export { ReactComponent as MenuIcon } from './menu.svg';
+export { ReactComponent as LangIcon } from './lang.svg';

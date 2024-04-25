@@ -12,9 +12,6 @@
   text-decoration: none !important;
 }
 
-.accountDataHolder {
-  display: flex;
-}
 
 .account {
   display: flex;
@@ -28,23 +25,16 @@
     font-size: 14px;
     line-height: 16px;
 
-    > *:first-of-type {
+    >*:first-of-type {
       text-decoration: none;
     }
   }
 }
 
-.img {
-  overflow: hidden;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 12px;
-}
+
 
 .drawerPaper {
   z-index: 250;
-  left: $aside-width;
   display: flex;
   width: $aside-width;
   flex-direction: column;
@@ -75,7 +65,7 @@
 }
 
 .drawerBackdrop {
-  background-color: transparent !important;
+  backdrop-filter: blur(2px);
 }
 
 .accountTitle {

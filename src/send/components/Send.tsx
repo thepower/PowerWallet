@@ -17,7 +17,7 @@ import { getWalletAddress, getWalletData } from '../../account/selectors/account
 import { RootState } from '../../application/store';
 import { WalletRoutesEnum } from '../../application/typings/routes';
 import {
-  Button, DeepPageTemplate, Divider, FullScreenLoader,
+  Button, PageTemplate, Divider, FullScreenLoader,
 } from '../../common';
 import { LogoIcon, MoneyBugIcon } from '../../assets/icons';
 import TxResult from '../../common/txResult/TxResult';
@@ -252,9 +252,9 @@ class Send extends React.Component<SendProps, SendState> {
 
     if (sentData) {
       return (
-        <DeepPageTemplate
-          topBarTitle={this.props.t('send')}
-          backUrl={WalletRoutesEnum.myAssets}
+        <PageTemplate
+          topBarChild={this.props.t('send')}
+          backUrl={WalletRoutesEnum.root}
           backUrlText={this.props.t('myAssets')!}
         >
           <TxResult sentData={{
@@ -262,12 +262,12 @@ class Send extends React.Component<SendProps, SendState> {
             amount: `${sentData.amount} ${assetSymbol}`,
           }}
           />
-        </DeepPageTemplate>
+        </PageTemplate>
       );
     }
 
     return (
-      <DeepPageTemplate topBarTitle={this.props.t('send')} backUrl={WalletRoutesEnum.myAssets} backUrlText={this.props.t('myAssets')!}>
+      <PageTemplate topBarChild={this.props.t('send')} backUrl={WalletRoutesEnum.root} backUrlText={this.props.t('myAssets')!}>
         <div className={styles.content}>
           <div className={styles.walletInfo}>
             <span className={styles.titleBalance}>{this.props.t('totalBalance')}</span>
@@ -286,7 +286,7 @@ class Send extends React.Component<SendProps, SendState> {
             {this.renderForm}
           </Formik>
         </div>
-      </DeepPageTemplate>
+      </PageTemplate>
     );
   }
 }

@@ -1,8 +1,8 @@
 import { put, select } from 'typed-redux-saga';
 import { push, createMatchSelector } from 'connected-react-router';
 import { NetworkApi, WalletApi } from '@thepowereco/tssdk';
-import { setDynamicApis, setTestnetAvailable, setNetworkChains } from '../slice/applicationSlice';
-import { CURRENT_NETWORK, getIsProductionOnlyDomains } from '../utils/applicationUtils';
+import { setDynamicApis, setNetworkChains } from '../slice/applicationSlice';
+import { CURRENT_NETWORK } from '../utils/applicationUtils';
 import { getKeyFromApplicationStorage } from '../utils/localStorageUtils';
 import { loginToWalletSaga } from '../../account/sagas/accountSaga';
 import { setWalletData } from '../../account/slice/accountSlice';
@@ -25,10 +25,6 @@ export function* initApplicationSaga() {
   yield* reInitApis({ payload: defaultChain });
   let address = '';
   let wif = '';
-
-  if (process.env.NODE_ENV !== 'test' && getIsProductionOnlyDomains()) {
-    yield* put(setTestnetAvailable(false));
-  }
 
   const chains: number[] = yield NetworkApi.getNetworkChains(CURRENT_NETWORK);
   yield put(setNetworkChains(chains.sort()));

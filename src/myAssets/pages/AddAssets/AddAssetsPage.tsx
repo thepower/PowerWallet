@@ -4,8 +4,8 @@ import { connect, ConnectedProps } from 'react-redux';
 
 import { OutlinedInput } from '@mui/material';
 import { RootState } from 'application/store';
-import { Button, DeepPageTemplate, Tabs } from 'common';
-import Asset from 'myAssets/components/Asset';
+import { Button, PageTemplate, Tabs } from 'common';
+import { Asset } from 'myAssets/components/Asset';
 import { getTokens } from 'myAssets/selectors/tokensSelectors';
 import { getWalletNativeTokensAmounts } from 'myAssets/selectors/walletSelectors';
 import { addTokenTrigger, toggleTokenShow, TokenType } from 'myAssets/slices/tokensSlice';
@@ -137,7 +137,7 @@ class AddAssetsPageComponent extends React.PureComponent<AddAssetsPageProps, Add
     });
 
     return (
-      <DeepPageTemplate topBarTitle={this.props.t('addAssets')} backUrl="/my-assets" backUrlText={this.props.t('myAssets')!}>
+      <PageTemplate topBarChild={this.props.t('addAssets')} backUrl="/" backUrlText={this.props.t('myAssets')!}>
         <div className={styles.addAssetsPage}>
           <SearchInput
             className={styles.addAssetsPageSearchInput}
@@ -160,7 +160,7 @@ class AddAssetsPageComponent extends React.PureComponent<AddAssetsPageProps, Add
             ? this.renderAddAssetsForm()
             : <div className={styles.tokens}>{this.renderAssetsList(filteredAssets)}</div>}
         </div>
-      </DeepPageTemplate>
+      </PageTemplate>
     );
   }
 }
