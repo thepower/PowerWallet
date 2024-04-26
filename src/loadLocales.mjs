@@ -20,7 +20,7 @@ const auth = new google.auth.GoogleAuth({
 
 google.options({ auth });
 
-const fileId = '1qhCzGaDhJ33yNFEKN4VKlA2ZKqNvCsHDRkrCO5wOJVY';
+const fileId = '1T6E0jgp7L3-Qrnr2B7WrGm966wSOoyB_J6r0kFwfLEU';
 
 async function loadLocales() {
   const res = await drive.files.export({

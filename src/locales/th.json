@@ -66,7 +66,7 @@
     "send": "ส่ง",
     "buy": "ซื้อ",
     "totalBalance": "ยอดรวมคงเหลือ",
-    "addAssets": "เพิ่มสินทรัพย์",
+    "addToken": "เพิ่มโทเค็น",
     "tx": "รายการ",
     "cur": "สกุลเงิน",
     "timestamp": "บันทึกเวลา",
@@ -182,8 +182,10 @@
     "return": "กลับ",
     "returnURL": "URL ส่งคืน",
     "insufficientFunds": "เงินทุนไม่เพียงพอ",
-    "iOSAndIPadOSDevicesNotSupported": "Извините. Устройства с ОС iOS и iPad в настоящее время не поддерживаются. Попробуйте зарегистрироваться на настольных компьютерах или устройствах Android.",
     "close": "Close",
-    "byClickingSignAndSend": "โดยการคลิก\"ลงชื่อและส่ง\"คุณจะอนุมัติการดำเนินการนี้"
+    "byClickingSignAndSend": "โดยการคลิก\"ลงชื่อและส่ง\"คุณจะอนุมัติการดำเนินการนี้",
+    "accountNumber": "เลขที่บัญชี",
+    "skBalance": "SK สมดุล",
+    "tokens": "โทเค็น"
   }
 }

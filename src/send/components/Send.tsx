@@ -6,14 +6,17 @@ import {
   Form, Formik, FormikHelpers, FormikProps,
 } from 'formik';
 import { getTokenByID } from 'myAssets/selectors/tokensSelectors';
-import { getWalletNativeTokensAmountByID } from 'myAssets/selectors/walletSelectors';
+import { getWalletNativeTokensAmountByAddress } from 'myAssets/selectors/walletSelectors';
 import { TokenKind } from 'myAssets/types';
 import React from 'react';
 import { WithTranslation, withTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import * as yup from 'yup';
-import { getWalletAddress, getWalletData } from '../../account/selectors/accountSelectors';
+import {
+  getWalletAddress,
+  getWalletData,
+} from '../../account/selectors/accountSelectors';
 import { RootState } from '../../application/store';
 import { WalletRoutesEnum } from '../../application/typings/routes';
 import {
@@ -23,11 +26,15 @@ import { LogoIcon, MoneyBugIcon } from '../../assets/icons';
 import TxResult from '../../common/txResult/TxResult';
 import { checkIfLoading } from '../../network/selectors';
 import { getSentData } from '../selectors/sendSelectors';
-import { clearSentData, sendTokenTrxTrigger, sendTrxTrigger } from '../slices/sendSlice';
+import {
+  clearSentData,
+  sendTokenTrxTrigger,
+  sendTrxTrigger,
+} from '../slices/sendSlice';
 import ConfirmSendModal from './ConfirmSendModal';
 import styles from './Send.module.scss';
 
-type OwnProps = RouteComponentProps<{ type: TokenKind, address: string }>;
+type OwnProps = RouteComponentProps<{ type: TokenKind; address: string }>;
 
 const mapDispatchToProps = {
   clearSentData,
@@ -39,17 +46,19 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
   address: getWalletAddress(state),
   sentData: getSentData(state),
   token: getTokenByID(state, props?.match?.params?.address),
-  nativeTokenAmount: getWalletNativeTokensAmountByID(state, props?.match?.params?.address),
+  nativeTokenAmount: getWalletNativeTokensAmountByAddress(
+    state,
+    props?.match?.params?.address,
+  ),
   tokenType: props?.match?.params?.type,
   tokenAddress: props?.match?.params?.address,
-  loading: checkIfLoading(state, sendTrxTrigger.type) || checkIfLoading(state, sendTokenTrxTrigger.type),
+  loading:
+    checkIfLoading(state, sendTrxTrigger.type) ||
+    checkIfLoading(state, sendTokenTrxTrigger.type),
   wif: getWalletData(state).wif,
 });
 
-const connector = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
+const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type SendProps = ConnectedProps<typeof connector> & WithTranslation;
 
@@ -91,9 +100,7 @@ class Send extends React.Component<SendProps, SendState> {
   }
 
   get formattedAmount() {
-    const {
-      nativeTokenAmount, token,
-    } = this.props;
+    const { nativeTokenAmount, token } = this.props;
     const { isNativeToken } = this;
 
     return isNativeToken
@@ -109,7 +116,10 @@ class Send extends React.Component<SendProps, SendState> {
         .number()
         .required()
         .moreThan(0)
-        .lessThan(Number(formattedAmount?.toString()), this.props.t('balanceExceededReduceAmount')!)
+        .lessThan(
+          Number(formattedAmount?.toString()),
+          this.props.t('balanceExceededReduceAmount')!,
+        )
         .nullable(),
       address: yup.string().required().length(20),
       comment: yup.string().max(1024),
@@ -118,11 +128,14 @@ class Send extends React.Component<SendProps, SendState> {
 
   handleClose = () => this.setState({ openModal: false });
 
-  send = async ({ values, decryptedWif }: { values: FormValues, decryptedWif: string }) => {
-    const {
-      sendTrxTrigger,
-      sendTokenTrxTrigger,
-    } = this.props;
+  send = async ({
+    values,
+    decryptedWif,
+  }: {
+    values: FormValues;
+    decryptedWif: string;
+  }) => {
+    const { sendTrxTrigger, sendTokenTrxTrigger } = this.props;
 
     const { address, token } = this.props;
 
@@ -146,7 +159,10 @@ class Send extends React.Component<SendProps, SendState> {
     }
   };
 
-  handleSubmit = async (values: FormValues, formikHelpers: FormikHelpers<FormValues>) => {
+  handleSubmit = async (
+    values: FormValues,
+    formikHelpers: FormikHelpers<FormValues>,
+  ) => {
     if (!AddressApi.isTextAddressValid(values.address!)) {
       formikHelpers.setFieldError('address', this.props.t('invalidAddress')!);
     } else {
@@ -175,76 +191,100 @@ class Send extends React.Component<SendProps, SendState> {
     } = this;
     const { token } = props;
 
-    return <>
-      <ConfirmSendModal
-        open={this.state.openModal}
-        trxValues={formikProps.values}
-        onClose={handleClose}
-        token={token}
-        onSubmit={onSubmit}
-      />
-      <Form className={styles.form}>
-        <div className={styles.fields}>
-          <TextField
-            variant="standard"
-            label={this.props.t('amount')}
-            type="number"
-            placeholder="00.000"
-            name="amount"
-            value={formikProps.values.amount}
-            onChange={formikProps.handleChange}
-            onBlur={formikProps.handleBlur}
-            error={formikProps.touched.amount && Boolean(formikProps.errors.amount)}
-            helperText={formikProps.touched.amount && formikProps.errors.amount}
-            InputLabelProps={this.InputLabelProps}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <MoneyBugIcon className={cn(formikProps.values.amount && styles.activeBugIcon)} />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <TextField
-            variant="standard"
-            label={this.props.t('addressOfTheRecipient')}
-            placeholder="AA000000000000000000"
-            name="address"
-            value={formikProps.values.address}
-            onChange={formikProps.handleChange}
-            onBlur={formikProps.handleBlur}
-            error={formikProps.touched.address && Boolean(formikProps.errors.address)}
-            helperText={formikProps.touched.address && formikProps.errors.address}
-          />
-          <TextField
-            disabled={!isNativeToken}
-            variant="outlined"
-            placeholder={this.props.t('addComment')!}
-            multiline
-            minRows={2}
-            name="comment"
-            value={formikProps.values.comment}
-            onChange={formikProps.handleChange}
-            onBlur={formikProps.handleBlur}
-            error={formikProps.touched.comment && Boolean(formikProps.errors.comment)}
-            helperText={formikProps.touched.comment && formikProps.errors.comment}
-          />
-        </div>
-        <Button size="large" variant="filled" className={styles.button} type="submit" disabled={!formikProps.dirty}>
-          {this.props.t('send')}
-        </Button>
-      </Form>
-    </>;
+    return (
+      <>
+        <ConfirmSendModal
+          open={this.state.openModal}
+          trxValues={formikProps.values}
+          onClose={handleClose}
+          token={token}
+          onSubmit={onSubmit}
+        />
+        <Form className={styles.form}>
+          <div className={styles.fields}>
+            <TextField
+              variant="standard"
+              label={this.props.t('amount')}
+              type="number"
+              placeholder="00.000"
+              name="amount"
+              value={formikProps.values.amount}
+              onChange={formikProps.handleChange}
+              onBlur={formikProps.handleBlur}
+              error={
+                formikProps.touched.amount && Boolean(formikProps.errors.amount)
+              }
+              helperText={
+                formikProps.touched.amount && formikProps.errors.amount
+              }
+              InputLabelProps={this.InputLabelProps}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <MoneyBugIcon
+                      className={cn(
+                        formikProps.values.amount && styles.activeBugIcon,
+                      )}
+                    />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              variant="standard"
+              label={this.props.t('addressOfTheRecipient')}
+              placeholder="AA000000000000000000"
+              name="address"
+              value={formikProps.values.address}
+              onChange={formikProps.handleChange}
+              onBlur={formikProps.handleBlur}
+              error={
+                formikProps.touched.address &&
+                Boolean(formikProps.errors.address)
+              }
+              helperText={
+                formikProps.touched.address && formikProps.errors.address
+              }
+            />
+            <TextField
+              disabled={!isNativeToken}
+              variant="outlined"
+              placeholder={this.props.t('addComment')!}
+              multiline
+              minRows={2}
+              name="comment"
+              value={formikProps.values.comment}
+              onChange={formikProps.handleChange}
+              onBlur={formikProps.handleBlur}
+              error={
+                formikProps.touched.comment &&
+                Boolean(formikProps.errors.comment)
+              }
+              helperText={
+                formikProps.touched.comment && formikProps.errors.comment
+              }
+            />
+          </div>
+          <Button
+            size="large"
+            variant="filled"
+            className={styles.button}
+            type="submit"
+            disabled={!formikProps.dirty}
+          >
+            {this.props.t('send')}
+          </Button>
+        </Form>
+      </>
+    );
   };
 
   render() {
     const {
-      address,
-      sentData,
-      loading, token, tokenAddress,
+      address, sentData, loading, token, tokenAddress,
     } = this.props;
     const { isNativeToken, formattedAmount } = this;
-    const assetSymbol = isNativeToken ? tokenAddress : token?.symbol;
+    const tokenSymbol = isNativeToken ? tokenAddress : token?.symbol;
     const formattedAmountString = formattedAmount?.toString();
     if (loading) {
       return <FullScreenLoader />;
@@ -255,26 +295,41 @@ class Send extends React.Component<SendProps, SendState> {
         <PageTemplate
           topBarChild={this.props.t('send')}
           backUrl={WalletRoutesEnum.root}
-          backUrlText={this.props.t('myAssets')!}
+          backUrlText={this.props.t('home')!}
         >
-          <TxResult sentData={{
-            ...sentData,
-            amount: `${sentData.amount} ${assetSymbol}`,
-          }}
+          <TxResult
+            sentData={{
+              ...sentData,
+              amount: `${sentData.amount} ${tokenSymbol}`,
+            }}
           />
         </PageTemplate>
       );
     }
 
     return (
-      <PageTemplate topBarChild={this.props.t('send')} backUrl={WalletRoutesEnum.root} backUrlText={this.props.t('myAssets')!}>
+      <PageTemplate
+        topBarChild={this.props.t('send')}
+        backUrl={WalletRoutesEnum.root}
+        backUrlText={this.props.t('home')!}
+      >
         <div className={styles.content}>
           <div className={styles.walletInfo}>
-            <span className={styles.titleBalance}>{this.props.t('totalBalance')}</span>
+            <span className={styles.titleBalance}>
+              {this.props.t('totalBalance')}
+            </span>
             <span className={styles.address}>{address}</span>
             <span className={styles.amount}>
-              {isNativeToken && <LogoIcon width={20} height={20} className={styles.totalBalanceIcon} />}
-              {formattedAmountString === '0' ? this.props.t('yourTokensWillBeHere') : `${formattedAmountString} ${assetSymbol}` }
+              {isNativeToken && (
+                <LogoIcon
+                  width={20}
+                  height={20}
+                  className={styles.totalBalanceIcon}
+                />
+              )}
+              {formattedAmountString === '0'
+                ? this.props.t('yourTokensWillBeHere')
+                : `${formattedAmountString} ${tokenSymbol}`}
             </span>
           </div>
           <Divider className={styles.divider} />

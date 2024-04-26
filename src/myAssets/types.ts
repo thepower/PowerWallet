@@ -38,32 +38,30 @@ export type TransactionPayloadType = {
 };
 
 export enum MyAssetsTabs {
-  PowerNativeTokens = 'PowerNativeTokens',
   Erc20 = 'Erc20',
-  // NFT = 'NFT',
+  NFT = 'NFT',
 }
 
 export const getMyAssetsTabsLabels = () => ({
-  PowerNativeTokens: i18n.t('powerNativeTokens'),
-  Erc20: 'Erc_20',
-  // NFT : 'NFT',
+  Erc20: 'ERC-20',
+  NFT: 'NFT',
 } as const);
 
-export enum AddAssetsTabs {
+export enum AddTokensTabs {
   Erc20 = 'Erc20',
-  // NFT = 'NFT',
-  AddAssets = 'AddAssets',
+  NFT = 'NFT',
+  AddTokens = 'AddTokens',
 }
 
-export const getAddAssetsTabsLabels = () => ({
-  Erc20: 'Erc_20',
-  // NFT :'NFT',
-  AddAssets: i18n.t('addOtherAssets'),
+export const getAddTokenTabsLabels = () => ({
+  Erc20: 'ERC-20',
+  NFT: 'NFT',
+  AddTokens: i18n.t('addOtherTokens'),
 } as const);
 
 export type TokenKind = 'nft' | 'erc20' | 'native';
 
-export type TokenPayloadType = {
+export type Token = {
   type: TokenKind;
   name: string;
   address: string;
@@ -72,5 +70,7 @@ export type TokenPayloadType = {
   amount?: string
   isShow?: boolean;
 };
+
+export type TokenPayloadType = Token;
 
 export const nativeTokensNameMap = { SK: 'Smart key' };

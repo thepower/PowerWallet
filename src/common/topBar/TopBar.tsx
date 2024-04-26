@@ -34,15 +34,17 @@ const TopBar: React.FC<TopBarProps> = ({
 
   const renderLeft = useCallback(() => {
     if (backUrl) {
-      return <ArrowLink
-        to={backUrl}
-        direction="left"
-        hideTextOnMobile
-        size="small"
-        defaultColor="lilac"
-      >
-        {backUrlText}
-      </ArrowLink>;
+      return (
+        <ArrowLink
+          to={backUrl}
+          direction="left"
+          hideTextOnMobile
+          size="small"
+          defaultColor="lilac"
+        >
+          {backUrlText}
+        </ArrowLink>
+      );
     }
     return (
       <IconButton
@@ -56,7 +58,7 @@ const TopBar: React.FC<TopBarProps> = ({
   const renderCenter = useCallback(() => {
     if (children) {
       return (
-        <div>
+        <div className={styles.centerText}>
           {children}
         </div>
       );

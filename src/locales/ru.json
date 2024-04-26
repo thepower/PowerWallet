@@ -66,7 +66,7 @@
     "send": "Отправить",
     "buy": "Купить",
     "totalBalance": "Общий баланс",
-    "addAssets": "Добавить активы",
+    "addToken": "Добавить токен",
     "tx": "Tx",
     "cur": "Cur",
     "timestamp": "Timestamp",
@@ -182,8 +182,10 @@
     "return": "Вернуться",
     "returnURL": "Ссылка возврата",
     "insufficientFunds": "Недостаточно средств",
-    "iOSAndIPadOSDevicesNotSupported": "",
     "close": "Закрыть",
-    "byClickingSignAndSend": "Нажимая «Подписать и отправить», вы подтверждаете это действие."
+    "byClickingSignAndSend": "Нажимая «Подписать и отправить», вы подтверждаете это действие.",
+    "accountNumber": "Номер счета",
+    "skBalance": "SK баланс",
+    "tokens": "Токены"
   }
 }

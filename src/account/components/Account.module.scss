@@ -46,10 +46,9 @@
   overflow-x: hidden;
 
   @include mobile {
-    top: $top-bar-mobile;
     left: 0;
     width: 100vw;
-    height: calc(100vh - $top-bar-mobile);
+    height: 100vh;
     padding: 16px;
     border-top: 2px solid #212831;
   }
@@ -97,6 +96,12 @@
   @include mobile {
     margin-left: 4px;
   }
+}
+
+.closeButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
 
 .accountActionsHolder {

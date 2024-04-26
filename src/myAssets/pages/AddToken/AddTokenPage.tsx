@@ -5,16 +5,18 @@ import { connect, ConnectedProps } from 'react-redux';
 import { OutlinedInput } from '@mui/material';
 import { RootState } from 'application/store';
 import { Button, PageTemplate, Tabs } from 'common';
-import { Asset } from 'myAssets/components/Asset';
+import { Token } from 'myAssets/components/Token';
 import { getTokens } from 'myAssets/selectors/tokensSelectors';
 import { getWalletNativeTokensAmounts } from 'myAssets/selectors/walletSelectors';
-import { addTokenTrigger, toggleTokenShow, TokenType } from 'myAssets/slices/tokensSlice';
 import {
-  AddAssetsTabs, getAddAssetsTabsLabels,
-} from 'myAssets/types';
+  addTokenTrigger,
+  toggleTokenShow,
+  TokenType,
+} from 'myAssets/slices/tokensSlice';
+import { AddTokensTabs, getAddTokenTabsLabels } from 'myAssets/types';
 import { WithTranslation, withTranslation } from 'react-i18next';
 import SearchInput from '../../../common/searchInput/SearchInput';
-import styles from './AddAssetsPage.module.scss';
+import styles from './AddTokenPage.module.scss';
 
 const mapDispatchToProps = {
   routeTo: push,
@@ -27,35 +29,42 @@ const mapStateToProps = (state: RootState) => ({
   tokens: getTokens(state),
 });
 
-interface AddAssetsPageState {
+interface AddTokenPageState {
   search: string;
   address: string;
-  tab: AddAssetsTabs;
+  tab: AddTokensTabs;
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
-type AddAssetsPageProps = ConnectedProps<typeof connector> & WithTranslation;
+type AddTokenPageProps = ConnectedProps<typeof connector> & WithTranslation;
 
-class AddAssetsPageComponent extends React.PureComponent<AddAssetsPageProps, AddAssetsPageState> {
-  constructor(props: AddAssetsPageProps) {
+class AddTokenPageComponent extends React.PureComponent<
+AddTokenPageProps,
+AddTokenPageState
+> {
+  constructor(props: AddTokenPageProps) {
     super(props);
 
     this.state = {
       address: '',
       search: '',
-      tab: AddAssetsTabs.Erc20,
+      tab: AddTokensTabs.Erc20,
     };
   }
 
-  onChangeTab = (_event: React.SyntheticEvent, value: AddAssetsTabs) => {
+  onChangeTab = (_event: React.SyntheticEvent, value: AddTokensTabs) => {
     this.setState({ tab: value });
   };
 
-  onChangeAddressInput = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+  onChangeAddressInput = (
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+  ) => {
     this.setState({ address: e.target.value });
   };
 
-  onChangeSearchInput = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+  onChangeSearchInput = (
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+  ) => {
     this.setState({ search: e.target.value });
   };
 
@@ -64,33 +73,35 @@ class AddAssetsPageComponent extends React.PureComponent<AddAssetsPageProps, Add
 
     if (!assets.length && this.state.search) {
       return (
-        <div className={styles.noTokens}>
-          {this.props.t('assetNotFound')}
-        </div>);
+        <div className={styles.noTokens}>{this.props.t('assetNotFound')}</div>
+      );
     }
     if (!assets.length) {
       return (
         <div className={styles.noTokens}>
           {this.props.t('yourTokensWillBeHere')}
-        </div>);
+        </div>
+      );
     }
     return (
       <ul className={styles.tokensList}>
-        {assets.map((asset) => (
-          <li key={asset.address}>
-            <Asset
-              asset={asset}
-              onClickSwitch={() => toggleTokenShow({ address: asset.address, isShow: !asset.isShow })}
+        {assets.map((token) => (
+          <li key={token.address}>
+            <Token
+              token={token}
+              onClickSwitch={() => toggleTokenShow({
+                address: token.address,
+                isShow: !token.isShow,
+              })}
             />
           </li>
         ))}
-      </ul>);
+      </ul>
+    );
   };
 
-  renderAddAssetsForm = () => {
-    const {
-      onChangeAddressInput, props, state,
-    } = this;
+  renderAddTokenForm = () => {
+    const { onChangeAddressInput, props, state } = this;
     const { addTokenTrigger } = props;
     const { address } = state;
     return (
@@ -113,9 +124,10 @@ class AddAssetsPageComponent extends React.PureComponent<AddAssetsPageProps, Add
           variant="filled"
           disabled={!address}
         >
-          {this.props.t('addAssets')}
+          {this.props.t('addToken')}
         </Button>
-      </div>);
+      </div>
+    );
   };
 
   render() {
@@ -123,9 +135,9 @@ class AddAssetsPageComponent extends React.PureComponent<AddAssetsPageProps, Add
     const { tab, search } = this.state;
 
     const tokensMap = {
-      [AddAssetsTabs.Erc20]: erc20Tokens,
-      // [AddAssetsTabs.NFT]: [],
-      [AddAssetsTabs.AddAssets]: [],
+      [AddTokensTabs.Erc20]: erc20Tokens,
+      [AddTokensTabs.NFT]: [],
+      [AddTokensTabs.AddTokens]: [],
     };
 
     const currentTokens = tokensMap[tab];
@@ -137,7 +149,11 @@ class AddAssetsPageComponent extends React.PureComponent<AddAssetsPageProps, Add
     });
 
     return (
-      <PageTemplate topBarChild={this.props.t('addAssets')} backUrl="/" backUrlText={this.props.t('myAssets')!}>
+      <PageTemplate
+        topBarChild={this.props.t('addToken')}
+        backUrl="/"
+        backUrlText={this.props.t('home')!}
+      >
         <div className={styles.addAssetsPage}>
           <SearchInput
             className={styles.addAssetsPageSearchInput}
@@ -146,8 +162,8 @@ class AddAssetsPageComponent extends React.PureComponent<AddAssetsPageProps, Add
             value={search}
           />
           <Tabs
-            tabs={AddAssetsTabs}
-            tabsLabels={getAddAssetsTabsLabels()}
+            tabs={AddTokensTabs}
+            tabsLabels={getAddTokenTabsLabels()}
             value={tab}
             onChange={this.onChangeTab}
             tabsRootClassName={styles.addAssetsPageTabsRoot}
@@ -156,13 +172,19 @@ class AddAssetsPageComponent extends React.PureComponent<AddAssetsPageProps, Add
             tabIndicatorClassName={styles.addAssetsPageTabIndicator}
             tabSelectedClassName={styles.addAssetsPageTabSelected}
           />
-          {tab === AddAssetsTabs.AddAssets
-            ? this.renderAddAssetsForm()
-            : <div className={styles.tokens}>{this.renderAssetsList(filteredAssets)}</div>}
+          {tab === AddTokensTabs.AddTokens ? (
+            this.renderAddTokenForm()
+          ) : (
+            <div className={styles.tokens}>
+              {this.renderAssetsList(filteredAssets)}
+            </div>
+          )}
         </div>
       </PageTemplate>
     );
   }
 }
 
-export const AddAssetsPage = withTranslation()(connector(AddAssetsPageComponent));
+export const AddTokenPage = withTranslation()(
+  connector(AddTokenPageComponent),
+);

@@ -1,5 +1,6 @@
 import React, { useCallback, useRef } from 'react';
 import cn from 'classnames';
+import { toast } from 'react-toastify';
 import { CopySvg } from '../../assets/icons';
 import styles from './CopyButton.module.scss';
 
@@ -20,13 +21,14 @@ const CopyButton: React.FC<CopyButtonProps> = ({
   const handleClick = useCallback(() => {
     if (ref.current) {
       navigator.clipboard.writeText(copyInfo || ref.current.textContent || '');
+      toast.success('Copied to clipboard');
     }
   }, [copyInfo]);
 
   return (
     <button type="button" className={cn(styles.copyData, className)} ref={ref} onClick={handleClick}>
       {textButton}
-      <CopySvg className={iconClassName} />
+      <CopySvg className={cn(styles.icon, iconClassName)} />
     </button>
   );
 };

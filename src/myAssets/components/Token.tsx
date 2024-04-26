@@ -7,50 +7,50 @@ import { BigNumber, formatFixed } from '@ethersproject/bignumber';
 import { Link } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { CheckedIcon, LogoIcon, UnCheckedIcon } from 'assets/icons';
-import styles from './Asset.module.scss';
+import styles from './Token.module.scss';
 
 type OwnProps = {
-  asset: TokenType,
+  token: TokenType,
   isCheckBoxChecked?: boolean,
   onClickSwitch?: (checked: boolean) => void,
   onClickCheckBox?: (value: string) => void
 };
 
-type AssetProps = OwnProps;
+type TokenProps = OwnProps;
 
-const AssetComponent: FC<AssetProps> = ({
-  asset, isCheckBoxChecked, onClickSwitch, onClickCheckBox,
+const TokenComponent: FC<TokenProps> = ({
+  token, isCheckBoxChecked, onClickSwitch, onClickCheckBox,
 }) => {
-  const { amount, decimals, type } = asset;
+  const { amount, decimals, type } = token;
   const formattedAmount = type === 'erc20'
     ? formatFixed(BigNumber.from(amount), decimals)
     : amount;
 
-  const onClickAsset = () => {
+  const onClickToken = () => {
     if (onClickSwitch) {
-      onClickSwitch(!asset.isShow);
+      onClickSwitch(!token.isShow);
     }
     if (onClickCheckBox) {
-      onClickCheckBox(asset.address);
+      onClickCheckBox(token.address);
     }
   };
 
   const renderWrapper = (children: React.ReactNode) => (onClickSwitch || onClickCheckBox ?
-    <div onClick={onClickAsset} className={styles.asset}>{children}</div>
+    <div onClick={onClickToken} className={styles.asset}>{children}</div>
     : <Link
-        to={`/${asset.type}/${asset.address}${WalletRoutesEnum.transactions}`}
+        to={`/${token.type}/${token.address}${WalletRoutesEnum.transactions}`}
         className={styles.asset}
     >
       {children}
     </Link>);
 
   const renderSymbol = () => {
-    const { symbol } = asset;
+    const { symbol } = token;
     return onClickCheckBox ? `${symbol} ${formattedAmount}` : symbol;
   };
 
   const renderIcon = () => {
-    switch (asset.address) {
+    switch (token.address) {
       case 'SK':
         return <LogoIcon />;
 
@@ -63,7 +63,7 @@ const AssetComponent: FC<AssetProps> = ({
     if (onClickSwitch) {
       return <Switch
         className={styles.assetSwitch}
-        checked={asset.isShow}
+        checked={token.isShow}
       />;
     }
     if (onClickCheckBox) {
@@ -89,7 +89,7 @@ const AssetComponent: FC<AssetProps> = ({
           <div className={styles.info}>
             <span className={styles.symbol}>{renderSymbol()}</span>
             <span className={styles.name}>
-              {asset?.name}
+              {token?.name}
             </span>
           </div>
           {renderRightCol()}
@@ -100,4 +100,4 @@ const AssetComponent: FC<AssetProps> = ({
   );
 };
 
-export const Asset = memo(AssetComponent);
+export const Token = memo(TokenComponent);

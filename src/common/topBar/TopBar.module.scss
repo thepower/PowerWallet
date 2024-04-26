@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 32px;
-  background: inherit;
+  backdrop-filter: blur(2px);
 
   @include mobile {
     padding: 8px 15px;
@@ -30,6 +30,14 @@
     display: block;
     background-color: #111923;
   }
+}
+
+.centerText {
+  color: #f5f5f7;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 28px;
 }
 
 

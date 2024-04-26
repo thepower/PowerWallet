@@ -49,7 +49,7 @@ export function* sendTrxSaga({
 
     yield loadBalanceSaga();
   } catch (error: any) {
-    toast.error(`${i18n.t('anErrorOccurredAsset')} ${error}`);
+    toast.error(`${i18n.t('anErrorOccurredToken')} ${error}`);
   }
 }
 
@@ -83,7 +83,7 @@ export function* sendTokenTrxSaga({
     yield updateTokenAmountSaga({ address });
   } catch (error: any) {
     console.error(error);
-    toast.error(`${i18n.t('anErrorOccurredAsset')} ${error}`);
+    toast.error(`${i18n.t('anErrorOccurredToken')} ${error}`);
   }
 }
 

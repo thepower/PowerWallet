@@ -66,7 +66,7 @@
     "send": "Send",
     "buy": "Buy",
     "totalBalance": "Total balance",
-    "addAssets": "Add assets",
+    "addToken": "Add token",
     "tx": "Tx",
     "cur": "Cur",
     "timestamp": "Timestamp",
@@ -182,8 +182,10 @@
     "return": "Return",
     "returnURL": "Return URL",
     "insufficientFunds": "Insufficient funds",
-    "iOSAndIPadOSDevicesNotSupported": "Sorry.  iOS and iPadOS devices are currently not supported. Try registration on desktop or Android devices.",
     "close": "Close",
-    "byClickingSignAndSend": "By clicking \"Sign and Send\", you are approve this action."
+    "byClickingSignAndSend": "By clicking \"Sign and Send\", you are approve this action.",
+    "accountNumber": "Account number",
+    "skBalance": "SK balance",
+    "tokens": "Tokens"
   }
 }

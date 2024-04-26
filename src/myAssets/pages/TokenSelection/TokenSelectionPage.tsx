@@ -5,10 +5,10 @@ import { connect, ConnectedProps } from 'react-redux';
 import { Button, PageTemplate } from 'common';
 import { RootState } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { Asset } from 'myAssets/components/Asset';
+import { Token } from 'myAssets/components/Token';
 import { getTokenByID, getTokens } from 'myAssets/selectors/tokensSelectors';
 import {
-  getWalletNativeTokensAmountByID,
+  getWalletNativeTokensAmountByAddress,
   getWalletNativeTokensAmounts,
 } from 'myAssets/selectors/walletSelectors';
 import {
@@ -19,7 +19,7 @@ import {
 import { TokenPayloadType } from 'myAssets/types';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import styles from './AssetSelectionPage.module.scss';
+import styles from './TokenSelectionPage.module.scss';
 
 const mapDispatchToProps = {
   addTokenTrigger,
@@ -31,31 +31,30 @@ const mapStateToProps = (state: RootState) => ({
   amounts: getWalletNativeTokensAmounts(state),
   tokens: getTokens(state),
   getTokenByID: (address: string) => getTokenByID(state, address),
-  getWalletNativeTokensAmountByID: (symbol: string) => getWalletNativeTokensAmountByID(state, symbol),
+  getWalletNativeTokensAmountByAddress: (address: string) => getWalletNativeTokensAmountByAddress(state, address),
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
-type AssetSelectionPageProps = ConnectedProps<typeof connector>;
+type TokenSelectionPageProps = ConnectedProps<typeof connector>;
 
-const AssetSelectionPageComponent: React.FC<AssetSelectionPageProps> = ({
+const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   tokens: erc20Tokens,
   getTokenByID,
-  getWalletNativeTokensAmountByID,
+  getWalletNativeTokensAmountByAddress,
   amounts,
   updateTokensAmountsTrigger,
 }) => {
-  const [selectedAsset, setSelectedAsset] = useState<string>('');
+  const [selectedToken, setSelectedToken] = useState<string>('');
   const { t } = useTranslation();
-
   useEffect(() => {
     updateTokensAmountsTrigger();
   }, []);
 
   const onClickCheckBox = useCallback(
     (value: string) => {
-      setSelectedAsset((prevState) => (prevState === value ? '' : value));
+      setSelectedToken((prevState) => (prevState === value ? '' : value));
     },
-    [setSelectedAsset],
+    [setSelectedToken],
   );
 
   const nativeTokens = useMemo(
@@ -82,12 +81,12 @@ const AssetSelectionPageComponent: React.FC<AssetSelectionPageProps> = ({
       <ul className={styles.tokensList}>
         {tokens.map((token) => (
           <li key={token.address}>
-            <Asset
-              asset={token}
+            <Token
+              token={token}
               isCheckBoxChecked={
                 token.type === 'native'
-                  ? selectedAsset === token.symbol
-                  : selectedAsset === token.address
+                  ? selectedToken === token.symbol
+                  : selectedToken === token.address
               }
               onClickCheckBox={onClickCheckBox}
             />
@@ -95,27 +94,27 @@ const AssetSelectionPageComponent: React.FC<AssetSelectionPageProps> = ({
         ))}
       </ul>
     ),
-    [tokens, selectedAsset, onClickCheckBox],
+    [tokens, selectedToken, onClickCheckBox],
   );
 
-  const nativeAssetAmount = getWalletNativeTokensAmountByID(selectedAsset);
-  const asset = getTokenByID(selectedAsset);
+  const nativeAssetAmount = getWalletNativeTokensAmountByAddress(selectedToken);
+  const token = getTokenByID(selectedToken);
   const assetIndetifier = nativeAssetAmount
-    ? selectedAsset
-    : asset?.address || '';
-  const assetType = nativeAssetAmount ? 'native' : asset?.type || '';
+    ? selectedToken
+    : token?.address || '';
+  const tokenType = nativeAssetAmount ? 'native' : token?.type || '';
 
   return (
     <PageTemplate
       topBarChild={t('assetSelection')}
       backUrl="/"
-      backUrlText={t('myAssets')!}
+      backUrlText={t('home')!}
     >
       <div className={styles.assetSelection}>
         <div className={styles.tokens}>{renderAssetsList()}</div>
-        <Link to={`/${assetType}/${assetIndetifier}${WalletRoutesEnum.send}`}>
+        <Link to={`/${tokenType}/${assetIndetifier}${WalletRoutesEnum.send}`}>
           <Button
-            disabled={!asset && !nativeAssetAmount}
+            disabled={!token && !nativeAssetAmount}
             className={styles.assetSelectionFixedButton}
             variant="filled"
           >
@@ -127,4 +126,4 @@ const AssetSelectionPageComponent: React.FC<AssetSelectionPageProps> = ({
   );
 };
 
-export const AssetSelectionPage = connector(AssetSelectionPageComponent);
+export const TokenSelectionPage = connector(TokenSelectionPageComponent);

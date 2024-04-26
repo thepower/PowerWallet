@@ -22,7 +22,7 @@ import {
 } from 'react-i18next';
 import { InView } from 'react-intersection-observer';
 import { RouteComponentProps } from 'react-router';
-import styles from './AssetTransactionsPage.module.scss';
+import styles from './TokenTransactionsPage.module.scss';
 
 type OwnProps = RouteComponentProps<{ type: TokenKind; address: string }>;
 
@@ -42,9 +42,9 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
-type AssetTransactionsPageProps = ConnectedProps<typeof connector>;
+type TokenTransactionsPageProps = ConnectedProps<typeof connector>;
 
-const AssetTransactionsPageComponent: React.FC<AssetTransactionsPageProps> = ({
+const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
   type,
   address,
   token,
@@ -96,7 +96,7 @@ const AssetTransactionsPageComponent: React.FC<AssetTransactionsPageProps> = ({
       backUrl="/"
       backUrlText={t('home')!}
     >
-      <div className={styles.AssetTransactionsPage}>
+      <div className={styles.TokenTransactionsPage}>
         <div className={styles.transactions}>
           <ul className={styles.groupByDates}>
             {renderTransactionsList()}
@@ -110,4 +110,4 @@ const AssetTransactionsPageComponent: React.FC<AssetTransactionsPageProps> = ({
   );
 };
 
-export const AssetTransactionsPage = connector(AssetTransactionsPageComponent);
+export const TokenTransactionsPage = connector(TokenTransactionsPageComponent);

@@ -4,10 +4,10 @@ import { FullScreenLoader } from 'common';
 import { RegistrationPage } from 'registration/components/RegistrationPage';
 import { LoginPage } from 'registration/components/pages/LoginPage';
 import { checkIfLoading } from 'network/selectors';
-import { AddAssetsPage } from 'myAssets/pages/AddAssets/AddAssetsPage';
-import { AssetTransactionsPage } from 'myAssets/pages/AssetTransactions/AssetTransactionsPage';
-import { AssetSelectionPage } from 'myAssets/pages/AssetSelection/AssetSelectionPage';
-import { MyAssets } from 'myAssets/components/MyAssets';
+import { AddTokenPage } from 'myAssets/pages/AddToken/AddTokenPage';
+import { TokenTransactionsPage } from 'myAssets/pages/TokenTransactions/TokenTransactionsPage';
+import { TokenSelectionPage } from 'myAssets/pages/TokenSelection/TokenSelectionPage';
+import { MyAssets } from 'myAssets/pages/Main/MainPage';
 import Send from 'send/components/Send';
 import SignAndSendPage from 'sign-and-send/components/SingAndSendPage';
 import WalletSSOPage from 'sso/components/pages/WalletSSOPage';
@@ -19,7 +19,9 @@ import { initApplication } from '../slice/applicationSlice';
 const AppRoutesComponent: React.FC = () => {
   const dispatch = useAppDispatch();
 
-  const networkApi = useAppSelector((state) => state.applicationData.networkApi);
+  const networkApi = useAppSelector(
+    (state) => state.applicationData.networkApi,
+  );
   const walletApi = useAppSelector((state) => state.applicationData.walletApi);
   const loading = useAppSelector((state) => checkIfLoading(state, initApplication.type));
 
@@ -28,29 +30,41 @@ const AppRoutesComponent: React.FC = () => {
   }, [dispatch]);
 
   if (!walletApi || !networkApi || loading) {
-    return (
-      <FullScreenLoader />
-    );
+    return <FullScreenLoader />;
   }
   return (
     <Switch>
-      <Route exact path={WalletRoutesEnum.signup} component={RegistrationPage} />
-      <Route exact path={`${WalletRoutesEnum.registrationForApps}/:data`} component={RegistrationForAppsPage} />
+      <Route
+        exact
+        path={WalletRoutesEnum.signup}
+        component={RegistrationPage}
+      />
+      <Route
+        exact
+        path={`${WalletRoutesEnum.registrationForApps}/:data`}
+        component={RegistrationForAppsPage}
+      />
       <Route exact path={WalletRoutesEnum.login} component={LoginPage} />
-      <Route path={`/:type/:address${WalletRoutesEnum.send}`} component={Send} />
+      <Route
+        path={`/:type/:address${WalletRoutesEnum.send}`}
+        component={Send}
+      />
       <Route exact path={`${WalletRoutesEnum.add}`}>
-        <AddAssetsPage />
+        <AddTokenPage />
       </Route>
       <Route
         path={`/:type/:address${WalletRoutesEnum.transactions}`}
-        component={AssetTransactionsPage}
+        component={TokenTransactionsPage}
       />
       <Route
         path={`${WalletRoutesEnum.assetSelection}`}
-        component={AssetSelectionPage}
+        component={TokenSelectionPage}
         exact
       />
-      <Route path={`${WalletRoutesEnum.signAndSend}/:message`} component={SignAndSendPage} />
+      <Route
+        path={`${WalletRoutesEnum.signAndSend}/:message`}
+        component={SignAndSendPage}
+      />
       <Route path={`${WalletRoutesEnum.sso}/:data`} component={WalletSSOPage} />
       <Route exact path={WalletRoutesEnum.root} component={MyAssets} />
     </Switch>
