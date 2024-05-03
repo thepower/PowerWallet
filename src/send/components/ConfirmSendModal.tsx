@@ -7,7 +7,7 @@ import { Button, Modal, OutlinedInput } from '../../common';
 import styles from './ConfirmSendModal.module.scss';
 import { RootState } from '../../application/store';
 import { getWalletAddress } from '../../account/selectors/accountSelectors';
-import { FormValues } from './Send';
+import { FormValues } from './SendPage';
 
 interface OwnProps {
   open: boolean;

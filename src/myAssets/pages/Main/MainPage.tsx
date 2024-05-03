@@ -72,11 +72,12 @@ const MyAssetsComponent: FC<MyAssetsProps> = ({
     setShowUnderConstruction(true);
   };
 
-  const erc20tokens = [...nativeTokens, ...tokens].filter((token) => token.isShow);
+  const erc20tokens = tokens.filter((token) => token.isShow && token.type === 'erc20');
+  const erc721tokens = tokens.filter((token) => token.isShow && token.type === 'erc721');
 
   const tokensMap = {
-    [MyAssetsTabs.Erc20]: erc20tokens,
-    [MyAssetsTabs.NFT]: [],
+    [MyAssetsTabs.Erc20]: [...nativeTokens, ...erc20tokens],
+    [MyAssetsTabs.Erc721]: erc721tokens,
   };
 
   const currentTokens = tokensMap[tab];
@@ -140,7 +141,7 @@ const MyAssetsComponent: FC<MyAssetsProps> = ({
               <FaucetSvg />
             </CardLink>
             <CardLink
-              to={WalletRoutesEnum.assetSelection}
+              to={WalletRoutesEnum.tokenSelection}
               label={t('send')}
               target={'_self'}
               rel="noreferrer"

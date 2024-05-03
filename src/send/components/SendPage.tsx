@@ -1,0 +1,325 @@
+import { BigNumber, formatFixed } from '@ethersproject/bignumber';
+import { InputAdornment, TextField } from '@mui/material';
+import { AddressApi, CryptoApi } from '@thepowereco/tssdk';
+import cn from 'classnames';
+import {
+  FormikHelpers, useFormik,
+} from 'formik';
+import { getTokenByID } from 'myAssets/selectors/tokensSelectors';
+import { getWalletNativeTokensAmountByAddress } from 'myAssets/selectors/walletSelectors';
+import { TokenKind } from 'myAssets/types';
+import React, {
+  FC, useCallback, useEffect, useMemo,
+} from 'react';
+import { ConnectedProps, connect } from 'react-redux';
+import { RouteComponentProps } from 'react-router';
+import * as yup from 'yup';
+import {
+  getWalletAddress,
+  getWalletData,
+} from 'account/selectors/accountSelectors';
+import { RootState } from 'application/store';
+import { WalletRoutesEnum } from 'application/typings/routes';
+import {
+  Button, PageTemplate, Divider, FullScreenLoader,
+} from 'common';
+import { LogoIcon, MoneyBugIcon } from 'assets/icons';
+import TxResult from 'common/txResult/TxResult';
+import { checkIfLoading } from 'network/selectors';
+import { useTranslation } from 'react-i18next';
+import { getSentData } from '../selectors/sendSelectors';
+import {
+  clearSentData,
+  sendTokenTrxTrigger,
+  sendTrxTrigger,
+} from '../slices/sendSlice';
+import ConfirmSendModal from './ConfirmSendModal';
+import styles from './SendPage.module.scss';
+
+type OwnProps = RouteComponentProps<{ type: TokenKind; address: string }>;
+
+const mapDispatchToProps = {
+  clearSentData,
+  sendTrxTrigger,
+  sendTokenTrxTrigger,
+};
+
+const mapStateToProps = (state: RootState, props: OwnProps) => ({
+  address: getWalletAddress(state),
+  sentData: getSentData(state),
+  token: getTokenByID(state, props?.match?.params?.address),
+  nativeTokenAmount: getWalletNativeTokensAmountByAddress(
+    state,
+    props?.match?.params?.address,
+  ),
+  tokenType: props?.match?.params?.type,
+  tokenAddress: props?.match?.params?.address,
+  loading:
+    checkIfLoading(state, sendTrxTrigger.type) ||
+    checkIfLoading(state, sendTokenTrxTrigger.type),
+  wif: getWalletData(state).wif,
+});
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+
+type SendProps = ConnectedProps<typeof connector>;
+
+export type FormValues = {
+  amount: number;
+  comment: string;
+  address: string;
+};
+
+const initialValues: FormValues = {
+  amount: 0,
+  comment: '',
+  address: '',
+};
+
+const InputLabelProps = {
+  className: styles.label,
+};
+
+const SendPageComponent: FC<SendProps> = ({
+  address,
+  sentData,
+  token,
+  tokenType,
+  tokenAddress,
+  loading,
+  clearSentData,
+  sendTrxTrigger,
+  sendTokenTrxTrigger,
+  nativeTokenAmount,
+  wif,
+}) => {
+  const { t } = useTranslation();
+
+  const [openModal, setOpenModal] = React.useState(false);
+
+  useEffect(
+    () => () => {
+      clearSentData();
+    },
+    [],
+  );
+
+  const isNativeToken = useMemo(() => tokenType === 'native', [tokenType]);
+
+  const formattedAmount = useMemo(() => {
+    switch (tokenType) {
+      case 'erc20':
+        return (
+          token && formatFixed(BigNumber.from(token.amount), token.decimals)
+        );
+      case 'native':
+        return nativeTokenAmount;
+      case 'erc721':
+        return token?.amount;
+      default:
+        return '0';
+    }
+  }, [tokenType, nativeTokenAmount, token]);
+
+  const getValidationSchema = useCallback(() => yup.object({
+    amount: yup
+      .number()
+      .required()
+      .moreThan(0)
+      .lessThan(
+        Number(formattedAmount?.toString()),
+        t('balanceExceededReduceAmount')!,
+      )
+      .nullable(),
+    address: yup.string().required().length(20),
+    comment: yup.string().max(1024),
+  }), [formattedAmount, t]);
+
+  const handleClose = () => setOpenModal(false);
+
+  const send = async ({
+    values,
+    decryptedWif,
+  }: {
+    values: FormValues;
+    decryptedWif: string;
+  }) => {
+    if (!token) {
+      sendTrxTrigger({
+        from: address,
+        to: values.address!,
+        comment: values.comment,
+        amount: Number(values.amount)!,
+        wif: decryptedWif,
+      });
+    } else {
+      sendTokenTrxTrigger({
+        address: token.address,
+        amount: values.amount,
+        decimals: token.decimals,
+        from: address,
+        to: values.address!,
+        wif: decryptedWif,
+      });
+    }
+  };
+
+  const handleSubmit = async (
+    values: FormValues,
+    formikHelpers: FormikHelpers<FormValues>,
+  ) => {
+    if (!AddressApi.isTextAddressValid(values.address!)) {
+      formikHelpers.setFieldError('address', t('invalidAddress')!);
+    } else {
+      try {
+        const decryptedWif = CryptoApi.decryptWif(wif, '');
+
+        await send({ values, decryptedWif });
+      } catch (error) {
+        setOpenModal(true);
+      }
+    }
+  };
+
+  const onSubmit = async (values: FormValues, password: string) => {
+    const decryptedWif = CryptoApi.decryptWif(wif, password);
+
+    await send({ values, decryptedWif });
+  };
+
+  const formik = useFormik({
+    initialValues,
+    onSubmit: handleSubmit,
+    validationSchema: getValidationSchema(),
+  });
+
+  const renderForm = useCallback(
+    () => (
+      <>
+        <ConfirmSendModal
+          open={openModal}
+          trxValues={formik.values}
+          onClose={handleClose}
+          token={token}
+          onSubmit={onSubmit}
+        />
+        <form className={styles.form} onSubmit={formik.handleSubmit}>
+          <div className={styles.fields}>
+            <TextField
+              variant="standard"
+              label={t('amount')}
+              type="number"
+              placeholder="00.000"
+              name="amount"
+              value={formik.values.amount}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.amount && Boolean(formik.errors.amount)}
+              helperText={formik.touched.amount && formik.errors.amount}
+              InputLabelProps={InputLabelProps}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <MoneyBugIcon
+                      className={cn(
+                        formik.values.amount && styles.activeBugIcon,
+                      )}
+                    />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              variant="standard"
+              label={t('addressOfTheRecipient')}
+              placeholder="AA000000000000000000"
+              name="address"
+              value={formik.values.address}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.address && Boolean(formik.errors.address)}
+              helperText={formik.touched.address && formik.errors.address}
+            />
+            <TextField
+              disabled={!isNativeToken}
+              variant="outlined"
+              placeholder={t('addComment')!}
+              multiline
+              minRows={2}
+              name="comment"
+              value={formik.values.comment}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.comment && Boolean(formik.errors.comment)}
+              helperText={formik.touched.comment && formik.errors.comment}
+            />
+          </div>
+          <Button
+            size="large"
+            variant="filled"
+            className={styles.button}
+            type="submit"
+            disabled={!formik.dirty}
+          >
+            {t('send')}
+          </Button>
+        </form>
+      </>
+    ),
+    [formik, t, onSubmit, openModal, handleClose, token, isNativeToken],
+  );
+
+  const tokenSymbol = isNativeToken ? tokenAddress : token?.symbol;
+  const formattedAmountString = formattedAmount?.toString();
+
+  if (loading) {
+    return <FullScreenLoader />;
+  }
+
+  if (sentData) {
+    return (
+      <PageTemplate
+        topBarChild={t('send')}
+        backUrl={WalletRoutesEnum.root}
+        backUrlText={t('home')!}
+      >
+        <TxResult
+          sentData={{
+            ...sentData,
+            amount: `${sentData.amount} ${tokenSymbol}`,
+          }}
+        />
+      </PageTemplate>
+    );
+  }
+
+  return (
+    <PageTemplate
+      topBarChild={t('send')}
+      backUrl={WalletRoutesEnum.root}
+      backUrlText={t('home')!}
+    >
+      <div className={styles.content}>
+        <div className={styles.walletInfo}>
+          <span className={styles.titleBalance}>{t('totalBalance')}</span>
+          <span className={styles.address}>{address}</span>
+          <span className={styles.amount}>
+            {isNativeToken && (
+              <LogoIcon
+                width={20}
+                height={20}
+                className={styles.totalBalanceIcon}
+              />
+            )}
+            {formattedAmountString === '0'
+              ? t('yourTokensWillBeHere')
+              : `${formattedAmountString} ${tokenSymbol}`}
+          </span>
+        </div>
+        <Divider className={styles.divider} />
+        {renderForm()}
+      </div>
+    </PageTemplate>
+  );
+};
+export const SendPage = connector(SendPageComponent);

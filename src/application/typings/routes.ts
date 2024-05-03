@@ -2,7 +2,7 @@ export enum WalletRoutesEnum {
   signAndSend = '/sign-and-send',
   registrationForApps = '/registration-for-apps',
   send = '/send',
-  assetSelection = '/selection',
+  tokenSelection = '/selection',
   transactions = '/transactions',
   add = '/add',
   buy = '/buy',

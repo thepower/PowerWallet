@@ -8,7 +8,7 @@ import { AddTokenPage } from 'myAssets/pages/AddToken/AddTokenPage';
 import { TokenTransactionsPage } from 'myAssets/pages/TokenTransactions/TokenTransactionsPage';
 import { TokenSelectionPage } from 'myAssets/pages/TokenSelection/TokenSelectionPage';
 import { MyAssets } from 'myAssets/pages/Main/MainPage';
-import Send from 'send/components/Send';
+import { SendPage } from 'send/components/SendPage';
 import SignAndSendPage from 'sign-and-send/components/SingAndSendPage';
 import WalletSSOPage from 'sso/components/pages/WalletSSOPage';
 import { RegistrationForAppsPage } from 'registration/components/RegistrationForAppsPage';
@@ -47,7 +47,7 @@ const AppRoutesComponent: React.FC = () => {
       <Route exact path={WalletRoutesEnum.login} component={LoginPage} />
       <Route
         path={`/:type/:address${WalletRoutesEnum.send}`}
-        component={Send}
+        component={SendPage}
       />
       <Route exact path={`${WalletRoutesEnum.add}`}>
         <AddTokenPage />
@@ -57,7 +57,7 @@ const AppRoutesComponent: React.FC = () => {
         component={TokenTransactionsPage}
       />
       <Route
-        path={`${WalletRoutesEnum.assetSelection}`}
+        path={`${WalletRoutesEnum.tokenSelection}`}
         component={TokenSelectionPage}
         exact
       />

@@ -8,27 +8,24 @@ import { WalletRoutesEnum } from 'application/typings/routes';
 import { Token } from 'myAssets/components/Token';
 import { getTokenByID, getTokens } from 'myAssets/selectors/tokensSelectors';
 import {
+  getWalletNativeTokens,
   getWalletNativeTokensAmountByAddress,
-  getWalletNativeTokensAmounts,
 } from 'myAssets/selectors/walletSelectors';
 import {
-  addTokenTrigger,
   toggleTokenShow,
   updateTokensAmountsTrigger,
 } from 'myAssets/slices/tokensSlice';
-import { TokenPayloadType } from 'myAssets/types';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styles from './TokenSelectionPage.module.scss';
 
 const mapDispatchToProps = {
-  addTokenTrigger,
   toggleTokenShow,
   updateTokensAmountsTrigger,
 };
 
 const mapStateToProps = (state: RootState) => ({
-  amounts: getWalletNativeTokensAmounts(state),
+  nativeTokens: getWalletNativeTokens(state),
   tokens: getTokens(state),
   getTokenByID: (address: string) => getTokenByID(state, address),
   getWalletNativeTokensAmountByAddress: (address: string) => getWalletNativeTokensAmountByAddress(state, address),
@@ -41,8 +38,9 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   tokens: erc20Tokens,
   getTokenByID,
   getWalletNativeTokensAmountByAddress,
-  amounts,
+  nativeTokens,
   updateTokensAmountsTrigger,
+
 }) => {
   const [selectedToken, setSelectedToken] = useState<string>('');
   const { t } = useTranslation();
@@ -55,20 +53,6 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
       setSelectedToken((prevState) => (prevState === value ? '' : value));
     },
     [setSelectedToken],
-  );
-
-  const nativeTokens = useMemo(
-    () => Object.entries(amounts).map(
-      ([symbol, amount]) => ({
-        type: 'native',
-        name: symbol,
-        address: symbol,
-        symbol,
-        decimals: '9',
-        amount,
-      } as TokenPayloadType),
-    ),
-    [amounts],
   );
 
   const tokens = useMemo(
@@ -106,16 +90,16 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
 
   return (
     <PageTemplate
-      topBarChild={t('assetSelection')}
+      topBarChild={t('tokenSelection')}
       backUrl="/"
       backUrlText={t('home')!}
     >
-      <div className={styles.assetSelection}>
+      <div className={styles.tokenSelection}>
         <div className={styles.tokens}>{renderAssetsList()}</div>
         <Link to={`/${tokenType}/${assetIndetifier}${WalletRoutesEnum.send}`}>
           <Button
             disabled={!token && !nativeAssetAmount}
-            className={styles.assetSelectionFixedButton}
+            className={styles.tokenSelectionFixedButton}
             variant="filled"
           >
             {t('next')}

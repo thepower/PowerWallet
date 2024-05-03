@@ -26,23 +26,36 @@ const TokenComponent: FC<TokenProps> = ({
     ? formatFixed(BigNumber.from(amount), decimals)
     : amount;
 
+  const isErc721Token = type === 'erc721';
+
   const onClickToken = () => {
     if (onClickSwitch) {
       onClickSwitch(!token.isShow);
     }
     if (onClickCheckBox) {
-      onClickCheckBox(token.address);
+      if (isErc721Token) {
+
+      } else {
+        onClickCheckBox(token.address);
+      }
     }
   };
 
-  const renderWrapper = (children: React.ReactNode) => (onClickSwitch || onClickCheckBox ?
-    <div onClick={onClickToken} className={styles.asset}>{children}</div>
-    : <Link
+  const renderWrapper = (children: React.ReactNode) => {
+    if (onClickSwitch || onClickCheckBox) {
+      return (
+        <div onClick={onClickToken} className={styles.asset}>{children}</div>
+      );
+    }
+    return (
+      <Link
         to={`/${token.type}/${token.address}${WalletRoutesEnum.transactions}`}
         className={styles.asset}
-    >
-      {children}
-    </Link>);
+      >
+        {children}
+      </Link>
+    );
+  };
 
   const renderSymbol = () => {
     const { symbol } = token;
@@ -66,7 +79,7 @@ const TokenComponent: FC<TokenProps> = ({
         checked={token.isShow}
       />;
     }
-    if (onClickCheckBox) {
+    if (onClickCheckBox && !isErc721Token) {
       return <Checkbox
         className={styles.assetCheckBox}
         size={'medium'}
@@ -76,9 +89,11 @@ const TokenComponent: FC<TokenProps> = ({
         disableRipple
       />;
     }
-    return <span className={styles.amount}>
-      {formattedAmount}
-    </span>;
+    return (
+      <span className={styles.amount}>
+        {formattedAmount}
+      </span>
+    );
   };
 
   return (

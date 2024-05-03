@@ -1,5 +1,5 @@
 import { push } from 'connected-react-router';
-import React from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { OutlinedInput } from '@mui/material';
@@ -7,14 +7,12 @@ import { RootState } from 'application/store';
 import { Button, PageTemplate, Tabs } from 'common';
 import { Token } from 'myAssets/components/Token';
 import { getTokens } from 'myAssets/selectors/tokensSelectors';
-import { getWalletNativeTokensAmounts } from 'myAssets/selectors/walletSelectors';
 import {
   addTokenTrigger,
   toggleTokenShow,
-  TokenType,
 } from 'myAssets/slices/tokensSlice';
 import { AddTokensTabs, getAddTokenTabsLabels } from 'myAssets/types';
-import { WithTranslation, withTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import SearchInput from '../../../common/searchInput/SearchInput';
 import styles from './AddTokenPage.module.scss';
 
@@ -25,67 +23,96 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = (state: RootState) => ({
-  amounts: getWalletNativeTokensAmounts(state),
   tokens: getTokens(state),
 });
 
-interface AddTokenPageState {
-  search: string;
-  address: string;
-  tab: AddTokensTabs;
-}
-
 const connector = connect(mapStateToProps, mapDispatchToProps);
-type AddTokenPageProps = ConnectedProps<typeof connector> & WithTranslation;
+type AddTokenPageProps = ConnectedProps<typeof connector> ;
 
-class AddTokenPageComponent extends React.PureComponent<
-AddTokenPageProps,
-AddTokenPageState
-> {
-  constructor(props: AddTokenPageProps) {
-    super(props);
+const AddTokenPageComponent:FC<AddTokenPageProps> = ({
+  tokens,
+  addTokenTrigger,
+  toggleTokenShow,
+}) => {
+  const { t } = useTranslation();
+  const [search, setSearch] = useState<string>('');
+  const [address, setAddress] = useState<string>('');
+  const [tab, setTab] = useState<AddTokensTabs>(AddTokensTabs.Erc20);
 
-    this.state = {
-      address: '',
-      search: '',
-      tab: AddTokensTabs.Erc20,
-    };
-  }
-
-  onChangeTab = (_event: React.SyntheticEvent, value: AddTokensTabs) => {
-    this.setState({ tab: value });
+  const onChangeTab = (_event: React.SyntheticEvent, value: AddTokensTabs) => {
+    setTab(value);
   };
 
-  onChangeAddressInput = (
+  const onChangeAddressInput = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ) => {
-    this.setState({ address: e.target.value });
+    setAddress(e.target.value);
   };
 
-  onChangeSearchInput = (
+  const onChangeSearchInput = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ) => {
-    this.setState({ search: e.target.value });
+    setSearch(e.target.value);
   };
 
-  renderAssetsList = (assets: TokenType[]) => {
-    const { toggleTokenShow } = this.props;
+  const renderAddTokenForm = useCallback(() => (
+    <div className={styles.addAssetsPageForm}>
+      <div className={styles.addAssetsPageFormTip}>
+        {t('youCanAddAnyStandardToken')}
+      </div>
 
-    if (!assets.length && this.state.search) {
+      <OutlinedInput
+        placeholder={t('assetsAddress')!}
+        fullWidth
+        size="small"
+        className={styles.addAssetsPageFormInput}
+        value={address}
+        onChange={onChangeAddressInput}
+      />
+      <Button
+        className={styles.addAssetsPageFormButton}
+        onClick={() => addTokenTrigger(address)}
+        variant="filled"
+        disabled={!address}
+      >
+        {t('addToken')}
+      </Button>
+    </div>
+  ), [address, t]);
+
+  const erc20tokens = tokens.filter((token) => token.type === 'erc20');
+  const erc721tokens = tokens.filter((token) => token.type === 'erc721');
+
+  const tokensMap = {
+    [AddTokensTabs.Erc20]: erc20tokens,
+    [AddTokensTabs.Erc721]: erc721tokens,
+    [AddTokensTabs.AddTokens]: [],
+  };
+
+  const currentTokens = tokensMap[tab];
+
+  const filteredTokens = currentTokens?.filter((token) => {
+    const regexp = new RegExp(search, 'gmi');
+    const stringifiedToken = JSON.stringify(token);
+    return !search || regexp.test(stringifiedToken);
+  });
+
+  const renderAssetsList = useCallback(() => {
+    if (!filteredTokens.length && search) {
       return (
-        <div className={styles.noTokens}>{this.props.t('assetNotFound')}</div>
+        <div className={styles.noTokens}>{t('tokenNotFound')}</div>
       );
     }
-    if (!assets.length) {
+    if (!filteredTokens.length) {
       return (
         <div className={styles.noTokens}>
-          {this.props.t('yourTokensWillBeHere')}
+          {t('yourTokensWillBeHere')}
         </div>
       );
     }
     return (
       <ul className={styles.tokensList}>
-        {assets.map((token) => (
+        {filteredTokens.map((token) => (
           <li key={token.address}>
             <Token
               token={token}
@@ -98,93 +125,42 @@ AddTokenPageState
         ))}
       </ul>
     );
-  };
+  }, [filteredTokens, search, t]);
 
-  renderAddTokenForm = () => {
-    const { onChangeAddressInput, props, state } = this;
-    const { addTokenTrigger } = props;
-    const { address } = state;
-    return (
-      <div className={styles.addAssetsPageForm}>
-        <div className={styles.addAssetsPageFormTip}>
-          {this.props.t('youCanAddAnyStandardToken')}
-        </div>
-
-        <OutlinedInput
-          placeholder={this.props.t('assetsAddress')!}
-          fullWidth
-          size="small"
-          className={styles.addAssetsPageFormInput}
-          value={address}
-          onChange={onChangeAddressInput}
+  return (
+    <PageTemplate
+      topBarChild={t('addToken')}
+      backUrl="/"
+      backUrlText={t('home')!}
+    >
+      <div className={styles.addAssetsPage}>
+        <SearchInput
+          className={styles.addAssetsPageSearchInput}
+          onClickSearch={() => {}}
+          onChange={onChangeSearchInput}
+          value={search}
         />
-        <Button
-          className={styles.addAssetsPageFormButton}
-          onClick={() => addTokenTrigger(address)}
-          variant="filled"
-          disabled={!address}
-        >
-          {this.props.t('addToken')}
-        </Button>
+        <Tabs
+          tabs={AddTokensTabs}
+          tabsLabels={getAddTokenTabsLabels()}
+          value={tab}
+          onChange={onChangeTab}
+          tabsRootClassName={styles.addAssetsPageTabsRoot}
+          tabsHolderClassName={styles.addAssetsPageTabsHolder}
+          tabClassName={styles.addAssetsPageTab}
+          tabIndicatorClassName={styles.addAssetsPageTabIndicator}
+          tabSelectedClassName={styles.addAssetsPageTabSelected}
+        />
+        {tab === AddTokensTabs.AddTokens ? (
+          renderAddTokenForm()
+        ) : (
+          <div className={styles.tokens}>
+            {renderAssetsList()}
+          </div>
+        )}
       </div>
-    );
-  };
+    </PageTemplate>
+  );
+};
 
-  render() {
-    const { tokens: erc20Tokens } = this.props;
-    const { tab, search } = this.state;
-
-    const tokensMap = {
-      [AddTokensTabs.Erc20]: erc20Tokens,
-      [AddTokensTabs.NFT]: [],
-      [AddTokensTabs.AddTokens]: [],
-    };
-
-    const currentTokens = tokensMap[tab];
-
-    const filteredAssets = currentTokens?.filter((token) => {
-      const regexp = new RegExp(search, 'gmi');
-      const stringifiedToken = JSON.stringify(token);
-      return !search || regexp.test(stringifiedToken);
-    });
-
-    return (
-      <PageTemplate
-        topBarChild={this.props.t('addToken')}
-        backUrl="/"
-        backUrlText={this.props.t('home')!}
-      >
-        <div className={styles.addAssetsPage}>
-          <SearchInput
-            className={styles.addAssetsPageSearchInput}
-            onClickSearch={() => {}}
-            onChange={this.onChangeSearchInput}
-            value={search}
-          />
-          <Tabs
-            tabs={AddTokensTabs}
-            tabsLabels={getAddTokenTabsLabels()}
-            value={tab}
-            onChange={this.onChangeTab}
-            tabsRootClassName={styles.addAssetsPageTabsRoot}
-            tabsHolderClassName={styles.addAssetsPageTabsHolder}
-            tabClassName={styles.addAssetsPageTab}
-            tabIndicatorClassName={styles.addAssetsPageTabIndicator}
-            tabSelectedClassName={styles.addAssetsPageTabSelected}
-          />
-          {tab === AddTokensTabs.AddTokens ? (
-            this.renderAddTokenForm()
-          ) : (
-            <div className={styles.tokens}>
-              {this.renderAssetsList(filteredAssets)}
-            </div>
-          )}
-        </div>
-      </PageTemplate>
-    );
-  }
-}
-
-export const AddTokenPage = withTranslation()(
-  connector(AddTokenPageComponent),
-);
+export const AddTokenPage = connector(AddTokenPageComponent);

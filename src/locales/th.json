@@ -78,14 +78,13 @@
     "comment": "แสดงความคิดเห็น",
     "transaction": "ธุรกรรม",
     "copy": "คัดลอก",
-    "assetNotFound": "ไม่พบสินทรัพย์",
-    "youCanAddAnyStandardToken": "คุณสามารถเพิ่มโทเค็นมาตรฐานหรือสินทรัพย์มาตรฐานได้ป้อนที่อยู่ สแกนรหัสและคลิก \"เพิ่มสินทรัพย์\"",
+    "tokenNotFound": "ไม่พบโทเค็น",
+    "youCanAddAnyStandardToken": "คุณสามารถเพิ่มโทเค็นมาตรฐานหรือโทเค็นมาตรฐานได้\nป้อนที่อยู่สแกนรหัสและคลิก\"เพิ่มโทเค็น\"",
     "assetsAddress": "ที่อยู่สินทรัพย์",
-    "assetSelection": "เลือกสินทรัพย์",
+    "tokenSelection": "การเลือกโทเค็น",
     "somethingWentWrongCode": "เกิดข้อผิดพลาดขณะเพิ่มโทเค็น รหัส:",
     "addressNotFound": "ไม่พบที่อยู่",
-    "powerNativeTokens": "Native โทเค็นเนทีฟ",
-    "addOtherAssets": "เพิ่มสินทรัพย์อื่น ๆ",
+    "addOtherTokens": "เพิ่มสัญญาณอื่นๆ",
     "importantRules": "กฎที่สำคัญ",
     "pleaseExportWalletData": "โปรดส่งออกข้อมูลกระเป๋าเงินเพื่อให้คุณสามารถกู้คืนกระเป๋าเงินของคุณภายหลังในกรณีฉุกเฉิน",
     "youNeedBothYourAddress": "คุณต้องใช้ทั้งที่อยู่และชุดคำลับของคุณเพื่อกู้คืนกระเป๋าเงินของคุณ ดังนั้นให้เก็บทั้งคู่",
@@ -148,7 +147,7 @@
     "invalidAddress": "ที่อยู่ไม่ถูกต้อง",
     "addressOfTheRecipient": "ที่อยู่ของผู้รับ",
     "addComment": "เพิ่มความคิดเห็น",
-    "anErrorOccurredAsset": "เกิดข้อผิดพลาดในขณะส่งสินทรัพย์ รหัส:",
+    "anErrorOccurredToken": "เกิดข้อผิดพลาดในขณะส่งสินทรัพย์ รหัส:",
     "somethingWentWrongTransaction": "บางอย่างผิดพลาดเมื่อส่งธุรกรรม รหัส:",
     "confirmYourAction": "ยืนยันการกระทำของคุณ",
     "transactionType": "ประเภทธุรกรรม",
@@ -186,6 +185,7 @@
     "byClickingSignAndSend": "โดยการคลิก\"ลงชื่อและส่ง\"คุณจะอนุมัติการดำเนินการนี้",
     "accountNumber": "เลขที่บัญชี",
     "skBalance": "SK สมดุล",
-    "tokens": "โทเค็น"
+    "tokens": "โทเค็น",
+    "wrongChain": "ห่วงโซ่ที่อยู่ของคุณไม่ตรงกับห่วงโซ่ของสัญญาโทเค็น"
   }
 }

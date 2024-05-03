@@ -78,14 +78,13 @@
     "comment": "Comment",
     "transaction": "Transaction",
     "copy": "Copy",
-    "assetNotFound": "Asset not found",
-    "youCanAddAnyStandardToken": "You can add any standard token or standard asset.\nEnter the address, scan the code and click \"add asset\"",
+    "tokenNotFound": "Token not found",
+    "youCanAddAnyStandardToken": "You can add any standard token or standard token.\nEnter the address, scan the code and click \"Add token\"",
     "assetsAddress": "Assets address",
-    "assetSelection": "Asset selection",
+    "tokenSelection": "Token selection",
     "somethingWentWrongCode": "Something went wrong when adding a token. Code:",
     "addressNotFound": "Address not found",
-    "powerNativeTokens": "Native tokens",
-    "addOtherAssets": "Add other assets",
+    "addOtherTokens": "Add other tokens",
     "importantRules": "Important rules!",
     "pleaseExportWalletData": "Please export wallet data so that you may recover your wallet later in case of emergency",
     "youNeedBothYourAddress": "You need both your address and seed phrase to restore your wallet. So store them both",
@@ -148,7 +147,7 @@
     "invalidAddress": "invalid address",
     "addressOfTheRecipient": "To",
     "addComment": "Add comment",
-    "anErrorOccurredAsset": "An error occurred while sending the asset. Code:",
+    "anErrorOccurredToken": "An error occurred while sending the asset. Code:",
     "somethingWentWrongTransaction": "Something went wrong when sending the transaction. Code:",
     "confirmYourAction": "Confirm Your Action",
     "transactionType": "Tx type",
@@ -186,6 +185,7 @@
     "byClickingSignAndSend": "By clicking \"Sign and Send\", you are approve this action.",
     "accountNumber": "Account number",
     "skBalance": "SK balance",
-    "tokens": "Tokens"
+    "tokens": "Tokens",
+    "wrongChain": "The chain of your address does not match the chain of the token contract"
   }
 }
