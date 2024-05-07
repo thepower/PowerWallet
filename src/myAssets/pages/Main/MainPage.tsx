@@ -173,10 +173,6 @@ const MyAssetsComponent: FC<MyAssetsProps> = ({
         value={tab}
         onChange={onChangeTab}
         tabsRootClassName={styles.myAssetsTabsRoot}
-        tabsHolderClassName={styles.myAssetsTabsHolder}
-        tabClassName={styles.myAssetsTab}
-        tabIndicatorClassName={styles.myAssetsTabIndicator}
-        tabSelectedClassName={styles.myAssetsTabSelected}
       />
       <div className={styles.tokens}>
         {renderAssetsList()}

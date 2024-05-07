@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from 'application/store';
-import type { Token } from 'myAssets/types';
+import type { TToken } from 'myAssets/types';
 
 const getWalletState = (state: RootState) => state.wallet;
 
@@ -17,12 +17,12 @@ export const getWalletNativeTokens = createSelector(getWalletState, (wallet) => 
     decimals: '9',
     amount,
     isShow: true,
-  } as Token),
+  } as TToken),
 ));
 
-export const getWalletNativeTokensAmountByAddress = createSelector(
-  [getWalletState, (_, address) => address],
-  (wallet, address) => wallet.amounts?.[address],
+export const getWalletNativeTokensAmountBySymbol = createSelector(
+  [getWalletState, (_, symbol) => symbol],
+  (wallet, symbol) => wallet.amounts?.[symbol],
 );
 export const getWalletPubKey = createSelector(getWalletState, (wallet) => wallet.pubkey);
 export const getPrevBlock = createSelector(getWalletState, (wallet) => wallet.preblk);

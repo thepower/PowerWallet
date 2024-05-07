@@ -186,6 +186,7 @@
     "accountNumber": "Account number",
     "skBalance": "SK balance",
     "tokens": "Tokens",
-    "wrongChain": "The chain of your address does not match the chain of the token contract"
+    "wrongChain": "The chain of your address does not match the chain of the token contract",
+    "tokenHasAlreadyBeenAdded": "the token has already been added"
   }
 }

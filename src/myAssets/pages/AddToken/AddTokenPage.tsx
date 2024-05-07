@@ -55,6 +55,10 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
     setSearch(e.target.value);
   };
 
+  const onClickAddToken = useCallback(() => {
+    addTokenTrigger({ address });
+  }, [addTokenTrigger, address]);
+
   const renderAddTokenForm = useCallback(() => (
     <div className={styles.addAssetsPageForm}>
       <div className={styles.addAssetsPageFormTip}>
@@ -71,14 +75,14 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
       />
       <Button
         className={styles.addAssetsPageFormButton}
-        onClick={() => addTokenTrigger(address)}
+        onClick={onClickAddToken}
         variant="filled"
         disabled={!address}
       >
         {t('addToken')}
       </Button>
     </div>
-  ), [address, t]);
+  ), [address, onClickAddToken, t]);
 
   const erc20tokens = tokens.filter((token) => token.type === 'erc20');
   const erc721tokens = tokens.filter((token) => token.type === 'erc721');
@@ -146,10 +150,6 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
           value={tab}
           onChange={onChangeTab}
           tabsRootClassName={styles.addAssetsPageTabsRoot}
-          tabsHolderClassName={styles.addAssetsPageTabsHolder}
-          tabClassName={styles.addAssetsPageTab}
-          tabIndicatorClassName={styles.addAssetsPageTabIndicator}
-          tabSelectedClassName={styles.addAssetsPageTabSelected}
         />
         {tab === AddTokensTabs.AddTokens ? (
           renderAddTokenForm()

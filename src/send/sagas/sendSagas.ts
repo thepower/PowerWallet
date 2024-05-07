@@ -11,7 +11,7 @@ import {
 import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { getNetworkApi, getWalletApi } from 'application/selectors';
-import { getIsErc721, updateTokenAmountSaga } from 'myAssets/sagas/tokens';
+import { updateTokenAmountSaga } from 'myAssets/sagas/tokens';
 import { loadBalanceSaga } from 'myAssets/sagas/wallet';
 import { toast } from 'react-toastify';
 import { TxPurpose } from 'sign-and-send/typing';
@@ -21,6 +21,7 @@ import abis from 'abis';
 
 import { LoadBalancePayloadType } from 'myAssets/types';
 import {
+  sendErc721TokenTrxTrigger,
   sendTokenTrxTrigger,
   sendTrxTrigger,
   setSentData,
@@ -31,16 +32,17 @@ const { packAndSignTX } = TransactionsApi;
 
 export function* sendTrxSaga({
   payload: {
-    wif, from, to, comment, amount,
+    wif, to, comment, amount,
   },
 }: ReturnType<typeof sendTrxTrigger>) {
   try {
     const WalletAPI = (yield* select(getWalletApi))!;
+    const walletAddress = yield* select(getWalletAddress);
 
     const { txId }: { txId: string; status: string } =
       yield WalletAPI.makeNewTx(
         wif,
-        from,
+        walletAddress,
         to,
         'SK',
         amount,
@@ -53,7 +55,7 @@ export function* sendTrxSaga({
         txId,
         comment,
         amount,
-        from,
+        from: walletAddress,
         to,
       }),
     );
@@ -64,77 +66,88 @@ export function* sendTrxSaga({
   }
 }
 
-export function* sendTokenTrxSaga({
+export async function* sendTokenTrxSaga({
   payload: {
-    wif, from, to, amount, decimals, address,
+    wif, to, amount, decimals, address,
   },
 }: ReturnType<typeof sendTokenTrxTrigger>) {
+  try {
+    const networkAPI = (yield* select(getNetworkApi))!;
+    const walletAddress = yield* select(getWalletAddress);
+
+    const EVM: EvmCore = yield EvmCore.build(networkAPI as NetworkApi);
+
+    const contract: EvmContract = yield EvmContract.build(
+      EVM,
+      address,
+      abis.erc20.abi,
+    );
+
+    const erc20contract = new Evm20Contract(contract, abis.erc20.abi);
+
+    const calculatedAmount = parseFixed(
+      BigNumber.from(amount).toString(),
+      decimals,
+    ).toBigInt();
+
+    const { txId } = yield erc20contract.transfer(to, calculatedAmount, {
+      wif,
+      address: walletAddress,
+    });
+    yield* put(
+      setSentData({
+        txId,
+        comment: '',
+        amount,
+        from: walletAddress,
+        to,
+      }),
+    );
+
+    yield updateTokenAmountSaga({ address });
+  } catch (error: any) {
+    console.error(error);
+    toast.error(`${i18n.t('anErrorOccurredToken')} ${error}`);
+  }
+}
+
+export function* sendErc721TokenTrxSaga({
+  payload: {
+    wif, to, address, id,
+  },
+}: ReturnType<typeof sendErc721TokenTrxTrigger>) {
   try {
     const networkAPI = (yield* select(getNetworkApi))!;
 
     const EVM: EvmCore = yield EvmCore.build(networkAPI as NetworkApi);
 
-    const storageScErc20: EvmContract = yield EvmContract.build(
-      EVM,
-      address,
-      abis.erc20.abi,
-    );
-    const storageScErc721: EvmContract = yield EvmContract.build(
+    const Erc721Contract: EvmContract = yield EvmContract.build(
       EVM,
       address,
       abis.erc721.abi,
     );
 
-    const erc20contract = new Evm20Contract(storageScErc20, abis.erc20.abi);
-    const erc721contract = new Evm721Contract(storageScErc721, abis.erc721.abi);
+    const erc721contract = new Evm721Contract(Erc721Contract, abis.erc721.abi);
 
-    const isErc721: boolean = yield getIsErc721(
-      networkAPI as NetworkApi,
-      address,
+    const walletAddress = yield* select(getWalletAddress);
+
+    const { txId } = yield erc721contract.transferFrom(
+      walletAddress,
+      to,
+      BigInt(id),
+      { wif, address: walletAddress },
+    );
+    yield* put(
+      setSentData({
+        txId,
+        comment: '',
+        amount: '1',
+        from: walletAddress,
+        to,
+      }),
     );
 
-    if (isErc721) {
-      const walletAddress = yield* select(getWalletAddress);
-
-      const { txId } = yield erc721contract.safeTransferFrom(
-        walletAddress,
-        to,
-        0n,
-        { wif, address: from },
-      );
-      yield* put(
-        setSentData({
-          txId,
-          comment: '',
-          amount,
-          from,
-          to,
-        }),
-      );
-
-      yield updateTokenAmountSaga({ address });
-    } else {
-      const calculatedAmount = parseFixed(
-        BigNumber.from(amount).toString(),
-        decimals,
-      ).toBigInt();
-
-      const { txId } = yield erc20contract.transfer(to, calculatedAmount, {
-        wif,
-        address: from,
-      });
-      yield* put(
-        setSentData({
-          txId,
-          comment: '',
-          amount,
-          from,
-          to,
-        }),
-      );
-
-      yield updateTokenAmountSaga({ address });
-    }
+    yield updateTokenAmountSaga({ address });
   } catch (error: any) {
     console.error(error);
     toast.error(`${i18n.t('anErrorOccurredToken')} ${error}`);

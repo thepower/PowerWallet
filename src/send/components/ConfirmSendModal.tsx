@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import { connect, ConnectedProps } from 'react-redux';
-import { TokenType } from 'myAssets/slices/tokensSlice';
+import { TToken } from 'myAssets/types';
 import { useTranslation } from 'react-i18next';
 import { Button, Modal, OutlinedInput } from '../../common';
 import styles from './ConfirmSendModal.module.scss';
@@ -13,7 +13,7 @@ interface OwnProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (values: FormValues, password: string) => Promise<void>;
-  token?: TokenType;
+  token?: TToken;
   trxValues: {
     amount: number;
     comment: string;

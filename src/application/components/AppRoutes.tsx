@@ -46,7 +46,7 @@ const AppRoutesComponent: React.FC = () => {
       />
       <Route exact path={WalletRoutesEnum.login} component={LoginPage} />
       <Route
-        path={`/:type/:address${WalletRoutesEnum.send}`}
+        path={`/:type/:address/:id?${WalletRoutesEnum.send}`}
         component={SendPage}
       />
       <Route exact path={`${WalletRoutesEnum.add}`}>
@@ -57,7 +57,7 @@ const AppRoutesComponent: React.FC = () => {
         component={TokenTransactionsPage}
       />
       <Route
-        path={`${WalletRoutesEnum.tokenSelection}`}
+        path={`${WalletRoutesEnum.tokenSelection}/:address?`}
         component={TokenSelectionPage}
         exact
       />

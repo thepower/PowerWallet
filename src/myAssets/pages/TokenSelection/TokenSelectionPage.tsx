@@ -2,33 +2,52 @@ import React, {
   useState, useEffect, useMemo, useCallback,
 } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import { Button, PageTemplate } from 'common';
+import { Button, PageTemplate, Tabs } from 'common';
 import { RootState } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { Token } from 'myAssets/components/Token';
-import { getTokenByID, getTokens } from 'myAssets/selectors/tokensSelectors';
+import {
+  getErc721Tokens,
+  getTokenByID,
+  getTokens,
+} from 'myAssets/selectors/tokensSelectors';
 import {
   getWalletNativeTokens,
-  getWalletNativeTokensAmountByAddress,
+  getWalletNativeTokensAmountBySymbol,
 } from 'myAssets/selectors/walletSelectors';
 import {
+  getErc721TokensTrigger,
   toggleTokenShow,
   updateTokensAmountsTrigger,
+  addTokenTrigger,
 } from 'myAssets/slices/tokensSlice';
+
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, RouteComponentProps } from 'react-router-dom';
+import { MyAssetsTabs, getMyAssetsTabsLabels } from 'myAssets/types';
+import { Token } from 'myAssets/components/Token';
+import { push } from 'connected-react-router';
+import { Erc721Token } from 'myAssets/components/Erc721Token';
+import { checkIfLoading } from 'network/selectors';
 import styles from './TokenSelectionPage.module.scss';
+
+type OwnProps = RouteComponentProps<{ address: string }>;
 
 const mapDispatchToProps = {
   toggleTokenShow,
   updateTokensAmountsTrigger,
+  pushTo: push,
+  getErc721TokensTrigger,
+  addTokenTrigger,
 };
 
-const mapStateToProps = (state: RootState) => ({
+const mapStateToProps = (state: RootState, props: OwnProps) => ({
+  collectionAddress: props?.match?.params?.address,
   nativeTokens: getWalletNativeTokens(state),
   tokens: getTokens(state),
+  erc721Tokens: getErc721Tokens(state),
+  isGetErc721TokensLoading: checkIfLoading(state, getErc721TokensTrigger.type),
   getTokenByID: (address: string) => getTokenByID(state, address),
-  getWalletNativeTokensAmountByAddress: (address: string) => getWalletNativeTokensAmountByAddress(state, address),
+  getWalletNativeTokensAmountBySymbol: (address: string) => getWalletNativeTokensAmountBySymbol(state, address),
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -37,20 +56,52 @@ type TokenSelectionPageProps = ConnectedProps<typeof connector>;
 const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   tokens: erc20Tokens,
   getTokenByID,
-  getWalletNativeTokensAmountByAddress,
+  getWalletNativeTokensAmountBySymbol,
   nativeTokens,
   updateTokensAmountsTrigger,
-
+  collectionAddress,
+  pushTo,
+  erc721Tokens,
+  isGetErc721TokensLoading,
+  getErc721TokensTrigger,
+  addTokenTrigger,
 }) => {
+  const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
   const [selectedToken, setSelectedToken] = useState<string>('');
   const { t } = useTranslation();
+
   useEffect(() => {
     updateTokensAmountsTrigger();
   }, []);
 
+  useEffect(() => {
+    if (collectionAddress) {
+      getErc721TokensTrigger({ address: collectionAddress });
+    }
+  }, [collectionAddress, getErc721TokensTrigger]);
+
+  const collection = useMemo(() => {
+    if (collectionAddress) {
+      return getTokenByID(collectionAddress);
+    }
+    return null;
+  }, [collectionAddress, getTokenByID]);
+
+  useEffect(() => {
+    if (!collection && collectionAddress) {
+      addTokenTrigger({
+        address: collectionAddress,
+        withoutRedirect: true,
+        additionalActionOnSuccess: () => {
+          setSelectedToken(collectionAddress);
+        },
+      });
+    }
+  }, [addTokenTrigger, collection, collectionAddress]);
+
   const onClickCheckBox = useCallback(
-    (value: string) => {
-      setSelectedToken((prevState) => (prevState === value ? '' : value));
+    (token: string) => {
+      setSelectedToken((prevState) => (prevState === token ? '' : token));
     },
     [setSelectedToken],
   );
@@ -60,10 +111,45 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     [nativeTokens, erc20Tokens],
   );
 
-  const renderAssetsList = useCallback(
-    () => (
+  const erc20tokens = tokens.filter(
+    (token) => token.isShow && token.type === 'erc20',
+  );
+  const erc721tokens = tokens.filter(
+    (token) => token.isShow && token.type === 'erc721',
+  );
+
+  const tokensMap = {
+    [MyAssetsTabs.Erc20]: [...nativeTokens, ...erc20tokens],
+    [MyAssetsTabs.Erc721]: erc721tokens,
+  };
+
+  const currentTokens = tokensMap[tab];
+
+  const onChangeTab = (_event: React.SyntheticEvent, value: MyAssetsTabs) => {
+    setTab(value);
+  };
+
+  const renderAssetsList = useCallback(() => {
+    if (collectionAddress && erc721Tokens.length) {
+      return (
+        <ul className={styles.tokensList}>
+          {erc721Tokens.map((token) => (
+            <li key={token.id}>
+              <Erc721Token
+                collection={collection!}
+                token={token}
+                isCheckBoxChecked={selectedToken === token.id}
+                onClickCheckBox={onClickCheckBox}
+              />
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
+    return (
       <ul className={styles.tokensList}>
-        {tokens.map((token) => (
+        {currentTokens.map((token) => (
           <li key={token.address}>
             <Token
               token={token}
@@ -73,20 +159,49 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
                   : selectedToken === token.address
               }
               onClickCheckBox={onClickCheckBox}
+              isErc721Collection={tab === MyAssetsTabs.Erc721}
             />
           </li>
         ))}
       </ul>
-    ),
-    [tokens, selectedToken, onClickCheckBox],
-  );
+    );
+  }, [
+    collectionAddress,
+    currentTokens,
+    erc721Tokens,
+    collection,
+    selectedToken,
+    onClickCheckBox,
+    tab,
+  ]);
 
-  const nativeAssetAmount = getWalletNativeTokensAmountByAddress(selectedToken);
+  const nativeAssetAmount = getWalletNativeTokensAmountBySymbol(selectedToken);
   const token = getTokenByID(selectedToken);
-  const assetIndetifier = nativeAssetAmount
-    ? selectedToken
-    : token?.address || '';
-  const tokenType = nativeAssetAmount ? 'native' : token?.type || '';
+
+  const assetIdentifier = useMemo(() => {
+    if (collectionAddress) {
+      return collection?.address;
+    }
+    if (nativeAssetAmount) {
+      return selectedToken;
+    }
+    return token?.address || '';
+  }, [
+    collectionAddress,
+    collection?.address,
+    nativeAssetAmount,
+    selectedToken,
+    token?.address,
+  ]);
+
+  const tokenType = nativeAssetAmount
+    ? 'native'
+    : token?.type || collection?.type || '';
+
+  const nextLink =
+    tokenType === 'erc721'
+      ? `/${tokenType}/${assetIdentifier}/${selectedToken}${WalletRoutesEnum.send}`
+      : `/${tokenType}/${assetIdentifier}${WalletRoutesEnum.send}`;
 
   return (
     <PageTemplate
@@ -95,10 +210,19 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
       backUrlText={t('home')!}
     >
       <div className={styles.tokenSelection}>
+        {!collectionAddress && <Tabs
+          tabs={MyAssetsTabs}
+          tabsLabels={getMyAssetsTabsLabels()}
+          value={tab}
+          onChange={onChangeTab}
+          tabsRootClassName={styles.myAssetsTabsRoot}
+          tabIndicatorClassName={styles.myAssetsTabIndicator}
+          tabSelectedClassName={styles.myAssetsTabSelected}
+        />}
         <div className={styles.tokens}>{renderAssetsList()}</div>
-        <Link to={`/${tokenType}/${assetIndetifier}${WalletRoutesEnum.send}`}>
+        <Link to={nextLink}>
           <Button
-            disabled={!token && !nativeAssetAmount}
+            disabled={!token && !nativeAssetAmount && !selectedToken}
             className={styles.tokenSelectionFixedButton}
             variant="filled"
           >
