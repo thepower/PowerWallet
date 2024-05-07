@@ -2,7 +2,9 @@ import React, {
   useState, useEffect, useMemo, useCallback,
 } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import { Button, PageTemplate, Tabs } from 'common';
+import {
+  Button, Divider, PageTemplate, Tabs,
+} from 'common';
 import { RootState } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import {
@@ -28,6 +30,8 @@ import { Token } from 'myAssets/components/Token';
 import { push } from 'connected-react-router';
 import { Erc721Token } from 'myAssets/components/Erc721Token';
 import { checkIfLoading } from 'network/selectors';
+import { range } from 'lodash';
+import { Skeleton } from '@mui/material';
 import styles from './TokenSelectionPage.module.scss';
 
 type OwnProps = RouteComponentProps<{ address: string }>;
@@ -60,7 +64,6 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   nativeTokens,
   updateTokensAmountsTrigger,
   collectionAddress,
-  pushTo,
   erc721Tokens,
   isGetErc721TokensLoading,
   getErc721TokensTrigger,
@@ -128,8 +131,31 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   const onChangeTab = (_event: React.SyntheticEvent, value: MyAssetsTabs) => {
     setTab(value);
   };
-
   const renderAssetsList = useCallback(() => {
+    if (isGetErc721TokensLoading) {
+      return (
+        <ul className={styles.tokensList}>
+          {range(0, 10).map((item) => (
+            <li key={item}>
+              <Skeleton
+                key={item}
+                height={60}
+                sx={{
+                  transform: 'none',
+                  transformOrigin: 'unset',
+                  borderRadius: '5px',
+                  mt: '40px',
+                  mb: '32px',
+                }}
+              />
+              <Divider />
+
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
     if (collectionAddress && erc721Tokens.length) {
       return (
         <ul className={styles.tokensList}>
@@ -141,6 +167,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
                 isCheckBoxChecked={selectedToken === token.id}
                 onClickCheckBox={onClickCheckBox}
               />
+
             </li>
           ))}
         </ul>
@@ -173,6 +200,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     selectedToken,
     onClickCheckBox,
     tab,
+    isGetErc721TokensLoading,
   ]);
 
   const nativeAssetAmount = getWalletNativeTokensAmountBySymbol(selectedToken);
