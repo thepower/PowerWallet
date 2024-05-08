@@ -252,7 +252,7 @@ export function* getErc721Token(id: number, address: string) {
       image: metadata?.image || '',
     };
   }
-  return { id: tokenId };
+  return { id: tokenId, image: uri };
 }
 
 export function* getErc721TokensSaga({
@@ -269,7 +269,6 @@ export function* getErc721TokensSaga({
     [AddressApi.textAddressToEvmAddress(walletAddress)],
     abis.erc721.abi,
   );
-
   const balance = Number(balanceBigint);
 
   const tokens = yield* all(

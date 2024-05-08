@@ -149,7 +149,6 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
                 }}
               />
               <Divider />
-
             </li>
           ))}
         </ul>

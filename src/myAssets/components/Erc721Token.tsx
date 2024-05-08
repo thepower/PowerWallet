@@ -27,7 +27,7 @@ const Erc721TokenComponent: FC<TokenProps> = ({
     }
   };
 
-  const renderIcon = () => <div />;
+  const renderIcon = () => <img className={styles.icon} src={token?.image} alt={token?.name} />;
 
   const renderRightCol = () => {
     if (onClickCheckBox) {
