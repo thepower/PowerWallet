@@ -25,7 +25,7 @@ import {
 
 import { useTranslation } from 'react-i18next';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { MyAssetsTabs, getMyAssetsTabsLabels } from 'myAssets/types';
+import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
 import { Token } from 'myAssets/components/Token';
 import { push } from 'connected-react-router';
 import { Erc721Token } from 'myAssets/components/Erc721Token';
@@ -115,10 +115,10 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   );
 
   const erc20tokens = tokens.filter(
-    (token) => token.isShow && token.type === 'erc20',
+    (token) => token.isShow && token.type === TokenKind.Erc20,
   );
   const erc721tokens = tokens.filter(
-    (token) => token.isShow && token.type === 'erc721',
+    (token) => token.isShow && token.type === TokenKind.Erc721,
   );
 
   const tokensMap = {
@@ -180,7 +180,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
             <Token
               token={token}
               isCheckBoxChecked={
-                token.type === 'native'
+                token.type === TokenKind.Native
                   ? selectedToken === token.symbol
                   : selectedToken === token.address
               }
@@ -222,11 +222,11 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   ]);
 
   const tokenType = nativeAssetAmount
-    ? 'native'
+    ? TokenKind.Native
     : token?.type || collection?.type || '';
 
   const nextLink =
-    tokenType === 'erc721'
+    tokenType === TokenKind.Erc721
       ? `/${tokenType}/${assetIdentifier}/${selectedToken}${WalletRoutesEnum.send}`
       : `/${tokenType}/${assetIdentifier}${WalletRoutesEnum.send}`;
 

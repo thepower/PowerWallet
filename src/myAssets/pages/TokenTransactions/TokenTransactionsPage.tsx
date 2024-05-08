@@ -63,7 +63,7 @@ const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
 
   const handleChangeView = (inView: boolean) => {
     if (inView) {
-      if (type === 'native') {
+      if (type === TokenKind.Native) {
         loadTransactionsTrigger();
       } else {
         loadTransactionsTrigger({ tokenAddress: address });
@@ -84,7 +84,7 @@ const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
     </li>)
   ), [JSON.stringify(transactions)]);
 
-  const tokenSymbol = type === 'native' ? address : token?.symbol;
+  const tokenSymbol = type === TokenKind.Native ? address : token?.symbol;
 
   if (loading && isEmpty(transactions)) {
     return <FullScreenLoader />;

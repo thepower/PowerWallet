@@ -1,5 +1,5 @@
 import React, { FC, memo } from 'react';
-import { TToken } from 'myAssets/types';
+import { TToken, TokenKind } from 'myAssets/types';
 import cn from 'classnames';
 import { Checkbox, Divider, Switch } from 'common';
 import { BigNumber, formatFixed } from '@ethersproject/bignumber';
@@ -28,7 +28,7 @@ const TokenComponent: FC<TokenProps> = ({
 }) => {
   const { amount, decimals, type } = token;
   const formattedAmount =
-    type === 'erc20' ? formatFixed(BigNumber.from(amount), decimals) : amount;
+    type === TokenKind.Erc20 ? formatFixed(BigNumber.from(amount), decimals) : amount;
 
   const onClickToken = () => {
     if (onClickSwitch) {

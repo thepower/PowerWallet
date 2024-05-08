@@ -11,7 +11,7 @@ import {
   addTokenTrigger,
   toggleTokenShow,
 } from 'myAssets/slices/tokensSlice';
-import { AddTokensTabs, getAddTokenTabsLabels } from 'myAssets/types';
+import { AddTokensTabs, TokenKind, getAddTokenTabsLabels } from 'myAssets/types';
 import { useTranslation } from 'react-i18next';
 import SearchInput from '../../../common/searchInput/SearchInput';
 import styles from './AddTokenPage.module.scss';
@@ -84,8 +84,8 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
     </div>
   ), [address, onClickAddToken, t]);
 
-  const erc20tokens = tokens.filter((token) => token.type === 'erc20');
-  const erc721tokens = tokens.filter((token) => token.type === 'erc721');
+  const erc20tokens = tokens.filter((token) => token.type === TokenKind.Erc20);
+  const erc721tokens = tokens.filter((token) => token.type === TokenKind.Erc721);
 
   const tokensMap = {
     [AddTokensTabs.Erc20]: erc20tokens,

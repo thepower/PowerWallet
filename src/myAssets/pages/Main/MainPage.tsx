@@ -10,6 +10,7 @@ import {
 } from 'myAssets/slices/tokensSlice';
 import {
   MyAssetsTabs,
+  TokenKind,
   getMyAssetsTabsLabels,
 } from 'myAssets/types';
 import React, {
@@ -72,8 +73,8 @@ const MyAssetsComponent: FC<MyAssetsProps> = ({
     setShowUnderConstruction(true);
   };
 
-  const erc20tokens = tokens.filter((token) => token.isShow && token.type === 'erc20');
-  const erc721tokens = tokens.filter((token) => token.isShow && token.type === 'erc721');
+  const erc20tokens = tokens.filter((token) => token.isShow && token.type === TokenKind.Erc20);
+  const erc721tokens = tokens.filter((token) => token.isShow && token.type === TokenKind.Erc721);
 
   const tokensMap = {
     [MyAssetsTabs.Erc20]: [...nativeTokens, ...erc20tokens],

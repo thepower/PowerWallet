@@ -131,18 +131,18 @@ const SendPageComponent: FC<SendProps> = ({
     [addTokenTrigger, token, tokenAddress],
   );
 
-  const isNativeToken = useMemo(() => tokenType === 'native', [tokenType]);
-  const isErc721Token = useMemo(() => tokenType === 'erc721', [tokenType]);
+  const isNativeToken = useMemo(() => tokenType === TokenKind.Native, [tokenType]);
+  const isErc721Token = useMemo(() => tokenType === TokenKind.Erc721, [tokenType]);
 
   const formattedAmount = useMemo(() => {
     switch (tokenType) {
-      case 'erc20':
+      case TokenKind.Erc20:
         return (
           token && formatFixed(BigNumber.from(token.amount), token.decimals)
         );
-      case 'native':
+      case TokenKind.Native:
         return nativeTokenAmount;
-      case 'erc721':
+      case TokenKind.Erc721:
         return token?.amount;
       default:
         return '0';
@@ -151,7 +151,7 @@ const SendPageComponent: FC<SendProps> = ({
 
   const getValidationSchema = useCallback(() => {
     switch (tokenType) {
-      case 'native':
+      case TokenKind.Native:
         return yup.object().shape({
           amount: yup
             .number()
@@ -165,7 +165,7 @@ const SendPageComponent: FC<SendProps> = ({
           address: yup.string().required().length(20),
           comment: yup.string().max(1024),
         });
-      case 'erc20':
+      case TokenKind.Erc20:
         return yup.object().shape({
           amount: yup
             .number()
@@ -178,7 +178,7 @@ const SendPageComponent: FC<SendProps> = ({
             .nullable(),
           address: yup.string().required().length(20),
         });
-      case 'erc721':
+      case TokenKind.Erc721:
         return yup.object().shape({
           address: yup.string().required().length(20),
         });
@@ -197,7 +197,7 @@ const SendPageComponent: FC<SendProps> = ({
     decryptedWif: string;
   }) => {
     switch (tokenType) {
-      case 'native':
+      case TokenKind.Native:
         sendTrxTrigger({
           to: values.address!,
           comment: values.comment,
@@ -205,7 +205,7 @@ const SendPageComponent: FC<SendProps> = ({
           wif: decryptedWif,
         });
         break;
-      case 'erc20':
+      case TokenKind.Erc20:
         if (token) {
           sendTokenTrxTrigger({
             address: token.address,
@@ -216,7 +216,7 @@ const SendPageComponent: FC<SendProps> = ({
           });
         }
         break;
-      case 'erc721':
+      case TokenKind.Erc721:
         sendErc721TokenTrxTrigger({
           to: values.address!,
           address: tokenAddress!,

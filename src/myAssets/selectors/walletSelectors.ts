@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from 'application/store';
-import type { TToken } from 'myAssets/types';
+import { TokenKind, type TToken } from 'myAssets/types';
 
 const getWalletState = (state: RootState) => state.wallet;
 
@@ -10,7 +10,7 @@ export const getWalletNativeTokensAmounts = createSelector(getWalletState, (wall
 
 export const getWalletNativeTokens = createSelector(getWalletState, (wallet) => Object.entries(wallet.amounts).map(
   ([symbol, amount]) => ({
-    type: 'native',
+    type: TokenKind.Native,
     name: symbol,
     address: symbol,
     symbol,
