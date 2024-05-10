@@ -122,17 +122,17 @@ const SendPageComponent: FC<SendProps> = ({
     [],
   );
 
+  const isNativeToken = useMemo(() => tokenType === TokenKind.Native, [tokenType]);
+  const isErc721Token = useMemo(() => tokenType === TokenKind.Erc721, [tokenType]);
+
   useEffect(
     () => {
-      if (!token && tokenAddress) {
+      if (!token && tokenAddress && !isNativeToken) {
         addTokenTrigger({ address: tokenAddress, withoutRedirect: true });
       }
     },
-    [addTokenTrigger, token, tokenAddress],
+    [addTokenTrigger, isNativeToken, token, tokenAddress],
   );
-
-  const isNativeToken = useMemo(() => tokenType === TokenKind.Native, [tokenType]);
-  const isErc721Token = useMemo(() => tokenType === TokenKind.Erc721, [tokenType]);
 
   const formattedAmount = useMemo(() => {
     switch (tokenType) {

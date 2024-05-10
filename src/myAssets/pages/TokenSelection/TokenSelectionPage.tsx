@@ -90,18 +90,6 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     return null;
   }, [collectionAddress, getTokenByID]);
 
-  useEffect(() => {
-    if (!collection && collectionAddress) {
-      addTokenTrigger({
-        address: collectionAddress,
-        withoutRedirect: true,
-        additionalActionOnSuccess: () => {
-          setSelectedToken(collectionAddress);
-        },
-      });
-    }
-  }, [addTokenTrigger, collection, collectionAddress]);
-
   const onClickCheckBox = useCallback(
     (token: string) => {
       setSelectedToken((prevState) => (prevState === token ? '' : token));
