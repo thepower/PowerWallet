@@ -4,6 +4,7 @@ import {
   MenuItem,
   MenuItemClasses,
   Menu,
+  MenuClasses,
 } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
@@ -13,6 +14,8 @@ import { IconButton } from 'common';
 import styles from './LangMenu.module.scss';
 
 type SelectProps = Omit<MuiMenuProps, 'open'>;
+
+const menuClasses: Partial<MenuClasses> = { list: styles.menuList, paper: styles.menuPaper, root: styles.menuRoot };
 
 const menuItemClasses: Partial<MenuItemClasses> = {
   selected: styles.menuItemSelected,
@@ -48,15 +51,16 @@ export const LangMenu: FC<SelectProps> = ({
     <div>
       <IconButton
         onClick={handleClick}
+        className={className}
       >
         <LangIcon />
       </IconButton>
       <Menu
-        className={className}
         id="lang-menu"
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        classes={menuClasses}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'center',

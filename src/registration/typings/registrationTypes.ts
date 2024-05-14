@@ -1,11 +1,12 @@
 import { WizardComponentProps } from 'common';
+import { TFunction } from 'i18next';
 import i18n from 'locales/initTranslation';
 import React from 'react';
 
 const { t } = i18n;
 
 // i18next keys
-export const getRegistrationTabs = () => ({
+export const getRegistrationTabs = (t: TFunction) => ({
   quickGuide: t('quickGuide'),
   beAware: t('beAware'),
   loginRegister: t('loginRegister'),

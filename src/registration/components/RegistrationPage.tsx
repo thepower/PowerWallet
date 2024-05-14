@@ -1,5 +1,4 @@
 import {
-  BreadcrumbsDataType,
   BreadcrumbsTypeEnum,
   Button,
   LangMenu,
@@ -7,8 +6,12 @@ import {
   Wizard,
 } from 'common';
 import { push } from 'connected-react-router';
-import React from 'react';
-import { WithTranslation, withTranslation } from 'react-i18next';
+import React, {
+  FC, useCallback, useMemo, useState,
+} from 'react';
+import {
+  useTranslation,
+} from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { WalletRoutesEnum } from '../../application/typings/routes';
 import { getRegistrationTabs } from '../typings/registrationTypes';
@@ -23,52 +26,45 @@ const mapDispatchToProps = {
 };
 
 const connector = connect(null, mapDispatchToProps);
-type RegistrationPageProps = ConnectedProps<typeof connector> & WithTranslation;
+type RegistrationPageProps = ConnectedProps<typeof connector>;
 
-interface RegistrationPageState {
-  enterButtonPressed: boolean;
-}
+const RegistrationPageComponent: FC<RegistrationPageProps> = ({ routeTo }) => {
+  const { t } = useTranslation();
 
-class RegistrationPageComponent extends React.PureComponent<RegistrationPageProps, RegistrationPageState> {
-  constructor(props: RegistrationPageProps) {
-    super(props);
-    this.state = {
-      enterButtonPressed: false,
-    };
-  }
+  const [enterButtonPressed, setEnterButtonPressed] = useState(false);
 
-  getRegistrationBreadcrumbs: () => BreadcrumbsDataType[] = () => [
+  const getRegistrationBreadcrumbs = useMemo(() => [
     {
-      label: getRegistrationTabs().quickGuide,
+      label: getRegistrationTabs(t).quickGuide,
       component: QuickGuide,
     },
     {
-      label: getRegistrationTabs().beAware,
+      label: getRegistrationTabs(t).beAware,
       component: BeAware,
     },
     {
-      label: getRegistrationTabs().loginRegister,
+      label: getRegistrationTabs(t).loginRegister,
       component: RegisterPage,
     },
     {
-      label: getRegistrationTabs().backup,
+      label: getRegistrationTabs(t).backup,
       component: Backup,
     },
-  ];
+  ], [t]);
 
-  handleProceedToRegistration = () => {
-    this.setState({ enterButtonPressed: true });
+  const handleProceedToRegistration = () => {
+    setEnterButtonPressed(true);
   };
 
-  handleProceedToLogin = () => {
-    this.props.routeTo(WalletRoutesEnum.login);
+  const handleProceedToLogin = () => {
+    routeTo(WalletRoutesEnum.login);
   };
 
-  renderWelcome = () => (
+  const renderWelcome = useCallback(() => (
     <>
       <div className={styles.registrationTitle}>{'Power Wallet'}</div>
       <div className={styles.registrationDesc}>
-        {this.props.t('registrationPageDesc')}
+        {t('registrationPageDesc')}
       </div>
       <div className={styles.buttonsHolder}>
         <Button
@@ -76,48 +72,44 @@ class RegistrationPageComponent extends React.PureComponent<RegistrationPageProp
           variant="filled"
           className={styles.loginButton}
           type="button"
-          onClick={this.handleProceedToRegistration}
+          onClick={handleProceedToRegistration}
         >
-          {this.props.t('registrationPageJoinButton')}
+          {t('registrationPageJoinButton')}
         </Button>
         <Button
           size="large"
           variant="outlined"
           className={styles.loginButton}
           type="button"
-          onClick={this.handleProceedToLogin}
+          onClick={handleProceedToLogin}
         >
-          {this.props.t('registrationPageImportAccountButton')}
+          {t('registrationPageImportAccountButton')}
         </Button>
       </div>
     </>
-  );
+  ), [t, handleProceedToLogin, handleProceedToRegistration]);
 
-  renderRegistration = () => (
+  const renderRegistration = useCallback(() => (
     <div className={styles.registrationWizardComponent}>
       <PELogoWithTitle className={styles.registrationPageIcon} />
       <div className={styles.registrationWizardHolder}>
         <Wizard
           className={styles.registrationWizard}
-          breadcrumbs={this.getRegistrationBreadcrumbs()}
+          breadcrumbs={getRegistrationBreadcrumbs}
           type={BreadcrumbsTypeEnum.direction}
           breadCrumbHasBorder
         />
       </div>
     </div>
-  );
+  ), [getRegistrationBreadcrumbs]);
 
-  render() {
-    const { enterButtonPressed } = this.state;
-
-    return <div className={styles.registrationPage}>
+  return (
+    <div className={styles.registrationPage}>
       <div className={styles.registrationPageCover} />
-      <LangMenu
-        className={styles.langSelect}
-      />
-      {enterButtonPressed ? this.renderRegistration() : this.renderWelcome()}
-    </div>;
-  }
-}
+      <LangMenu className={styles.langSelect} />
+      {enterButtonPressed ? renderRegistration() : renderWelcome()}
+    </div>
+  );
+};
 
-export const RegistrationPage = withTranslation()(connector(RegistrationPageComponent));
+export const RegistrationPage = connector(RegistrationPageComponent);

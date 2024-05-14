@@ -240,7 +240,6 @@ class LoginPageComponent extends React.PureComponent<LoginPageProps, LoginPageSt
       />
       <LangMenu
         className={styles.langSelect}
-
       />
       <div className={styles.registrationPageCover} />
       <div className={styles.registrationWizardComponent}>

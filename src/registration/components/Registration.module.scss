@@ -23,18 +23,6 @@
   margin-bottom: $unit * 4;
 }
 
-.registrationPageCover {
-  position: absolute;
-  width: 60vw;
-  height: 100vh;
-  background: url('../../assets/imgs/RegistraionBackground.png');
-  background-size: contain;
-
-  @include mobile {
-    width: 150vw;
-  }
-}
-
 .langSelect {
   position: fixed;
   z-index: 100001;

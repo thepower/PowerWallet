@@ -20,7 +20,6 @@ import {
   getErc721TokensTrigger,
   toggleTokenShow,
   updateTokensAmountsTrigger,
-  addTokenTrigger,
 } from 'myAssets/slices/tokensSlice';
 
 import { useTranslation } from 'react-i18next';
@@ -41,7 +40,6 @@ const mapDispatchToProps = {
   updateTokensAmountsTrigger,
   pushTo: push,
   getErc721TokensTrigger,
-  addTokenTrigger,
 };
 
 const mapStateToProps = (state: RootState, props: OwnProps) => ({
@@ -67,7 +65,6 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   erc721Tokens,
   isGetErc721TokensLoading,
   getErc721TokensTrigger,
-  addTokenTrigger,
 }) => {
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
   const [selectedToken, setSelectedToken] = useState<string>('');
@@ -143,7 +140,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
       );
     }
 
-    if (collectionAddress && erc721Tokens.length) {
+    if (collectionAddress) {
       return (
         <ul className={styles.tokensList}>
           {erc721Tokens.map((token) => (
@@ -154,7 +151,6 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
                 isCheckBoxChecked={selectedToken === token.id}
                 onClickCheckBox={onClickCheckBox}
               />
-
             </li>
           ))}
         </ul>

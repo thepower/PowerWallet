@@ -1,8 +1,8 @@
 {
   "translation": {
-    "registrationPageDesc": "дом для всех и каждого dapp",
-    "registrationPageJoinButton": "Присоединяйтесь к Web3",
-    "registrationPageImportAccountButton": "Войдите в систему или импортируйте учетную запись",
+    "registrationPageDesc": "Ваш доступ к децентрализованному интернету и цифровым активам",
+    "registrationPageJoinButton": "Регистрация",
+    "registrationPageImportAccountButton": "Авторизоваться",
     "createNewAccount": "Регистрация",
     "exportAccount": "Экспорт ключей",
     "importAccount": "Импорт ключей",

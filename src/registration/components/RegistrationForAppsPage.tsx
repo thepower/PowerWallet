@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {
+  FC, useCallback, useEffect, useMemo,
+} from 'react';
 import { push } from 'connected-react-router';
 import { connect, ConnectedProps } from 'react-redux';
 import {
-  BreadcrumbsDataType,
   BreadcrumbsTypeEnum,
   PELogoWithTitle,
   Wizard,
@@ -18,7 +19,9 @@ import { RouteComponentProps } from 'react-router';
 
 import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { WithTranslation, withTranslation } from 'react-i18next';
+import {
+  useTranslation,
+} from 'react-i18next';
 import { getRegistrationTabs } from '../typings/registrationTypes';
 
 import styles from './Registration.module.scss';
@@ -38,68 +41,66 @@ const mapDispatchToProps = {
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
-type RegistrationForAppsPageProps = ConnectedProps<typeof connector> & WithTranslation;
+type RegistrationForAppsPageProps = ConnectedProps<typeof connector>;
 
-interface RegistrationForAppsPageState {
-  enterButtonPressed: boolean;
-}
+const RegistrationForAppsPageComponent: FC<RegistrationForAppsPageProps> = ({
+  routeTo,
+  data,
+  walletAddress,
+  setCreatingCurrentShard,
+  generateSeedPhrase,
+}) => {
+  const { t } = useTranslation();
 
-class RegistrationForAppsPageComponent extends
-  React.PureComponent<RegistrationForAppsPageProps, RegistrationForAppsPageState> {
-  private registrationBreadcrumbs: BreadcrumbsDataType[] = [
+  const registrationBreadcrumbs = useMemo(() => [
     {
-      label: getRegistrationTabs().loginRegister,
+      label: getRegistrationTabs(t).loginRegister,
       component: RegisterForAppsPage,
     },
     {
-      label: getRegistrationTabs().backup,
+      label: getRegistrationTabs(t).backup,
     },
-  ];
+  ], [t]);
 
-  componentDidMount(): void {
-    const {
-      generateSeedPhrase,
-      setCreatingCurrentShard,
-      data,
-      routeTo,
-      walletAddress,
-    } = this.props;
+  const parsedData: { chainID: number; callbackUrl?: string } | null =
+    useMemo(() => {
+      if (data) return stringToObject(data);
+      return null;
+    }, [data]);
 
+  useEffect(() => {
     if (walletAddress) {
       routeTo(`${WalletRoutesEnum.sso}/${data}`);
     } else {
       generateSeedPhrase();
-      setCreatingCurrentShard(this.parsedData?.chainID || defaultChain);
+      setCreatingCurrentShard(parsedData?.chainID || defaultChain);
     }
-  }
+  }, [
+    data,
+    parsedData?.chainID,
+    walletAddress,
+  ]);
 
-  get parsedData(): { chainID: number, callbackUrl?: string } | null {
-    const { data } = this.props;
-
-    if (data) return stringToObject(data);
-    return null;
-  }
-
-  renderRegistration = () => (
+  const renderRegistration = useCallback(() => (
     <div className={styles.registrationWizardComponent}>
       <PELogoWithTitle className={styles.registrationPageIcon} />
       <div className={styles.registrationWizardHolder}>
         <Wizard
           className={styles.registrationWizard}
-          breadcrumbs={this.registrationBreadcrumbs}
+          breadcrumbs={registrationBreadcrumbs}
           type={BreadcrumbsTypeEnum.direction}
           breadCrumbHasBorder
         />
       </div>
     </div>
-  );
+  ), [registrationBreadcrumbs]);
 
-  render() {
-    return <div className={styles.registrationPage}>
+  return (
+    <div className={styles.registrationPage}>
       <div className={styles.registrationPageCover} />
-      {this.renderRegistration()}
-    </div>;
-  }
-}
+      {renderRegistration()}
+    </div>
+  );
+};
 
-export const RegistrationForAppsPage = withTranslation()(connector(RegistrationForAppsPageComponent));
+export const RegistrationForAppsPage = connector(RegistrationForAppsPageComponent);

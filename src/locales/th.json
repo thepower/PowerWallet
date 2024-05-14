@@ -1,8 +1,8 @@
 {
   "translation": {
-    "registrationPageDesc": "บ้านสำหรับทุกคนและแอปพลิเคชันทุกตัว",
-    "registrationPageJoinButton": "เข้าร่วม Web3",
-    "registrationPageImportAccountButton": "เข้าสู่ระบบหรือนำเข้าบัญชี",
+    "registrationPageDesc": "เกตเวย์สู่เว็บแบบกระจายศูนย์และสินทรัพย์ดิจิทัล",
+    "registrationPageJoinButton": "ลงทะเบียน",
+    "registrationPageImportAccountButton": "เข้าสู่ระบบ",
     "createNewAccount": "สร้างบัญชีใหม่",
     "exportAccount": "ส่งออกบัญชี",
     "importAccount": "นำเข้าบัญชี",
