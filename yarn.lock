@@ -2449,10 +2449,10 @@
     int64-buffer "^0.1.9"
     isarray "^1.0.0"
 
-"@thepowereco/tssdk@^1.15.34":
-  version "1.15.34"
-  resolved "https://registry.yarnpkg.com/@thepowereco/tssdk/-/tssdk-1.15.34.tgz#72502d00d183b117345c4e3e52aba19eaafd9cdb"
-  integrity sha512-qDoltFrQD9XR4C7X2vOErsJewGeBanDrutMJfvrb8Rr9cotIZVXutbvhROjWNgLjWA1ASF+VvUjmPGoyzD0xsg==
+"@thepowereco/tssdk@^1.15.35":
+  version "1.15.35"
+  resolved "https://registry.yarnpkg.com/@thepowereco/tssdk/-/tssdk-1.15.35.tgz#f5667fafcada3bab239a1baefd98895daff6305c"
+  integrity sha512-gAfLmXtyMJtuog15LTxjgcTiKvu4Ig2WzfpnbWTPFLpfTMDOx7fHC5gcXbDJxz3gqzM+hKfh2mBnGBOkMd8CQg==
   dependencies:
     "@ethereumjs/common" "^4.1.0"
     "@ethereumjs/tx" "^5.1.0"

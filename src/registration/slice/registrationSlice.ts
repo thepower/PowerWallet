@@ -1,4 +1,5 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { NetworkEnum } from '@thepowereco/tssdk';
 import { AddActionOnSuccessType, Maybe } from '../../typings/common';
 import {
   CreateAccountStepsEnum,
@@ -9,17 +10,10 @@ import {
 
 const SLICE_NAME = 'registration';
 
-const generateSeedPhrase = createAction(`${SLICE_NAME}/generateSeedPhrase`);
-const createWallet = createAction<AddActionOnSuccessType<{
-  password: string;
-  randomChain: boolean,
-}>>(`${SLICE_NAME}/createWallet`);
-const loginToWalletFromRegistration = createAction<LoginToWalletInputType>(`${SLICE_NAME}/loginToWallet`);
-const proceedToWallet = createAction(`${SLICE_NAME}/proceedToWallet`);
-
 export type RegistrationState = {
-  tab: LoginRegisterAccountTabs;
-  currentShard: Maybe<number>;
+  tab: LoginRegisterAccountTabs; // old logic
+  selectedNetwork: Maybe<NetworkEnum>;
+  selectedChain: Maybe<number>;
   seedPhrase: Maybe<string>;
   creatingStep: CreateAccountStepsEnum;
   address: Maybe<string>;
@@ -27,20 +21,21 @@ export type RegistrationState = {
   password: Maybe<string>;
   confirmedPassword: Maybe<string>;
   passwordsNotEqual: boolean;
-  randomChain: boolean;
+  isRandomChain: boolean;
 };
 
 const initialState: RegistrationState = {
   tab: LoginRegisterAccountTabs.create,
-  currentShard: null,
+  selectedNetwork: null,
+  selectedChain: null,
   seedPhrase: null,
-  creatingStep: CreateAccountStepsEnum.selectSubChain,
+  creatingStep: CreateAccountStepsEnum.selectChain,
   address: null,
   seed: null,
   password: null,
   confirmedPassword: null,
   passwordsNotEqual: false,
-  randomChain: true,
+  isRandomChain: true,
 };
 
 const registrationSlice = createSlice({
@@ -50,8 +45,11 @@ const registrationSlice = createSlice({
     setCurrentRegisterCreateAccountTab: (state: RegistrationState, action: PayloadAction<LoginRegisterAccountTabs>) => {
       state.tab = action.payload;
     },
-    setCreatingCurrentShard: (state: RegistrationState, action: PayloadAction<Maybe<number>>) => {
-      state.currentShard = action.payload;
+    setSelectedNetwork: (state: RegistrationState, action: PayloadAction<Maybe<NetworkEnum>>) => {
+      state.selectedNetwork = action.payload;
+    },
+    setSelectedChain: (state: RegistrationState, action: PayloadAction<Maybe<number>>) => {
+      state.selectedChain = action.payload;
     },
     setSeedPhrase: (state: RegistrationState, action: PayloadAction<SetSeedPhraseInput>) => {
       state.seedPhrase = action.payload.seedPhrase;
@@ -78,16 +76,17 @@ const registrationSlice = createSlice({
       state.passwordsNotEqual = action.payload;
     },
     toggleRandomChain: (state: RegistrationState) => {
-      state.randomChain = !state.randomChain;
+      state.isRandomChain = !state.isRandomChain;
     },
   },
 });
 
-const {
+export const {
   reducer: registrationReducer,
   actions: {
     setCurrentRegisterCreateAccountTab,
-    setCreatingCurrentShard,
+    setSelectedNetwork,
+    setSelectedChain,
     setSeedPhrase,
     setCreatingStep,
     seLoginAddress,
@@ -99,11 +98,9 @@ const {
   },
 } = registrationSlice;
 
-export {
-  createWallet, generateSeedPhrase, loginToWalletFromRegistration,
-  proceedToWallet, registrationReducer,
-  seLoginAddress, setCreatingCurrentShard, setCreatingStep,
-  setCurrentRegisterCreateAccountTab, setLoginConfirmedPassword,
-  setLoginPassword, setLoginSeed, setPasswordNotEqual, setSeedPhrase,
-  toggleRandomChain,
-};
+export const generateSeedPhrase = createAction(`${SLICE_NAME}/generateSeedPhrase`);
+export const createWallet = createAction<AddActionOnSuccessType<{
+  password: string;
+}>>(`${SLICE_NAME}/createWallet`);
+export const loginToWalletFromRegistration = createAction<LoginToWalletInputType>(`${SLICE_NAME}/loginToWallet`);
+export const proceedToWallet = createAction(`${SLICE_NAME}/proceedToWallet`);

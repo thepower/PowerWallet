@@ -7,8 +7,7 @@ const { t } = i18n;
 
 // i18next keys
 export const getRegistrationTabs = (t: TFunction) => ({
-  quickGuide: t('quickGuide'),
-  beAware: t('beAware'),
+  selectNetwork: t('selectNetwork'),
   loginRegister: t('loginRegister'),
   backup: t('backup'),
 } as const);
@@ -34,7 +33,7 @@ export const getLoginRegisterAccountTabsLabelsShort = () => ({
 } as const);
 
 export enum CreateAccountStepsEnum {
-  selectSubChain = 'selectSubChain',
+  selectChain = 'selectChain',
   setSeedPhrase = 'setSeedPhrase',
   confirmSeedPhrase = 'confirmSeedPhrase',
   encryptPrivateKey = 'encryptPrivateKey',

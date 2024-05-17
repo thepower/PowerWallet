@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../Registration.module.scss';
+import styles from './RegistrationStatement.module.scss';
 
 interface RegistrationStatementProps {
   title?: string;

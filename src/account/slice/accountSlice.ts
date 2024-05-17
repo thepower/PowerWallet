@@ -4,7 +4,7 @@ import { ExportAccountInputType, ImportAccountInputType, LoginToWalletSagaInput 
 
 export type WalletData = {
   address: string;
-  wif: string;
+  encryptedWif: string;
 };
 
 export interface AccountState {
@@ -22,7 +22,7 @@ const importAccountFromFile = createAction<AddActionOnDecryptErrorType<ImportAcc
 const initialState: AccountState = {
   walletData: {
     address: '',
-    wif: '',
+    encryptedWif: '',
   },
   logged: false,
   openedMenu: false,

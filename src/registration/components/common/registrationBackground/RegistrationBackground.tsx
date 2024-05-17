@@ -1,6 +1,6 @@
 import React from 'react';
 import classnames from 'classnames';
-import styles from '../Registration.module.scss';
+import styles from './RegistrationBackground.module.scss';
 
 interface RegistrationBackgroundProps extends React.PropsWithChildren {
   className?: string;

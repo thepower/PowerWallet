@@ -5,7 +5,7 @@ import { FileReaderType, getFileData } from 'common';
 import { push } from 'connected-react-router';
 import { toast } from 'react-toastify';
 import i18n from 'locales/initTranslation';
-import { getCurrentShardSelector } from 'registration/selectors/registrationSelectors';
+import { getSelectedChain } from 'registration/selectors/registrationSelectors';
 import {
   clearAccountData,
   exportAccount,
@@ -25,7 +25,7 @@ import { reInitApis } from '../../application/sagas/initApplicationSaga';
 import { loadBalanceTrigger } from '../../myAssets/slices/walletSlice';
 
 export function* loginToWalletSaga({ payload }: { payload?: LoginToWalletSagaInput } = {}) {
-  const { address, wif } = payload!;
+  const { address, encryptedWif } = payload!;
   let NetworkAPI = (yield* select(getNetworkApi))!;
 
   try {
@@ -51,10 +51,10 @@ export function* loginToWalletSaga({ payload }: { payload?: LoginToWalletSagaInp
     } while (subChain.result !== 'found');
 
     yield setKeyToApplicationStorage('address', address);
-    yield setKeyToApplicationStorage('wif', wif);
+    yield setKeyToApplicationStorage('wif', encryptedWif);
     yield* put(setWalletData({
       address: payload?.address!,
-      wif: payload?.wif!,
+      encryptedWif: payload?.encryptedWif!,
       logged: true,
     }));
 
@@ -73,9 +73,9 @@ export function* importAccountFromFileSaga({ payload }: ReturnType<typeof import
   try {
     const data = yield* call(getFileData, accountFile, FileReaderType.binary);
     const walletData: LoginToWalletSagaInput = yield WalletAPI.parseExportData(data!, password);
-    const wif = yield* call(CryptoApi.encryptWif, walletData.wif!, password);
+    const encryptedWif = yield* call(CryptoApi.encryptWif, walletData.encryptedWif!, password);
 
-    yield* loginToWalletSaga({ payload: { address: walletData.address, wif } });
+    yield* loginToWalletSaga({ payload: { address: walletData.address, encryptedWif } });
     yield* put(push(WalletRoutesEnum.root));
   } catch (e: any) {
     if (additionalActionOnDecryptError && e.message === 'unable to decrypt data') {
@@ -87,20 +87,20 @@ export function* importAccountFromFileSaga({ payload }: ReturnType<typeof import
 }
 
 export function* exportAccountSaga({ payload }: ReturnType<typeof exportAccount>) {
-  const { wif, address } = yield* select(getWalletData);
+  const { encryptedWif, address } = yield* select(getWalletData);
   const {
     password, hint, isWithoutGoHome, additionalActionOnSuccess, additionalActionOnDecryptError,
   } = payload;
   const WalletAPI = (yield* select(getWalletApi))!;
   const currentNetworkChain = yield* select(getNetworkChainID);
-  const currentRegistrationChain = yield* select(getCurrentShardSelector);
+  const currentRegistrationChain = yield* select(getSelectedChain);
   try {
-    const decryptedWif: string = yield CryptoApi.decryptWif(wif, password);
+    const decryptedWif: string = yield CryptoApi.decryptWif(encryptedWif, password);
     const exportedData: string = yield WalletAPI.getExportData(decryptedWif, address, password, hint);
 
     const blob: Blob = yield new Blob([exportedData], { type: 'octet-stream' });
 
-    yield* loginToWalletSaga({ payload: { address, wif } });
+    yield* loginToWalletSaga({ payload: { address, encryptedWif } });
 
     const fileName = currentNetworkChain || currentRegistrationChain ?
       `power_wallet_${currentRegistrationChain || currentNetworkChain}_${address}.pem` :

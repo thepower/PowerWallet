@@ -1,0 +1,28 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.registrationBackground {
+  display: flex;
+  width: 800px;
+  max-width: 80vw;
+  height: 100%;
+  min-height: 456px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 12px 84px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  background: #151516;
+
+  @include mobile {
+    width: 100%;
+    height: unset;
+    min-height: unset;
+    padding: 20px 8px;
+    margin-bottom: 40px;
+  }
+
+  div:not(:last-of-type) {
+    margin-bottom: 16px;
+  }
+}

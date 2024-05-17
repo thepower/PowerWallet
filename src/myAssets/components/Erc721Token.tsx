@@ -3,7 +3,6 @@ import { TErc721Token, TToken } from 'myAssets/types';
 import cn from 'classnames';
 import { Checkbox, Divider } from 'common';
 
-import { CheckedIcon, UnCheckedIcon } from 'assets/icons';
 import styles from './Erc721Token.module.scss';
 
 type OwnProps = {
@@ -35,9 +34,8 @@ const Erc721TokenComponent: FC<TokenProps> = ({
         <Checkbox
           className={styles.assetCheckBox}
           size={'medium'}
+          onClick={() => onClickCheckBox(token.id)}
           checked={isCheckBoxChecked}
-          checkedIcon={<CheckedIcon />}
-          icon={<UnCheckedIcon />}
           disableRipple
         />
       );

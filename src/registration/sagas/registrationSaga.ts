@@ -15,8 +15,9 @@ import bs58 from 'bs58';
 import { getWalletData } from '../../account/selectors/accountSelectors';
 import { loginToWallet, setWalletData } from '../../account/slice/accountSlice';
 import { WalletRoutesEnum } from '../../application/typings/routes';
-import { CURRENT_NETWORK } from '../../application/utils/applicationUtils';
-import { getCurrentShardSelector, getGeneratedSeedPhrase } from '../selectors/registrationSelectors';
+import {
+  getSelectedChain, getGeneratedSeedPhrase, getSelectedNetwork, getIsRandomChain,
+} from '../selectors/registrationSelectors';
 import { createWallet, setSeedPhrase } from '../slice/registrationSlice';
 import { CreateAccountStepsEnum, LoginToWalletInputType } from '../typings/registrationTypes';
 
@@ -30,23 +31,29 @@ export function* generateSeedPhraseSaga() {
 }
 
 export function* createWalletSaga({ payload }: ReturnType<typeof createWallet>) {
-  const { password, additionalActionOnSuccess, randomChain } = payload;
+  const { password, additionalActionOnSuccess } = payload;
   const seedPhrase = yield* select(getGeneratedSeedPhrase);
-  const shard = yield* select(getCurrentShardSelector);
+  const isRandomChain = yield* select(getIsRandomChain);
+  const network = yield* select(getSelectedNetwork);
+
+  const chain = yield* select(getSelectedChain);
   let account: RegisteredAccount;
 
+  if (!network) return;
+  if (!isRandomChain && !chain) return;
+
   try {
-    if (randomChain) {
-      account = yield WalletApi.registerRandomChain(CURRENT_NETWORK!, seedPhrase!);
+    if (isRandomChain) {
+      account = yield WalletApi.registerRandomChain(network, seedPhrase!);
     } else {
-      account = yield WalletApi.registerCertainChain(shard!, seedPhrase!);
+      account = yield WalletApi.registerCertainChain(chain!, seedPhrase!);
     }
 
     const encryptedWif = CryptoApi.encryptWif(account.wif, password);
 
     yield put(setWalletData({
       address: account.address,
-      wif: encryptedWif,
+      encryptedWif,
     }));
 
     additionalActionOnSuccess?.();
@@ -86,19 +93,19 @@ export function* loginToWalletSaga({ payload }: { payload: LoginToWalletInputTyp
   }
 
   try {
-    let wif = null;
+    let encryptedWif = null;
     if (isValidSeed) {
       const keyPair: ECPairInterface =
         yield CryptoApi.generateKeyPairFromSeedPhraseAndAddress(seedOrPrivateKey, address);
-      wif = keyPair && CryptoApi.encryptWif(keyPair.toWIF(), password);
+      encryptedWif = keyPair && CryptoApi.encryptWif(keyPair.toWIF(), password);
     } else if (!isValidSeed && isValidPrivateKey) {
-      wif = CryptoApi.encryptWif(seedOrPrivateKey, password);
+      encryptedWif = CryptoApi.encryptWif(seedOrPrivateKey, password);
     }
-    if (wif) {
-      yield* put(loginToWallet({ address, wif }));
+    if (encryptedWif) {
+      yield* put(loginToWallet({ address, encryptedWif }));
       yield* put(push(WalletRoutesEnum.root));
     } else {
-      console.error('loginToWalletSaga if (!wif)', wif);
+      console.error('loginToWalletSaga if (!wif)', encryptedWif);
       toast.error(i18n.t('loginError'));
     }
   } catch (e) {
@@ -108,7 +115,7 @@ export function* loginToWalletSaga({ payload }: { payload: LoginToWalletInputTyp
 }
 
 export function* proceedToWalletSaga() {
-  const { wif, address } = yield* select(getWalletData);
-  yield* put(loginToWallet({ address, wif }));
+  const { encryptedWif, address } = yield* select(getWalletData);
+  yield* put(loginToWallet({ address, encryptedWif }));
   yield* put(push(WalletRoutesEnum.root));
 }

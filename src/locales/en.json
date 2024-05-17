@@ -28,7 +28,6 @@
     "discover": "Discover",
     "myPlace": "MyPlace",
     "build": "Build",
-    "contribute": "Contribute",
     "signUp": "Sign up",
     "linkTransactionCopied": "The link to the transaction has been copied!",
     "amount": "Amount",
@@ -130,11 +129,6 @@
     "weNeverTransmit": "We never transmit or store your seed phrases or other account information\nWe can’t restore it or freeze it",
     "loginToAccount": "Login to  account",
     "whatIsPowerHub": "What is Power Hub?",
-    "discoverDApps": "Discover DApps",
-    "powerHubGivesPeople": "Power Hub gives people around the world a safe and trusted place to discover dapps that are secured by blockchain with high standards of privacy and security",
-    "buildPublish": "Build & Publish",
-    "buildDappWhereEverything": "Build Dapp where everything is in one place:  decentralized infrastructure and services. Make developer’s life easier -  the real full-stack dapps",
-    "communityInputIsValuable": "Community input is valuable and essential to ongoing growth \nand improvement. Contributions and involvement help shape DAO's direction and development.",
     "createAccountError": "Create account error",
     "seedPhraseIsNotValid": "Seed phrase is not valid",
     "addressIsNotValid": "Address is not valid",
@@ -168,7 +162,7 @@
     "logInToTheApp": "Log in to the app",
     "savedToDisk": "saved to disk",
     "wallets": "Wallets",
-    "quickGuide": "Quick guide",
+    "selectNetwork": "Select network",
     "beAware": "Be aware",
     "loginRegister": "Login / Register",
     "backup": "Backup",
@@ -187,6 +181,7 @@
     "skBalance": "SK balance",
     "tokens": "Tokens",
     "wrongChain": "The chain of your address does not match the chain of the token contract",
-    "tokenHasAlreadyBeenAdded": "the token has already been added"
+    "tokenHasAlreadyBeenAdded": "the token has already been added",
+    "chooseDeInfraNetwork": "Choose DeInfra network"
   }
 }

@@ -66,7 +66,7 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
     checkIfLoading(state, sendTokenTrxTrigger.type) ||
     checkIfLoading(state, sendErc721TokenTrxTrigger.type),
   isAddTokenLoading: checkIfLoading(state, addTokenTrigger.type),
-  wif: getWalletData(state).wif,
+  encryptedWif: getWalletData(state).encryptedWif,
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -103,7 +103,7 @@ const SendPageComponent: FC<SendProps> = ({
   sendErc721TokenTrxTrigger,
   addTokenTrigger,
   nativeTokenAmount,
-  wif,
+  encryptedWif,
   erc721TokenId,
 }) => {
   const { t } = useTranslation();
@@ -236,7 +236,7 @@ const SendPageComponent: FC<SendProps> = ({
       formikHelpers.setFieldError('address', t('invalidAddress')!);
     } else {
       try {
-        const decryptedWif = CryptoApi.decryptWif(wif, '');
+        const decryptedWif = CryptoApi.decryptWif(encryptedWif, '');
 
         await send({ values, decryptedWif });
       } catch (error) {
@@ -246,7 +246,7 @@ const SendPageComponent: FC<SendProps> = ({
   };
 
   const onSubmit = async (values: FormValues, password: string) => {
-    const decryptedWif = CryptoApi.decryptWif(wif, password);
+    const decryptedWif = CryptoApi.decryptWif(encryptedWif, password);
 
     await send({ values, decryptedWif });
   };

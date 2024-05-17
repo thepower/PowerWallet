@@ -6,7 +6,7 @@ import { BigNumber, formatFixed } from '@ethersproject/bignumber';
 
 import { Link } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { CheckedIcon, LogoIcon, UnCheckedIcon } from 'assets/icons';
+import { LogoIcon } from 'assets/icons';
 import styles from './Token.module.scss';
 
 type OwnProps = {
@@ -84,8 +84,7 @@ const TokenComponent: FC<TokenProps> = ({
           className={styles.assetCheckBox}
           size={'medium'}
           checked={isCheckBoxChecked}
-          checkedIcon={<CheckedIcon />}
-          icon={<UnCheckedIcon />}
+          onClick={() => onClickCheckBox(token.address)}
           disableRipple
         />
       );

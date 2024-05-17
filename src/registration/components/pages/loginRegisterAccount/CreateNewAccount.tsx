@@ -1,7 +1,6 @@
 import {
   Collapse,
   FormControlLabel,
-  MenuItem,
   Select,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select/SelectInput';
@@ -13,17 +12,17 @@ import {
   ModalLoader,
   OutlinedInput,
 } from 'common';
-import { CheckedIcon, ChevronDown, UnCheckedIcon } from 'assets/icons';
+import { ChevronDown } from 'assets/icons';
 import { checkIfLoading } from 'network/selectors';
 import React from 'react';
 import { WithTranslation, withTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
-import { getCurrentNetworkChains } from '../../../../application/selectors';
-import { getCurrentCreatingStep, getCurrentShardSelector, getGeneratedSeedPhrase } from '../../../selectors/registrationSelectors';
+import { getNetworksChains } from '../../../../application/selectors';
+import { getCurrentCreatingStep, getSelectedChain, getGeneratedSeedPhrase } from '../../../selectors/registrationSelectors';
 import {
   createWallet,
   generateSeedPhrase,
-  setCreatingCurrentShard,
+  setSelectedChain,
   setCreatingStep,
   setCurrentRegisterCreateAccountTab,
   setSeedPhrase,
@@ -35,19 +34,19 @@ import {
 } from '../../../typings/registrationTypes';
 import { compareTwoStrings } from '../../../utils/registrationUtils';
 import styles from '../../Registration.module.scss';
-import { RegistrationBackground } from '../../common/RegistrationBackground';
-import { RegistrationStatement } from '../../common/RegistrationStatement';
+import { RegistrationBackground } from '../../common/registrationBackground/RegistrationBackground';
+import { RegistrationStatement } from '../../common/registrationStatement/RegistrationStatement';
 
 const mapStateToProps = (state: RootState) => ({
-  currentShard: getCurrentShardSelector(state),
+  selectedChain: getSelectedChain(state),
   creatingStep: getCurrentCreatingStep(state),
   generatedSeedPhrase: getGeneratedSeedPhrase(state),
   loading: checkIfLoading(state, createWallet.type),
-  networkChains: getCurrentNetworkChains(state),
+  networkChains: getNetworksChains(state),
 });
 
 const mapDispatchToProps = {
-  setCreatingCurrentShard,
+  setSelectedChain,
   generateSeedPhrase,
   setCreatingStep,
   setSeedPhrase,
@@ -59,7 +58,7 @@ const mapDispatchToProps = {
 const connector = connect(mapStateToProps, mapDispatchToProps);
 type CreateNewAccountProps = ConnectedProps<typeof connector> & WithTranslation & {
   setNextStep: () => void;
-  randomChain: boolean;
+  isRandomChain: boolean;
 };
 
 interface CreateNewAccountState {
@@ -109,7 +108,7 @@ class CreateNewAccountComponent extends React.PureComponent<CreateNewAccountProp
   }
 
   onSelectShard = (event: SelectChangeEvent<number>) => {
-    this.props.setCreatingCurrentShard(event.target.value as number);
+    this.props.setSelectedChain(event.target.value as number);
   };
 
   submitForm = () => {
@@ -121,7 +120,6 @@ class CreateNewAccountComponent extends React.PureComponent<CreateNewAccountProp
       setCreatingStep,
       createWallet,
       setNextStep,
-      randomChain,
     } = this.props;
     const {
       userSeedPhrase,
@@ -130,7 +128,7 @@ class CreateNewAccountComponent extends React.PureComponent<CreateNewAccountProp
       confirmedPassword,
     } = this.state;
 
-    if (creatingStep === CreateAccountStepsEnum.selectSubChain) {
+    if (creatingStep === CreateAccountStepsEnum.selectChain) {
       generateSeedPhrase();
       return;
     }
@@ -168,7 +166,6 @@ class CreateNewAccountComponent extends React.PureComponent<CreateNewAccountProp
       createWallet({
         password,
         additionalActionOnSuccess: setNextStep,
-        randomChain,
       });
     }
   };
@@ -181,7 +178,7 @@ class CreateNewAccountComponent extends React.PureComponent<CreateNewAccountProp
     const { creatingStep, setCreatingStep } = this.props;
 
     if (creatingStep === CreateAccountStepsEnum.setSeedPhrase) {
-      setCreatingStep(CreateAccountStepsEnum.selectSubChain);
+      setCreatingStep(CreateAccountStepsEnum.selectChain);
       return;
     }
 
@@ -207,8 +204,8 @@ class CreateNewAccountComponent extends React.PureComponent<CreateNewAccountProp
   renderContent = () => {
     const { creatingStep } = this.props;
     switch (creatingStep) {
-      case CreateAccountStepsEnum.selectSubChain:
-        return this.renderSelectSubChain();
+      case CreateAccountStepsEnum.selectChain:
+        return this.renderselectChain();
       case CreateAccountStepsEnum.setSeedPhrase:
         return this.renderSetSeedPhrase();
       case CreateAccountStepsEnum.confirmSeedPhrase:
@@ -230,44 +227,42 @@ class CreateNewAccountComponent extends React.PureComponent<CreateNewAccountProp
     </div>;
   };
 
-  renderNetworkMenuItem = (chain: number) => (
-    <MenuItem
-      key={chain}
-      className={styles.loginRegisterAccountShardMenuItem}
-      value={chain}
-    >
-      {chain}
-    </MenuItem>
-  );
+  // renderNetworkMenuItem = (chain: number) => (
+  //   <MenuItem
+  //     key={chain}
+  //     className={styles.loginRegisterAccountShardMenuItem}
+  //     value={chain}
+  //   >
+  //     {chain}
+  //   </MenuItem>
+  // );
 
   renderRandomChainCheckbox = () => (
     <Checkbox
       size={'medium'}
-      checked={!this.props.randomChain}
+      checked={!this.props.isRandomChain}
       onClick={this.toggleRandomChain}
-      checkedIcon={<CheckedIcon />}
-      icon={<UnCheckedIcon />}
       disableRipple
     />
   );
 
-  renderSelectSubChain = () => {
-    const { currentShard, networkChains, randomChain } = this.props;
+  renderselectChain = () => {
+    const { selectedChain, isRandomChain } = this.props;
 
     return <>
       <div className={styles.registrationFormHolder}>
         <div className={styles.registrationFormDesc}>
           {this.props.t('theWalletAlphaTestingPhase')}
         </div>
-        <Collapse in={!randomChain}>
+        <Collapse in={!isRandomChain}>
           <div className={styles.loginRegisterAccountShardTitle}>
             {this.props.t('selectedChain')}
           </div>
           <Select
-            value={currentShard!}
+            value={selectedChain!}
             className={classnames(
               styles.loginRegisterAccountCreateSelect,
-              currentShard ? styles.loginRegisterAccountCreateSelectWithValue : '',
+              selectedChain ? styles.loginRegisterAccountCreateSelectWithValue : '',
             )}
             fullWidth
             MenuProps={this.selectMenuProps}
@@ -278,7 +273,7 @@ class CreateNewAccountComponent extends React.PureComponent<CreateNewAccountProp
             renderValue={this.renderShardSelectValue}
             IconComponent={ChevronDown}
           >
-            {networkChains?.map(this.renderNetworkMenuItem)}
+            {/* {networkChains?.map(this.renderNetworkMenuItem)} */}
           </Select>
         </Collapse>
       </div>
@@ -398,7 +393,7 @@ class CreateNewAccountComponent extends React.PureComponent<CreateNewAccountProp
   };
 
   getSubmitButtonDisabled = () => {
-    const { creatingStep, currentShard } = this.props;
+    const { creatingStep, selectedChain } = this.props;
     const {
       confirmedSeedPhrase,
       seedsNotEqual,
@@ -408,8 +403,8 @@ class CreateNewAccountComponent extends React.PureComponent<CreateNewAccountProp
     } = this.state;
 
     switch (creatingStep) {
-      case CreateAccountStepsEnum.selectSubChain:
-        return !currentShard;
+      case CreateAccountStepsEnum.selectChain:
+        return !selectedChain;
       case CreateAccountStepsEnum.confirmSeedPhrase:
         return !confirmedSeedPhrase || seedsNotEqual;
       case CreateAccountStepsEnum.encryptPrivateKey:
@@ -429,7 +424,7 @@ class CreateNewAccountComponent extends React.PureComponent<CreateNewAccountProp
       />
       {this.renderContent()}
       {
-        creatingStep !== CreateAccountStepsEnum.selectSubChain &&
+        creatingStep !== CreateAccountStepsEnum.selectChain &&
         <div className={styles.registrationButtonsHolder}>
           <Button
             size="medium"

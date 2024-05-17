@@ -10,7 +10,7 @@ import {
 } from 'common';
 import {
   generateSeedPhrase,
-  setCreatingCurrentShard,
+  setSelectedChain,
 } from 'registration/slice/registrationSlice';
 import { defaultChain } from 'application/sagas/initApplicationSaga';
 import { stringToObject } from 'sso/utils';
@@ -36,7 +36,7 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
 
 const mapDispatchToProps = {
   routeTo: push,
-  setCreatingCurrentShard,
+  setSelectedChain,
   generateSeedPhrase,
 };
 
@@ -47,7 +47,7 @@ const RegistrationForAppsPageComponent: FC<RegistrationForAppsPageProps> = ({
   routeTo,
   data,
   walletAddress,
-  setCreatingCurrentShard,
+  setSelectedChain,
   generateSeedPhrase,
 }) => {
   const { t } = useTranslation();
@@ -73,7 +73,7 @@ const RegistrationForAppsPageComponent: FC<RegistrationForAppsPageProps> = ({
       routeTo(`${WalletRoutesEnum.sso}/${data}`);
     } else {
       generateSeedPhrase();
-      setCreatingCurrentShard(parsedData?.chainID || defaultChain);
+      setSelectedChain(parsedData?.chainID || defaultChain);
     }
   }, [
     data,

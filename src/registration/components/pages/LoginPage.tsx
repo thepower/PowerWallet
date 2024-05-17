@@ -13,7 +13,7 @@ import {
 import { Maybe } from '../../../typings/common';
 import { loginToWalletFromRegistration } from '../../slice/registrationSlice';
 import { compareTwoStrings } from '../../utils/registrationUtils';
-import { RegistrationBackground } from '../common/RegistrationBackground';
+import { RegistrationBackground } from '../common/registrationBackground/RegistrationBackground';
 import styles from '../Registration.module.scss';
 import { ImportAccountModal } from './loginRegisterAccount/import/ImportAccountModal';
 

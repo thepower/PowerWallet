@@ -6,7 +6,7 @@ import { ConnectedProps, connect } from 'react-redux';
 import {
   getCurrentCreatingStep,
   getCurrentRegistrationTab,
-  getCurrentShardSelector,
+  getSelectedChain,
   getLoginData,
 } from '../../../selectors/registrationSelectors';
 import {
@@ -22,14 +22,14 @@ import {
 } from '../../../typings/registrationTypes';
 import { compareTwoStrings } from '../../../utils/registrationUtils';
 import styles from '../../Registration.module.scss';
-import { RegistrationBackground } from '../../common/RegistrationBackground';
+import { RegistrationBackground } from '../../common/registrationBackground/RegistrationBackground';
 import { CreateNewAccount } from './CreateNewAccount';
 import { LoginToAccount } from './LoginToAccount';
 import { ImportAccount } from './import/ImportAccount';
 
 const mapStateToProps = (state: RootState) => ({
   tab: getCurrentRegistrationTab(state),
-  currentShard: getCurrentShardSelector(state),
+  selectedChain: getSelectedChain(state),
   creatingStep: getCurrentCreatingStep(state),
   ...getLoginData(state),
 });
@@ -70,14 +70,14 @@ class LoginRegisterAccountComponent extends React.PureComponent<LoginRegisterAcc
       password,
       confirmedPassword,
       passwordsNotEqual,
-      randomChain,
+      isRandomChain,
     } = this.props;
 
     switch (tab) {
       case LoginRegisterAccountTabs.create:
         return <CreateNewAccount
           setNextStep={setNextStep}
-          randomChain={randomChain}
+          isRandomChain={isRandomChain}
         />;
       case LoginRegisterAccountTabs.login:
         return <LoginToAccount
@@ -96,18 +96,18 @@ class LoginRegisterAccountComponent extends React.PureComponent<LoginRegisterAcc
 
   getButtonDisabled = () => {
     const {
-      currentShard,
+      selectedChain,
       tab,
       address,
       seed,
       password,
       confirmedPassword,
       passwordsNotEqual,
-      randomChain,
+      isRandomChain,
     } = this.props;
 
     if (tab === LoginRegisterAccountTabs.create) {
-      return !randomChain && !currentShard;
+      return !isRandomChain && !selectedChain;
     }
 
     return !address || !seed || passwordsNotEqual || !password || !confirmedPassword;
@@ -144,13 +144,13 @@ class LoginRegisterAccountComponent extends React.PureComponent<LoginRegisterAcc
   };
 
   render() {
-    const { tab, setNextStep, randomChain } = this.props;
+    const { tab, setNextStep, isRandomChain } = this.props;
     const { isMobile } = this.state;
 
-    if (this.props.creatingStep !== CreateAccountStepsEnum.selectSubChain) {
+    if (this.props.creatingStep !== CreateAccountStepsEnum.selectChain) {
       return <CreateNewAccount
         setNextStep={setNextStep}
-        randomChain={randomChain}
+        isRandomChain={isRandomChain}
       />;
     }
 

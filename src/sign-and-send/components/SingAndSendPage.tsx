@@ -45,7 +45,7 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
   message: props?.match?.params?.message,
   feeSettings: getNetworkFeeSettings(state),
   gasSettings: getNetworkGasSettings(state),
-  wif: getWalletData(state).wif,
+  encryptedWif: getWalletData(state).encryptedWif,
 });
 
 const mapDispatchToProps = {
@@ -136,10 +136,10 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
   }
 
   handleClickSignAndSend = () => {
-    const { wif } = this.props;
+    const { encryptedWif } = this.props;
     const { decodedTxBody, returnURL } = this.state;
     try {
-      const decryptedWif = CryptoApi.decryptWif(wif, '');
+      const decryptedWif = CryptoApi.decryptWif(encryptedWif, '');
       if (decodedTxBody) {
         this.props.signAndSendTrxTrigger({
           wif: decryptedWif,

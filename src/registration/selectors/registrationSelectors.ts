@@ -1,47 +1,67 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from 'application/store';
-import { RegistrationState } from '../slice/registrationSlice';
 
 export const getRegistrationState = (state: RootState) => (
   state.registration
 );
 
-export const getCurrentShardSelector = createSelector(
+export const getSelectedNetwork = createSelector(
   getRegistrationState,
-  (registrationState: RegistrationState) => (
-    registrationState.currentShard
+  (registrationState) => (
+    registrationState.selectedNetwork
+  ),
+);
+
+export const getSelectedChain = createSelector(
+  getRegistrationState,
+  (registrationState) => (
+    registrationState.selectedChain
   ),
 );
 
 export const getCurrentRegistrationTab = createSelector(
   getRegistrationState,
-  (registrationState: RegistrationState) => (
+  (registrationState) => (
     registrationState.tab
   ),
 );
 
 export const getCurrentCreatingStep = createSelector(
   getRegistrationState,
-  (registrationState: RegistrationState) => (
+  (registrationState) => (
     registrationState.creatingStep
   ),
 );
 
 export const getGeneratedSeedPhrase = createSelector(
   getRegistrationState,
-  (registrationState: RegistrationState) => (
+  (registrationState) => (
     registrationState.seedPhrase
   ),
 );
 
 export const getLoginData = createSelector(
   getRegistrationState,
-  (registrationState: RegistrationState) => ({
+  (registrationState) => ({
     address: registrationState.address,
     seed: registrationState.seed,
-    password: registrationState.password,
-    confirmedPassword: registrationState.confirmedPassword,
-    passwordsNotEqual: registrationState.passwordsNotEqual,
-    randomChain: registrationState.randomChain,
+    password: registrationState.password, // TODO remove
+    confirmedPassword: registrationState.confirmedPassword, // TODO remove
+    passwordsNotEqual: registrationState.passwordsNotEqual, // TODO remove
+    isRandomChain: registrationState.isRandomChain, // TODO remove
   }),
+);
+
+export const getGeneratedAddress = createSelector(
+  getRegistrationState,
+  (registrationState) => (
+    registrationState.address
+  ),
+);
+
+export const getIsRandomChain = createSelector(
+  getRegistrationState,
+  (registrationState) => (
+    registrationState.isRandomChain
+  ),
 );

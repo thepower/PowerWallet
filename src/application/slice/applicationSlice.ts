@@ -4,14 +4,14 @@ import {
   Draft,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { NetworkApi, WalletApi } from '@thepowereco/tssdk';
+import { ChainNetwork, NetworkApi, WalletApi } from '@thepowereco/tssdk';
 import { Maybe } from '../../typings/common';
 
 interface ApplicationDataState {
   showUnderConstruction: boolean;
   networkApi: Maybe<Draft<NetworkApi>>;
   walletApi: Maybe<Draft<WalletApi>>;
-  networkChains: number[];
+  networksChains: Maybe<ChainNetwork>;
 }
 
 const SLICE_NAME = 'applicationData';
@@ -20,7 +20,7 @@ const initialState: ApplicationDataState = {
   showUnderConstruction: false,
   networkApi: null,
   walletApi: null,
-  networkChains: [],
+  networksChains: null,
 };
 
 const applicationDataSlice = createSlice({
@@ -37,8 +37,8 @@ const applicationDataSlice = createSlice({
     setShowUnderConstruction: (state: ApplicationDataState, action: PayloadAction<boolean>) => {
       state.showUnderConstruction = action.payload;
     },
-    setNetworkChains: (state: ApplicationDataState, action: PayloadAction<number[]>) => {
-      state.networkChains = action.payload;
+    setNetworkChains: (state: ApplicationDataState, action: PayloadAction<ChainNetwork>) => {
+      state.networksChains = action.payload;
     },
   },
 });

@@ -1,8 +1,8 @@
 import {
   BreadcrumbsTypeEnum,
   Button,
+  Checkbox,
   LangMenu,
-  PELogoWithTitle,
   Wizard,
 } from 'common';
 import { push } from 'connected-react-router';
@@ -13,51 +13,63 @@ import {
   useTranslation,
 } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
+import { FormControlLabel } from '@mui/material';
+import { setSelectedNetwork, toggleRandomChain } from 'registration/slice/registrationSlice';
+import { RootState } from 'application/store';
+import { getIsRandomChain } from 'registration/selectors/registrationSelectors';
 import { WalletRoutesEnum } from '../../application/typings/routes';
 import { getRegistrationTabs } from '../typings/registrationTypes';
 import styles from './Registration.module.scss';
-import { BeAware } from './pages/BeAware';
-import { QuickGuide } from './pages/QuickGuide';
-import { Backup } from './pages/backup/Backup';
+import { SelectNetwork } from './scenes/selectNetwork/SelectNetwork';
+import { Backup } from './scenes/backup/Backup';
 import { RegisterPage } from './pages/loginRegisterAccount/RegisterPage';
+
+const mapStateToProps = (state: RootState) => ({
+  isRandomChain: getIsRandomChain(state),
+});
 
 const mapDispatchToProps = {
   routeTo: push,
+  toggleRandomChain,
+  setSelectedNetwork,
 };
 
-const connector = connect(null, mapDispatchToProps);
+const connector = connect(mapStateToProps, mapDispatchToProps);
 type RegistrationPageProps = ConnectedProps<typeof connector>;
 
-const RegistrationPageComponent: FC<RegistrationPageProps> = ({ routeTo }) => {
+const RegistrationPageComponent: FC<RegistrationPageProps> = ({
+  routeTo, toggleRandomChain, isRandomChain, setSelectedNetwork,
+}) => {
   const { t } = useTranslation();
 
-  const [enterButtonPressed, setEnterButtonPressed] = useState(false);
+  const [enterButtonPressed, setEnterButtonPressed] = useState(true);
+  const [currentStep, setCurrentStep] = useState(0);
 
   const getRegistrationBreadcrumbs = useMemo(() => [
     {
-      label: getRegistrationTabs(t).quickGuide,
-      component: QuickGuide,
-    },
-    {
-      label: getRegistrationTabs(t).beAware,
-      component: BeAware,
-    },
-    {
-      label: getRegistrationTabs(t).loginRegister,
-      component: RegisterPage,
+      label: getRegistrationTabs(t).selectNetwork,
+      component: SelectNetwork,
     },
     {
       label: getRegistrationTabs(t).backup,
       component: Backup,
     },
+    {
+      label: getRegistrationTabs(t).loginRegister,
+      component: RegisterPage,
+    },
   ], [t]);
 
-  const handleProceedToRegistration = () => {
+  const handleProceedToRegistration = useCallback(() => {
     setEnterButtonPressed(true);
-  };
+  }, [setEnterButtonPressed]);
 
-  const handleProceedToLogin = () => {
+  const handleProceedToLogin = useCallback(() => {
     routeTo(WalletRoutesEnum.login);
+  }, [routeTo]);
+
+  const onSelectBreadCrumb = (nextStep: number) => {
+    setCurrentStep(nextStep);
   };
 
   const renderWelcome = useCallback(() => (
@@ -89,24 +101,47 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({ routeTo }) => {
     </>
   ), [t, handleProceedToLogin, handleProceedToRegistration]);
 
+  const toggleRandomChainHandler = useCallback(() => {
+    if (isRandomChain) setSelectedNetwork(null);
+    toggleRandomChain();
+  }, [isRandomChain, setSelectedNetwork, toggleRandomChain]);
+
+  const renderCheckBox = useCallback(() => (
+    <div className={styles.checkBoxHolder}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            size={'medium'}
+            checked={!isRandomChain}
+            onClick={() => toggleRandomChainHandler()}
+            disableRipple
+          />
+        }
+        label="I want to select a chain by number"
+        className={styles.checkBoxLabel}
+      />
+    </div>
+  ), [isRandomChain, toggleRandomChainHandler]);
+
   const renderRegistration = useCallback(() => (
     <div className={styles.registrationWizardComponent}>
-      <PELogoWithTitle className={styles.registrationPageIcon} />
+      <div className={styles.registrationPageTitle}>Power Wallet</div>
+      <LangMenu className={styles.langSelect} />
       <div className={styles.registrationWizardHolder}>
         <Wizard
           className={styles.registrationWizard}
           breadcrumbs={getRegistrationBreadcrumbs}
           type={BreadcrumbsTypeEnum.direction}
           breadCrumbHasBorder
+          onSelectBreadCrumb={onSelectBreadCrumb}
         />
       </div>
+      {currentStep === 0 && renderCheckBox()}
     </div>
-  ), [getRegistrationBreadcrumbs]);
+  ), [currentStep, getRegistrationBreadcrumbs, renderCheckBox]);
 
   return (
     <div className={styles.registrationPage}>
-      <div className={styles.registrationPageCover} />
-      <LangMenu className={styles.langSelect} />
       {enterButtonPressed ? renderRegistration() : renderWelcome()}
     </div>
   );

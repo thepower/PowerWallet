@@ -15,10 +15,10 @@ import { exportAccount } from 'account/slice/accountSlice';
 import { objectToString, stringToObject } from 'sso/utils';
 import { getRouterParamsData } from 'router/selectors';
 
-import { getCurrentNetworkChains, getNetworkChainID } from 'application/selectors';
+import { getNetworksChains, getNetworkChainID } from 'application/selectors';
 import styles from '../../Registration.module.scss';
 import {
-  setCreatingCurrentShard,
+  setSelectedChain,
   setCreatingStep,
   setSeedPhrase,
   createWallet,
@@ -27,23 +27,23 @@ import {
 import {
   CreateAccountStepsEnum,
 } from '../../../typings/registrationTypes';
-import { getCurrentCreatingStep, getCurrentShardSelector, getGeneratedSeedPhrase } from '../../../selectors/registrationSelectors';
-import { RegistrationBackground } from '../../common/RegistrationBackground';
-import { RegistrationStatement } from '../../common/RegistrationStatement';
+import { getCurrentCreatingStep, getSelectedChain, getGeneratedSeedPhrase } from '../../../selectors/registrationSelectors';
+import { RegistrationBackground } from '../../common/registrationBackground/RegistrationBackground';
+import { RegistrationStatement } from '../../common/registrationStatement/RegistrationStatement';
 
 const mapStateToProps = (state: RootState) => ({
-  currentShard: getCurrentShardSelector(state),
+  selectedChain: getSelectedChain(state),
   creatingStep: getCurrentCreatingStep(state),
   generatedSeedPhrase: getGeneratedSeedPhrase(state),
   loading: checkIfLoading(state, createWallet.type),
-  networkChains: getCurrentNetworkChains(state),
+  networkChains: getNetworksChains(state),
   walletAddress: getWalletAddress(state),
   data: getRouterParamsData(state),
   currentNetworkChain: getNetworkChainID(state),
 });
 
 const mapDispatchToProps = {
-  setCreatingCurrentShard,
+  setSelectedChain,
   setCreatingStep,
   setSeedPhrase,
   createWallet,
@@ -98,7 +98,6 @@ class CreateNewAccountForAppsComponent extends React.PureComponent<CreateNewAcco
       });
       createWallet({
         password,
-        randomChain: false,
       });
     }
 
@@ -164,11 +163,11 @@ class CreateNewAccountForAppsComponent extends React.PureComponent<CreateNewAcco
   exportKeyForApps = () => {
     const { parsedData } = this;
     const {
-      walletAddress, generatedSeedPhrase, currentNetworkChain, currentShard,
+      walletAddress, generatedSeedPhrase, currentNetworkChain, selectedChain,
     } = this.props;
 
-    const fileName = currentNetworkChain || currentShard ?
-      `power_wallet_${currentShard || currentNetworkChain}_${walletAddress}.pem` :
+    const fileName = currentNetworkChain || selectedChain ?
+      `power_wallet_${selectedChain || currentNetworkChain}_${walletAddress}.pem` :
       `power_wallet_${walletAddress}.pem`;
 
     return (
