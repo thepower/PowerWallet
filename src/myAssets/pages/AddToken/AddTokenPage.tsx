@@ -76,7 +76,7 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
       <Button
         className={styles.addAssetsPageFormButton}
         onClick={onClickAddToken}
-        variant="filled"
+        variant="contained"
         disabled={!address}
       >
         {t('addToken')}

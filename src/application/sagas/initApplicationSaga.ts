@@ -33,7 +33,7 @@ export function* initApplicationSaga() {
 
   encryptedWif = yield getKeyFromApplicationStorage('wif');
 
-  const matchSelector = createMatchSelector({ path: WalletRoutesEnum.registrationForApps });
+  const matchSelector = createMatchSelector({ path: [`${WalletRoutesEnum.signup}/:data?`, `${WalletRoutesEnum.sso}/:data?`] });
   const match = yield* select(matchSelector);
 
   if (address && encryptedWif) {
@@ -47,7 +47,6 @@ export function* initApplicationSaga() {
     yield* put(setWalletData({
       address,
       encryptedWif,
-      logged: true,
     }));
 
     yield* put(push(window.location.pathname));

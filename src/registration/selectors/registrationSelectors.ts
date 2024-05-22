@@ -19,17 +19,17 @@ export const getSelectedChain = createSelector(
   ),
 );
 
-export const getCurrentRegistrationTab = createSelector(
-  getRegistrationState,
-  (registrationState) => (
-    registrationState.tab
-  ),
-);
-
 export const getCurrentCreatingStep = createSelector(
   getRegistrationState,
   (registrationState) => (
     registrationState.creatingStep
+  ),
+);
+
+export const getCurrentBackupStep = createSelector(
+  getRegistrationState,
+  (registrationState) => (
+    registrationState.backupStep
   ),
 );
 
@@ -40,28 +40,16 @@ export const getGeneratedSeedPhrase = createSelector(
   ),
 );
 
-export const getLoginData = createSelector(
-  getRegistrationState,
-  (registrationState) => ({
-    address: registrationState.address,
-    seed: registrationState.seed,
-    password: registrationState.password, // TODO remove
-    confirmedPassword: registrationState.confirmedPassword, // TODO remove
-    passwordsNotEqual: registrationState.passwordsNotEqual, // TODO remove
-    isRandomChain: registrationState.isRandomChain, // TODO remove
-  }),
-);
-
-export const getGeneratedAddress = createSelector(
-  getRegistrationState,
-  (registrationState) => (
-    registrationState.address
-  ),
-);
-
 export const getIsRandomChain = createSelector(
   getRegistrationState,
   (registrationState) => (
     registrationState.isRandomChain
+  ),
+);
+
+export const getIsWithoutPassword = createSelector(
+  getRegistrationState,
+  (registrationState) => (
+    registrationState.isWithoutPassword
   ),
 );

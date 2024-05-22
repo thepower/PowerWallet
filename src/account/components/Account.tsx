@@ -15,14 +15,14 @@ import { WithTranslation, withTranslation } from 'react-i18next';
 import { getOpenedMenu, getWalletAddress } from '../selectors/accountSelectors';
 import { Maybe } from '../../typings/common';
 import { AccountActionsList } from './AccountActionsList';
-import { ImportAccountModal } from '../../registration/components/pages/loginRegisterAccount/import/ImportAccountModal';
+import { ImportAccountModal } from '../../registration/components/modals/ImportAccountModal';
 import {
   exportAccount,
   importAccountFromFile,
   resetAccount,
   toggleOpenedAccountMenu,
 } from '../slice/accountSlice';
-import { ExportAccountModal } from '../../registration/components/pages/backup/ExportAccountModal';
+import { ExportAccountModal } from '../../registration/components/modals/ExportAccountModal';
 import { ResetAccountModal } from './ResetAccountModal';
 import { setShowUnderConstruction } from '../../application/slice/applicationSlice';
 import { RootState } from '../../application/store';

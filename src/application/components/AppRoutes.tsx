@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import { FullScreenLoader } from 'common';
 import { RegistrationPage } from 'registration/components/RegistrationPage';
-import { LoginPage } from 'registration/components/pages/LoginPage';
+import { LoginPage } from 'registration/components/pages/login/LoginPage';
 import { checkIfLoading } from 'network/selectors';
 import { AddTokenPage } from 'myAssets/pages/AddToken/AddTokenPage';
 import { TokenTransactionsPage } from 'myAssets/pages/TokenTransactions/TokenTransactionsPage';
@@ -11,7 +11,7 @@ import { MyAssets } from 'myAssets/pages/Main/MainPage';
 import { SendPage } from 'send/components/SendPage';
 import SignAndSendPage from 'sign-and-send/components/SingAndSendPage';
 import WalletSSOPage from 'sso/components/pages/WalletSSOPage';
-import { RegistrationForAppsPage } from 'registration/components/RegistrationForAppsPage';
+import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { useAppDispatch, useAppSelector } from '../store';
 import { WalletRoutesEnum } from '../typings/routes';
 import { initApplication } from '../slice/applicationSlice';
@@ -24,6 +24,7 @@ const AppRoutesComponent: React.FC = () => {
   );
   const walletApi = useAppSelector((state) => state.applicationData.walletApi);
   const loading = useAppSelector((state) => checkIfLoading(state, initApplication.type));
+  const walletAddress = useAppSelector(getWalletAddress);
 
   useEffect(() => {
     dispatch(initApplication());
@@ -36,37 +37,35 @@ const AppRoutesComponent: React.FC = () => {
     <Switch>
       <Route
         exact
-        path={WalletRoutesEnum.signup}
+        path={`${WalletRoutesEnum.signup}/:data?`}
         component={RegistrationPage}
       />
-      <Route
-        exact
-        path={`${WalletRoutesEnum.registrationForApps}/:data`}
-        component={RegistrationForAppsPage}
-      />
-      <Route exact path={WalletRoutesEnum.login} component={LoginPage} />
-      <Route
-        path={`/:type/:address/:id?${WalletRoutesEnum.send}`}
-        component={SendPage}
-      />
-      <Route exact path={`${WalletRoutesEnum.add}`}>
-        <AddTokenPage />
-      </Route>
-      <Route
-        path={`/:type/:address${WalletRoutesEnum.transactions}`}
-        component={TokenTransactionsPage}
-      />
-      <Route
-        path={`${WalletRoutesEnum.tokenSelection}/:address?`}
-        component={TokenSelectionPage}
-        exact
-      />
-      <Route
-        path={`${WalletRoutesEnum.signAndSend}/:message`}
-        component={SignAndSendPage}
-      />
+      <Route exact path={`${WalletRoutesEnum.login}/:data?`} component={LoginPage} />
       <Route path={`${WalletRoutesEnum.sso}/:data`} component={WalletSSOPage} />
-      <Route exact path={WalletRoutesEnum.root} component={MyAssets} />
+      {walletAddress && <>
+        <Route
+          path={`/:type/:address/:id?${WalletRoutesEnum.send}`}
+          component={SendPage}
+        />
+        <Route exact path={`${WalletRoutesEnum.add}`}>
+          <AddTokenPage />
+        </Route>
+        <Route
+          path={`/:type/:address${WalletRoutesEnum.transactions}`}
+          component={TokenTransactionsPage}
+        />
+        <Route
+          path={`${WalletRoutesEnum.tokenSelection}/:address?`}
+          component={TokenSelectionPage}
+          exact
+        />
+        <Route
+          path={`${WalletRoutesEnum.signAndSend}/:message`}
+          component={SignAndSendPage}
+        />
+        <Route exact path={WalletRoutesEnum.root} component={MyAssets} />
+      </>}
+      <Redirect path="*" to={walletAddress ? WalletRoutesEnum.root : WalletRoutesEnum.signup} />
     </Switch>
   );
 };

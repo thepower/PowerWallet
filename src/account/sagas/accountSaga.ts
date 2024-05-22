@@ -55,7 +55,6 @@ export function* loginToWalletSaga({ payload }: { payload?: LoginToWalletSagaInp
     yield* put(setWalletData({
       address: payload?.address!,
       encryptedWif: payload?.encryptedWif!,
-      logged: true,
     }));
 
     yield* put(loadBalanceTrigger());
@@ -72,8 +71,8 @@ export function* importAccountFromFileSaga({ payload }: ReturnType<typeof import
 
   try {
     const data = yield* call(getFileData, accountFile, FileReaderType.binary);
-    const walletData: LoginToWalletSagaInput = yield WalletAPI.parseExportData(data!, password);
-    const encryptedWif = yield* call(CryptoApi.encryptWif, walletData.encryptedWif!, password);
+    const walletData = yield* call(WalletAPI.parseExportData, data!, password);
+    const encryptedWif = yield* call(CryptoApi.encryptWif, walletData.wif!, password);
 
     yield* loginToWalletSaga({ payload: { address: walletData.address, encryptedWif } });
     yield* put(push(WalletRoutesEnum.root));
@@ -125,9 +124,9 @@ export function* exportAccountSaga({ payload }: ReturnType<typeof exportAccount>
 }
 
 export function* resetAccountSaga({ payload: { password, additionalActionOnDecryptError } }: ReturnType<typeof resetAccount>) {
-  const { wif } = yield select(getWalletData);
+  const { encryptedWif } = yield* select(getWalletData);
   try {
-    yield CryptoApi.decryptWif(wif, password);
+    yield CryptoApi.decryptWif(encryptedWif, password);
     yield clearApplicationStorage();
     yield put(clearAccountData());
     yield put(push(WalletRoutesEnum.signup));

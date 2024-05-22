@@ -61,6 +61,8 @@
   font-weight: 700;
   line-height: 32px;
 
+  text-align: center;
+
   @media screen and (max-width: $tablet) {
     margin-top: 20px;
     font-size: 16px;
@@ -157,10 +159,6 @@
   justify-content: center;
   margin-top: 20px;
   background-color: transparent;
-
-  @media screen and (max-width: $notebook) {
-    margin-top: 0;
-  }
 }
 
 
@@ -592,23 +590,6 @@
   padding: 40px 16px;
 }
 
-.loginPagePart {
-  display: flex;
-  max-width: 380px;
-  height: 100%;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 32px 50px 44px;
-  border-radius: 20px;
-  background: #151516;
-
-  @include mobile {
-    width: 100%;
-    max-width: unset;
-    padding: 32px 16px;
-  }
-}
 
 .loginPageFormsHolder {
   display: flex;
@@ -619,14 +600,6 @@
 
   @include mobile {
     flex-direction: column;
-  }
-
-  .loginPagePart:nth-child(1) {
-    margin-right: 40px;
-
-    @include mobile {
-      margin-right: 0 !important;
-    }
   }
 }
 
@@ -664,9 +637,7 @@
   margin-bottom: 32px !important;
 }
 
-.loginButtonHolder {
-  margin-top: 36px;
-}
+
 
 .loginPageImportButton {
   margin-top: 60px;

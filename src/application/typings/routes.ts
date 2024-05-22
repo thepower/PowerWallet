@@ -1,6 +1,5 @@
 export enum WalletRoutesEnum {
   signAndSend = '/sign-and-send',
-  registrationForApps = '/registration-for-apps',
   send = '/send',
   tokenSelection = '/selection',
   transactions = '/transactions',
@@ -11,3 +10,11 @@ export enum WalletRoutesEnum {
   login = '/login',
   sso = '/sso',
 }
+
+export type AppQueryParams = {
+  callbackUrl?: string;
+  returnUrl?: string;
+  chainID?: number;
+  isShowSeedAfterRegistration?: boolean;
+  isAutoDownloadSeed?: boolean;
+};

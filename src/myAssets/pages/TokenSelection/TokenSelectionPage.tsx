@@ -235,7 +235,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
           <Button
             disabled={!token && !nativeAssetAmount && !selectedToken}
             className={styles.tokenSelectionFixedButton}
-            variant="filled"
+            variant="contained"
           >
             {t('next')}
           </Button>

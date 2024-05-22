@@ -2,8 +2,8 @@ import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NetworkEnum } from '@thepowereco/tssdk';
 import { AddActionOnSuccessType, Maybe } from '../../typings/common';
 import {
+  BackupAccountStepsEnum,
   CreateAccountStepsEnum,
-  LoginRegisterAccountTabs,
   LoginToWalletInputType,
   SetSeedPhraseInput,
 } from '../typings/registrationTypes';
@@ -11,30 +11,22 @@ import {
 const SLICE_NAME = 'registration';
 
 export type RegistrationState = {
-  tab: LoginRegisterAccountTabs; // old logic
   selectedNetwork: Maybe<NetworkEnum>;
   selectedChain: Maybe<number>;
   seedPhrase: Maybe<string>;
   creatingStep: CreateAccountStepsEnum;
-  address: Maybe<string>;
-  seed: Maybe<string>;
-  password: Maybe<string>;
-  confirmedPassword: Maybe<string>;
-  passwordsNotEqual: boolean;
+  backupStep: BackupAccountStepsEnum;
+  isWithoutPassword: boolean;
   isRandomChain: boolean;
 };
 
 const initialState: RegistrationState = {
-  tab: LoginRegisterAccountTabs.create,
   selectedNetwork: null,
   selectedChain: null,
   seedPhrase: null,
-  creatingStep: CreateAccountStepsEnum.selectChain,
-  address: null,
-  seed: null,
-  password: null,
-  confirmedPassword: null,
-  passwordsNotEqual: false,
+  creatingStep: CreateAccountStepsEnum.selectNetwork,
+  backupStep: BackupAccountStepsEnum.generateSeedPhrase,
+  isWithoutPassword: false,
   isRandomChain: true,
 };
 
@@ -42,9 +34,6 @@ const registrationSlice = createSlice({
   name: SLICE_NAME,
   initialState,
   reducers: {
-    setCurrentRegisterCreateAccountTab: (state: RegistrationState, action: PayloadAction<LoginRegisterAccountTabs>) => {
-      state.tab = action.payload;
-    },
     setSelectedNetwork: (state: RegistrationState, action: PayloadAction<Maybe<NetworkEnum>>) => {
       state.selectedNetwork = action.payload;
     },
@@ -58,25 +47,14 @@ const registrationSlice = createSlice({
     setCreatingStep: (state: RegistrationState, action: PayloadAction<CreateAccountStepsEnum>) => {
       state.creatingStep = action.payload;
     },
-    seLoginAddress: (state: RegistrationState, action: PayloadAction<string>) => {
-      state.address = action.payload;
+    setBackupStep: (state: RegistrationState, action: PayloadAction<BackupAccountStepsEnum>) => {
+      state.backupStep = action.payload;
     },
-    setLoginSeed: (state: RegistrationState, action: PayloadAction<string>) => {
-      state.seed = action.payload;
+    setIsRandomChain: (state: RegistrationState, action: PayloadAction<boolean>) => {
+      state.isRandomChain = action.payload;
     },
-    setLoginPassword: (state: RegistrationState, action: PayloadAction<string>) => {
-      state.password = action.payload;
-      state.passwordsNotEqual = false;
-    },
-    setLoginConfirmedPassword: (state: RegistrationState, action: PayloadAction<string>) => {
-      state.confirmedPassword = action.payload;
-      state.passwordsNotEqual = false;
-    },
-    setPasswordNotEqual: (state: RegistrationState, action: PayloadAction<boolean>) => {
-      state.passwordsNotEqual = action.payload;
-    },
-    toggleRandomChain: (state: RegistrationState) => {
-      state.isRandomChain = !state.isRandomChain;
+    toggleIsWithoutPassword: (state: RegistrationState) => {
+      state.isWithoutPassword = !state.isWithoutPassword;
     },
   },
 });
@@ -84,17 +62,13 @@ const registrationSlice = createSlice({
 export const {
   reducer: registrationReducer,
   actions: {
-    setCurrentRegisterCreateAccountTab,
     setSelectedNetwork,
     setSelectedChain,
     setSeedPhrase,
     setCreatingStep,
-    seLoginAddress,
-    setLoginSeed,
-    setLoginPassword,
-    setLoginConfirmedPassword,
-    setPasswordNotEqual,
-    toggleRandomChain,
+    setBackupStep,
+    setIsRandomChain,
+    toggleIsWithoutPassword,
   },
 } = registrationSlice;
 

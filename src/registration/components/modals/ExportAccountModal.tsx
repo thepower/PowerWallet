@@ -3,10 +3,10 @@ import classnames from 'classnames';
 import React from 'react';
 import { WithTranslation, withTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
-import { exportAccount } from '../../../../account/slice/accountSlice';
-import { Modal, OutlinedInput } from '../../../../common';
-import { compareTwoStrings } from '../../../utils/registrationUtils';
-import styles from '../../Registration.module.scss';
+import { exportAccount } from '../../../account/slice/accountSlice';
+import { Modal, OutlinedInput } from '../../../common';
+import { compareTwoStrings } from '../../utils/registrationUtils';
+import styles from '../Registration.module.scss';
 
 const mapDispatchToProps = {
   exportAccount,

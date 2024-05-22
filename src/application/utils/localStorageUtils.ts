@@ -11,6 +11,7 @@ const applicationStorage = localForage.createInstance({
 export const getKeyFromApplicationStorage = <T>(key: ApplicationStorageKeyType) => applicationStorage.getItem<T>(key);
 export const setKeyToApplicationStorage = (key: ApplicationStorageKeyType, value: any) => applicationStorage.setItem(key, value);
 export const clearApplicationStorage = async () => {
+  // await applicationStorage.removeItem('tokens');
   await applicationStorage.removeItem('address');
   await applicationStorage.removeItem('wif');
 };

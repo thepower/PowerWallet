@@ -1,0 +1,29 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 30px;
+}
+
+.title {
+
+  max-width: 275px;
+  color: #f5f5f7;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 28px;
+  text-align: center;
+}
+
+.logo {
+  width: 150px;
+  height: 154px;
+}
+
+.button {
+  min-width: 256px;
+  max-width: 256px;
+}

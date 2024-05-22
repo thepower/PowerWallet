@@ -1,6 +1,6 @@
 // components
 export { default as CopyButton } from './copyButton/CopyButton';
-export { default as Button } from './button/Button';
+export { Button } from './button/Button';
 export { LinkBlock } from './linkBlock/LinkBlock';
 export { Modal } from './modal/Modal';
 export { Breadcrumbs } from './breadcrumbs/components/Breadcrumbs';
@@ -38,7 +38,5 @@ export { FileReaderType, getFileData } from './utils/files';
 
 // svg
 export { PELogo } from '../assets/icons/PELogo';
-export { PELogoWithTitle } from '../assets/icons/PELogoWithTitle';
 export { ClosedEyeIcon } from '../assets/icons/ClosedEyeIcon';
 export { EyeIcon } from '../assets/icons/EyeIcon';
-export { AttachIcon } from '../assets/icons/AttachIcon';

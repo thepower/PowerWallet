@@ -6,9 +6,12 @@ import { ConnectedProps, connect } from 'react-redux';
 import {
   createWallet,
   generateSeedPhrase,
+  setBackupStep,
 } from 'registration/slice/registrationSlice';
 import {
+  getCurrentBackupStep,
   getGeneratedSeedPhrase,
+  getIsWithoutPassword,
   getSelectedChain,
 } from 'registration/selectors/registrationSelectors';
 import { RootState } from 'application/store';
@@ -24,31 +27,32 @@ import { compareTwoStrings } from 'registration/utils/registrationUtils';
 import { exportAccount } from 'account/slice/accountSlice';
 import { checkIfLoading } from 'network/selectors';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
+import { BackupAccountStepsEnum } from 'registration/typings/registrationTypes';
+import { useParams } from 'react-router-dom';
 import styles from './Backup.module.scss';
 
-enum Stage {
-  generateSeedPhrase = 'generateSeedPhrase',
-  encryptPrivateKey = 'encryptPrivateKey',
-  registrationCompleted = 'registrationCompleted',
-}
-
 const mapStateToProps = (state: RootState) => ({
+  backupStep: getCurrentBackupStep(state),
   generatedSeedPhrase: getGeneratedSeedPhrase(state),
   walletAddress: getWalletAddress(state),
   isCreateWalletLoading: checkIfLoading(state, createWallet.type),
   selectedChain: getSelectedChain(state),
+  isWithoutPassword: getIsWithoutPassword(state),
 });
 
 const mapDispatchToProps = {
   generateSeedPhrase,
   createWallet,
   exportAccount,
+  setBackupStep,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 type BackupProps = ConnectedProps<typeof connector> & WizardComponentProps;
 
 const BackupComponent: FC<BackupProps> = ({
+  backupStep,
+  setBackupStep,
   selectedChain,
   walletAddress,
   generateSeedPhrase,
@@ -56,14 +60,17 @@ const BackupComponent: FC<BackupProps> = ({
   createWallet,
   exportAccount,
   isCreateWalletLoading,
+  isWithoutPassword,
+  setNextStep,
 }) => {
   const { t } = useTranslation();
-  const [stage, setStage] = useState(Stage.generateSeedPhrase);
   const [password, setPassword] = useState('');
   const [confirmedPassword, setConfirmedPassword] = useState('');
   const [passwordsNotEqual, setPasswordsNotEqual] = useState(false);
 
   const [isSeedPhraseSaved, setIsSeedPhraseSaved] = useState(false);
+
+  const { data } = useParams<{ data?: string }>();
 
   useEffect(() => {
     if (!generatedSeedPhrase) {
@@ -72,24 +79,30 @@ const BackupComponent: FC<BackupProps> = ({
   }, [generateSeedPhrase, generatedSeedPhrase]);
 
   const onClickNext = useCallback(() => {
-    if (stage === Stage.generateSeedPhrase) {
-      setStage(Stage.encryptPrivateKey);
-    } else if (stage === Stage.encryptPrivateKey) {
+    if (backupStep === BackupAccountStepsEnum.generateSeedPhrase) {
+      setBackupStep(BackupAccountStepsEnum.encryptPrivateKey);
+    } else if (backupStep === BackupAccountStepsEnum.encryptPrivateKey) {
       const passwordsNotEqual = compareTwoStrings(password, confirmedPassword);
 
-      if (!passwordsNotEqual) {
+      if (!passwordsNotEqual && !isWithoutPassword) {
         setPasswordsNotEqual(true);
         return;
       }
-
       createWallet({
-        password,
+        password: isWithoutPassword ? '' : password,
         additionalActionOnSuccess: () => {
-          setStage(Stage.registrationCompleted);
+          setBackupStep(BackupAccountStepsEnum.registrationCompleted);
         },
       });
     }
-  }, [confirmedPassword, createWallet, password, stage]);
+  }, [
+    backupStep,
+    setBackupStep,
+    password,
+    confirmedPassword,
+    isWithoutPassword,
+    createWallet,
+  ]);
 
   const renderSeedPhrase = useCallback(() => {
     if (generatedSeedPhrase) {
@@ -148,7 +161,7 @@ const BackupComponent: FC<BackupProps> = ({
         </div>
         <Button
           className={styles.button}
-          variant="filled"
+          variant="contained"
           size="large"
           onClick={onClickNext}
           disabled={!isSeedPhraseSaved}
@@ -197,7 +210,7 @@ const BackupComponent: FC<BackupProps> = ({
             autoComplete="new-password"
             size="small"
             type={'password'}
-            disabled={isCreateWalletLoading}
+            disabled={isCreateWalletLoading || isWithoutPassword}
           />
           <OutlinedInput
             id="confirmedPassword"
@@ -211,14 +224,18 @@ const BackupComponent: FC<BackupProps> = ({
             autoComplete="new-password"
             size="small"
             errorMessage={t('oopsPasswordsDidntMatch')!}
-            disabled={isCreateWalletLoading}
+            disabled={isCreateWalletLoading || isWithoutPassword}
           />
           <Button
             className={styles.button}
-            variant="filled"
+            variant="contained"
             size="large"
             onClick={onClickNext}
-            disabled={passwordsNotEqual || isCreateWalletLoading}
+            loading={isCreateWalletLoading}
+            disabled={
+              passwordsNotEqual ||
+              (!password && !isWithoutPassword)
+            }
           >
             Next
           </Button>
@@ -228,6 +245,7 @@ const BackupComponent: FC<BackupProps> = ({
     [
       confirmedPassword,
       isCreateWalletLoading,
+      isWithoutPassword,
       onClickNext,
       password,
       passwordsNotEqual,
@@ -238,9 +256,14 @@ const BackupComponent: FC<BackupProps> = ({
   const onClickExportAccount = useCallback(() => {
     exportAccount({
       password,
-      isWithoutGoHome: true,
+      isWithoutGoHome: !!data,
+      additionalActionOnSuccess: () => {
+        if (data) {
+          setNextStep();
+        }
+      },
     });
-  }, [exportAccount, password]);
+  }, [data, exportAccount, password, setNextStep]);
 
   const renderRegistrationCompleted = useCallback(() => {
     const fileName = selectedChain
@@ -270,7 +293,7 @@ const BackupComponent: FC<BackupProps> = ({
         </div>
         <Button
           className={styles.button}
-          variant="filled"
+          variant="contained"
           size="large"
           onClick={onClickExportAccount}
           disabled={passwordsNotEqual}
@@ -288,12 +311,12 @@ const BackupComponent: FC<BackupProps> = ({
   ]);
 
   const renderContent = useCallback(() => {
-    switch (stage) {
-      case Stage.generateSeedPhrase:
+    switch (backupStep) {
+      case BackupAccountStepsEnum.generateSeedPhrase:
         return renderGenerateSeedPhrase();
-      case Stage.encryptPrivateKey:
+      case BackupAccountStepsEnum.encryptPrivateKey:
         return renderEncryptPrivateKey();
-      case Stage.registrationCompleted:
+      case BackupAccountStepsEnum.registrationCompleted:
         return renderRegistrationCompleted();
       default:
         return null;
@@ -302,7 +325,7 @@ const BackupComponent: FC<BackupProps> = ({
     renderEncryptPrivateKey,
     renderGenerateSeedPhrase,
     renderRegistrationCompleted,
-    stage,
+    backupStep,
   ]);
 
   return <div className={styles.content}>{renderContent()}</div>;

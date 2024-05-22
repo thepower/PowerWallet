@@ -1,100 +1,101 @@
 @import 'src/styles/variables';
 @import 'src/styles/mixins';
 
-.button {
-  z-index: 9999999999;
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  cursor: pointer;
+.root {
+  border-radius: 5px;
+  text-transform: none;
 }
 
-.medium {
+.sizeSmall {
+  min-width: 152px;
+  height: 40px;
+
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.sizeMedium {
   min-width: 190px;
   height: 48px;
-}
-
-.large {
-  min-width: 290px;
-  height: 56px;
-}
-
-.fullWidth {
-  width: 100%;
-  flex-shrink: 1;
-}
-
-.text {
-  display: flex;
-  align-items: center;
-  margin: 0 4px;
   font-size: 18px;
+
   font-weight: 500;
+
+  letter-spacing: 0.02em;
   line-height: 24px;
 }
 
-.filled {
-  background: linear-gradient(90deg, #1768e5 50.44%, #00f0ff 129.31%);
+.sizeLarge {
+  min-width: 290px;
+  height: 56px;
+  border-radius: 10px;
 
-  .text {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 24px;
+}
+
+.contained {
+  background: $the-power-gradient;
+
+  span {
     color: #f5f5f7;
   }
 
   &:hover {
-    background: linear-gradient(90deg, #1768e5 0%, #00f0ff 100%);
+    background: $hover-gradient;
   }
 
   &:active {
-    background: linear-gradient(90deg, rgba(23, 104, 229, 0.8) 0%, rgba(0, 240, 255, 0.8) 100%);
+    background: $active-gradient;
   }
 
   &:disabled {
     background: #26354d;
-    pointer-events: none;
 
-    .text {
-      color: #79789d;
-    }
+    background-color: #26354d !important;
+
+    color: #79789d;
+    pointer-events: none;
   }
 }
 
-@include icon-colors('.filled', #f5f5f7, #f5f5f7, #f5f5f7);
-
 .outlined {
-  @include border-gradient(linear-gradient(90deg, #1768e5 50.44%, #00f0ff 129.31%));
+  @include border-gradient();
+
   background: #121923;
 
-  .text {
-    @include text-gradient(linear-gradient(90deg, #1768e5 50.44%, #00f0ff 129.31%));
+  span {
+    @include text-gradient();
   }
 
   &:hover {
-    @include border-gradient(linear-gradient(90deg, #1768e5 0%, #00f0ff 100%));
+    @include border-gradient($hover-gradient);
 
-    .text {
-      @include text-gradient(linear-gradient(90deg, #1768e5 0%, #00f0ff 100%));
+    span {
+      @include text-gradient($hover-gradient);
     }
   }
 
   &:active {
-    @include border-gradient(linear-gradient(90deg, rgba(23, 104, 229, 0.8) 0%, rgba(0, 240, 255, 0.8) 100%));
+    @include border-gradient($active-gradient);
 
-    .text {
-      @include text-gradient(linear-gradient(90deg, rgba(23, 104, 229, 0.8) 0%, rgba(0, 240, 255, 0.8) 100%));
+    span {
+      @include text-gradient($active-gradient);
     }
   }
 
   &:disabled {
     @include border-gradient(#26354d);
+
     background: #26354d;
+    background-color: #26354d !important;
     pointer-events: none;
 
-    .text {
+    span {
       @include text-gradient(#79789d);
     }
   }
 }
-
-@include icon-colors('.outlined', url('#default'));

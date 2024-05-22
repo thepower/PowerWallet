@@ -274,7 +274,7 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
         <div className={styles.title}>{this.props.t('confirmYourAction')}</div>
         <div className={styles.buttons}>
           <Button onClick={handleClickBack} variant="outlined">{this.props.t('cancel')}</Button>
-          <Button onClick={handleClickSignAndSend} fullWidth variant="filled">{this.props.t('signAndSend')}</Button>
+          <Button onClick={handleClickSignAndSend} fullWidth variant="contained">{this.props.t('signAndSend')}</Button>
         </div>
         <div className={styles.text}>{this.props.t('byClickingSignAndSend')}</div>
         <div className={styles.table}>

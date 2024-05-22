@@ -92,7 +92,7 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
           title="TestNet"
           iconType={3}
           description="Explore, test, and innovate with decentralized web"
-          buttonVariant="filled"
+          buttonVariant="contained"
           isWithBorder
           onSelect={() => onSelectNetwork(NetworkEnum.testnet)}
         />
@@ -132,7 +132,7 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
         </div>
         <Button
           className={styles.button}
-          variant="filled"
+          variant="contained"
           size="large"
           onClick={() => onSelectChain(chain)}
         >

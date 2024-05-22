@@ -18,15 +18,15 @@ import { WalletRoutesEnum } from '../../application/typings/routes';
 import {
   getSelectedChain, getGeneratedSeedPhrase, getSelectedNetwork, getIsRandomChain,
 } from '../selectors/registrationSelectors';
-import { createWallet, setSeedPhrase } from '../slice/registrationSlice';
-import { CreateAccountStepsEnum, LoginToWalletInputType } from '../typings/registrationTypes';
+import { createWallet, loginToWalletFromRegistration, setSeedPhrase } from '../slice/registrationSlice';
+import { CreateAccountStepsEnum } from '../typings/registrationTypes';
 
 export function* generateSeedPhraseSaga() {
   const phrase: string = yield CryptoApi.generateSeedPhrase();
 
   yield* put(setSeedPhrase({
     seedPhrase: phrase,
-    nextStep: CreateAccountStepsEnum.setSeedPhrase,
+    nextStep: CreateAccountStepsEnum.backup,
   }));
 }
 
@@ -39,12 +39,15 @@ export function* createWalletSaga({ payload }: ReturnType<typeof createWallet>) 
   const chain = yield* select(getSelectedChain);
   let account: RegisteredAccount;
 
-  if (!network) return;
   if (!isRandomChain && !chain) return;
 
   try {
     if (isRandomChain) {
-      account = yield WalletApi.registerRandomChain(network, seedPhrase!);
+      if (network) {
+        account = yield WalletApi.registerRandomChain(network, seedPhrase!);
+      } else {
+        return;
+      }
     } else {
       account = yield WalletApi.registerCertainChain(chain!, seedPhrase!);
     }
@@ -63,7 +66,7 @@ export function* createWalletSaga({ payload }: ReturnType<typeof createWallet>) 
   }
 }
 
-export function* loginToWalletSaga({ payload }: { payload: LoginToWalletInputType }) {
+export function* loginToWalletSaga({ payload }: ReturnType<typeof loginToWalletFromRegistration>) {
   const {
     address, seedOrPrivateKey, password,
   } = payload;
@@ -108,7 +111,7 @@ export function* loginToWalletSaga({ payload }: { payload: LoginToWalletInputTyp
       console.error('loginToWalletSaga if (!wif)', encryptedWif);
       toast.error(i18n.t('loginError'));
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error('loginToWalletSaga isValidSeed', e);
     toast.error(i18n.t('loginError'));
   }

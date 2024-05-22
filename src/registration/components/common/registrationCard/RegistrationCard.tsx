@@ -8,8 +8,9 @@ interface RegistrationCardProps {
   className?: string;
   title: string;
   description: string;
-  buttonVariant: 'outlined' | 'filled';
+  buttonVariant: 'outlined' | 'contained';
   iconType: 1 | 2 | 3;
+  buttonLabel?: string;
   isWithBorder?: boolean;
   disabled?: boolean;
   onSelect?: () => void;
@@ -24,6 +25,7 @@ const RegistrationCardComponent: React.FC<RegistrationCardProps> = memo(
     buttonVariant,
     isWithBorder,
     disabled,
+    buttonLabel,
     onSelect,
   }) => {
     const renderIcon = () => {
@@ -56,7 +58,7 @@ const RegistrationCardComponent: React.FC<RegistrationCardProps> = memo(
           size="large"
           onClick={onSelect}
         >
-          Select
+          {buttonLabel || 'Select'}
         </Button>
       </div>
     );

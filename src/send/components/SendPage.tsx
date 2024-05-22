@@ -322,7 +322,7 @@ const SendPageComponent: FC<SendProps> = ({
         </div>
         <Button
           size="large"
-          variant="filled"
+          variant="contained"
           className={styles.button}
           type="submit"
           disabled={!formik.dirty}

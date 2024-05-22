@@ -3,6 +3,11 @@
 .cards {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+
+  @include mobile {
+    max-width: 360px;
+    overflow-x: scroll;
+  }
 }
 
 .selectChain {
