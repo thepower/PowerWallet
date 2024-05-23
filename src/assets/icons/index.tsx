@@ -31,3 +31,4 @@ export { ReactComponent as LangIcon } from './lang.svg';
 export { ReactComponent as OneLayersIcon } from './one-layer.svg';
 export { ReactComponent as TwoLayersIcon } from './two-layers.svg';
 export { ReactComponent as ThreeLayersIcon } from './three-layers.svg';
+export { ReactComponent as ChevronRightIcon } from './chevron_right.svg';

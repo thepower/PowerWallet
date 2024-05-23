@@ -1,22 +1,24 @@
-import React, { memo } from 'react';
+import React, {
+  ComponentPropsWithRef, FC, forwardRef, memo,
+} from 'react';
 import classnames from 'classnames';
 import { ThreeLayersIcon, TwoLayersIcon, OneLayersIcon } from 'assets/icons';
 import { Button } from 'common';
 import styles from './RegistrationCard.module.scss';
 
-interface RegistrationCardProps {
+interface RegistrationCardProps extends ComponentPropsWithRef<'div'> {
   className?: string;
   title: string;
   description: string;
   buttonVariant: 'outlined' | 'contained';
   iconType: 1 | 2 | 3;
-  buttonLabel?: string;
+  buttonLabel: string;
   isWithBorder?: boolean;
   disabled?: boolean;
   onSelect?: () => void;
 }
 
-const RegistrationCardComponent: React.FC<RegistrationCardProps> = memo(
+const RegistrationCardComponent: FC<RegistrationCardProps> = forwardRef<HTMLDivElement, RegistrationCardProps>(
   ({
     className,
     title,
@@ -27,6 +29,7 @@ const RegistrationCardComponent: React.FC<RegistrationCardProps> = memo(
     disabled,
     buttonLabel,
     onSelect,
+    ...props
   }) => {
     const renderIcon = () => {
       switch (iconType) {
@@ -48,6 +51,7 @@ const RegistrationCardComponent: React.FC<RegistrationCardProps> = memo(
           disabled && styles.disabled,
           className,
         )}
+        {...props}
       >
         <div className={styles.title}>{title}</div>
         {renderIcon()}
@@ -58,11 +62,11 @@ const RegistrationCardComponent: React.FC<RegistrationCardProps> = memo(
           size="large"
           onClick={onSelect}
         >
-          {buttonLabel || 'Select'}
+          {buttonLabel}
         </Button>
       </div>
     );
   },
 );
 
-export const RegistrationCard = RegistrationCardComponent;
+export const RegistrationCard = memo(RegistrationCardComponent);

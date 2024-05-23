@@ -27,6 +27,16 @@
 .cards {
   display: grid;
   grid-template-columns: 1fr 1fr;
+
+  @include mobile {
+    position: relative;
+
+    max-width: 100%;
+    padding: 0 110px 16px;
+
+    gap: 24px;
+    overflow-x: auto;
+  }
 }
 
 .checkBoxLabel {
@@ -45,4 +55,33 @@
 .button {
   min-width: 165px;
   max-width: 165px;
+}
+
+
+.leftArrow {
+  display: none;
+
+  @include mobile {
+    position: absolute;
+    z-index: 999;
+    top: 50%;
+    left: 16px;
+    display: block;
+    opacity: 0.5;
+    transform: translateY(-50%);
+  }
+}
+
+.rightArrow {
+  display: none;
+
+  @include mobile {
+    position: absolute;
+    z-index: 999;
+    top: 50%;
+    right: 16px;
+    display: block;
+    opacity: 0.5;
+    transform: translateY(-50%);
+  }
 }

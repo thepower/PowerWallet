@@ -134,30 +134,30 @@ const BackupComponent: FC<BackupProps> = ({
           />
         }
         className={styles.checkBoxLabel}
-        label="I saved my seed phrase"
+        label={t('ISavedMySeedPhrase')}
       />
     ),
-    [isSeedPhraseSaved],
+    [isSeedPhraseSaved, t],
   );
 
   const renderGenerateSeedPhrase = useCallback(
     () => (
       <>
         <div className={styles.title}>
-          Write down your seed phrase and store is somewhere safe
+          {t('writeDownYourSeedPhraseAndStore')}
         </div>
         {renderSeedPhrase()}
         {generatedSeedPhrase && (
           <CopyButton
             className={styles.copyButton}
             iconClassName={styles.copyIcon}
-            textButton="Copy Seed Phrase"
+            textButton={t('copySeedPhrase')}
             copyInfo={generatedSeedPhrase}
           />
         )}
         {renderCheckBox()}
         <div className={styles.tip}>
-          Seed phrase is the only way to restore your private key
+          {t('seedPhraseIsTheOnlyWay')}
         </div>
         <Button
           className={styles.button}
@@ -166,11 +166,12 @@ const BackupComponent: FC<BackupProps> = ({
           onClick={onClickNext}
           disabled={!isSeedPhraseSaved}
         >
-          Next
+          {t('next')}
         </Button>
       </>
     ),
     [
+      t,
       generatedSeedPhrase,
       isSeedPhraseSaved,
       onClickNext,
@@ -197,7 +198,7 @@ const BackupComponent: FC<BackupProps> = ({
     () => (
       <>
         <div className={styles.title}>
-          Enter password to encrypt your private key
+          {t('enterPasswordEncryptYour')}
         </div>
         <div className={styles.passwordForm}>
           <OutlinedInput
@@ -237,7 +238,7 @@ const BackupComponent: FC<BackupProps> = ({
               (!password && !isWithoutPassword)
             }
           >
-            Next
+            {t('next')}
           </Button>
         </div>
       </>
@@ -273,21 +274,19 @@ const BackupComponent: FC<BackupProps> = ({
     return (
       <div className={styles.registrationCompleted}>
         <div className={styles.title}>
-          Congratulations!
+          {t('congratulations')}
           <br />
-          Registration is completed
+          {t('registrationCompleted')}
         </div>
-        <div className={styles.label}>Your account number:</div>
+        <div className={styles.label}>{t('yourAccountNumber')}</div>
         <div className={styles.text}>{walletAddress}</div>
-        <div className={styles.label}>Your seed phrase:</div>
+        <div className={styles.label}>{t('yourSeedPhrase')}</div>
         <div className={styles.text}>{generatedSeedPhrase}</div>
         <div className={styles.instruction}>
-          To log in, it is more convenient to use a key file, but to reserve, be
-          sure to write down the seed phrase and account number for an
-          alternative login.
+          {t('toLogInItIsMoreConvenient')}
         </div>
         <div className={styles.instruction}>
-          <b>Your key file will be saved to disk</b>
+          <b>{t('yourKeyFileWillBeSavedToDisk')}</b>
           <br />
           {fileName}
         </div>
@@ -298,7 +297,7 @@ const BackupComponent: FC<BackupProps> = ({
           onClick={onClickExportAccount}
           disabled={passwordsNotEqual}
         >
-          Export account
+          {t('exportAccount')}
         </Button>
       </div>
     );
@@ -308,6 +307,7 @@ const BackupComponent: FC<BackupProps> = ({
     passwordsNotEqual,
     selectedChain,
     walletAddress,
+    t,
   ]);
 
   const renderContent = useCallback(() => {

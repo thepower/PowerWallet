@@ -18,7 +18,9 @@ import { WalletRoutesEnum } from '../../application/typings/routes';
 import {
   getSelectedChain, getGeneratedSeedPhrase, getSelectedNetwork, getIsRandomChain,
 } from '../selectors/registrationSelectors';
-import { createWallet, loginToWalletFromRegistration, setSeedPhrase } from '../slice/registrationSlice';
+import {
+  createWallet, loginToWalletFromRegistration, setSeedPhrase, setSelectedChain,
+} from '../slice/registrationSlice';
 import { CreateAccountStepsEnum } from '../typings/registrationTypes';
 
 export function* generateSeedPhraseSaga() {
@@ -45,6 +47,7 @@ export function* createWalletSaga({ payload }: ReturnType<typeof createWallet>) 
     if (isRandomChain) {
       if (network) {
         account = yield WalletApi.registerRandomChain(network, seedPhrase!);
+        yield* put(setSelectedChain(account.chain));
       } else {
         return;
       }

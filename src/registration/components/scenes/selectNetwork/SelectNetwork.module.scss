@@ -5,8 +5,13 @@
   grid-template-columns: 1fr 1fr 1fr;
 
   @include mobile {
-    max-width: 360px;
-    overflow-x: scroll;
+    position: relative;
+
+    max-width: 100%;
+    padding: 0 110px 16px;
+
+    gap: 24px;
+    overflow-x: auto;
   }
 }
 
@@ -21,7 +26,6 @@
 }
 
 .selectChainTitle {
-
   @include text-gradient;
   font-size: 32px;
   font-style: normal;
@@ -41,4 +45,32 @@
 
 .button {
   min-width: 100%;
+}
+
+.leftArrow {
+  display: none;
+
+  @include mobile {
+    position: absolute;
+    z-index: 999;
+    top: 50%;
+    left: 16px;
+    display: block;
+    opacity: 0.5;
+    transform: translateY(-50%);
+  }
+}
+
+.rightArrow {
+  display: none;
+
+  @include mobile {
+    position: absolute;
+    z-index: 999;
+    top: 50%;
+    right: 16px;
+    display: block;
+    opacity: 0.5;
+    transform: translateY(-50%);
+  }
 }

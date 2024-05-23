@@ -1,20 +1,22 @@
 import React, {
-  ChangeEvent, FC, useCallback, useRef, useState,
+  ChangeEvent, FC, useCallback, useEffect, useRef, useState,
 } from 'react';
 import {
   useTranslation,
 } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
 import {
-  Button, Checkbox, LangMenu, OutlinedInput,
+  Button, Checkbox, LangMenu, OutlinedInput, IconButton,
 } from 'common';
 import { importAccountFromFile } from 'account/slice/accountSlice';
 import { Maybe } from 'typings/common';
 import { RegistrationCard } from 'registration/components/common/registrationCard/RegistrationCard';
-import { FormControlLabel } from '@mui/material';
+import { FormControlLabel, useMediaQuery } from '@mui/material';
 import { compareTwoStrings } from 'registration/utils/registrationUtils';
 import { Link } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
+import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
+import hooks from 'hooks';
 import { loginToWalletFromRegistration } from '../../../slice/registrationSlice';
 import registrationStyles from '../../Registration.module.scss';
 import styles from './LoginPage.module.scss';
@@ -47,6 +49,21 @@ const LoginPageComponent: FC<LoginPageProps> = ({
   const [isEnterToAccPressed, setIsEnterToAccPressed] = useState(false);
   const [isWithoutPassword, setIsWithoutPassword] = useState(false);
   const importAccountRef = useRef<HTMLInputElement>(null);
+
+  const {
+    scrollContainerRef,
+    scrollToElementByIndex,
+    scrollToNext,
+    scrollToPrevious,
+  } = hooks.useSmoothHorizontalScroll();
+
+  const isMobile = useMediaQuery('(max-width:768px)');
+
+  useEffect(() => {
+    if (isMobile) {
+      scrollToElementByIndex(0);
+    }
+  }, []);
 
   const handleOpenImportFile = () => {
     if (importAccountRef) {
@@ -123,7 +140,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
     return (
       <>
         <div className={styles.title}>
-          Enter account number and seed phrase
+          {t('enterAccountNumberAndSeedPhrase')}
         </div>
         <div className={styles.fields}>
           <OutlinedInput
@@ -166,7 +183,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
                 disableRipple
               />
             }
-            label="I don't want to use a password to encrypt my key"
+            label={t('IDontWantUsePassword')}
             className={styles.checkBoxLabel}
           />
         </div>
@@ -177,7 +194,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
           onClick={loginToAccount}
           disabled={isButtonDisabled}
         >
-          Login
+          {t('login')}
         </Button>
       </>
     );
@@ -186,7 +203,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
   const renderInitCards = useCallback(() => (
     <>
       <div className={styles.title}>
-        Login or import an account
+        {t('loginImport')}
       </div>
       <input
         ref={importAccountRef}
@@ -194,27 +211,33 @@ const LoginPageComponent: FC<LoginPageProps> = ({
         onChange={setAccountFileHandler}
         type="file"
       />
-      <div className={styles.cards}>
+      <div ref={scrollContainerRef} className={styles.cards}>
         <RegistrationCard
-          title="Login to account"
+          title={t('loginToAccount')}
           iconType={2}
-          description="Enter the address and seed phrase"
+          description={t('enterAddressAndSeedPhrase')}
           buttonVariant="outlined"
-          buttonLabel="Enter"
+          buttonLabel={t('Enter')}
           onSelect={() => setIsEnterToAccPressed(true)}
         />
         <RegistrationCard
-          title="Import account"
+          title={t('importAccount')}
           iconType={3}
-          description="Upload the PEM file to import an account"
+          description={t('uploadPEMFileToImportAccount')}
           buttonVariant="contained"
-          buttonLabel="Select file"
+          buttonLabel={t('selectFile')}
           isWithBorder
           onSelect={handleOpenImportFile}
         />
       </div>
+      <IconButton className={styles.leftArrow} onClick={scrollToPrevious}>
+        <ChevronLeftIcon />
+      </IconButton>
+      <IconButton className={styles.rightArrow} onClick={scrollToNext}>
+        <ChevronRightIcon />
+      </IconButton>
     </>
-  ), [setAccountFileHandler]);
+  ), [t, scrollContainerRef, scrollToNext, scrollToPrevious, setAccountFileHandler]);
 
   return (
     <div className={registrationStyles.registrationPage}>
@@ -223,9 +246,12 @@ const LoginPageComponent: FC<LoginPageProps> = ({
         onClose={closePasswordModal}
         onSubmit={handleImportAccount}
       />
-      <LangMenu className={registrationStyles.langSelect} />
       <div className={registrationStyles.registrationWizardComponent}>
-        <Link to={WalletRoutesEnum.root} className={registrationStyles.registrationPageTitle}>Power Wallet</Link>
+        <div className={registrationStyles.registrationPageHeader}>
+          <div style={{ width: '48px' }} />
+          <Link to={WalletRoutesEnum.root} className={registrationStyles.registrationPageTitle}>Power Wallet</Link>
+          <LangMenu className={registrationStyles.registrationPageLangSelect} />
+        </div>
         <div className={registrationStyles.registrationWizardHolder}>
           {isEnterToAccPressed ? renderLoginPart() : renderInitCards()}
         </div>

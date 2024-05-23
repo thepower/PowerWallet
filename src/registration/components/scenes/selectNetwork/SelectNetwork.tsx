@@ -1,4 +1,6 @@
-import React, { useCallback, useMemo } from 'react';
+import React, {
+  useCallback, useEffect, useMemo,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { RegistrationCard } from 'registration/components/common/registrationCard/RegistrationCard';
 import { RootState } from 'application/store';
@@ -15,7 +17,10 @@ import {
 import ChainSelect from 'common/chainSelect/ChainSelect';
 import { getNetworksChains } from 'application/selectors';
 import { Maybe } from 'typings/common';
-import { Button, WizardComponentProps } from 'common';
+import { Button, IconButton, WizardComponentProps } from 'common';
+import hooks from 'hooks';
+import { useMediaQuery } from '@mui/material';
+import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import registrationStyles from '../../Registration.module.scss';
 import styles from './SelectNetwork.module.scss';
 
@@ -32,7 +37,8 @@ const mapDispatchToProps = {
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-type SelectNetworkProps = ConnectedProps<typeof connector> & WizardComponentProps;
+type SelectNetworkProps = ConnectedProps<typeof connector> &
+WizardComponentProps;
 
 export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
   selectedNetwork,
@@ -43,6 +49,22 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
   setNextStep,
 }) => {
   const { t } = useTranslation();
+
+  const {
+    scrollContainerRef,
+    scrollToElementByIndex,
+    scrollToNext,
+    scrollToPrevious,
+  } = hooks.useSmoothHorizontalScroll();
+
+  const isMobile = useMediaQuery('(max-width:768px)');
+
+  useEffect(() => {
+    if (isMobile) {
+      scrollToElementByIndex(1);
+    }
+  }, []);
+
   const selectedChains = useMemo(
     () => (selectedNetwork ? networksChains?.[selectedNetwork] || [] : []),
     [networksChains, selectedNetwork],
@@ -80,33 +102,51 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
 
   const renderCards = useCallback(
     () => (
-      <div className={styles.cards}>
-        <RegistrationCard
-          title="DevNet"
-          iconType={2}
-          description="Engage with latest environments to try out features before it go live"
-          buttonVariant="outlined"
-          onSelect={() => onSelectNetwork(NetworkEnum.devnet)}
-        />
-        <RegistrationCard
-          title="TestNet"
-          iconType={3}
-          description="Explore, test, and innovate with decentralized web"
-          buttonVariant="contained"
-          isWithBorder
-          onSelect={() => onSelectNetwork(NetworkEnum.testnet)}
-        />
-        <RegistrationCard
-          title="AppChains"
-          iconType={3}
-          description="Connect directly to dedicated application chains"
-          buttonVariant="outlined"
-          disabled={isRandomChain}
-          onSelect={() => onSelectNetwork(NetworkEnum.appchain)}
-        />
-      </div>
+      <>
+        <div ref={scrollContainerRef} className={styles.cards}>
+          <RegistrationCard
+            title="DevNet"
+            iconType={2}
+            description={t('engageWithLatestEnvironments')}
+            buttonVariant="outlined"
+            buttonLabel={t('select')}
+            onSelect={() => onSelectNetwork(NetworkEnum.devnet)}
+          />
+          <RegistrationCard
+            title="TestNet"
+            iconType={3}
+            description={t('exploreTestAndInnovate')}
+            buttonVariant="contained"
+            buttonLabel={t('select')}
+            isWithBorder
+            onSelect={() => onSelectNetwork(NetworkEnum.testnet)}
+          />
+          <RegistrationCard
+            title="AppChains"
+            iconType={3}
+            description={t('connectDirectlyToDedicated')}
+            buttonVariant="outlined"
+            buttonLabel={t('select')}
+            disabled={isRandomChain}
+            onSelect={() => onSelectNetwork(NetworkEnum.appchain)}
+          />
+        </div>
+        <IconButton className={styles.leftArrow} onClick={scrollToPrevious}>
+          <ChevronLeftIcon />
+        </IconButton>
+        <IconButton className={styles.rightArrow} onClick={scrollToNext}>
+          <ChevronRightIcon />
+        </IconButton>
+      </>
     ),
-    [isRandomChain, onSelectNetwork],
+    [
+      isRandomChain,
+      onSelectNetwork,
+      scrollContainerRef,
+      scrollToNext,
+      scrollToPrevious,
+      t,
+    ],
   );
 
   const renderSelectChain = useCallback(() => {
@@ -117,7 +157,7 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
 
     return (
       <div className={styles.selectChain}>
-        <div className={styles.selectChainTitle}>Select chain</div>
+        <div className={styles.selectChainTitle}>{t('selectChain')}</div>
         <ChainSelect
           id="chain-select"
           name="chain-select"
@@ -128,7 +168,7 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
           }}
         />
         <div className={styles.selectChainDesc}>
-          Select the chain number to register an account
+          {t('selectChainNumberToRegister')}
         </div>
         <Button
           className={styles.button}
@@ -136,11 +176,11 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
           size="large"
           onClick={() => onSelectChain(chain)}
         >
-          Select
+          {t('select')}
         </Button>
       </div>
     );
-  }, [chain, onSelectChain, selectedChains]);
+  }, [t, chain, onSelectChain, selectedChains]);
 
   return (
     <>

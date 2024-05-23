@@ -7,6 +7,7 @@ import { useParams } from 'react-router';
 import { objectToString, stringToObject } from 'sso/utils';
 import { AppQueryParams } from 'application/typings/routes';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
+import { useTranslation } from 'react-i18next';
 import styles from './LoginToDapp.module.scss';
 
 const mapStateToProps = (state: RootState) => ({
@@ -20,6 +21,8 @@ type LoginToDappProps = ConnectedProps<typeof connector> & WizardComponentProps;
 const LoginToDappComponent: React.FC<LoginToDappProps> = ({
   walletAddress,
 }) => {
+  const { t } = useTranslation();
+
   const { data } = useParams<{ data?: string }>();
 
   const parsedData: AppQueryParams = useMemo(() => {
@@ -40,7 +43,7 @@ const LoginToDappComponent: React.FC<LoginToDappProps> = ({
   return (
     <div className={styles.content}>
       <div className={styles.title}>
-        You now have access to the decentralized web
+        {t('youNowHaveAccessToTheDecentralizedWeb')}
       </div>
       <LogoIcon className={styles.logo} />
       <Button
@@ -49,7 +52,7 @@ const LoginToDappComponent: React.FC<LoginToDappProps> = ({
         size="large"
         onClick={onClickLoginHandler}
       >
-        Login to DApp
+        {t('loginToDApp')}
       </Button>
     </div>
   );

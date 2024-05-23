@@ -34,11 +34,6 @@ export function* loginToWalletSaga({ payload }: { payload?: LoginToWalletSagaInp
     do {
       subChain = yield NetworkAPI.getAddressChain(address!);
 
-      // Switch bootstrap when transitioning from testnet to 101-th chain
-      if (subChain.chain === 101) {
-        subChain = yield NetworkAPI.getAddressChain(address!);
-      }
-
       if (subChain.result === 'other_chain') {
         if (subChain.chain === null) {
           toast.error(i18n.t('portationInProgress'));

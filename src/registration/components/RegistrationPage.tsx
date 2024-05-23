@@ -150,6 +150,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
   const renderWelcome = useCallback(
     () => (
       <>
+        <LangMenu className={styles.langSelect} />
         <Link to={WalletRoutesEnum.root} className={styles.registrationTitle}>
           Power Wallet
         </Link>
@@ -197,7 +198,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
                 disableRipple
               />
             }
-            label="I want to select a chain by number"
+            label={t('iWantToSelectChain')}
             className={styles.checkBoxLabel}
           />
         </div>
@@ -218,7 +219,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
                 disableRipple
               />
             }
-            label="I don't want to use a password to encrypt my key"
+            label={t('IDontWantUsePassword')}
             className={styles.checkBoxLabel}
           />
         </div>
@@ -226,6 +227,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
     }
     return null;
   }, [
+    t,
     backupStep,
     creatingStep,
     isRandomChain,
@@ -237,8 +239,11 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
   const renderRegistration = useCallback(
     () => (
       <div className={styles.registrationWizardComponent}>
-        <div className={styles.registrationPageTitle}>Power Wallet</div>
-        <LangMenu className={styles.langSelect} />
+        <div className={styles.registrationPageHeader}>
+          <div style={{ width: '48px' }} />
+          <Link to={WalletRoutesEnum.root} className={styles.registrationPageTitle}>Power Wallet</Link>
+          <LangMenu className={styles.registrationPageLangSelect} />
+        </div>
         <div className={styles.registrationWizardHolder}>
           <Wizard
             className={styles.registrationWizard}
