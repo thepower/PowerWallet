@@ -217,7 +217,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
           iconType={2}
           description={t('enterAddressAndSeedPhrase')}
           buttonVariant="outlined"
-          buttonLabel={t('Enter')}
+          buttonLabel={t('enter')}
           onSelect={() => setIsEnterToAccPressed(true)}
         />
         <RegistrationCard

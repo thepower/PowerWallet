@@ -174,7 +174,7 @@
     "chooseDeInfraNetwork": "Choose DeInfra network",
     "enterAccountNumberAndSeedPhrase": "Enter account number and seed phrase",
     "IDontWantUsePassword": "I don't want to use a password to encrypt my key",
-    "Enter": "Enter the address and seed phrase",
+    "enterAddressAndSeedPhrase": "Enter the address and seed phrase",
     "enter": "Enter",
     "uploadPEMFileToImportAccount": "Upload the PEM file to import an account",
     "selectFile": "Select file",
