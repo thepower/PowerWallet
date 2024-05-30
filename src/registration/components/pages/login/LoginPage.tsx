@@ -1,12 +1,20 @@
 import React, {
-  ChangeEvent, FC, useCallback, useEffect, useRef, useState,
+  ChangeEvent,
+  FC,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
-import {
-  useTranslation,
-} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
 import {
-  Button, Checkbox, LangMenu, OutlinedInput, IconButton,
+  Button,
+  Checkbox,
+  LangMenu,
+  OutlinedInput,
+  IconButton,
+  FullScreenLoader,
 } from 'common';
 import { importAccountFromFile } from 'account/slice/accountSlice';
 import { Maybe } from 'typings/common';
@@ -17,13 +25,25 @@ import { Link } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import hooks from 'hooks';
+import { checkIfLoading } from 'network/selectors';
+import { RootState } from 'application/store';
 import { loginToWalletFromRegistration } from '../../../slice/registrationSlice';
 import registrationStyles from '../../Registration.module.scss';
 import styles from './LoginPage.module.scss';
 
 import { ImportAccountModal } from '../../modals/ImportAccountModal';
 
-const mapStateToProps = () => ({});
+const mapStateToProps = (state: RootState) => ({
+  isImportAccountFromFileLoading: checkIfLoading(
+    state,
+    importAccountFromFile.type,
+  ),
+  isLoginToWalletFromRegistrationLoading: checkIfLoading(
+    state,
+    loginToWalletFromRegistration.type,
+  ),
+});
+
 const mapDispatchToProps = {
   importAccountFromFile,
   loginToWalletFromRegistration,
@@ -35,6 +55,8 @@ type LoginPageProps = ConnectedProps<typeof connector>;
 const LoginPageComponent: FC<LoginPageProps> = ({
   importAccountFromFile,
   loginToWalletFromRegistration,
+  isImportAccountFromFileLoading,
+  isLoginToWalletFromRegistrationLoading,
 }) => {
   const { t } = useTranslation();
 
@@ -71,17 +93,20 @@ const LoginPageComponent: FC<LoginPageProps> = ({
     }
   };
 
-  const setAccountFileHandler = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    const accountFile = event?.target?.files?.[0]!;
-    importAccountFromFile({
-      password: '',
-      accountFile: accountFile!,
-      additionalActionOnDecryptError: () => {
-        setAccountFile(accountFile);
-        setOpenedPasswordModal(true);
-      },
-    });
-  }, [importAccountFromFile]);
+  const setAccountFileHandler = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const accountFile = event?.target?.files?.[0]!;
+      importAccountFromFile({
+        password: '',
+        accountFile: accountFile!,
+        additionalActionOnDecryptError: () => {
+          setAccountFile(accountFile);
+          setOpenedPasswordModal(true);
+        },
+      });
+    },
+    [importAccountFromFile],
+  );
   const closePasswordModal = () => {
     setOpenedPasswordModal(false);
   };
@@ -112,9 +137,16 @@ const LoginPageComponent: FC<LoginPageProps> = ({
 
   const loginToAccount = useCallback(() => {
     if (isWithoutPassword) {
-      loginToWalletFromRegistration({ address, seedOrPrivateKey, password: '' });
+      loginToWalletFromRegistration({
+        address,
+        seedOrPrivateKey,
+        password: '',
+      });
     } else {
-      const passwordsNotEqual = !compareTwoStrings(password!, confirmedPassword!);
+      const passwordsNotEqual = !compareTwoStrings(
+        password!,
+        confirmedPassword!,
+      );
 
       if (passwordsNotEqual) {
         setPasswordsNotEqual(passwordsNotEqual);
@@ -122,7 +154,13 @@ const LoginPageComponent: FC<LoginPageProps> = ({
       }
       loginToWalletFromRegistration({ address, seedOrPrivateKey, password });
     }
-  }, [address, seedOrPrivateKey, password, confirmedPassword, isWithoutPassword]);
+  }, [
+    address,
+    seedOrPrivateKey,
+    password,
+    confirmedPassword,
+    isWithoutPassword,
+  ]);
 
   const handleImportAccount = (password: string) => {
     importAccountFromFile({
@@ -134,9 +172,10 @@ const LoginPageComponent: FC<LoginPageProps> = ({
   };
 
   const renderLoginPart = useCallback(() => {
-    const isButtonDisabled = !address ||
-    !seedOrPrivateKey ||
-    (passwordsNotEqual && !password && !isWithoutPassword);
+    const isButtonDisabled =
+      !address ||
+      !seedOrPrivateKey ||
+      (passwordsNotEqual && !password && !isWithoutPassword);
     return (
       <>
         <div className={styles.title}>
@@ -193,51 +232,73 @@ const LoginPageComponent: FC<LoginPageProps> = ({
           size="large"
           onClick={loginToAccount}
           disabled={isButtonDisabled}
+          loading={isLoginToWalletFromRegistrationLoading}
         >
           {t('login')}
         </Button>
       </>
     );
-  }, [address, seedOrPrivateKey, passwordsNotEqual, password, isWithoutPassword, t, confirmedPassword, loginToAccount]);
+  }, [
+    address,
+    seedOrPrivateKey,
+    passwordsNotEqual,
+    password,
+    isWithoutPassword,
+    t,
+    confirmedPassword,
+    loginToAccount,
+    isLoginToWalletFromRegistrationLoading,
+  ]);
 
-  const renderInitCards = useCallback(() => (
-    <>
-      <div className={styles.title}>
-        {t('loginImport')}
-      </div>
-      <input
-        ref={importAccountRef}
-        className={registrationStyles.importAccountInput}
-        onChange={setAccountFileHandler}
-        type="file"
-      />
-      <div ref={scrollContainerRef} className={styles.cards}>
-        <RegistrationCard
-          title={t('loginToAccount')}
-          iconType={2}
-          description={t('enterAddressAndSeedPhrase')}
-          buttonVariant="outlined"
-          buttonLabel={t('enter')}
-          onSelect={() => setIsEnterToAccPressed(true)}
+  const renderInitCards = useCallback(
+    () => (
+      <>
+        <div className={styles.title}>{t('loginImport')}</div>
+        <input
+          ref={importAccountRef}
+          className={registrationStyles.importAccountInput}
+          onChange={setAccountFileHandler}
+          type="file"
         />
-        <RegistrationCard
-          title={t('importAccount')}
-          iconType={3}
-          description={t('uploadPEMFileToImportAccount')}
-          buttonVariant="contained"
-          buttonLabel={t('selectFile')}
-          isWithBorder
-          onSelect={handleOpenImportFile}
-        />
-      </div>
-      <IconButton className={styles.leftArrow} onClick={scrollToPrevious}>
-        <ChevronLeftIcon />
-      </IconButton>
-      <IconButton className={styles.rightArrow} onClick={scrollToNext}>
-        <ChevronRightIcon />
-      </IconButton>
-    </>
-  ), [t, scrollContainerRef, scrollToNext, scrollToPrevious, setAccountFileHandler]);
+        <div ref={scrollContainerRef} className={styles.cards}>
+          <RegistrationCard
+            title={t('loginToAccount')}
+            iconType={2}
+            description={t('enterAddressAndSeedPhrase')}
+            buttonVariant="outlined"
+            buttonLabel={t('enter')}
+            onSelect={() => setIsEnterToAccPressed(true)}
+          />
+          <RegistrationCard
+            title={t('importAccount')}
+            iconType={3}
+            description={t('uploadPEMFileToImportAccount')}
+            buttonVariant="contained"
+            buttonLabel={t('selectFile')}
+            isWithBorder
+            onSelect={handleOpenImportFile}
+          />
+        </div>
+        <IconButton className={styles.leftArrow} onClick={scrollToPrevious}>
+          <ChevronLeftIcon />
+        </IconButton>
+        <IconButton className={styles.rightArrow} onClick={scrollToNext}>
+          <ChevronRightIcon />
+        </IconButton>
+      </>
+    ),
+    [
+      t,
+      scrollContainerRef,
+      scrollToNext,
+      scrollToPrevious,
+      setAccountFileHandler,
+    ],
+  );
+
+  if (isImportAccountFromFileLoading) {
+    return <FullScreenLoader />;
+  }
 
   return (
     <div className={registrationStyles.registrationPage}>
@@ -249,7 +310,12 @@ const LoginPageComponent: FC<LoginPageProps> = ({
       <div className={registrationStyles.registrationWizardComponent}>
         <div className={registrationStyles.registrationPageHeader}>
           <div style={{ width: '48px' }} />
-          <Link to={WalletRoutesEnum.root} className={registrationStyles.registrationPageTitle}>Power Wallet</Link>
+          <Link
+            to={WalletRoutesEnum.root}
+            className={registrationStyles.registrationPageTitle}
+          >
+            Power Wallet
+          </Link>
           <LangMenu className={registrationStyles.registrationPageLangSelect} />
         </div>
         <div className={registrationStyles.registrationWizardHolder}>

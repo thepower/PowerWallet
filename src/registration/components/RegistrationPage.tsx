@@ -30,6 +30,7 @@ import {
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { stringToObject } from 'sso/utils';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
+import { AddressApi } from '@thepowereco/tssdk';
 import {
   AppQueryParams,
   WalletRoutesEnum,
@@ -44,11 +45,11 @@ import { SelectNetwork } from './scenes/selectNetwork/SelectNetwork';
 import { Backup } from './scenes/backup/Backup';
 import { LoginToDapp } from './scenes/loginToDapp/LoginToDapp';
 
-type OwnProps = RouteComponentProps<{ data?: string }>;
+type OwnProps = RouteComponentProps<{ dataOrReferrer?: string }>;
 
 const mapStateToProps = (state: RootState, props: OwnProps) => ({
   walletAddress: getWalletAddress(state),
-  data: props?.match?.params?.data,
+  dataOrReferrer: props?.match?.params?.dataOrReferrer,
   creatingStep: getCurrentCreatingStep(state),
   backupStep: getCurrentBackupStep(state),
   isRandomChain: getIsRandomChain(state),
@@ -69,7 +70,7 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type RegistrationPageProps = ConnectedProps<typeof connector>;
 
 const RegistrationPageComponent: FC<RegistrationPageProps> = ({
-  data,
+  dataOrReferrer,
   routeTo,
   setIsRandomChain,
   toggleIsWithoutPassword,
@@ -86,14 +87,16 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
 
   const [enterButtonPressed, setEnterButtonPressed] = useState(false);
 
+  const isAddressInParams = useMemo(() => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer), [dataOrReferrer]);
+
   const parsedData: AppQueryParams = useMemo(() => {
-    if (data) return stringToObject(data);
+    if (!isAddressInParams && dataOrReferrer) return stringToObject(dataOrReferrer);
     return null;
-  }, [data]);
+  }, [dataOrReferrer, isAddressInParams]);
 
   useEffect(() => {
     if (walletAddress) {
-      routeTo(`${WalletRoutesEnum.sso}/${data}`);
+      routeTo(`${WalletRoutesEnum.sso}/${dataOrReferrer}`);
     } else if (parsedData?.chainID) {
       setEnterButtonPressed(true);
       setCreatingStep(CreateAccountStepsEnum.backup);
@@ -101,13 +104,13 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
       setSelectedChain(parsedData.chainID);
     }
   }, [
-    data,
+    dataOrReferrer,
     parsedData?.chainID,
   ]);
 
   const getRegistrationBreadcrumbs = useMemo(
     () => (
-      data
+      dataOrReferrer
         ? [
           {
             label: getRegistrationTabs(t).selectNetwork,
@@ -132,7 +135,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
             component: Backup,
           },
         ]),
-    [t],
+    [dataOrReferrer, t],
   );
 
   const handleProceedToRegistration = useCallback(() => {

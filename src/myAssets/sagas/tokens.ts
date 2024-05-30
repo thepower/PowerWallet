@@ -2,11 +2,11 @@ import { AddressApi, NetworkApi } from '@thepowereco/tssdk';
 
 import { getWalletAddress } from 'account/selectors/accountSelectors';
 
-import { getNetworkApi } from 'application/selectors';
+import { getNetworkApi, getNetworkChainID } from 'application/selectors';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { push } from 'connected-react-router';
 import i18n from 'locales/initTranslation';
-import { getTokens, getTokensIds } from 'myAssets/selectors/tokensSelectors';
+import { getTokens } from 'myAssets/selectors/tokensSelectors';
 import {
   addErc721Tokens,
   addToken,
@@ -42,9 +42,11 @@ export function* addTokenSaga({
   payload: { address, withoutRedirect, additionalActionOnSuccess },
 }: ReturnType<typeof addTokenTrigger>) {
   try {
-    const tokensIds = yield* select(getTokensIds);
+    const tokens = yield* select(getTokens);
 
-    if (tokensIds.includes(address)) {
+    const existedToken = tokens.find((token) => token.address === address);
+
+    if (existedToken && existedToken?.chainId) {
       toast.error(i18n.t('tokenHasAlreadyBeenAdded'));
       return;
     }
@@ -61,8 +63,6 @@ export function* addTokenSaga({
 
     if (chain !== networkAPI.getChain()) {
       toast.error(i18n.t('wrongChain'));
-      // contractNetworkApi = new NetworkApi(chain!);
-      // yield contractNetworkApi.bootstrap(true);
     }
 
     const isErc721 = yield* getIsErc721(
@@ -99,6 +99,7 @@ export function* addTokenSaga({
           address,
           decimals: '1',
           type: TokenKind.Erc721,
+          chainId: chain!,
           amount: balance,
           isShow: true,
         }),
@@ -139,6 +140,7 @@ export function* addTokenSaga({
           symbol,
           address,
           decimals,
+          chainId: chain!,
           type: TokenKind.Erc20,
           amount: balance,
           isShow: true,
@@ -152,7 +154,7 @@ export function* addTokenSaga({
   }
 }
 
-export function* updateTokenAmountSaga({ address }: { address: string }) {
+export function* updateTokenAmountSaga({ address }: { address: string, isErc721?: boolean }) {
   const networkAPI = (yield* select(getNetworkApi))!;
   const contractNetworkApi = networkAPI;
   const { chain }: { chain?: number } = yield networkAPI.getAddressChain(
@@ -198,9 +200,12 @@ export function* updateTokenAmountSaga({ address }: { address: string }) {
 
 export function* updateTokensAmountsSaga() {
   const tokens = yield* select(getTokens);
+  const chainId = yield* select(getNetworkChainID);
+
+  const chainTokens = tokens.filter((token) => token?.chainId === chainId);
 
   yield all(
-    tokens.map(({ address }) => ({ address })).map(updateTokenAmountSaga),
+    chainTokens.map(({ address }) => ({ address })).map(updateTokenAmountSaga),
   );
 }
 

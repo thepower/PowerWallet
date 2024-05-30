@@ -34,23 +34,41 @@ const registrationSlice = createSlice({
   name: SLICE_NAME,
   initialState,
   reducers: {
-    setSelectedNetwork: (state: RegistrationState, action: PayloadAction<Maybe<NetworkEnum>>) => {
+    setSelectedNetwork: (
+      state: RegistrationState,
+      action: PayloadAction<Maybe<NetworkEnum>>,
+    ) => {
       state.selectedNetwork = action.payload;
     },
-    setSelectedChain: (state: RegistrationState, action: PayloadAction<Maybe<number>>) => {
+    setSelectedChain: (
+      state: RegistrationState,
+      action: PayloadAction<Maybe<number>>,
+    ) => {
       state.selectedChain = action.payload;
     },
-    setSeedPhrase: (state: RegistrationState, action: PayloadAction<SetSeedPhraseInput>) => {
+    setSeedPhrase: (
+      state: RegistrationState,
+      action: PayloadAction<SetSeedPhraseInput>,
+    ) => {
       state.seedPhrase = action.payload.seedPhrase;
       state.creatingStep = action.payload.nextStep;
     },
-    setCreatingStep: (state: RegistrationState, action: PayloadAction<CreateAccountStepsEnum>) => {
+    setCreatingStep: (
+      state: RegistrationState,
+      action: PayloadAction<CreateAccountStepsEnum>,
+    ) => {
       state.creatingStep = action.payload;
     },
-    setBackupStep: (state: RegistrationState, action: PayloadAction<BackupAccountStepsEnum>) => {
+    setBackupStep: (
+      state: RegistrationState,
+      action: PayloadAction<BackupAccountStepsEnum>,
+    ) => {
       state.backupStep = action.payload;
     },
-    setIsRandomChain: (state: RegistrationState, action: PayloadAction<boolean>) => {
+    setIsRandomChain: (
+      state: RegistrationState,
+      action: PayloadAction<boolean>,
+    ) => {
       state.isRandomChain = action.payload;
     },
     toggleIsWithoutPassword: (state: RegistrationState) => {
@@ -72,9 +90,15 @@ export const {
   },
 } = registrationSlice;
 
-export const generateSeedPhrase = createAction(`${SLICE_NAME}/generateSeedPhrase`);
-export const createWallet = createAction<AddActionOnSuccessType<{
+export const generateSeedPhrase = createAction(
+  `${SLICE_NAME}/generateSeedPhrase`,
+);
+export const createWallet = createAction<
+AddActionOnSuccessType<{
   password: string;
-}>>(`${SLICE_NAME}/createWallet`);
-export const loginToWalletFromRegistration = createAction<LoginToWalletInputType>(`${SLICE_NAME}/loginToWallet`);
+  referrer?: string;
+}>
+>(`${SLICE_NAME}/createWallet`);
+export const loginToWalletFromRegistration =
+  createAction<LoginToWalletInputType>(`${SLICE_NAME}/loginToWallet`);
 export const proceedToWallet = createAction(`${SLICE_NAME}/proceedToWallet`);

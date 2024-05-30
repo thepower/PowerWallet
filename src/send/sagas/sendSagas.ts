@@ -15,7 +15,7 @@ import { updateTokenAmountSaga } from 'myAssets/sagas/tokens';
 import { loadBalanceSaga } from 'myAssets/sagas/wallet';
 import { toast } from 'react-toastify';
 import { TxPurpose } from 'sign-and-send/typing';
-import { put, select } from 'typed-redux-saga';
+import { call, put, select } from 'typed-redux-saga';
 import i18n from 'locales/initTranslation';
 import abis from 'abis';
 
@@ -47,7 +47,6 @@ export function* sendTrxSaga({
         'SK',
         amount,
         comment ?? '',
-        +new Date(),
       );
 
     yield* put(
@@ -211,6 +210,11 @@ export function* singAndSendTrxSaga({
       );
 
     const comment = decodedTxBody?.e?.msg;
+    const sequence = yield* call(networkAPI.getWalletSequence, walletAddress);
+    const newSequence = sequence + 1;
+
+    decodedTxBody.s = newSequence;
+
     const txResponse: { txId: string } =
       yield networkAPI.sendTxAndWaitForResponse(
         packAndSignTX(decodedTxBody, wif),

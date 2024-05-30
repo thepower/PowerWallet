@@ -88,7 +88,6 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
       this.setState({ returnURL: decodedMessage?.returnUrl });
       const sponsor = decodedMessage?.sponsor;
 
-      const date = Date.now();
       const srcFee = decodedTxBody?.p?.find((purpose) => purpose?.[0] === TxPurpose.SRCFEE);
       const gas = decodedTxBody?.p?.find((purpose) => purpose?.[0] === TxPurpose.GAS);
 
@@ -97,8 +96,7 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
       }
 
       decodedTxBody.f = Buffer.from(AddressApi.parseTextAddress(address));
-      decodedTxBody.s = date;
-      decodedTxBody.t = date;
+      decodedTxBody.t = Date.now();
 
       if (sponsor) {
         decodedTxBody.e.sponsor = [Buffer.from(AddressApi.parseTextAddress(sponsor))];

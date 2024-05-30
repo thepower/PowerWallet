@@ -12,6 +12,7 @@ import { SendPage } from 'send/components/SendPage';
 import SignAndSendPage from 'sign-and-send/components/SingAndSendPage';
 import WalletSSOPage from 'sso/components/pages/WalletSSOPage';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
+import { ReferralSystemPage } from 'referral-system/components/pages/ReferralSystemPage';
 import { useAppDispatch, useAppSelector } from '../store';
 import { WalletRoutesEnum } from '../typings/routes';
 import { initApplication } from '../slice/applicationSlice';
@@ -33,38 +34,38 @@ const AppRoutesComponent: React.FC = () => {
   if (!walletApi || !networkApi || loading) {
     return <FullScreenLoader />;
   }
+
   return (
     <Switch>
       <Route
         exact
-        path={`${WalletRoutesEnum.signup}/:data?`}
+        path={`${WalletRoutesEnum.signup}/:dataOrReferrer?`}
         component={RegistrationPage}
       />
       <Route exact path={`${WalletRoutesEnum.login}/:data?`} component={LoginPage} />
       <Route path={`${WalletRoutesEnum.sso}/:data`} component={WalletSSOPage} />
-      {walletAddress && <>
-        <Route
-          path={`/:type/:address/:id?${WalletRoutesEnum.send}`}
-          component={SendPage}
-        />
-        <Route exact path={`${WalletRoutesEnum.add}`}>
-          <AddTokenPage />
-        </Route>
-        <Route
-          path={`/:type/:address${WalletRoutesEnum.transactions}`}
-          component={TokenTransactionsPage}
-        />
-        <Route
-          path={`${WalletRoutesEnum.tokenSelection}/:address?`}
-          component={TokenSelectionPage}
-          exact
-        />
-        <Route
-          path={`${WalletRoutesEnum.signAndSend}/:message`}
-          component={SignAndSendPage}
-        />
-        <Route exact path={WalletRoutesEnum.root} component={MyAssets} />
-      </>}
+      <Route
+        path={`/:type/:address/:id?${WalletRoutesEnum.send}`}
+        component={SendPage}
+      />
+      <Route exact path={`${WalletRoutesEnum.add}`}>
+        <AddTokenPage />
+      </Route>
+      <Route
+        path={`/:type/:address${WalletRoutesEnum.transactions}`}
+        component={TokenTransactionsPage}
+      />
+      <Route
+        path={`${WalletRoutesEnum.tokenSelection}/:address?`}
+        component={TokenSelectionPage}
+        exact
+      />
+      <Route
+        path={`${WalletRoutesEnum.signAndSend}/:message`}
+        component={SignAndSendPage}
+      />
+      <Route exact path={WalletRoutesEnum.referralSystem} component={ReferralSystemPage} />
+      <Route exact path={`${WalletRoutesEnum.root}:referrer?`} component={MyAssets} />
       <Redirect path="*" to={walletAddress ? WalletRoutesEnum.root : WalletRoutesEnum.signup} />
     </Switch>
   );

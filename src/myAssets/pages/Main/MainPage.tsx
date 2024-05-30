@@ -5,14 +5,8 @@ import {
   BuySvg, FaucetSvg, LogoIcon, SendSvg,
 } from 'assets/icons';
 import { getTokens } from 'myAssets/selectors/tokensSelectors';
-import {
-  updateTokensAmountsTrigger,
-} from 'myAssets/slices/tokensSlice';
-import {
-  MyAssetsTabs,
-  TokenKind,
-  getMyAssetsTabsLabels,
-} from 'myAssets/types';
+import { updateTokensAmountsTrigger } from 'myAssets/slices/tokensSlice';
+import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
 import React, {
   FC, useCallback, useEffect, useState,
 } from 'react';
@@ -25,7 +19,10 @@ import { getNetworkChainID } from 'application/selectors';
 import { setShowUnderConstruction } from 'application/slice/applicationSlice';
 import { RootState } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { getWalletNativeTokens, getWalletNativeTokensAmounts } from '../../selectors/walletSelectors';
+import {
+  getWalletNativeTokens,
+  getWalletNativeTokensAmounts,
+} from '../../selectors/walletSelectors';
 import AddButton from '../../components/AddButton';
 import { Token } from '../../components/Token';
 import styles from './MainPage.module.scss';
@@ -73,8 +70,16 @@ const MyAssetsComponent: FC<MyAssetsProps> = ({
     setShowUnderConstruction(true);
   };
 
-  const erc20tokens = tokens.filter((token) => token.isShow && token.type === TokenKind.Erc20);
-  const erc721tokens = tokens.filter((token) => token.isShow && token.type === TokenKind.Erc721);
+  const erc20tokens = tokens.filter(
+    (token) => token.isShow &&
+      token.type === TokenKind.Erc20 &&
+      token?.chainId === chainId,
+  );
+  const erc721tokens = tokens.filter(
+    (token) => token.isShow &&
+      token.type === TokenKind.Erc721 &&
+      token?.chainId === chainId,
+  );
 
   const tokensMap = {
     [MyAssetsTabs.Erc20]: [...nativeTokens, ...erc20tokens],
@@ -85,11 +90,7 @@ const MyAssetsComponent: FC<MyAssetsProps> = ({
 
   const renderAssetsList = useCallback(() => {
     if (!currentTokens.length) {
-      return (
-        <div className={styles.noTokens}>
-          {t('yourTokensWillBeHere')}
-        </div>
-      );
+      return <div className={styles.noTokens}>{t('yourTokensWillBeHere')}</div>;
     }
 
     return (
@@ -113,9 +114,7 @@ const MyAssetsComponent: FC<MyAssetsProps> = ({
             className={styles.addressButton}
             iconClassName={styles.copyIcon}
           />
-          <div className={styles.accountChain}>
-            {`Chain: ${chainId}`}
-          </div>
+          <div className={styles.accountChain}>{`Chain: ${chainId}`}</div>
         </div>
         <div className={styles.panel}>
           <div className={styles.info}>
@@ -161,9 +160,7 @@ const MyAssetsComponent: FC<MyAssetsProps> = ({
         </div>
         <div className={styles.tokensHeadRow}>
           <div className={styles.title}>{t('tokens')}</div>
-          <Link
-            to={`${WalletRoutesEnum.add}`}
-          >
+          <Link to={`${WalletRoutesEnum.add}`}>
             <AddButton>{t('addToken')}</AddButton>
           </Link>
         </div>
@@ -175,9 +172,7 @@ const MyAssetsComponent: FC<MyAssetsProps> = ({
         onChange={onChangeTab}
         tabsRootClassName={styles.myAssetsTabsRoot}
       />
-      <div className={styles.tokens}>
-        {renderAssetsList()}
-      </div>
+      <div className={styles.tokens}>{renderAssetsList()}</div>
     </PageTemplate>
   );
 };

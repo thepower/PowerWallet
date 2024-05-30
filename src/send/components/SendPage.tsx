@@ -198,6 +198,7 @@ const SendPageComponent: FC<SendProps> = ({
   }) => {
     switch (tokenType) {
       case TokenKind.Native:
+        console.log({ tokenType });
         sendTrxTrigger({
           to: values.address!,
           comment: values.comment,

@@ -31,6 +31,7 @@ import { Erc721Token } from 'myAssets/components/Erc721Token';
 import { checkIfLoading } from 'network/selectors';
 import { range } from 'lodash';
 import { Skeleton } from '@mui/material';
+import { getNetworkChainID } from 'application/selectors';
 import styles from './TokenSelectionPage.module.scss';
 
 type OwnProps = RouteComponentProps<{ address: string }>;
@@ -50,13 +51,14 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
   isGetErc721TokensLoading: checkIfLoading(state, getErc721TokensTrigger.type),
   getTokenByID: (address: string) => getTokenByID(state, address),
   getWalletNativeTokensAmountBySymbol: (address: string) => getWalletNativeTokensAmountBySymbol(state, address),
+  chainId: getNetworkChainID(state),
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 type TokenSelectionPageProps = ConnectedProps<typeof connector>;
 
 const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
-  tokens: erc20Tokens,
+  tokens,
   getTokenByID,
   getWalletNativeTokensAmountBySymbol,
   nativeTokens,
@@ -65,6 +67,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   erc721Tokens,
   isGetErc721TokensLoading,
   getErc721TokensTrigger,
+  chainId,
 }) => {
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
   const [selectedToken, setSelectedToken] = useState<string>('');
@@ -94,16 +97,11 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     [setSelectedToken],
   );
 
-  const tokens = useMemo(
-    () => [...nativeTokens, ...erc20Tokens],
-    [nativeTokens, erc20Tokens],
-  );
-
   const erc20tokens = tokens.filter(
-    (token) => token.isShow && token.type === TokenKind.Erc20,
+    (token) => token.isShow && token.type === TokenKind.Erc20 && token?.chainId === chainId,
   );
   const erc721tokens = tokens.filter(
-    (token) => token.isShow && token.type === TokenKind.Erc721,
+    (token) => token.isShow && token.isShow && TokenKind.Erc721 && token?.chainId === chainId,
   );
 
   const tokensMap = {

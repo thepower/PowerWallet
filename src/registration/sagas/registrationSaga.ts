@@ -33,7 +33,7 @@ export function* generateSeedPhraseSaga() {
 }
 
 export function* createWalletSaga({ payload }: ReturnType<typeof createWallet>) {
-  const { password, additionalActionOnSuccess } = payload;
+  const { password, referrer, additionalActionOnSuccess } = payload;
   const seedPhrase = yield* select(getGeneratedSeedPhrase);
   const isRandomChain = yield* select(getIsRandomChain);
   const network = yield* select(getSelectedNetwork);
@@ -46,13 +46,13 @@ export function* createWalletSaga({ payload }: ReturnType<typeof createWallet>) 
   try {
     if (isRandomChain) {
       if (network) {
-        account = yield WalletApi.registerRandomChain(network, seedPhrase!);
+        account = yield WalletApi.registerRandomChain({ network, customSeed: seedPhrase!, referrer });
         yield* put(setSelectedChain(account.chain));
       } else {
         return;
       }
     } else {
-      account = yield WalletApi.registerCertainChain(chain!, seedPhrase!);
+      account = yield WalletApi.registerCertainChain({ chain: chain!, customSeed: seedPhrase!, referrer });
     }
 
     const encryptedWif = CryptoApi.encryptWif(account.wif, password);

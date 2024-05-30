@@ -13,6 +13,7 @@ import {
 } from 'myAssets/slices/tokensSlice';
 import { AddTokensTabs, TokenKind, getAddTokenTabsLabels } from 'myAssets/types';
 import { useTranslation } from 'react-i18next';
+import { getNetworkChainID } from 'application/selectors';
 import SearchInput from '../../../common/searchInput/SearchInput';
 import styles from './AddTokenPage.module.scss';
 
@@ -24,6 +25,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState) => ({
   tokens: getTokens(state),
+  chainId: getNetworkChainID(state),
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -33,6 +35,7 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
   tokens,
   addTokenTrigger,
   toggleTokenShow,
+  chainId,
 }) => {
   const { t } = useTranslation();
   const [search, setSearch] = useState<string>('');
@@ -84,8 +87,8 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
     </div>
   ), [address, onClickAddToken, t]);
 
-  const erc20tokens = tokens.filter((token) => token.type === TokenKind.Erc20);
-  const erc721tokens = tokens.filter((token) => token.type === TokenKind.Erc721);
+  const erc20tokens = tokens.filter((token) => token.type === TokenKind.Erc20 && token?.chainId === chainId);
+  const erc721tokens = tokens.filter((token) => token.type === TokenKind.Erc721 && token?.chainId === chainId);
 
   const tokensMap = {
     [AddTokensTabs.Erc20]: erc20tokens,
