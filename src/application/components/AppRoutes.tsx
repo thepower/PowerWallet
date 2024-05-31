@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import {
+  Redirect, Route, Switch,
+} from 'react-router-dom';
 import { FullScreenLoader } from 'common';
 import { RegistrationPage } from 'registration/components/RegistrationPage';
 import { LoginPage } from 'registration/components/pages/login/LoginPage';
@@ -12,7 +14,8 @@ import { SendPage } from 'send/components/SendPage';
 import SignAndSendPage from 'sign-and-send/components/SingAndSendPage';
 import WalletSSOPage from 'sso/components/pages/WalletSSOPage';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { ReferralSystemPage } from 'referral-system/components/pages/ReferralSystemPage';
+import { ReferralProgramPage } from 'referral-program/components/pages/ReferralProgramPage';
+
 import { useAppDispatch, useAppSelector } from '../store';
 import { WalletRoutesEnum } from '../typings/routes';
 import { initApplication } from '../slice/applicationSlice';
@@ -48,9 +51,7 @@ const AppRoutesComponent: React.FC = () => {
         path={`/:type/:address/:id?${WalletRoutesEnum.send}`}
         component={SendPage}
       />
-      <Route exact path={`${WalletRoutesEnum.add}`}>
-        <AddTokenPage />
-      </Route>
+      <Route exact path={`${WalletRoutesEnum.add}`} component={AddTokenPage} />
       <Route
         path={`/:type/:address${WalletRoutesEnum.transactions}`}
         component={TokenTransactionsPage}
@@ -64,7 +65,7 @@ const AppRoutesComponent: React.FC = () => {
         path={`${WalletRoutesEnum.signAndSend}/:message`}
         component={SignAndSendPage}
       />
-      <Route exact path={WalletRoutesEnum.referralSystem} component={ReferralSystemPage} />
+      <Route exact path={WalletRoutesEnum.referralProgram} component={ReferralProgramPage} />
       <Route exact path={`${WalletRoutesEnum.root}:referrer?`} component={MyAssets} />
       <Redirect path="*" to={walletAddress ? WalletRoutesEnum.root : WalletRoutesEnum.signup} />
     </Switch>

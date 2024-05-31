@@ -1,14 +1,20 @@
+@import 'src/styles/mixins';
+
 .wrapper {
   padding: 16px 32px;
 }
 
 .firstBlock {
   display: flex;
+
+  max-width: 420px;
   flex-direction: column;
   align-items: center;
   padding: 20px;
 
   border-radius: 20px;
+
+  margin: 0 auto 16px;
 
   margin-bottom: 16px;
   background: #151516;
@@ -43,3 +49,41 @@
   text-align: center;
   text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
 }
+
+.tabs {
+  margin-top: 24px;
+  margin-bottom: 10px;
+}
+
+.secondBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+
+  border-radius: 20px;
+
+  margin-bottom: 16px;
+
+  margin-bottom: 16px;
+  background: #151516;
+  gap: 16px;
+}
+
+.referralLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+
+  border-radius: 20px;
+  background: #232932;
+
+  word-wrap: anywhere;
+}
+
+.copyButton {
+  @include text-gradient;
+}
+
+@include icon-colors('.copyIcon', url('#pressed'));

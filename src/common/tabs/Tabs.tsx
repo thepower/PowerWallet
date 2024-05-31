@@ -16,6 +16,7 @@ interface TabsProps extends MUITabsProps {
   tabClassName?: string;
   tabIndicatorClassName?: string;
   tabSelectedClassName?: string;
+  disabledTabs?: string[]
 }
 
 class TabsComponent extends React.PureComponent<TabsProps> {
@@ -39,7 +40,9 @@ class TabsComponent extends React.PureComponent<TabsProps> {
   };
 
   renderTab = (key: string) => {
-    const { tabs, tabsLabels, tabClassName } = this.props;
+    const {
+      tabs, tabsLabels, tabClassName, disabledTabs,
+    } = this.props;
     const labels = tabsLabels || tabs;
 
     return (
@@ -52,6 +55,7 @@ class TabsComponent extends React.PureComponent<TabsProps> {
         disableFocusRipple
         disableRipple
         wrapped
+        disabled={disabledTabs?.includes(key)}
       />
     );
   };

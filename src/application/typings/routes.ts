@@ -1,5 +1,5 @@
 export enum WalletRoutesEnum {
-  referralSystem = '/referral-system',
+  referralProgram = '/referral-program',
   signAndSend = '/sign-and-send',
   send = '/send',
   tokenSelection = '/selection',

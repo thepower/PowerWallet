@@ -181,6 +181,16 @@
     "connectDirectlyToDedicated": "Подключайтесь напрямую к специализированным цепочкам приложений",
     "selectChainNumberToRegister": "Выберите номер чейна для регистрации учетной записи",
     "iWantToSelectChain": "Я хочу выбрать чейн по номеру",
-    "sorryReferralLinkIsOnly": "Извините, реферальная ссылка действует только при регистрации аккаунта"
+    "sorryReferralLinkIsOnly": "Извините, реферальная ссылка действует только при регистрации аккаунта",
+    "inviteFriendsEarnRewards": "Invite Friends, Earn Rewards!",
+    "welcomeToPowerWalletReferral": "Welcome to Power Wallet Referral Program!",
+    "helpUsGrowOurCommunity": "Help us grow our community and earn rewards for both you and your friends",
+    "myFriends": "My Friends",
+    "shareYourUniqueReferralLink": "Share Your Unique Referral Link",
+    "copyAndShareThisLink": "Copy and share this link with your friends to invite them to join Power Wallet",
+    "copyReferralLink": "Copy Referral Link",
+    "rewards": "🎉 Rewards",
+    "referralLink": "🔗 Referral Link",
+    "referralProgram": "Referral Program"
   }
 }

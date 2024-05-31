@@ -181,6 +181,16 @@
     "connectDirectlyToDedicated": "Connect directly to dedicated application chains",
     "selectChainNumberToRegister": "Select the chain number to register an account",
     "iWantToSelectChain": "I want to select a chain by number",
-    "sorryReferralLinkIsOnly": "Sorry, the referral link is only valid when registering an account"
+    "sorryReferralLinkIsOnly": "Sorry, the referral link is only valid when registering an account",
+    "inviteFriendsEarnRewards": "👋 Invite Friends, Earn Rewards!",
+    "welcomeToPowerWalletReferral": "Welcome to Power Wallet Referral Program!",
+    "helpUsGrowOurCommunity": "Help us grow our community and earn rewards for both you and your friends",
+    "myFriends": "My Friends",
+    "shareYourUniqueReferralLink": "Share Your Unique Referral Link",
+    "copyAndShareThisLink": "Copy and share this link with your friends to invite them to join Power Wallet",
+    "copyReferralLink": "Copy Referral Link",
+    "rewards": "🎉 Rewards",
+    "referralLink": "🔗 Referral Link",
+    "referralProgram": "Referral Program"
   }
 }

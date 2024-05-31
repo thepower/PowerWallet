@@ -108,6 +108,13 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
     parsedData?.chainID,
   ]);
 
+  const resetStage = () => {
+    setEnterButtonPressed(false);
+    setCreatingStep(CreateAccountStepsEnum.selectNetwork);
+    setIsRandomChain(true);
+    setSelectedChain(null);
+  };
+
   const getRegistrationBreadcrumbs = useMemo(
     () => (
       dataOrReferrer
@@ -154,7 +161,11 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
     () => (
       <>
         <LangMenu className={styles.langSelect} />
-        <Link to={WalletRoutesEnum.root} className={styles.registrationTitle}>
+        <Link
+          to={walletAddress ? WalletRoutesEnum.root : WalletRoutesEnum.signup}
+          className={styles.registrationTitle}
+          onClick={resetStage}
+        >
           Power Wallet
         </Link>
         <div className={styles.registrationDesc}>
@@ -244,7 +255,13 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
       <div className={styles.registrationWizardComponent}>
         <div className={styles.registrationPageHeader}>
           <div style={{ width: '48px' }} />
-          <Link to={WalletRoutesEnum.root} className={styles.registrationPageTitle}>Power Wallet</Link>
+          <Link
+            to={walletAddress ? WalletRoutesEnum.root : WalletRoutesEnum.signup}
+            className={styles.registrationPageTitle}
+            onClick={resetStage}
+          >
+            Power Wallet
+          </Link>
           <LangMenu className={styles.registrationPageLangSelect} />
         </div>
         <div className={styles.registrationWizardHolder}>

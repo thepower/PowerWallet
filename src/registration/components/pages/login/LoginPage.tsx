@@ -27,6 +27,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import hooks from 'hooks';
 import { checkIfLoading } from 'network/selectors';
 import { RootState } from 'application/store';
+import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { loginToWalletFromRegistration } from '../../../slice/registrationSlice';
 import registrationStyles from '../../Registration.module.scss';
 import styles from './LoginPage.module.scss';
@@ -42,6 +43,7 @@ const mapStateToProps = (state: RootState) => ({
     state,
     loginToWalletFromRegistration.type,
   ),
+  walletAddress: getWalletAddress(state),
 });
 
 const mapDispatchToProps = {
@@ -57,6 +59,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
   loginToWalletFromRegistration,
   isImportAccountFromFileLoading,
   isLoginToWalletFromRegistrationLoading,
+  walletAddress,
 }) => {
   const { t } = useTranslation();
 
@@ -78,6 +81,17 @@ const LoginPageComponent: FC<LoginPageProps> = ({
     scrollToNext,
     scrollToPrevious,
   } = hooks.useSmoothHorizontalScroll();
+
+  const resetStage = () => {
+    setAccountFile(null);
+    setAddress('');
+    setSeedOrPrivateKey('');
+    setPassword('');
+    setConfirmedPassword('');
+    setPasswordsNotEqual(false);
+    setIsEnterToAccPressed(false);
+    setIsWithoutPassword(false);
+  };
 
   const isMobile = useMediaQuery('(max-width:768px)');
 
@@ -311,8 +325,9 @@ const LoginPageComponent: FC<LoginPageProps> = ({
         <div className={registrationStyles.registrationPageHeader}>
           <div style={{ width: '48px' }} />
           <Link
-            to={WalletRoutesEnum.root}
+            to={walletAddress ? WalletRoutesEnum.root : WalletRoutesEnum.signup}
             className={registrationStyles.registrationPageTitle}
+            onClick={resetStage}
           >
             Power Wallet
           </Link>

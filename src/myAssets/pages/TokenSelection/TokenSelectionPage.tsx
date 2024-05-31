@@ -101,7 +101,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     (token) => token.isShow && token.type === TokenKind.Erc20 && token?.chainId === chainId,
   );
   const erc721tokens = tokens.filter(
-    (token) => token.isShow && token.isShow && TokenKind.Erc721 && token?.chainId === chainId,
+    (token) => token.isShow && token.type === TokenKind.Erc721 && token?.chainId === chainId,
   );
 
   const tokensMap = {

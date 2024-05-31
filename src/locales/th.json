@@ -181,6 +181,16 @@
     "connectDirectlyToDedicated": "เชื่อมต่อโดยตรงกับสายโซ่แอปพลิเคชันที่กำหนด",
     "selectChainNumberToRegister": "เลือกหมายเลขสายโซ่เพื่อสมัครบัญชี",
     "iWantToSelectChain": "ฉันต้องการเลือกสายโซ่ตามหมายเลข",
-    "sorryReferralLinkIsOnly": "ขออภัยลิงก์อ้างอิงจะใช้ได้เฉพาะเมื่อลงทะเบียนบัญชีเท่านั้น"
+    "sorryReferralLinkIsOnly": "ขออภัยลิงก์อ้างอิงจะใช้ได้เฉพาะเมื่อลงทะเบียนบัญชีเท่านั้น",
+    "inviteFriendsEarnRewards": "Invite Friends, Earn Rewards!",
+    "welcomeToPowerWalletReferral": "Welcome to Power Wallet Referral Program!",
+    "helpUsGrowOurCommunity": "Help us grow our community and earn rewards for both you and your friends",
+    "myFriends": "My Friends",
+    "shareYourUniqueReferralLink": "Share Your Unique Referral Link",
+    "copyAndShareThisLink": "Copy and share this link with your friends to invite them to join Power Wallet",
+    "copyReferralLink": "Copy Referral Link",
+    "rewards": "🎉 Rewards",
+    "referralLink": "🔗 Referral Link",
+    "referralProgram": "Referral Program"
   }
 }
