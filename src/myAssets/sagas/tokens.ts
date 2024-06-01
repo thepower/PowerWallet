@@ -6,7 +6,7 @@ import { getNetworkApi, getNetworkChainID } from 'application/selectors';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { push } from 'connected-react-router';
 import i18n from 'locales/initTranslation';
-import { getTokens } from 'myAssets/selectors/tokensSelectors';
+import { getTokenByID, getTokens } from 'myAssets/selectors/tokensSelectors';
 import {
   addErc721Tokens,
   addToken,
@@ -165,14 +165,13 @@ export function* updateTokenAmountSaga({ address }: { address: string, isErc721?
     toast.error(i18n.t('addressNotFound'));
   }
 
-  const isErc721: boolean = yield contractNetworkApi.executeCall(
-    AddressApi.textAddressToHex(address),
-    'supportsInterface',
-    ['0x80ac58cd'],
-    abis.erc721.abi,
-  );
+  const token = yield* select(getTokenByID, address);
 
-  if (isErc721) {
+  if (!token || !token?.type) {
+    return;
+  }
+
+  if (token.type === TokenKind.Erc721) {
     const walletAddress: string = yield* select(getWalletAddress);
     const balanceBigint: bigint = yield contractNetworkApi.executeCall(
       AddressApi.textAddressToHex(address),
