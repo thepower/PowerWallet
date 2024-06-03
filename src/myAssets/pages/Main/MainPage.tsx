@@ -1,5 +1,5 @@
 import {
-  Button, CardLink, CopyButton, PageTemplate, Tabs,
+  CardLink, CopyButton, PageTemplate, Tabs,
 } from 'common';
 import {
   BuySvg, FaucetSvg, LogoIcon, SendSvg,
@@ -158,7 +158,7 @@ const MyAssetsComponent: FC<MyAssetsProps> = ({
             </CardLink>
           </div>
         </div>
-        <div className={styles.btnWrapper}>
+        {/* <div className={styles.btnWrapper}>
           <Button
             to={WalletRoutesEnum.referralProgram}
             className={styles.referralBtn}
@@ -166,7 +166,7 @@ const MyAssetsComponent: FC<MyAssetsProps> = ({
           >
             {t('inviteFriendsEarnRewards')}
           </Button>
-        </div>
+        </div> */}
         <div className={styles.tokensHeadRow}>
           <div className={styles.title}>{t('tokens')}</div>
           <Link to={`${WalletRoutesEnum.add}`}>

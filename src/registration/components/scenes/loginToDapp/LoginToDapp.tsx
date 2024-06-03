@@ -23,12 +23,12 @@ const LoginToDappComponent: React.FC<LoginToDappProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const { data } = useParams<{ data?: string }>();
+  const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
 
   const parsedData: AppQueryParams = useMemo(() => {
-    if (data) return stringToObject(data);
+    if (dataOrReferrer) return stringToObject(dataOrReferrer);
     return null;
-  }, [data]);
+  }, [dataOrReferrer]);
 
   const onClickLoginHandler = useCallback(() => {
     if (parsedData?.callbackUrl) {

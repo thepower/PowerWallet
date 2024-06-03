@@ -13,7 +13,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import { Drawer, IconButton } from '@mui/material';
 import { WithTranslation, withTranslation } from 'react-i18next';
 import { push } from 'connected-react-router';
-import { WalletRoutesEnum } from 'application/typings/routes';
+// import { WalletRoutesEnum } from 'application/typings/routes';
 import { getOpenedMenu, getWalletAddress } from '../selectors/accountSelectors';
 import { Maybe } from '../../typings/common';
 import { AccountActionsList } from './AccountActionsList';
@@ -69,10 +69,10 @@ const Account: React.FC<AccountProps> = ({
     useState<boolean>(false);
   const importAccountInputRef = useRef<HTMLInputElement>(null);
 
-  const handleReferralProgram = () => {
-    routeTo(WalletRoutesEnum.referralProgram);
-    toggleOpenedAccountMenu();
-  };
+  // const handleReferralProgram = () => {
+  //   routeTo(WalletRoutesEnum.referralProgram);
+  //   toggleOpenedAccountMenu();
+  // };
 
   const handleCreateAccount = () => {
     setShowUnderConstruction(true);
@@ -139,11 +139,11 @@ const Account: React.FC<AccountProps> = ({
   };
 
   const getAccountActionsData = () => [
-    {
-      title: t('referralProgram'),
-      action: handleReferralProgram,
-      Icon: CreateIcon,
-    },
+    // {
+    //   title: t('referralProgram'),
+    //   action: handleReferralProgram,
+    //   Icon: CreateIcon,
+    // },
     {
       title: t('createNewAccount'),
       action: handleCreateAccount,

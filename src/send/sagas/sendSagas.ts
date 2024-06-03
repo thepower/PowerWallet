@@ -20,6 +20,7 @@ import i18n from 'locales/initTranslation';
 import abis from 'abis';
 
 import { LoadBalancePayloadType } from 'myAssets/types';
+import { clone } from 'lodash';
 import {
   sendErc721TokenTrxTrigger,
   sendTokenTrxTrigger,
@@ -153,6 +154,19 @@ export function* sendErc721TokenTrxSaga({
   }
 }
 
+function* getWalletSequence() {
+  try {
+    const walletAddress = yield* select(getWalletAddress);
+
+    const networkAPI = (yield* select(getNetworkApi))!;
+
+    const sequence = yield* call(networkAPI.getWalletSequence, walletAddress);
+    return sequence;
+  } catch (error) {
+    return 0;
+  }
+}
+
 export function* singAndSendTrxSaga({
   payload: {
     wif,
@@ -172,18 +186,19 @@ export function* singAndSendTrxSaga({
     const balance: LoadBalancePayloadType = yield WalletAPI.loadBalance(
       walletAddress!,
     );
+    const newDecodedTxBody = clone(decodedTxBody);
 
-    const fee = decodedTxBody?.p?.find(
+    const fee = newDecodedTxBody?.p?.find(
       (purpose) => purpose?.[0] === TxPurpose.SRCFEE,
     );
     const feeAmount = fee?.[2] || 0;
 
-    const gas = decodedTxBody?.p?.find(
+    const gas = newDecodedTxBody?.p?.find(
       (purpose) => purpose?.[0] === TxPurpose.GAS,
     );
     const gasAmount = gas?.[2] || 0;
 
-    const transfer = decodedTxBody?.p?.find(
+    const transfer = newDecodedTxBody?.p?.find(
       (purpose) => purpose?.[0] === TxPurpose.TRANSFER,
     );
     const transferAmount = transfer?.[2] || 0;
@@ -204,20 +219,20 @@ export function* singAndSendTrxSaga({
       correctAmount(transferAmount, transferToken);
 
     const to =
-      decodedTxBody?.to &&
+      newDecodedTxBody?.to &&
       AddressApi.hexToTextAddress(
-        Buffer.from(decodedTxBody.to).toString('hex'),
+        Buffer.from(newDecodedTxBody.to).toString('hex'),
       );
 
-    const comment = decodedTxBody?.e?.msg;
-    const sequence = yield* call(networkAPI.getWalletSequence, walletAddress);
+    const comment = newDecodedTxBody?.e?.msg;
+    const sequence = yield* getWalletSequence();
     const newSequence = sequence + 1;
 
-    decodedTxBody.s = newSequence;
+    newDecodedTxBody.s = newSequence;
 
     const txResponse: { txId: string } =
       yield networkAPI.sendTxAndWaitForResponse(
-        packAndSignTX(decodedTxBody, wif),
+        packAndSignTX(newDecodedTxBody, wif),
       );
     if (txResponse.txId) {
       yield* put(

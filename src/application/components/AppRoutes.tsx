@@ -14,7 +14,7 @@ import { SendPage } from 'send/components/SendPage';
 import SignAndSendPage from 'sign-and-send/components/SingAndSendPage';
 import WalletSSOPage from 'sso/components/pages/WalletSSOPage';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { ReferralProgramPage } from 'referral-program/components/pages/ReferralProgramPage';
+// import { ReferralProgramPage } from 'referral-program/components/pages/ReferralProgramPage';
 
 import { useAppDispatch, useAppSelector } from '../store';
 import { WalletRoutesEnum } from '../typings/routes';
@@ -65,7 +65,7 @@ const AppRoutesComponent: React.FC = () => {
         path={`${WalletRoutesEnum.signAndSend}/:message`}
         component={SignAndSendPage}
       />
-      <Route exact path={WalletRoutesEnum.referralProgram} component={ReferralProgramPage} />
+      {/* <Route exact path={WalletRoutesEnum.referralProgram} component={ReferralProgramPage} /> */}
       <Route exact path={`${WalletRoutesEnum.root}:referrer?`} component={MyAssets} />
       <Redirect path="*" to={walletAddress ? WalletRoutesEnum.root : WalletRoutesEnum.signup} />
     </Switch>

@@ -29,6 +29,8 @@ import { checkIfLoading } from 'network/selectors';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { BackupAccountStepsEnum } from 'registration/typings/registrationTypes';
 import { useParams } from 'react-router-dom';
+import { push } from 'connected-react-router';
+import { WalletRoutesEnum } from 'application/typings/routes';
 import styles from './Backup.module.scss';
 
 const mapStateToProps = (state: RootState) => ({
@@ -45,6 +47,7 @@ const mapDispatchToProps = {
   createWallet,
   exportAccount,
   setBackupStep,
+  routeTo: push,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -62,6 +65,7 @@ const BackupComponent: FC<BackupProps> = ({
   isCreateWalletLoading,
   isWithoutPassword,
   setNextStep,
+  routeTo,
 }) => {
   const { t } = useTranslation();
   const [password, setPassword] = useState('');
@@ -70,7 +74,7 @@ const BackupComponent: FC<BackupProps> = ({
 
   const [isSeedPhraseSaved, setIsSeedPhraseSaved] = useState(false);
 
-  const { data } = useParams<{ data?: string }>();
+  const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
 
   useEffect(() => {
     if (!generatedSeedPhrase) {
@@ -257,14 +261,16 @@ const BackupComponent: FC<BackupProps> = ({
   const onClickExportAccount = useCallback(() => {
     exportAccount({
       password,
-      isWithoutGoHome: !!data,
+      isWithoutGoHome: true,
       additionalActionOnSuccess: () => {
-        if (data) {
+        if (dataOrReferrer) {
           setNextStep();
+        } else {
+          routeTo(WalletRoutesEnum.root);
         }
       },
     });
-  }, [data, exportAccount, password, setNextStep]);
+  }, [dataOrReferrer, exportAccount, password, routeTo, setNextStep]);
 
   const renderRegistrationCompleted = useCallback(() => {
     const fileName = selectedChain

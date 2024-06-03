@@ -70,8 +70,11 @@ export function* initApplicationSaga() {
     }
   } else if (!match) {
     if (dataOrReferrer) {
-      console.log({ dataOrReferrer });
-      yield* put(push(`${WalletRoutesEnum.signup}/${dataOrReferrer}`));
+      if (dataOrReferrer === 'sign-and-send') {
+        yield* put(push(WalletRoutesEnum.signup));
+      } else {
+        yield* put(push(`${WalletRoutesEnum.signup}/${dataOrReferrer}`));
+      }
     } else {
       yield* put(push(WalletRoutesEnum.signup));
     }
