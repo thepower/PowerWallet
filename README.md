@@ -1,18 +1,13 @@
-# Welcome to the Power Hub repository!
+# Welcome to the Power Wallet repository!
 
-Power Hub is a decentralized application and content distribution platform within the Power DCloud ecosystem. It allows for the distribution of apps and content to end users in a decentralized manner.
-
-https://hub.thepower.io
+https://wallet.thepower.io
 
 Key features of Power Hub include:
 
 - Decentralized wallet
 - Account management
-- A marketplace for dapps and NFTs (non-fungible tokens)
-- Tools for developers to create and distribute their applications
-- Tools for end users to discover and interact with dapps
-- Tools for maintainers to manage and update their applications
-- Tools for DAO (decentralized autonomous organization) contributors to participate in the development and governance of the platform
+- Token management
+- Web3 SSO
 
 We hope you find the resources here helpful in creating and distributing your own dapps within the Power DCloud ecosystem.
 
