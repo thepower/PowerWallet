@@ -9,7 +9,7 @@ export type GetChainResultType = {
 
 export type LoginToWalletSagaInput = {
   address?: string;
-  wif?: string;
+  encryptedWif?: string;
 };
 
 export type ExportAccountInputType = {

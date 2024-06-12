@@ -1,48 +1,23 @@
-import { WizardComponentProps } from 'common';
-import i18n from 'locales/initTranslation';
-import React from 'react';
-
-const { t } = i18n;
+import { TFunction } from 'i18next';
 
 // i18next keys
-export const getRegistrationTabs = () => ({
-  quickGuide: t('quickGuide'),
-  beAware: t('beAware'),
-  loginRegister: t('loginRegister'),
+export const getRegistrationTabs = (t: TFunction) => ({
+  selectNetwork: t('selectNetwork'),
   backup: t('backup'),
-} as const);
-
-export enum LoginRegisterAccountTabs {
-  create = 'create',
-  login = 'login',
-  import = 'import',
-}
-
-// i18next keys
-export const getLoginRegisterAccountTabsLabels = () => ({
-  create: t('createNewAccount'),
-  login: t('loginToAccount'),
-  import: t('importYourAccount'),
-} as const);
-
-// i18next keys
-export const getLoginRegisterAccountTabsLabelsShort = () => ({
-  create: t('create'),
   login: t('login'),
-  import: t('import'),
 } as const);
 
 export enum CreateAccountStepsEnum {
-  selectSubChain = 'selectSubChain',
-  setSeedPhrase = 'setSeedPhrase',
-  confirmSeedPhrase = 'confirmSeedPhrase',
-  encryptPrivateKey = 'encryptPrivateKey',
+  selectNetwork,
+  backup,
+  login,
 }
 
-export type RegistrationPageAdditionalProps = {
-  onChangeTab: (_event: React.SyntheticEvent, value: LoginRegisterAccountTabs) => void;
-  tab: LoginRegisterAccountTabs;
-} & WizardComponentProps;
+export enum BackupAccountStepsEnum {
+  generateSeedPhrase,
+  encryptPrivateKey,
+  registrationCompleted,
+}
 
 export type SetSeedPhraseInput = {
   seedPhrase: string;

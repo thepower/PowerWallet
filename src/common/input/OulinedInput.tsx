@@ -1,43 +1,31 @@
-import React from 'react';
+import React, { FC, memo } from 'react';
 import {
   FormControl, FormHelperText,
   OutlinedInput as MUIOutlinedInput,
   OutlinedInputProps as MUIOutlinedInputProps,
 } from '@mui/material';
-import { ClosedEyeIcon } from '../icons/ClosedEyeIcon';
-import { EyeIcon } from '../icons/EyeIcon';
+import { ClosedEyeIcon } from 'assets/icons/ClosedEyeIcon';
+import { EyeIcon } from 'assets/icons/EyeIcon';
 import styles from './Input.module.scss';
 
 interface OutlinedInputProps extends MUIOutlinedInputProps {
   errorMessage?: string;
 }
 
-interface OutlinedInputState {
-  showPassword: boolean;
-}
+export const OutlinedInput: FC<OutlinedInputProps> = memo(({
+  className, value, onChange, error, errorMessage, type, ...otherProps
+}) => {
+  const [showPassword, setShowPassword] = React.useState(false);
 
-export class OutlinedInput extends React.PureComponent<OutlinedInputProps, OutlinedInputState> {
-  constructor(props: OutlinedInputProps) {
-    super(props);
-    this.state = {
-      showPassword: false,
-    };
-  }
-
-  toggleShowPassword = () => {
-    const { showPassword } = this.state;
-
-    this.setState({ showPassword: !showPassword });
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
-  getEndAdornment = () => {
-    const { type } = this.props;
-    const { showPassword } = this.state;
-
+  const getEndAdornment = () => {
     if (type === 'password') {
       return <div
         className={styles.passwordAdornment}
-        onClick={this.toggleShowPassword}
+        onClick={toggleShowPassword}
       >
         { showPassword ? <ClosedEyeIcon /> : <EyeIcon /> }
       </div>;
@@ -46,9 +34,7 @@ export class OutlinedInput extends React.PureComponent<OutlinedInputProps, Outli
     return null;
   };
 
-  getInputType = (type: string) => {
-    const { showPassword } = this.state;
-
+  const getInputType = (type: string) => {
     if (type === 'password') {
       return showPassword ? 'text' : 'password';
     }
@@ -56,29 +42,17 @@ export class OutlinedInput extends React.PureComponent<OutlinedInputProps, Outli
     return type;
   };
 
-  render() {
-    const {
-      errorMessage,
-      className,
-      onChange,
-      type,
-      value,
-      error,
-      placeholder,
-      ...otherProps
-    } = this.props;
-
-    return <FormControl className={styles.formControl}>
+  return (
+    <FormControl className={styles.formControl}>
       <MUIOutlinedInput
-        placeholder={placeholder}
         className={className}
         value={value}
         onChange={onChange}
-        type={this.getInputType(type!)}
+        type={getInputType(type!)}
         classes={{
           notchedOutline: value ? styles.bordered : '',
         }}
-        endAdornment={this.getEndAdornment()}
+        endAdornment={getEndAdornment()}
         {...otherProps}
       />
       {
@@ -87,6 +61,6 @@ export class OutlinedInput extends React.PureComponent<OutlinedInputProps, Outli
           {errorMessage}
         </FormHelperText>
       }
-    </FormControl>;
-  }
-}
+    </FormControl>
+  );
+});

@@ -1,12 +1,13 @@
 import React from 'react';
 import { Checkbox as MUICheckbox, CheckboxProps as MUICheckboxProps } from '@mui/material';
-import { CheckedIcon, UnCheckedIcon } from '../icons';
+import { CheckedIcon, UnCheckedIcon } from 'assets/icons';
 
 type CheckboxProps = MUICheckboxProps;
 
 export const Checkbox: React.FC<CheckboxProps> = (props) => (
   <MUICheckbox
     checkedIcon={<CheckedIcon />}
+    sx={{ p: 0 }}
     icon={<UnCheckedIcon />}
     {...props}
   />

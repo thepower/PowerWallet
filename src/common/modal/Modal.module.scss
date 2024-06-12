@@ -3,7 +3,7 @@
 
 .modal {
   max-width: unset;
-  border-radius: $unit * 2.5;
+  border-radius: 10px;
 
   @media screen and (max-width: $tablet) {
     width: 100vw;

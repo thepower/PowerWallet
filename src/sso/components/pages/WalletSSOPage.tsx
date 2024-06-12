@@ -1,60 +1,44 @@
-import React from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import { RouteComponentProps } from 'react-router';
+import { RouteComponentProps, useHistory } from 'react-router';
 import { objectToString, stringToObject } from 'sso/utils';
 
 import { RootState } from 'application/store';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { push } from 'connected-react-router';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
 
 type OwnProps = RouteComponentProps<{ data?: string }>;
-
-const mapDispatchToProps = {
-};
 
 const mapStateToProps = (state: RootState, props: OwnProps) => ({
   data: props.match.params.data,
   address: getWalletAddress(state),
-  routeTo: push,
 });
 
 const connector = connect(
   mapStateToProps,
-  mapDispatchToProps,
 );
 
 type WalletSSOProps = ConnectedProps<typeof connector>;
 
-type WalletSSOState = {
-  isConfirmModalOpen: boolean;
-};
+const WalletSSOPage: FC<WalletSSOProps> = ({ data, address }) => {
+  const h = useHistory();
+  const parsedData: AppQueryParams = useMemo(() => {
+    if (data) return stringToObject(data);
+    return null;
+  }, [data]);
 
-class WalletSSOPage extends React.Component<WalletSSOProps, WalletSSOState> {
-  componentDidMount(): void {
-    const { parsedData } = this;
-    const { address, routeTo } = this.props;
-
+  useEffect(() => {
     if (!address) {
-      routeTo(WalletRoutesEnum.signup);
+      h.push(WalletRoutesEnum.signup);
     } else {
       const stringData = objectToString({ address, returnUrl: parsedData?.returnUrl });
       if (parsedData?.callbackUrl) {
         window.location.replace(`${parsedData.callbackUrl}sso/${stringData}`);
       }
     }
-  }
+  });
 
-  get parsedData(): { callbackUrl?: string, returnUrl?: string } | null {
-    const { data } = this.props;
-
-    if (data) return stringToObject(data);
-    return null;
-  }
-
-  render() {
-    return null;
-  }
-}
+  return null;
+};
 
 export default connector(WalletSSOPage);

@@ -1,47 +1,55 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from 'application/store';
-import { RegistrationState } from '../slice/registrationSlice';
 
 export const getRegistrationState = (state: RootState) => (
   state.registration
 );
 
-export const getCurrentShardSelector = createSelector(
+export const getSelectedNetwork = createSelector(
   getRegistrationState,
-  (registrationState: RegistrationState) => (
-    registrationState.currentShard
+  (registrationState) => (
+    registrationState.selectedNetwork
   ),
 );
 
-export const getCurrentRegistrationTab = createSelector(
+export const getSelectedChain = createSelector(
   getRegistrationState,
-  (registrationState: RegistrationState) => (
-    registrationState.tab
+  (registrationState) => (
+    registrationState.selectedChain
   ),
 );
 
 export const getCurrentCreatingStep = createSelector(
   getRegistrationState,
-  (registrationState: RegistrationState) => (
+  (registrationState) => (
     registrationState.creatingStep
+  ),
+);
+
+export const getCurrentBackupStep = createSelector(
+  getRegistrationState,
+  (registrationState) => (
+    registrationState.backupStep
   ),
 );
 
 export const getGeneratedSeedPhrase = createSelector(
   getRegistrationState,
-  (registrationState: RegistrationState) => (
+  (registrationState) => (
     registrationState.seedPhrase
   ),
 );
 
-export const getLoginData = createSelector(
+export const getIsRandomChain = createSelector(
   getRegistrationState,
-  (registrationState: RegistrationState) => ({
-    address: registrationState.address,
-    seed: registrationState.seed,
-    password: registrationState.password,
-    confirmedPassword: registrationState.confirmedPassword,
-    passwordsNotEqual: registrationState.passwordsNotEqual,
-    randomChain: registrationState.randomChain,
-  }),
+  (registrationState) => (
+    registrationState.isRandomChain
+  ),
+);
+
+export const getIsWithoutPassword = createSelector(
+  getRegistrationState,
+  (registrationState) => (
+    registrationState.isWithoutPassword
+  ),
 );
