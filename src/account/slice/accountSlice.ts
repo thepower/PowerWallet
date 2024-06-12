@@ -4,12 +4,11 @@ import { ExportAccountInputType, ImportAccountInputType, LoginToWalletSagaInput 
 
 export type WalletData = {
   address: string;
-  wif: string;
+  encryptedWif: string;
 };
 
 export interface AccountState {
   walletData: WalletData;
-  logged: boolean;
   openedMenu: boolean;
 }
 
@@ -22,9 +21,8 @@ const importAccountFromFile = createAction<AddActionOnDecryptErrorType<ImportAcc
 const initialState: AccountState = {
   walletData: {
     address: '',
-    wif: '',
+    encryptedWif: '',
   },
-  logged: false,
   openedMenu: false,
 };
 
@@ -32,14 +30,11 @@ const accountSlice = createSlice({
   name: SLICE_NAME,
   initialState,
   reducers: {
-    setWalletData: (state: AccountState, action: PayloadAction<WalletData & { logged?: boolean; }>) => {
+    setWalletData: (state: AccountState, action: PayloadAction<WalletData>) => {
       state.walletData = {
         ...state.walletData,
         ...action.payload,
       };
-    },
-    setLoggedToAccount: (state: AccountState, action: PayloadAction<boolean>) => {
-      state.logged = action.payload;
     },
     clearAccountData: () => initialState,
     toggleOpenedAccountMenu: (state: AccountState) => {
@@ -55,7 +50,6 @@ const {
   reducer: accountReducer,
   actions: {
     setWalletData,
-    setLoggedToAccount,
     clearAccountData,
     toggleOpenedAccountMenu,
     closeAccountMenu,
@@ -67,7 +61,6 @@ export {
   importAccountFromFile,
   setWalletData,
   loginToWallet,
-  setLoggedToAccount,
   resetAccount,
   clearAccountData,
   exportAccount,

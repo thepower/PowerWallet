@@ -19,4 +19,8 @@
   }
 }
 
+.icon {
+  margin-left: 8px;
+}
+
 @include icon-colors('.copyData');

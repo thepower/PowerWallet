@@ -21,29 +21,29 @@ type Values = typeof initialValues;
 
 const connector = connect(
   (state: RootState) => ({
-    wif: getWalletData(state).wif,
+    encryptedWif: getWalletData(state).encryptedWif,
   }),
 );
 
 type ConfirmModalProps = ConnectedProps<typeof connector> & OwnProps;
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
-  onClose, open, wif, callback,
+  onClose, open, encryptedWif, callback,
 }) => {
   const { t } = useTranslation();
   const handleSubmit = useCallback(async (values: Values, formikHelpers: FormikHelpers<Values>) => {
     try {
-      const decryptedWif = await CryptoApi.decryptWif(wif, '');
+      const decryptedWif = await CryptoApi.decryptWif(encryptedWif, '');
       callback(decryptedWif);
     } catch (e) {
       try {
-        const decryptedWif = await CryptoApi.decryptWif(wif, values.password);
+        const decryptedWif = await CryptoApi.decryptWif(encryptedWif, values.password);
         callback(decryptedWif);
       } catch (error) {
         formikHelpers.setFieldError('password', t('invalidPasswordError')!);
       }
     }
-  }, [callback, t, wif]);
+  }, [callback, t, encryptedWif]);
 
   return (
     <Modal open={open} onClose={onClose} contentClassName={styles.modalContent}>

@@ -6,7 +6,7 @@
 }
 
 .selectedTab {
-  @include text-gradient($the-power-gradient);
+  color: #f5f5f7 !important;
 }
 
 .tab {
@@ -40,7 +40,7 @@
 }
 
 .tabsIndicator {
-  height: 4px;
+  height: 2px;
   border-radius: 5px 5px 0 0;
-  background: linear-gradient(90deg, #1768e5 0%, #00f0ff 100%);
+  background: #f5f5f7;
 }

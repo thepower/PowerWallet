@@ -2,7 +2,7 @@ import React from 'react';
 import cn from 'classnames';
 import { Link, LinkProps } from 'react-router-dom';
 import styles from './ArrowLink.module.scss';
-import { ChevronLeftIcon } from '../icons';
+import { ChevronLeftIcon } from '../../assets/icons';
 
 interface LinkButtonProps extends LinkProps {
   hideTextOnMobile?: boolean;

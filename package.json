@@ -1,13 +1,13 @@
 {
-  "name": "@thepowereco/hub",
-  "version": "1.12.5",
-  "description": "thepower hub",
+  "name": "power_wallet",
+  "version": "1.0.0",
+  "description": "thepower wallet",
   "author": "thepower",
   "license": "ISC",
   "scripts": {
-    "start:wallet": "DISABLE_ESLINT_PLUGIN=true PORT=3001 REACT_APP_TYPE=wallet react-app-rewired start",
-    "start:wallet:network": "DISABLE_ESLINT_PLUGIN=true REACT_APP_TYPE=wallet env-cmd -f .env.network react-app-rewired start",
-    "start:hub": "DISABLE_ESLINT_PLUGIN=true REACT_APP_TYPE=hub react-app-rewired start",
+    "start": "DISABLE_ESLINT_PLUGIN=true PORT=3001 react-app-rewired start",
+    "start-prod": "GENERATE_SOURCEMAP=false DISABLE_ESLINT_PLUGIN=true env-cmd -f .env.production react-app-rewired start",
+    "start:network": "DISABLE_ESLINT_PLUGIN=true env-cmd -f .env.network react-app-rewired start",
     "build": "DISABLE_ESLINT_PLUGIN=true env-cmd -f .env react-app-rewired build",
     "build-test": "DISABLE_ESLINT_PLUGIN=true env-cmd -f .env.test react-app-rewired build",
     "build-prod": "DISABLE_ESLINT_PLUGIN=true env-cmd -f .env.production react-app-rewired build",
@@ -31,7 +31,7 @@
     "@mui/styles": "^5.6.2",
     "@reduxjs/toolkit": "^1.8.6",
     "@thepowereco/msgpack": "^1.5.3",
-    "@thepowereco/tssdk": "^1.15.34",
+    "@thepowereco/tssdk": "^2.1.0",
     "@types/classnames": "^2.3.1",
     "@types/date-fns": "^2.6.0",
     "@types/file-saver": "^2.0.5",
@@ -46,6 +46,7 @@
     "@types/redux-logger": "^3.0.9",
     "@typescript-eslint/eslint-plugin": "^6.18.1",
     "@typescript-eslint/parser": "^6.18.1",
+    "axios": "^1.6.8",
     "base64url": "^3.0.1",
     "classnames": "^2.3.1",
     "commitizen": "^4.2.5",
@@ -64,9 +65,9 @@
     "formik": "^2.2.9",
     "history": "4.10.1",
     "husky": "^8.0.2",
-    "i18next": "^22.4.6",
-    "i18next-browser-languagedetector": "^7.0.1",
-    "i18next-http-backend": "^2.1.1",
+    "i18next": "^23.2.8",
+    "i18next-browser-languagedetector": "^7.1.0",
+    "i18next-http-backend": "^2.2.1",
     "lint-staged": "^13.0.3",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
@@ -74,7 +75,7 @@
     "qs": "^6.10.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-i18next": "^12.1.1",
+    "react-i18next": "^13.0.1",
     "react-intersection-observer": "^9.4.0",
     "react-redux": "^8.0.4",
     "react-router-dom": "^5.3.3",
@@ -82,7 +83,7 @@
     "react-toastify": "^9.1.0",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
-    "redux-saga": "^1.2.1",
+    "redux-saga": "^1.3.0",
     "sass": "^1.50.1",
     "sass-loader": "^12.6.0",
     "stylelint": "^14.14.1",
@@ -110,10 +111,7 @@
     "sass-loader": "^12.6.0",
     "serve": "^14.0.1",
     "stream-browserify": "^3.0.0",
-    "stream-http": "^3.2.0",
-    "typescript": "^5.3.3",
-    "url": "^0.11.0",
-    "yarn": "^1.22.19"
+    "typescript": "^5.3.3"
   },
   "browserslist": {
     "production": [
@@ -136,12 +134,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thepower/power_hub.git"
+    "url": "git+https://github.com/thepower/PowerWallet.git"
   },
   "bugs": {
-    "url": "https://github.com/thepower/power_hub/issues"
+    "url": "https://github.com/thepower/PowerWallet/issues"
   },
-  "gitHead": "fc1bd3a0ef3ec4badf1fa7dcf555f5ac5fba7049",
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"

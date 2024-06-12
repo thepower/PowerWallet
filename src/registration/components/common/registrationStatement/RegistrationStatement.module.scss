@@ -1,0 +1,13 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.registrationStatement {
+  padding: 12px 20px 16px;
+  border-radius: 20px;
+  background: #151516;
+
+  @include mobile {
+    width: 100%;
+    padding: 12px 6px 20px 20px;
+  }
+}

@@ -78,10 +78,10 @@ const TxResult: React.FC<TxResultProps> = ({
       <div className={styles.buttons}>
         <Button onClick={onCopyClick} variant="outlined" fullWidth>{t('share')}</Button>
         <a target="_blank" href={txExplorerLink} style={{ width: '100%' }} rel="noreferrer">
-          <Button variant="filled" fullWidth>{t('explorer')}</Button>
+          <Button variant="contained" fullWidth>{t('explorer')}</Button>
         </a>
       </div>
-      {sentData.returnURL && <Button onClick={onClickClose} variant="filled" fullWidth>{t('close')}</Button>}
+      {sentData.returnURL && <Button onClick={onClickClose} variant="contained" fullWidth>{t('close')}</Button>}
       {/* </div> */}
     </div>
   );

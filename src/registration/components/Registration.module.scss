@@ -2,41 +2,18 @@
 @import '../../styles/mixins';
 
 .registrationPage {
-  position: absolute;
-  z-index: 10000;
+  position: relative;
   display: flex;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+
+  min-height: 100vh;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: $black;
-
-  @include mobile {
-    overflow: hidden;
-  }
-}
-
-.registrationPageIcon {
-  flex-shrink: 0;
-  margin-top: $unit * 4;
-  margin-bottom: $unit * 4;
-}
-
-.registrationPageCover {
-  position: absolute;
-  width: 60vw;
-  height: 100vh;
-  background: url('../../common/imgs/RegistraionBackground.png');
-  background-size: contain;
-
-  @include mobile {
-    width: 150vw;
-  }
 }
 
 .langSelect {
-  position: fixed;
+  position: absolute;
   z-index: 100001;
   top: 16px;
   right: calc(10vw + 32px);
@@ -48,35 +25,59 @@
 }
 
 .registrationTitle {
-  @include text-gradient($the-power-gradient);
-  font-size: $unit * 20;
+  @include text-gradient();
+  font-size: 80px;
 
   font-weight: 700;
-  line-height: $unit * 16;
+  line-height: 64px;
 
   @media screen and (max-width: $tablet) {
-    font-size: $unit * 12;
-    line-height: $unit * 10;
+    font-size: 48px;
+    line-height: 40px;
   }
 }
 
-.registrationDesc {
-  @include text-gradient($the-power-gradient);
+.registrationPageHeader {
 
-  margin-top: $unit * 8;
-  font-size: $unit * 7;
+  display: flex;
+
+  width: 100%;
+  max-width: 768px;
+  align-items: center;
+  justify-content: space-evenly;
+
+  margin-bottom: 8px;
+}
+
+
+.registrationPageTitle {
+  @include text-gradient();
+
+  font-size: 24px;
+  font-style: normal;
   font-weight: 700;
-  line-height: $unit * 8;
+  line-height: 28px;
+}
+
+.registrationDesc {
+  @include text-gradient();
+
+  margin-top: 32px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 32px;
+
+  text-align: center;
 
   @media screen and (max-width: $tablet) {
-    margin-top: $unit * 5;
-    font-size: $unit * 4;
-    line-height: $unit * 8;
+    margin-top: 20px;
+    font-size: 16px;
+    line-height: 32px;
   }
 }
 
 .registrationNextButtonText {
-  @include text-gradient($the-power-gradient);
+  @include text-gradient();
 }
 
 .buttonsHolder {
@@ -99,36 +100,14 @@
   }
 }
 
-.loginButton {
-  padding: 0 12px;
-}
-
-.registrationButton {
-  @include the-power-color;
-  width: 312px;
-  height: 56px;
-
-  border-radius: 5px;
-  margin-top: $unit * 15;
-  color: #f5f5f7;
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 24px;
-  text-transform: unset;
-
-  @media screen and (max-width: $tablet) {
-    width: 280px;
-    height: 48px;
-  }
-}
-
 .registrationWizardComponent {
-  z-index: 100000;
+  position: relative;
   display: flex;
   width: 100%;
   height: 100%;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   overflow-y: auto;
 
   @include mobile {
@@ -136,23 +115,23 @@
   }
 
   @media screen and (max-width: $notebook) {
-    padding: $unit * 6 $unit * 4;
+    padding: 24px 16px;
   }
 }
 
 .registrationWizardHolder {
   display: flex;
-  width: 1072px;
+  width: 768px;
   max-width: 100vw;
   flex-direction: column;
   align-items: center;
-  padding: 20px $unit * 26;
-  border-radius: $unit * 5;
+  padding-bottom: 48px;
+  border-radius: 20px;
   background-color: #151516 !important;
 
   @include mobile {
     width: 100%;
-    padding: $unit * 5 $unit * 4;
+    padding-bottom: 24px;
   }
 }
 
@@ -161,107 +140,35 @@
   height: 100%;
   align-items: center;
   justify-content: center;
-  margin-top: $unit * 5;
+  margin-top: 20px;
   background-color: transparent;
-
-  @media screen and (max-width: $notebook) {
-    margin-top: 0;
-  }
-}
-
-.registrationBackground {
-  display: flex;
-  width: 800px;
-  max-width: 80vw;
-  height: 100%;
-  min-height: 456px;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: $unit * 3 $unit * 21;
-  border-radius: $unit * 5;
-  margin-bottom: $unit * 4;
-  background: linear-gradient(90deg, #1768e5 50.44%, #00f0ff 129.31%);
-
-  @include mobile {
-    width: 100%;
-    height: unset;
-    min-height: unset;
-    padding: $unit * 5 $unit * 2;
-    margin-bottom: 40px;
-  }
-
-  div:not(:last-of-type) {
-    margin-bottom: $unit * 4;
-  }
-}
-
-.registrationStatement {
-  padding: $unit * 3 $unit * 5 $unit * 4 $unit * 5;
-  border-radius: $unit * 5;
-  background: #151516;
-
-  @include mobile {
-    width: 100%;
-    padding: $unit * 3 $unit * 1.5 $unit * 5 $unit * 5;
-  }
 }
 
 .registrationStatementTitle {
-  padding-bottom: $unit * 2;
+  padding-bottom: 8px;
   margin-bottom: 0 !important;
   color: #2997ff;
-  font-size: $unit * 4.5;
+  font-size: 16px0.5;
   font-weight: 500;
-  line-height: $unit * 6;
+  line-height: 24px;
   text-shadow: 0 4px 4px rgb(0 0 0 / 25%);
 }
 
 .registrationStatementDesc {
   color: #f5f5f7;
-  font-size: $unit * 3.5;
+  font-size: 12px0.5;
   font-weight: 400;
-  line-height: $unit * 4;
+  line-height: 16px;
   text-shadow: 0 4px 4px rgb(0 0 0 / 25%);
 }
 
-.registrationPageTitle {
-  margin-bottom: $unit * 4;
-  margin-left: $unit * 5;
+.registrationSceneTitle {
+  margin-bottom: 28px;
   color: #f5f5f7;
-  font-size: $unit * 6;
+  font-size: 24px;
+  font-style: normal;
   font-weight: 700;
-  line-height: $unit * 7;
-
-  @include mobile {
-    width: 100%;
-    margin-bottom: 20px !important;
-    margin-left: 0;
-    text-align: center;
-  }
-}
-
-.registrationButtonsHolder {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  margin-right: auto;
-  margin-left: auto;
-
-  @include mobile {
-    flex-direction: column;
-    align-items: center;
-    margin-right: 0 !important;
-    margin-left: 0 !important;
-
-    button:nth-child(2) {
-      margin-top: 16px;
-      margin-left: 0 !important;
-    }
-  }
-
-  button:nth-child(2) {
-    margin-left: $unit * 3;
-  }
+  line-height: 28px;
 }
 
 .registrationNextButton {
@@ -270,8 +177,8 @@
   height: 48px;
   border-radius: 5px;
 
-  margin-top: $unit * 4;
-  margin-bottom: $unit * 5;
+  margin-top: 16px;
+  margin-bottom: 20px;
 
   color: #f5f5f7;
   font-size: 20px;
@@ -301,209 +208,10 @@
 .loginRegisterAccountTitle {
   width: 100%;
   color: #f5f5f7;
-  font-size: $unit * 6;
-  font-weight: 700;
-  line-height: $unit * 7;
-  text-align: center;
-}
-
-.loginRegisterAccountBreadCrumb {
-  @include the-power-color-text;
-  width: 100%;
-  height: 34px !important;
-
-  border-bottom: 2px #2e3642 solid !important;
-  margin: 0 !important;
-}
-
-.loginRegisterAccountWizard {
-  height: 100%;
-  padding: $unit * 5 $unit * 16;
-  border-radius: $unit * 5;
-  background: #151516;
-}
-
-.loginRegisterAccountHolder {
-  display: flex;
-  min-height: 370px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 20px 45px;
-  padding-bottom: 46px;
-  border-radius: 20px;
-  margin-right: auto;
-  margin-left: auto;
-  background: #151516;
-
-  @media screen and (max-width: $tablet) {
-    width: 100%;
-    padding: 20px;
-  }
-}
-
-.registrationFormHolder {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-}
-
-.registrationFormDesc {
-  display: flex;
-  align-items: center;
-  margin-top: 36px;
-  color: #f5f5f7;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: $unit * 4;
-  white-space: pre-line;
-}
-
-.loginRegisterAccountCreateSelect {
-  width: 170px;
-  height: 40px;
-  padding: 0 !important;
-  border-radius: 5px;
-  margin-bottom: 30px;
-}
-
-.loginRegisterAccountCreateSelectWithValue {
-  :global(.MuiOutlinedInput-notchedOutline) {
-    border: 1px solid #f5f5f7 !important;
-  }
-}
-
-.loginRegisterAccountCreateSelectMenu {
-  z-index: 15000;
-}
-
-.seedPhraseTitle {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: flex-start;
-  margin-bottom: 4px;
-  color: #f5f5f7;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 24px;
-
-  @media screen and (max-width: $tablet) {
-    width: 100%;
-    justify-content: center;
-    margin-top: 12px;
-    margin-bottom: 20px !important;
-  }
-}
-
-.loginTextArea {
-  width: 502px;
-  min-height: 64px;
-  border-radius: 20px;
-  background: #252b35;
-  gap: 10px;
-
-  @media screen and (max-width: $tablet) {
-    width: 100%;
-  }
-}
-
-.setSeedPhraseHolder {
-  width: 100%;
-
-  div:last-of-type {
-    @media screen and (max-width: $tablet) {
-      width: 100%;
-    }
-  }
-}
-
-.confirmSeedPhraseHolder {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  background: transparent;
-}
-
-.confirmSeedPhraseTitle {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  margin-bottom: 20px;
-  margin-left: 62px;
-  color: #f5f5f7;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 24px;
-
-  @include mobile {
-    justify-content: flex-start;
-    margin-left: unset !important;
-    font-size: 24px;
-  }
-}
-
-.confirmSeedPhraseError {
-  color: #ac2d2d;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 16px;
-}
-
-.encryptKeyHolder {
-  display: flex;
-  width: 451px;
-  height: 305px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20px;
-  margin-right: auto;
-  margin-left: auto;
-  background: #151516;
-
-  @media screen and (max-width: $tablet) {
-    width: unset;
-    height: unset;
-    padding: 32px 20px;
-  }
-}
-
-.exportKeyForAppsHolder {
-  background: #151516;
-}
-
-.exportKeyForAppsTitle {
-  @include text-gradient(linear-gradient(318deg, #00f0ff 0%, #1768e5 100%));
-  margin: 0 auto;
-
-  margin-bottom: 40px !important;
   font-size: 24px;
   font-weight: 700;
   line-height: 28px;
-}
-
-.exportKeyForAppsAdvice {
-  color: #f5f5f7;
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 24px;
-
   text-align: center;
-}
-
-.exportKeyForAppsText {
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 24px;
-
-  span {
-    @include text-gradient(linear-gradient(318deg, #00f0ff 0%, #1768e5 100%));
-  }
 }
 
 .passwordInput {
@@ -521,13 +229,6 @@
   margin-bottom: 16px;
 }
 
-.importAccountFormHolder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
 .importAccountInput {
   width: 1px;
   height: 1px;
@@ -535,32 +236,6 @@
   visibility: hidden;
 }
 
-.importAccountButton {
-  margin-top: 32px;
-  background: #151516;
-}
-
-.importAccountButtonLabel {
-  @include text-gradient($the-power-gradient);
-
-  margin-left: 16px;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 20px;
-}
-
-.importAccountFormDesc {
-  display: flex;
-  align-items: center;
-  margin-top: 36px;
-  margin-bottom: 32px;
-  color: #f5f5f7;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 20px;
-  text-align: center;
-  white-space: pre-line;
-}
 
 .exportModalTitleHolder {
   display: flex;
@@ -644,188 +319,14 @@
   margin-bottom: 90px;
 }
 
-.loginPageBackground {
-  display: flex;
-  width: 1072px;
-  max-width: 100vw;
-  height: auto;
-  align-items: center;
-  padding: 40px 16px;
-}
-
-.loginPagePart {
-  display: flex;
-  max-width: 380px;
-  height: 100%;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 32px 50px 44px;
-  border-radius: 20px;
-  background: #151516;
-
-  @include mobile {
-    width: 100%;
-    max-width: unset;
-    padding: 32px 16px;
-  }
-}
-
-.loginPageFormsHolder {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  justify-content: space-evenly;
-  margin-top: 16px;
-
-  @include mobile {
-    flex-direction: column;
-  }
-
-  .loginPagePart:nth-child(1) {
-    margin-right: 40px;
-
-    @include mobile {
-      margin-right: 0 !important;
-    }
-  }
-}
-
-.loginPagePartTitle {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 40px !important;
-  color: #f5f5f7;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 28px;
-}
-
-.loginPagePartDesc {
-  color: #f5f5f7;
+.checkBoxLabel {
+  margin-top: 12px;
+  color: #636468;
   font-size: 20px;
-  font-weight: 700;
+  font-style: normal;
+  font-weight: 400;
   line-height: 24px;
-  text-align: center;
+  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
 
-  @include mobile {
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 16px;
-
-    &_short {
-      width: 164px;
-    }
-  }
-}
-
-.loginPagePartLoginDesc {
-  margin-bottom: 32px !important;
-}
-
-.loginButtonHolder {
-  margin-top: 36px;
-}
-
-.loginPageImportButton {
-  margin-top: 60px;
-}
-
-.registrationComponent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.loginRegisterAccountShardTitle {
-  margin-top: 4px;
-  margin-bottom: 8px !important;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 20px;
-}
-
-.loginRegisterAccountShardInput {
-  padding: 8px 12px !important;
-}
-
-.loginRegisterAccountShardIcon {
-  margin-top: 3px !important;
-}
-
-.loginRegisterAccountShardPlaceholder {
-  display: flex;
-  align-items: center;
-  color: #6b798f;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 20px;
-}
-
-.loginRegisterAccountShardPaper {
-  padding: 0 !important;
-  border: 1px solid #6b798f;
-  border-radius: 5px;
-  margin-top: 5px !important;
-  background: #121923;
-}
-
-.loginRegisterAccountShardMenu {
-  padding: 0 !important;
-}
-
-.loginRegisterAccountShardMenuItem {
-  background: #121923;
-  color: #6b798f;
-}
-
-.rememberBackground {
-  padding: 12px 150px 36px;
-
-  @include mobile {
-    padding: 12px 8px;
-  }
-}
-
-.rememberTitle {
-  text-align: left;
-
-  @include mobile {
-    text-align: center;
-  }
-}
-
-.enterPasswordBackground {
-  padding: 40px 150px 51px;
-
-  @include mobile {
-    padding: 12px 8px;
-  }
-}
-
-.exportBackground {
-  padding: 80px 100px;
-
-  @include mobile {
-    padding: 12px 8px;
-  }
-}
-
-.selectChainCheckbox {
-  margin-top: 16px;
-}
-
-.selectChainCheckboxLabel {
-  color: #f5f5f766;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 16px;
-
-  @include mobile {
-    margin-left: -8px;
-    font-size: 12px;
-    line-height: 14px;
-  }
+  user-select: none;
 }

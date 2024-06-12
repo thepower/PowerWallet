@@ -1,36 +1,27 @@
-/* eslint-disable react/button-has-type */
 import React from 'react';
-import cn from 'classnames';
+import { LoadingButton as MuiLoadingButton, LoadingButtonProps as MuiLoadingButtonProps } from '@mui/lab';
+import { Link, LinkProps } from 'react-router-dom';
 import styles from './Button.module.scss';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant: 'outlined' | 'filled';
-  size?: 'medium' | 'large',
-  fullWidth?: boolean;
-  StartIcon?: React.ReactElement;
-  EndIcon?: React.ReactElement;
-}
+type ButtonProps = MuiLoadingButtonProps & Partial<Pick<LinkProps, 'to'>> & {
+  variant: 'outlined' | 'contained'
+};
 
-const Button: React.FC<ButtonProps> = ({
-  StartIcon,
-  EndIcon,
-  variant,
+export const Button: React.FC<ButtonProps> = ({
   children,
   size = 'medium',
-  fullWidth,
-  className,
+  loading,
   ...btnProps
 }) => (
-  <button
+  <MuiLoadingButton
     {...btnProps}
-    className={cn(styles.button, styles[variant], styles[size], fullWidth && styles.fullWidth, className)}
+    disableRipple
+    size={size}
+    disableElevation
+    loading={loading}
+    LinkComponent={Link}
+    classes={styles}
   >
-    {StartIcon}
-    <span className={styles.text}>
-      {children}
-    </span>
-    {EndIcon}
-  </button>
+    {!loading && <span>{children}</span>}
+  </MuiLoadingButton>
 );
-
-export default Button;

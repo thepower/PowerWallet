@@ -1,109 +1,104 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { NetworkEnum } from '@thepowereco/tssdk';
 import { AddActionOnSuccessType, Maybe } from '../../typings/common';
 import {
+  BackupAccountStepsEnum,
   CreateAccountStepsEnum,
-  LoginRegisterAccountTabs,
   LoginToWalletInputType,
   SetSeedPhraseInput,
 } from '../typings/registrationTypes';
 
 const SLICE_NAME = 'registration';
 
-const generateSeedPhrase = createAction(`${SLICE_NAME}/generateSeedPhrase`);
-const createWallet = createAction<AddActionOnSuccessType<{
-  password: string;
-  randomChain: boolean,
-}>>(`${SLICE_NAME}/createWallet`);
-const loginToWalletFromRegistration = createAction<LoginToWalletInputType>(`${SLICE_NAME}/loginToWallet`);
-const proceedToHub = createAction(`${SLICE_NAME}/proceedToHub`);
-
 export type RegistrationState = {
-  tab: LoginRegisterAccountTabs;
-  currentShard: Maybe<number>;
+  selectedNetwork: Maybe<NetworkEnum>;
+  selectedChain: Maybe<number>;
   seedPhrase: Maybe<string>;
   creatingStep: CreateAccountStepsEnum;
-  address: Maybe<string>;
-  seed: Maybe<string>;
-  password: Maybe<string>;
-  confirmedPassword: Maybe<string>;
-  passwordsNotEqual: boolean;
-  randomChain: boolean;
+  backupStep: BackupAccountStepsEnum;
+  isWithoutPassword: boolean;
+  isRandomChain: boolean;
 };
 
 const initialState: RegistrationState = {
-  tab: LoginRegisterAccountTabs.create,
-  currentShard: null,
+  selectedNetwork: null,
+  selectedChain: null,
   seedPhrase: null,
-  creatingStep: CreateAccountStepsEnum.selectSubChain,
-  address: null,
-  seed: null,
-  password: null,
-  confirmedPassword: null,
-  passwordsNotEqual: false,
-  randomChain: true,
+  creatingStep: CreateAccountStepsEnum.selectNetwork,
+  backupStep: BackupAccountStepsEnum.generateSeedPhrase,
+  isWithoutPassword: false,
+  isRandomChain: true,
 };
 
 const registrationSlice = createSlice({
   name: SLICE_NAME,
   initialState,
   reducers: {
-    setCurrentRegisterCreateAccountTab: (state: RegistrationState, action: PayloadAction<LoginRegisterAccountTabs>) => {
-      state.tab = action.payload;
+    setSelectedNetwork: (
+      state: RegistrationState,
+      action: PayloadAction<Maybe<NetworkEnum>>,
+    ) => {
+      state.selectedNetwork = action.payload;
     },
-    setCreatingCurrentShard: (state: RegistrationState, action: PayloadAction<Maybe<number>>) => {
-      state.currentShard = action.payload;
+    setSelectedChain: (
+      state: RegistrationState,
+      action: PayloadAction<Maybe<number>>,
+    ) => {
+      state.selectedChain = action.payload;
     },
-    setSeedPhrase: (state: RegistrationState, action: PayloadAction<SetSeedPhraseInput>) => {
+    setSeedPhrase: (
+      state: RegistrationState,
+      action: PayloadAction<SetSeedPhraseInput>,
+    ) => {
       state.seedPhrase = action.payload.seedPhrase;
       state.creatingStep = action.payload.nextStep;
     },
-    setCreatingStep: (state: RegistrationState, action: PayloadAction<CreateAccountStepsEnum>) => {
+    setCreatingStep: (
+      state: RegistrationState,
+      action: PayloadAction<CreateAccountStepsEnum>,
+    ) => {
       state.creatingStep = action.payload;
     },
-    seLoginAddress: (state: RegistrationState, action: PayloadAction<string>) => {
-      state.address = action.payload;
+    setBackupStep: (
+      state: RegistrationState,
+      action: PayloadAction<BackupAccountStepsEnum>,
+    ) => {
+      state.backupStep = action.payload;
     },
-    setLoginSeed: (state: RegistrationState, action: PayloadAction<string>) => {
-      state.seed = action.payload;
+    setIsRandomChain: (
+      state: RegistrationState,
+      action: PayloadAction<boolean>,
+    ) => {
+      state.isRandomChain = action.payload;
     },
-    setLoginPassword: (state: RegistrationState, action: PayloadAction<string>) => {
-      state.password = action.payload;
-      state.passwordsNotEqual = false;
-    },
-    setLoginConfirmedPassword: (state: RegistrationState, action: PayloadAction<string>) => {
-      state.confirmedPassword = action.payload;
-      state.passwordsNotEqual = false;
-    },
-    setPasswordNotEqual: (state: RegistrationState, action: PayloadAction<boolean>) => {
-      state.passwordsNotEqual = action.payload;
-    },
-    toggleRandomChain: (state: RegistrationState) => {
-      state.randomChain = !state.randomChain;
+    toggleIsWithoutPassword: (state: RegistrationState) => {
+      state.isWithoutPassword = !state.isWithoutPassword;
     },
   },
 });
 
-const {
+export const {
   reducer: registrationReducer,
   actions: {
-    setCurrentRegisterCreateAccountTab,
-    setCreatingCurrentShard,
+    setSelectedNetwork,
+    setSelectedChain,
     setSeedPhrase,
     setCreatingStep,
-    seLoginAddress,
-    setLoginSeed,
-    setLoginPassword,
-    setLoginConfirmedPassword,
-    setPasswordNotEqual,
-    toggleRandomChain,
+    setBackupStep,
+    setIsRandomChain,
+    toggleIsWithoutPassword,
   },
 } = registrationSlice;
 
-export {
-  createWallet, generateSeedPhrase, loginToWalletFromRegistration,
-  proceedToHub, registrationReducer,
-  seLoginAddress, setCreatingCurrentShard, setCreatingStep,
-  setCurrentRegisterCreateAccountTab, setLoginConfirmedPassword,
-  setLoginPassword, setLoginSeed, setPasswordNotEqual, setSeedPhrase,
-  toggleRandomChain,
-};
+export const generateSeedPhrase = createAction(
+  `${SLICE_NAME}/generateSeedPhrase`,
+);
+export const createWallet = createAction<
+AddActionOnSuccessType<{
+  password: string;
+  referrer?: string;
+}>
+>(`${SLICE_NAME}/createWallet`);
+export const loginToWalletFromRegistration =
+  createAction<LoginToWalletInputType>(`${SLICE_NAME}/loginToWallet`);
+export const proceedToWallet = createAction(`${SLICE_NAME}/proceedToWallet`);

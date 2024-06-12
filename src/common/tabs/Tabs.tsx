@@ -1,6 +1,9 @@
 import React from 'react';
 import {
-  Tab, Box, Tabs as MUITabs, TabsProps as MUITabsProps,
+  Tab,
+  Box,
+  Tabs as MUITabs,
+  TabsProps as MUITabsProps,
 } from '@mui/material';
 import classnames from 'classnames';
 import styles from './Tabs.module.scss';
@@ -13,6 +16,7 @@ interface TabsProps extends MUITabsProps {
   tabClassName?: string;
   tabIndicatorClassName?: string;
   tabSelectedClassName?: string;
+  disabledTabs?: string[]
 }
 
 class TabsComponent extends React.PureComponent<TabsProps> {
@@ -36,7 +40,9 @@ class TabsComponent extends React.PureComponent<TabsProps> {
   };
 
   renderTab = (key: string) => {
-    const { tabs, tabsLabels, tabClassName } = this.props;
+    const {
+      tabs, tabsLabels, tabClassName, disabledTabs,
+    } = this.props;
     const labels = tabsLabels || tabs;
 
     return (
@@ -49,6 +55,7 @@ class TabsComponent extends React.PureComponent<TabsProps> {
         disableFocusRipple
         disableRipple
         wrapped
+        disabled={disabledTabs?.includes(key)}
       />
     );
   };
@@ -59,8 +66,16 @@ class TabsComponent extends React.PureComponent<TabsProps> {
     } = this.props;
 
     return (
-      <Box className={classnames(styles.tabsHolder, tabsHolderClassName)} sx={this.boxSx}>
-        <MUITabs value={value} onChange={onChange} classes={this.getTabsClasses()}>
+      <Box
+        className={classnames(styles.tabsHolder, tabsHolderClassName)}
+        sx={this.boxSx}
+      >
+        <MUITabs
+          value={value}
+          onChange={onChange}
+          classes={this.getTabsClasses()}
+          centered
+        >
           {Object.keys(tabs).map(this.renderTab)}
         </MUITabs>
       </Box>

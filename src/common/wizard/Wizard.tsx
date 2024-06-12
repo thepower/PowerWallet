@@ -9,6 +9,7 @@ export interface WizardProps {
   breadcrumbs: BreadcrumbsDataType[];
   componentsCommonProps?: any;
   className?: string;
+  currentStep: number;
   onSelectBreadCrumb?: (data?: any) => void;
   type: BreadcrumbsTypeEnum;
   breadCrumbHasBorder?: boolean;
@@ -20,24 +21,12 @@ export type WizardComponentType = {
   componentProps?: any;
 };
 
-export interface WizardState {
-  currentStep: number;
-}
-
 export type WizardComponentProps = {
   setNextStep: () => void;
   setPrevStep: () => void;
 };
 
-export class Wizard extends React.Component<WizardProps, WizardState> {
-  constructor(props: WizardProps) {
-    super(props);
-
-    this.state = {
-      currentStep: 0,
-    };
-  }
-
+export class Wizard extends React.Component<WizardProps> {
   handleSelectBreadcrumb = (nextStep: number) => {
     const { onSelectBreadCrumb } = this.props;
 
@@ -45,39 +34,27 @@ export class Wizard extends React.Component<WizardProps, WizardState> {
   };
 
   setNextStep = () => {
-    const { currentStep } = this.state;
-    const { breadcrumbs } = this.props;
+    const { breadcrumbs, currentStep } = this.props;
 
     const nextStep = Math.min(currentStep + 1, breadcrumbs.length - 1);
-
-    this.setState({ currentStep: nextStep });
 
     this.handleSelectBreadcrumb(nextStep);
   };
 
   setPrevStep = () => {
-    const { currentStep } = this.state;
+    const { currentStep } = this.props;
 
     const nextStep = Math.max(currentStep - 1, 0);
-
-    this.setState({
-      currentStep: nextStep,
-    });
 
     this.handleSelectBreadcrumb(nextStep);
   };
 
   setCurrentStep = (nextStep: number) => {
-    this.setState({
-      currentStep: nextStep,
-    });
-
     this.handleSelectBreadcrumb(nextStep);
   };
 
   getCurrentComponent = (): WizardComponentType => {
-    const { currentStep } = this.state;
-    const { breadcrumbs } = this.props;
+    const { currentStep, breadcrumbs } = this.props;
     const { componentProps, component } = (breadcrumbs || [])[currentStep];
 
     if (!component && !componentProps) {
@@ -110,7 +87,7 @@ export class Wizard extends React.Component<WizardProps, WizardState> {
       breadCrumbHasBorder,
       breadCrumbClassName,
     } = this.props;
-    const { currentStep } = this.state;
+    const { currentStep } = this.props;
 
     return <div className={classnames(styles.wizard, className)}>
       <Breadcrumbs

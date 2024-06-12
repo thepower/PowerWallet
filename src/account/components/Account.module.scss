@@ -12,9 +12,6 @@
   text-decoration: none !important;
 }
 
-.accountDataHolder {
-  display: flex;
-}
 
 .account {
   display: flex;
@@ -28,23 +25,16 @@
     font-size: 14px;
     line-height: 16px;
 
-    > *:first-of-type {
+    >*:first-of-type {
       text-decoration: none;
     }
   }
 }
 
-.img {
-  overflow: hidden;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 12px;
-}
+
 
 .drawerPaper {
   z-index: 250;
-  left: $aside-width;
   display: flex;
   width: $aside-width;
   flex-direction: column;
@@ -56,10 +46,9 @@
   overflow-x: hidden;
 
   @include mobile {
-    top: $top-bar-mobile;
     left: 0;
     width: 100vw;
-    height: calc(100vh - $top-bar-mobile);
+    height: 100vh;
     padding: 16px;
     border-top: 2px solid #212831;
   }
@@ -75,7 +64,7 @@
 }
 
 .drawerBackdrop {
-  background-color: transparent !important;
+  backdrop-filter: blur(2px);
 }
 
 .accountTitle {
@@ -107,6 +96,12 @@
   @include mobile {
     margin-left: 4px;
   }
+}
+
+.closeButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
 
 .accountActionsHolder {

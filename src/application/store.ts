@@ -15,14 +15,13 @@ import { networkReducer } from '../network/slice';
 import { walletReducer } from '../myAssets/slices/walletSlice';
 import { transactionsReducer } from '../myAssets/slices/transactionsSlice';
 import { sendReducer } from '../send/slices/sendSlice';
-import { discoverReducer } from '../discover/slice/discoverSlice';
 
 const loggerMiddleware = createLogger({ collapsed: true });
 const routeMiddleware = routerMiddleware(history);
 const sagaMiddleware = createSagaMiddleware();
 
 const tokensPersistConfig = {
-  key: 'PowerHub/tokens',
+  key: 'PowerWallet/tokens',
   storage,
 };
 
@@ -36,7 +35,6 @@ const reducer = {
   tokens: persistReducer(tokensPersistConfig, tokensReducer),
   transactions: transactionsReducer,
   send: sendReducer,
-  discover: discoverReducer,
 };
 
 const store = configureStore({

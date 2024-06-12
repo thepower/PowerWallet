@@ -1,9 +1,28 @@
-import { RootState } from '../../application/store';
+import { createSelector } from '@reduxjs/toolkit';
+import { RootState } from 'application/store';
+import { TokenKind, type TToken } from 'myAssets/types';
 
-export const getWalletInitialLastBlock = (state: RootState) => state.wallet.initialLastBlock;
-export const getWalletLastBlock = (state: RootState) => state.wallet.lastblk;
-export const getWalletNativeTokensAmounts = (state: RootState) => state.wallet.amounts;
-export const getWalletNativeTokensAmountByID =
-  (state: RootState, symbol: string) => state.wallet.amounts?.[symbol];
-export const getWalletPubKey = (state: RootState) => state.wallet.pubkey;
-export const getPrevBlock = (state: RootState) => state.wallet.preblk;
+const getWalletState = (state: RootState) => state.wallet;
+
+export const getWalletInitialLastBlock = createSelector(getWalletState, (wallet) => wallet.initialLastBlock);
+export const getWalletLastBlock = createSelector(getWalletState, (wallet) => wallet.lastblk);
+export const getWalletNativeTokensAmounts = createSelector(getWalletState, (wallet) => wallet.amounts);
+
+export const getWalletNativeTokens = createSelector(getWalletState, (wallet) => Object.entries(wallet.amounts).map(
+  ([symbol, amount]) => ({
+    type: TokenKind.Native,
+    name: symbol,
+    address: symbol,
+    symbol,
+    decimals: '9',
+    amount,
+    isShow: true,
+  } as TToken),
+));
+
+export const getWalletNativeTokensAmountBySymbol = createSelector(
+  [getWalletState, (_, symbol) => symbol],
+  (wallet, symbol) => wallet.amounts?.[symbol],
+);
+export const getWalletPubKey = createSelector(getWalletState, (wallet) => wallet.pubkey);
+export const getPrevBlock = createSelector(getWalletState, (wallet) => wallet.preblk);

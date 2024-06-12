@@ -45,7 +45,7 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
   message: props?.match?.params?.message,
   feeSettings: getNetworkFeeSettings(state),
   gasSettings: getNetworkGasSettings(state),
-  wif: getWalletData(state).wif,
+  encryptedWif: getWalletData(state).encryptedWif,
 });
 
 const mapDispatchToProps = {
@@ -88,7 +88,6 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
       this.setState({ returnURL: decodedMessage?.returnUrl });
       const sponsor = decodedMessage?.sponsor;
 
-      const date = Date.now();
       const srcFee = decodedTxBody?.p?.find((purpose) => purpose?.[0] === TxPurpose.SRCFEE);
       const gas = decodedTxBody?.p?.find((purpose) => purpose?.[0] === TxPurpose.GAS);
 
@@ -97,8 +96,7 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
       }
 
       decodedTxBody.f = Buffer.from(AddressApi.parseTextAddress(address));
-      decodedTxBody.s = date;
-      decodedTxBody.t = date;
+      decodedTxBody.t = Date.now();
 
       if (sponsor) {
         decodedTxBody.e.sponsor = [Buffer.from(AddressApi.parseTextAddress(sponsor))];
@@ -136,10 +134,10 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
   }
 
   handleClickSignAndSend = () => {
-    const { wif } = this.props;
+    const { encryptedWif } = this.props;
     const { decodedTxBody, returnURL } = this.state;
     try {
-      const decryptedWif = CryptoApi.decryptWif(wif, '');
+      const decryptedWif = CryptoApi.decryptWif(encryptedWif, '');
       if (decodedTxBody) {
         this.props.signAndSendTrxTrigger({
           wif: decryptedWif,
@@ -225,7 +223,7 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
       <header className={styles.header}>
         <div className={styles.headerCol}>
           <ThePowerLogoIcon className={styles.headerLogoIcon} />
-          <div className={styles.headerText}>POWER HUB</div>
+          <div className={styles.headerText}>POWER WALLET</div>
         </div>
       </header>
     </div>);
@@ -274,7 +272,7 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
         <div className={styles.title}>{this.props.t('confirmYourAction')}</div>
         <div className={styles.buttons}>
           <Button onClick={handleClickBack} variant="outlined">{this.props.t('cancel')}</Button>
-          <Button onClick={handleClickSignAndSend} fullWidth variant="filled">{this.props.t('signAndSend')}</Button>
+          <Button onClick={handleClickSignAndSend} fullWidth variant="contained">{this.props.t('signAndSend')}</Button>
         </div>
         <div className={styles.text}>{this.props.t('byClickingSignAndSend')}</div>
         <div className={styles.table}>

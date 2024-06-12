@@ -8,7 +8,7 @@ import {
 import { Close } from '@mui/icons-material';
 import classnames from 'classnames';
 import styles from './Modal.module.scss';
-import { PELogo } from '../icons/PELogo';
+import { PELogo } from '../../assets/icons/PELogo';
 
 export interface ModalProps extends DialogProps {
   children?: JSX.Element | JSX.Element[];

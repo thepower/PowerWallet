@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import React, { useState, useRef } from 'react';
 import cn from 'classnames';
 import {
   SupportIcon,
@@ -6,23 +6,25 @@ import {
   ExportIcon,
   ImportIcon,
   ResetIcon,
-} from 'common/icons';
+  CloseIcon,
+} from 'assets/icons';
 import { CopyButton } from 'common';
 import { connect, ConnectedProps } from 'react-redux';
-import { Drawer } from '@mui/material';
-import { isHub, isWallet } from 'application/components/AppRoutes';
-import { clearApplicationStorage, getKeyFromApplicationStorage } from 'application/utils/localStorageUtils';
+import { Drawer, IconButton } from '@mui/material';
 import { WithTranslation, withTranslation } from 'react-i18next';
+import { push } from 'connected-react-router';
+// import { WalletRoutesEnum } from 'application/typings/routes';
 import { getOpenedMenu, getWalletAddress } from '../selectors/accountSelectors';
-import globe from './globe.jpg';
 import { Maybe } from '../../typings/common';
 import { AccountActionsList } from './AccountActionsList';
-import { AccountActionType } from '../typings/accountTypings';
-import { ImportAccountModal } from '../../registration/components/pages/loginRegisterAccount/import/ImportAccountModal';
+import { ImportAccountModal } from '../../registration/components/modals/ImportAccountModal';
 import {
-  clearAccountData, exportAccount, importAccountFromFile, resetAccount, toggleOpenedAccountMenu,
+  exportAccount,
+  importAccountFromFile,
+  resetAccount,
+  toggleOpenedAccountMenu,
 } from '../slice/accountSlice';
-import { ExportAccountModal } from '../../registration/components/pages/backup/ExportAccountModal';
+import { ExportAccountModal } from '../../registration/components/modals/ExportAccountModal';
 import { ResetAccountModal } from './ResetAccountModal';
 import { setShowUnderConstruction } from '../../application/slice/applicationSlice';
 import { RootState } from '../../application/store';
@@ -37,209 +39,175 @@ const mapDispatchToProps = {
   importAccountFromFile,
   setShowUnderConstruction,
   toggleOpenedAccountMenu,
-  clearAccountData,
   resetAccount,
   exportAccount,
+  routeTo: push,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
-type AccountProps = ConnectedProps<typeof connector> & WithTranslation & { className?: string };
+type AccountProps = ConnectedProps<typeof connector> &
+WithTranslation & { className?: string };
 
-interface AccountState {
-  accountFile: Maybe<File>;
-  isWifExists: boolean;
-  openedImportAccountModal: boolean;
-  openedExportAccountModal: boolean;
-  openedResetAccountModal: boolean;
-}
+const Account: React.FC<AccountProps> = ({
+  walletAddress,
+  openedMenu,
+  setShowUnderConstruction,
+  importAccountFromFile,
+  toggleOpenedAccountMenu,
+  resetAccount,
+  exportAccount,
+  t,
+  className,
+  routeTo,
+}) => {
+  const [accountFile, setAccountFile] = useState<Maybe<File>>(null);
+  const [openedImportAccountModal, setOpenedImportAccountModal] =
+    useState<boolean>(false);
+  const [openedExportAccountModal, setOpenedExportAccountModal] =
+    useState<boolean>(false);
+  const [openedResetAccountModal, setOpenedResetAccountModal] =
+    useState<boolean>(false);
+  const importAccountInputRef = useRef<HTMLInputElement>(null);
 
-class AccountComponent extends React.PureComponent<AccountProps, AccountState> {
-  private drawerPaperClasses = {
-    paper: styles.drawerPaper,
-    root: styles.drawerModalRoot,
+  // const handleReferralProgram = () => {
+  //   routeTo(WalletRoutesEnum.referralProgram);
+  //   toggleOpenedAccountMenu();
+  // };
+
+  const handleCreateAccount = () => {
+    setShowUnderConstruction(true);
   };
 
-  private drawerModalProps = {
-    componentsProps: {
-      backdrop: {
-        className: styles.drawerBackdrop,
-      },
-    },
-  };
-
-  private importAccountInput: Maybe<HTMLInputElement> = null;
-
-  constructor(props: AccountProps) {
-    super(props);
-    this.state = {
-      accountFile: null,
-      isWifExists: false,
-      openedImportAccountModal: false,
-      openedExportAccountModal: false,
-      openedResetAccountModal: false,
-    };
-  }
-
-  async componentDidMount() {
-    const wif = await getKeyFromApplicationStorage('wif');
-    this.setState({ isWifExists: !!wif });
-  }
-
-  handleCreateAccount = () => {
-    this.props.setShowUnderConstruction(true);
-  };
-
-  handleExportAccount = () => {
-    const { exportAccount } = this.props;
+  const handleExportAccount = () => {
     exportAccount({
       password: '',
       additionalActionOnDecryptError: () => {
-        this.setState({ openedExportAccountModal: true });
+        setOpenedExportAccountModal(true);
       },
     });
   };
 
-  closeImportAccountModal = () => {
-    this.setState({ openedImportAccountModal: false });
+  const closeImportAccountModal = () => {
+    setOpenedImportAccountModal(false);
   };
 
-  setImportAccountRef = (el: HTMLInputElement) => this.importAccountInput = el;
-
-  handleOpenImportFile = () => {
-    if (this.importAccountInput) {
-      this.importAccountInput.click();
+  const handleOpenImportFile = () => {
+    if (importAccountInputRef.current) {
+      importAccountInputRef.current.click();
     }
   };
 
-  handleImportAccount = (password: string) => {
-    const { importAccountFromFile } = this.props;
-    const { accountFile } = this.state;
-
+  const handleImportAccount = (password: string) => {
     importAccountFromFile({
       password,
       accountFile: accountFile!,
     });
 
-    this.setState({ openedImportAccountModal: false });
+    setOpenedImportAccountModal(false);
   };
 
-  setAccountFile = (event: ChangeEvent<HTMLInputElement>) => {
+  const setAccountFileOnChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const accountFile = event?.target?.files?.[0]!;
 
     importAccountFromFile({
       password: '',
       accountFile,
-      additionalActionOnDecryptError: () => this.setState({
-        accountFile,
-        openedImportAccountModal: true,
-      }),
+      additionalActionOnDecryptError: () => {
+        setAccountFile(accountFile);
+        setOpenedImportAccountModal(true);
+      },
     });
 
-    this.props.toggleOpenedAccountMenu();
+    toggleOpenedAccountMenu();
   };
 
-  closeExportAccountModal = () => {
-    this.setState({ openedExportAccountModal: false });
+  const closeExportAccountModal = () => {
+    setOpenedExportAccountModal(false);
   };
 
-  handleResetAccount = () => {
-    const { resetAccount } = this.props;
-    if (isWallet) {
-      resetAccount({
-        password: '',
-        additionalActionOnDecryptError: () => this.setState({ openedResetAccountModal: true }),
-      });
-    } else if (isHub) {
-      clearApplicationStorage();
-      window.location.reload();
-    }
+  const handleResetAccount = () => {
+    resetAccount({
+      password: '',
+      additionalActionOnDecryptError: () => setOpenedResetAccountModal(true),
+    });
   };
 
-  closeResetAccountModal = () => {
-    this.setState({ openedResetAccountModal: false });
+  const closeResetAccountModal = () => {
+    setOpenedResetAccountModal(false);
   };
 
-  // eslint-disable-next-line react/sort-comp
-  getAccountActionsData:() => AccountActionType[] = () => {
-    const hubActions = this.state.isWifExists ? [{
-      title: this.props.t('resetAccount'),
-      action: this.handleResetAccount,
-      Icon: ResetIcon,
+  const getAccountActionsData = () => [
+    // {
+    //   title: t('referralProgram'),
+    //   action: handleReferralProgram,
+    //   Icon: CreateIcon,
+    // },
+    {
+      title: t('createNewAccount'),
+      action: handleCreateAccount,
+      Icon: CreateIcon,
     },
     {
-      title: this.props.t('exportAccount'),
-      action: this.handleExportAccount,
+      title: t('exportAccount'),
+      action: handleExportAccount,
       Icon: ExportIcon,
-    }] : [{
-      title: this.props.t('resetAccount'),
-      action: this.handleResetAccount,
+    },
+    {
+      title: t('importAccount'),
+      action: handleOpenImportFile,
+      Icon: ImportIcon,
+    },
+    {
+      title: t('resetAccount'),
+      action: handleResetAccount,
       Icon: ResetIcon,
-    }];
-    return (isWallet ? [
-      {
-        title: this.props.t('createNewAccount'),
-        action: this.handleCreateAccount,
-        Icon: CreateIcon,
-      },
-      {
-        title: this.props.t('exportAccount'),
-        action: this.handleExportAccount,
-        Icon: ExportIcon,
-      },
-      {
-        title: this.props.t('importAccount'),
-        action: this.handleOpenImportFile,
-        Icon: ImportIcon,
-      },
-      {
-        title: this.props.t('resetAccount'),
-        action: this.handleResetAccount,
-        Icon: ResetIcon,
-      },
-    ] : hubActions);
+    },
+  ];
+
+  const toggleAccountMenu = () => {
+    toggleOpenedAccountMenu();
   };
 
-  toggleAccountMenu = () => {
-    this.props.toggleOpenedAccountMenu();
-  };
-
-  render() {
-    const {
-      walletAddress,
-      className,
-      openedMenu,
-    } = this.props;
-
-    const {
-      openedImportAccountModal,
-      openedExportAccountModal,
-      openedResetAccountModal,
-    } = this.state;
-
-    return <div className={cn(styles.account, className)}>
+  return (
+    <div className={cn(styles.account, className)}>
       <input
-        ref={this.setImportAccountRef}
+        ref={importAccountInputRef}
         className={styles.importAccountInput}
-        onChange={this.setAccountFile}
+        onChange={setAccountFileOnChange}
         type="file"
       />
       <Drawer
         anchor={'left'}
         open={openedMenu}
-        onClose={this.toggleAccountMenu}
+        onClose={toggleAccountMenu}
         elevation={0}
-        ModalProps={this.drawerModalProps}
-        classes={this.drawerPaperClasses}
+        classes={{
+          paper: styles.drawerPaper,
+          root: styles.drawerModalRoot,
+        }}
+        ModalProps={{
+          componentsProps: {
+            backdrop: {
+              className: styles.drawerBackdrop,
+            },
+          },
+        }}
       >
-        <div className={styles.accountTitle}>
-          {this.props.t('myAccount')}
-        </div>
+        <IconButton
+          className={styles.closeButton}
+          onClick={toggleAccountMenu}
+        >
+          <CloseIcon />
+        </IconButton>
+        <div className={styles.accountTitle}>{t('myAccount')}</div>
         <CopyButton
           textButton={walletAddress}
           className={styles.addressButton}
           iconClassName={styles.copyIcon}
         />
-        <AccountActionsList actions={this.getAccountActionsData()} />
+        <AccountActionsList actions={getAccountActionsData()} />
         <a
           className={styles.supportLink}
           rel={'noreferrer'}
@@ -251,28 +219,19 @@ class AccountComponent extends React.PureComponent<AccountProps, AccountState> {
       </Drawer>
       <ImportAccountModal
         open={openedImportAccountModal}
-        onClose={this.closeImportAccountModal}
-        onSubmit={this.handleImportAccount}
+        onClose={closeImportAccountModal}
+        onSubmit={handleImportAccount}
       />
       <ExportAccountModal
         open={openedExportAccountModal}
-        onClose={this.closeExportAccountModal}
+        onClose={closeExportAccountModal}
       />
       <ResetAccountModal
         open={openedResetAccountModal}
-        onClose={this.closeResetAccountModal}
+        onClose={closeResetAccountModal}
       />
-      <div
-        className={styles.accountDataHolder}
-        onClick={this.toggleAccountMenu}
-      >
-        <img className={styles.img} src={globe} alt="Avatar" />
-        <div className={styles.accountText}>
-          <p>{walletAddress}</p>
-        </div>
-      </div>
-    </div>;
-  }
-}
+    </div>
+  );
+};
 
-export const Account = withTranslation()(connector(AccountComponent));
+export default withTranslation()(connector(Account));

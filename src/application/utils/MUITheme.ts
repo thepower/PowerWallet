@@ -11,7 +11,7 @@ const MUITheme = createTheme({
   },
   palette: {
     background: {
-      default: '#121923',
+      default: '#020409',
     },
     primary: {
       main: '#2997ff',
