@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import {
   FormikHelpers, useFormik,
 } from 'formik';
-import styles from '../../registration/components/Registration.module.scss';
+import styles from '../../registration/components/pages/registration/RegistrationPage.module.scss';
 import { resetAccount } from '../slice/accountSlice';
 
 const initialValues = { password: '' };

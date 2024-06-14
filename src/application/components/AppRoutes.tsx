@@ -3,19 +3,20 @@ import {
   Redirect, Route, Switch,
 } from 'react-router-dom';
 import { FullScreenLoader } from 'common';
-import { RegistrationPage } from 'registration/components/RegistrationPage';
 import { LoginPage } from 'registration/components/pages/login/LoginPage';
 import { checkIfLoading } from 'network/selectors';
 import { AddTokenPage } from 'myAssets/pages/AddToken/AddTokenPage';
 import { TokenTransactionsPage } from 'myAssets/pages/TokenTransactions/TokenTransactionsPage';
 import { TokenSelectionPage } from 'myAssets/pages/TokenSelection/TokenSelectionPage';
-import { MyAssets } from 'myAssets/pages/Main/MainPage';
+import { MainPage } from 'myAssets/pages/Main/MainPage';
 import { SendPage } from 'send/components/SendPage';
 import SignAndSendPage from 'sign-and-send/components/SingAndSendPage';
 import WalletSSOPage from 'sso/components/pages/WalletSSOPage';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
 // import { ReferralProgramPage } from 'referral-program/components/pages/ReferralProgramPage';
 
+import { WelcomePage } from 'registration/components/pages/welcome/WelcomePage';
+import { RegistrationPage } from 'registration/components/pages/registration/RegistrationPage';
 import { useAppDispatch, useAppSelector } from '../store';
 import { WalletRoutesEnum } from '../typings/routes';
 import { initApplication } from '../slice/applicationSlice';
@@ -66,8 +67,8 @@ const AppRoutesComponent: React.FC = () => {
         component={SignAndSendPage}
       />
       {/* <Route exact path={WalletRoutesEnum.referralProgram} component={ReferralProgramPage} /> */}
-      <Route exact path={`${WalletRoutesEnum.root}:referrer?`} component={MyAssets} />
-      <Redirect path="*" to={walletAddress ? WalletRoutesEnum.root : WalletRoutesEnum.signup} />
+      <Route exact path={walletAddress ? '/' : '/:referrer?'} component={walletAddress ? MainPage : WelcomePage} />
+      <Redirect path="*" to={WalletRoutesEnum.root} />
     </Switch>
   );
 };

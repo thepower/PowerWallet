@@ -1,5 +1,5 @@
 import React, {
-  FC, useCallback, useEffect, useState,
+  FC, useCallback, useEffect, useMemo, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
@@ -31,6 +31,7 @@ import { BackupAccountStepsEnum } from 'registration/typings/registrationTypes';
 import { useParams } from 'react-router-dom';
 import { push } from 'connected-react-router';
 import { WalletRoutesEnum } from 'application/typings/routes';
+import { AddressApi } from '@thepowereco/tssdk';
 import styles from './Backup.module.scss';
 
 const mapStateToProps = (state: RootState) => ({
@@ -76,6 +77,11 @@ const BackupComponent: FC<BackupProps> = ({
 
   const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
 
+  const isAddressInParams = useMemo(
+    () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
+    [dataOrReferrer],
+  );
+
   useEffect(() => {
     if (!generatedSeedPhrase) {
       generateSeedPhrase();
@@ -94,6 +100,7 @@ const BackupComponent: FC<BackupProps> = ({
       }
       createWallet({
         password: isWithoutPassword ? '' : password,
+        referrer: isAddressInParams ? dataOrReferrer : '',
         additionalActionOnSuccess: () => {
           setBackupStep(BackupAccountStepsEnum.registrationCompleted);
         },
@@ -106,6 +113,8 @@ const BackupComponent: FC<BackupProps> = ({
     confirmedPassword,
     isWithoutPassword,
     createWallet,
+    isAddressInParams,
+    dataOrReferrer,
   ]);
 
   const renderSeedPhrase = useCallback(() => {
@@ -160,9 +169,7 @@ const BackupComponent: FC<BackupProps> = ({
           />
         )}
         {renderCheckBox()}
-        <div className={styles.tip}>
-          {t('seedPhraseIsTheOnlyWay')}
-        </div>
+        <div className={styles.tip}>{t('seedPhraseIsTheOnlyWay')}</div>
         <Button
           className={styles.button}
           variant="contained"
@@ -201,9 +208,7 @@ const BackupComponent: FC<BackupProps> = ({
   const renderEncryptPrivateKey = useCallback(
     () => (
       <>
-        <div className={styles.title}>
-          {t('enterPasswordEncryptYour')}
-        </div>
+        <div className={styles.title}>{t('enterPasswordEncryptYour')}</div>
         <div className={styles.passwordForm}>
           <OutlinedInput
             id="password"
@@ -237,10 +242,7 @@ const BackupComponent: FC<BackupProps> = ({
             size="large"
             onClick={onClickNext}
             loading={isCreateWalletLoading}
-            disabled={
-              passwordsNotEqual ||
-              (!password && !isWithoutPassword)
-            }
+            disabled={passwordsNotEqual || (!password && !isWithoutPassword)}
           >
             {t('next')}
           </Button>
@@ -263,14 +265,21 @@ const BackupComponent: FC<BackupProps> = ({
       password,
       isWithoutGoHome: true,
       additionalActionOnSuccess: () => {
-        if (dataOrReferrer) {
+        if (dataOrReferrer && !isAddressInParams) {
           setNextStep();
         } else {
           routeTo(WalletRoutesEnum.root);
         }
       },
     });
-  }, [dataOrReferrer, exportAccount, password, routeTo, setNextStep]);
+  }, [
+    dataOrReferrer,
+    exportAccount,
+    isAddressInParams,
+    password,
+    routeTo,
+    setNextStep,
+  ]);
 
   const renderRegistrationCompleted = useCallback(() => {
     const fileName = selectedChain

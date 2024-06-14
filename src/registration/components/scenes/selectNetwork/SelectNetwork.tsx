@@ -21,7 +21,7 @@ import { Button, IconButton, WizardComponentProps } from 'common';
 import hooks from 'hooks';
 import { useMediaQuery } from '@mui/material';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
-import registrationStyles from '../../Registration.module.scss';
+import registrationStyles from '../../pages/registration/RegistrationPage.module.scss';
 import styles from './SelectNetwork.module.scss';
 
 const mapStateToProps = (state: RootState) => ({

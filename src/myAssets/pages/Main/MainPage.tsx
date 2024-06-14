@@ -42,9 +42,9 @@ const mapStateToProps = (state: RootState) => ({
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-type MyAssetsProps = ConnectedProps<typeof connector>;
+type MainPageProps = ConnectedProps<typeof connector>;
 
-const MyAssetsComponent: FC<MyAssetsProps> = ({
+const MainPageComponent: FC<MainPageProps> = ({
   amounts,
   nativeTokens,
   tokens,
@@ -186,4 +186,4 @@ const MyAssetsComponent: FC<MyAssetsProps> = ({
   );
 };
 
-export const MyAssets = connector(MyAssetsComponent);
+export const MainPage = connector(MainPageComponent);

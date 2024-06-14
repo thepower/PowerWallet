@@ -124,7 +124,7 @@ export function* resetAccountSaga({ payload: { password, additionalActionOnDecry
     yield CryptoApi.decryptWif(encryptedWif, password);
     yield clearApplicationStorage();
     yield put(clearAccountData());
-    yield put(push(WalletRoutesEnum.signup));
+    yield put(push(WalletRoutesEnum.root));
   } catch (e: any) {
     if (additionalActionOnDecryptError && e.message === 'unable to decrypt data') {
       additionalActionOnDecryptError?.();

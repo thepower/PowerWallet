@@ -71,8 +71,11 @@ const registrationSlice = createSlice({
     ) => {
       state.isRandomChain = action.payload;
     },
-    toggleIsWithoutPassword: (state: RegistrationState) => {
-      state.isWithoutPassword = !state.isWithoutPassword;
+    setIsWithoutPassword: (
+      state: RegistrationState,
+      action: PayloadAction<boolean>,
+    ) => {
+      state.isWithoutPassword = action.payload;
     },
   },
 });
@@ -86,7 +89,7 @@ export const {
     setCreatingStep,
     setBackupStep,
     setIsRandomChain,
-    toggleIsWithoutPassword,
+    setIsWithoutPassword,
   },
 } = registrationSlice;
 

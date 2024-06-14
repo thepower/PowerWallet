@@ -29,7 +29,7 @@ import { checkIfLoading } from 'network/selectors';
 import { RootState } from 'application/store';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { loginToWalletFromRegistration } from '../../../slice/registrationSlice';
-import registrationStyles from '../../Registration.module.scss';
+import registrationStyles from '../registration/RegistrationPage.module.scss';
 import styles from './LoginPage.module.scss';
 
 import { ImportAccountModal } from '../../modals/ImportAccountModal';
@@ -325,7 +325,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
         <div className={registrationStyles.registrationPageHeader}>
           <div style={{ width: '48px' }} />
           <Link
-            to={walletAddress ? WalletRoutesEnum.root : WalletRoutesEnum.signup}
+            to={WalletRoutesEnum.root}
             className={registrationStyles.registrationPageTitle}
             onClick={resetStage}
           >

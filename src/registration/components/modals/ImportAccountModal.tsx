@@ -3,7 +3,7 @@ import { Button, Modal, OutlinedInput } from 'common';
 import { Form, Formik, FormikHelpers } from 'formik';
 import React from 'react';
 import { WithTranslation, withTranslation } from 'react-i18next';
-import styles from '../Registration.module.scss';
+import styles from '../pages/registration/RegistrationPage.module.scss';
 
 interface ImportAccountModalProps {
   open: boolean;

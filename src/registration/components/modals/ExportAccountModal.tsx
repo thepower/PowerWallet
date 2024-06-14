@@ -6,7 +6,7 @@ import { ConnectedProps, connect } from 'react-redux';
 import { exportAccount } from '../../../account/slice/accountSlice';
 import { Modal, OutlinedInput } from '../../../common';
 import { compareTwoStrings } from '../../utils/registrationUtils';
-import styles from '../Registration.module.scss';
+import styles from '../pages/registration/RegistrationPage.module.scss';
 
 const mapDispatchToProps = {
   exportAccount,
