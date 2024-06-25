@@ -2449,10 +2449,10 @@
     int64-buffer "^0.1.9"
     isarray "^1.0.0"
 
-"@thepowereco/tssdk@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@thepowereco/tssdk/-/tssdk-2.1.0.tgz#92954a80e82e99dd9d16a06b8d3259667d0dbbf3"
-  integrity sha512-HeKR6miDBrge1IeC/FjCsIxL4sZNNu+YrYhAc+z8WA4QS9z66sfVZm2i9h3KOIyVCi0owit6h8bToBcQ5sYq+Q==
+"@thepowereco/tssdk@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@thepowereco/tssdk/-/tssdk-2.1.2.tgz#e73948a28547c7269b946b012feaa39d07c62f71"
+  integrity sha512-U3iwA5hRPX+2qc7yq9n+ik+iEzIiCVcUSEryFnSEVLk0SSbwC2072JBeIW9z4BAJuZmSHR/d/QnpiNxUvGHhKg==
   dependencies:
     "@ethereumjs/common" "^4.1.0"
     "@ethereumjs/tx" "^5.1.0"
@@ -2469,7 +2469,6 @@
     debug "^4.3.4"
     ecpair "^2.0.1"
     lz4js "^0.2.0"
-    safe-buffer "^5.2.1"
     solc "^0.8.14-fixed"
     stream-browserify "^3.0.0"
     tsconfig-paths-webpack-plugin "^4.1.0"
@@ -10807,7 +10806,7 @@ safe-buffer@5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"
   integrity sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==
 
-safe-buffer@5.2.1, safe-buffer@>=5.1.0, safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@^5.1.2, safe-buffer@^5.2.0, safe-buffer@^5.2.1, safe-buffer@~5.2.0:
+safe-buffer@5.2.1, safe-buffer@>=5.1.0, safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@^5.1.2, safe-buffer@^5.2.0, safe-buffer@~5.2.0:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.2.1.tgz#1eaf9fa9bdb1fdd4ec75f58f9cdb4e6b7827eec6"
   integrity sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==

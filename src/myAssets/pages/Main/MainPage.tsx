@@ -1,4 +1,5 @@
 import {
+  Button,
   CardLink, CopyButton, PageTemplate, Tabs,
 } from 'common';
 import {
@@ -158,7 +159,7 @@ const MainPageComponent: FC<MainPageProps> = ({
             </CardLink>
           </div>
         </div>
-        {/* <div className={styles.btnWrapper}>
+        <div className={styles.btnWrapper}>
           <Button
             to={WalletRoutesEnum.referralProgram}
             className={styles.referralBtn}
@@ -166,7 +167,7 @@ const MainPageComponent: FC<MainPageProps> = ({
           >
             {t('inviteFriendsEarnRewards')}
           </Button>
-        </div> */}
+        </div>
         <div className={styles.tokensHeadRow}>
           <div className={styles.title}>{t('tokens')}</div>
           <Link to={`${WalletRoutesEnum.add}`}>

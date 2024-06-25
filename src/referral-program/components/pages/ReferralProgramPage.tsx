@@ -54,10 +54,10 @@ const ReferralProgramPageComponent: FC<ReferralProgramPageProps> = ({ walletAddr
             {t('helpUsGrowOurCommunity')}
           </div>
         </div>
-        <div className={styles.title}>
+        {/* <div className={styles.title}>
           {t('myFriends')}
           : 0
-        </div>
+        </div> */}
         <Tabs
           tabs={ReferralProgramTabs}
           tabsLabels={getReferralProgramTabsLabels(t)}

@@ -182,15 +182,15 @@
     "selectChainNumberToRegister": "Выберите номер чейна для регистрации учетной записи",
     "iWantToSelectChain": "Я хочу выбрать чейн по номеру",
     "sorryReferralLinkIsOnly": "Извините, реферальная ссылка действует только при регистрации аккаунта",
-    "inviteFriendsEarnRewards": "Invite Friends, Earn Rewards!",
-    "welcomeToPowerWalletReferral": "Welcome to Power Wallet Referral Program!",
-    "helpUsGrowOurCommunity": "Help us grow our community and earn rewards for both you and your friends",
-    "myFriends": "My Friends",
-    "shareYourUniqueReferralLink": "Share Your Unique Referral Link",
-    "copyAndShareThisLink": "Copy and share this link with your friends to invite them to join Power Wallet",
-    "copyReferralLink": "Copy Referral Link",
-    "rewards": "🎉 Rewards",
-    "referralLink": "🔗 Referral Link",
-    "referralProgram": "Referral Program"
+    "inviteFriendsEarnRewards": "👋 Приглашай друзей и зарабатывай!",
+    "welcomeToPowerWalletReferral": "Добро пожаловать в реферальную программу Power Wallet Referral Program!",
+    "helpUsGrowOurCommunity": "Помогайте нашему комьюнити расти и зарабатывайте познаграждения для вас и ваших друзей",
+    "myFriends": "Мои друзья",
+    "shareYourUniqueReferralLink": "Отправьте вашу уникальную реферальную ссылку",
+    "copyAndShareThisLink": "Скопируйте и отправьте эту ссылку вашим друзьям, пригласив присоединиться к Power Wallet",
+    "copyReferralLink": "Скопировать реферальную ссылку",
+    "rewards": "🎉 Награды",
+    "referralLink": "🔗 Реферальная ссылка",
+    "referralProgram": "Реферальная программа"
   }
 }

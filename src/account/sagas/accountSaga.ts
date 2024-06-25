@@ -1,5 +1,5 @@
 import { call, put, select } from 'typed-redux-saga';
-import { CryptoApi } from '@thepowereco/tssdk';
+import { CryptoApi, WalletApi } from '@thepowereco/tssdk';
 import fileSaver from 'file-saver';
 import { FileReaderType, getFileData } from 'common';
 import { push } from 'connected-react-router';
@@ -19,7 +19,7 @@ import {
   LoginToWalletSagaInput,
 } from '../typings/accountTypings';
 import { clearApplicationStorage, setKeyToApplicationStorage } from '../../application/utils/localStorageUtils';
-import { getNetworkApi, getNetworkChainID, getWalletApi } from '../../application/selectors';
+import { getNetworkApi, getNetworkChainID } from '../../application/selectors';
 import { WalletRoutesEnum } from '../../application/typings/routes';
 import { reInitApis } from '../../application/sagas/initApplicationSaga';
 import { loadBalanceTrigger } from '../../myAssets/slices/walletSlice';
@@ -62,11 +62,10 @@ export function* loginToWalletSaga({ payload }: { payload?: LoginToWalletSagaInp
 
 export function* importAccountFromFileSaga({ payload }: ReturnType<typeof importAccountFromFile>) {
   const { accountFile, password, additionalActionOnDecryptError } = payload;
-  const WalletAPI = (yield* select(getWalletApi))!;
 
   try {
     const data = yield* call(getFileData, accountFile, FileReaderType.binary);
-    const walletData = yield* call(WalletAPI.parseExportData, data!, password);
+    const walletData = yield* call(WalletApi.parseExportData, data!, password);
     const encryptedWif = yield* call(CryptoApi.encryptWif, walletData.wif!, password);
 
     yield* loginToWalletSaga({ payload: { address: walletData.address, encryptedWif } });
@@ -85,12 +84,11 @@ export function* exportAccountSaga({ payload }: ReturnType<typeof exportAccount>
   const {
     password, hint, isWithoutGoHome, additionalActionOnSuccess, additionalActionOnDecryptError,
   } = payload;
-  const WalletAPI = (yield* select(getWalletApi))!;
   const currentNetworkChain = yield* select(getNetworkChainID);
   const currentRegistrationChain = yield* select(getSelectedChain);
   try {
     const decryptedWif: string = yield CryptoApi.decryptWif(encryptedWif, password);
-    const exportedData: string = yield WalletAPI.getExportData(decryptedWif, address, password, hint);
+    const exportedData: string = yield WalletApi.getExportData(decryptedWif, address, password, hint);
 
     const blob: Blob = yield new Blob([exportedData], { type: 'octet-stream' });
 
