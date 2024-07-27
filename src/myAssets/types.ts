@@ -40,30 +40,32 @@ export type TransactionPayloadType = {
 export enum TokenKind {
   Erc20 = 'erc20',
   Erc721 = 'erc721',
-  Native = 'native',
+  Native = 'native'
 }
 
 export enum MyAssetsTabs {
   Erc20 = 'Erc20',
-  Erc721 = 'Erc721',
+  Erc721 = 'Erc721'
 }
 
-export const getMyAssetsTabsLabels = () => ({
-  Erc20: 'ERC-20',
-  Erc721: 'NFT',
-} as const);
+export const getMyAssetsTabsLabels = () =>
+  ({
+    Erc20: 'ERC-20',
+    Erc721: 'NFT'
+  }) as const;
 
 export enum AddTokensTabs {
   Erc20 = 'Erc20',
   Erc721 = 'Erc721',
-  AddTokens = 'AddTokens',
+  AddTokens = 'AddTokens'
 }
 
-export const getAddTokenTabsLabels = () => ({
-  Erc20: 'ERC-20',
-  Erc721: 'NFT',
-  AddTokens: i18n.t('addOtherTokens'),
-} as const);
+export const getAddTokenTabsLabels = () =>
+  ({
+    Erc20: 'ERC-20',
+    Erc721: 'NFT',
+    AddTokens: i18n.t('addOtherTokens')
+  }) as const;
 
 export type TToken = {
   type: TokenKind;
@@ -72,15 +74,15 @@ export type TToken = {
   symbol: string;
   chainId: number;
   decimals: string;
-  amount?: string
+  amount?: string;
   isShow?: boolean;
 };
 
 export type TErc721Token = {
   id: string;
-  name?: string,
-  description?: string,
-  image?: string
+  name?: string;
+  description?: string;
+  image?: string;
 };
 
 export type TokenPayloadType = TToken;

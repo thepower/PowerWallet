@@ -1,37 +1,35 @@
-import React, {
-  FC, useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FormControlLabel } from '@mui/material';
+import { AddressApi } from '@thepowereco/tssdk';
+import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
-import {
-  createWallet,
-  generateSeedPhrase,
-  setBackupStep,
-} from 'registration/slice/registrationSlice';
-import {
-  getCurrentBackupStep,
-  getGeneratedSeedPhrase,
-  getIsWithoutPassword,
-  getSelectedChain,
-} from 'registration/selectors/registrationSelectors';
+import { useParams } from 'react-router-dom';
+import { getWalletAddress } from 'account/selectors/accountSelectors';
+import { exportAccount } from 'account/slice/accountSlice';
 import { RootState } from 'application/store';
+import { WalletRoutesEnum } from 'application/typings/routes';
 import {
   Button,
   Checkbox,
   CopyButton,
   OutlinedInput,
-  WizardComponentProps,
+  WizardComponentProps
 } from 'common';
-import { FormControlLabel } from '@mui/material';
-import { compareTwoStrings } from 'registration/utils/registrationUtils';
-import { exportAccount } from 'account/slice/accountSlice';
 import { checkIfLoading } from 'network/selectors';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
+import {
+  getCurrentBackupStep,
+  getGeneratedSeedPhrase,
+  getIsWithoutPassword,
+  getSelectedChain
+} from 'registration/selectors/registrationSelectors';
+import {
+  createWallet,
+  generateSeedPhrase,
+  setBackupStep
+} from 'registration/slice/registrationSlice';
 import { BackupAccountStepsEnum } from 'registration/typings/registrationTypes';
-import { useParams } from 'react-router-dom';
-import { push } from 'connected-react-router';
-import { WalletRoutesEnum } from 'application/typings/routes';
-import { AddressApi } from '@thepowereco/tssdk';
+import { compareTwoStrings } from 'registration/utils/registrationUtils';
 import styles from './Backup.module.scss';
 
 const mapStateToProps = (state: RootState) => ({
@@ -40,7 +38,7 @@ const mapStateToProps = (state: RootState) => ({
   walletAddress: getWalletAddress(state),
   isCreateWalletLoading: checkIfLoading(state, createWallet.type),
   selectedChain: getSelectedChain(state),
-  isWithoutPassword: getIsWithoutPassword(state),
+  isWithoutPassword: getIsWithoutPassword(state)
 });
 
 const mapDispatchToProps = {
@@ -48,7 +46,7 @@ const mapDispatchToProps = {
   createWallet,
   exportAccount,
   setBackupStep,
-  routeTo: push,
+  routeTo: push
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -66,7 +64,7 @@ const BackupComponent: FC<BackupProps> = ({
   isCreateWalletLoading,
   isWithoutPassword,
   setNextStep,
-  routeTo,
+  routeTo
 }) => {
   const { t } = useTranslation();
   const [password, setPassword] = useState('');
@@ -79,7 +77,7 @@ const BackupComponent: FC<BackupProps> = ({
 
   const isAddressInParams = useMemo(
     () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
-    [dataOrReferrer],
+    [dataOrReferrer]
   );
 
   useEffect(() => {
@@ -103,7 +101,7 @@ const BackupComponent: FC<BackupProps> = ({
         referrer: isAddressInParams ? dataOrReferrer : '',
         additionalActionOnSuccess: () => {
           setBackupStep(BackupAccountStepsEnum.registrationCompleted);
-        },
+        }
       });
     }
   }, [
@@ -114,7 +112,7 @@ const BackupComponent: FC<BackupProps> = ({
     isWithoutPassword,
     createWallet,
     isAddressInParams,
-    dataOrReferrer,
+    dataOrReferrer
   ]);
 
   const renderSeedPhrase = useCallback(() => {
@@ -150,7 +148,7 @@ const BackupComponent: FC<BackupProps> = ({
         label={t('ISavedMySeedPhrase')}
       />
     ),
-    [isSeedPhraseSaved, t],
+    [isSeedPhraseSaved, t]
   );
 
   const renderGenerateSeedPhrase = useCallback(
@@ -172,8 +170,8 @@ const BackupComponent: FC<BackupProps> = ({
         <div className={styles.tip}>{t('seedPhraseIsTheOnlyWay')}</div>
         <Button
           className={styles.button}
-          variant="contained"
-          size="large"
+          variant='contained'
+          size='large'
           onClick={onClickNext}
           disabled={!isSeedPhraseSaved}
         >
@@ -187,19 +185,19 @@ const BackupComponent: FC<BackupProps> = ({
       isSeedPhraseSaved,
       onClickNext,
       renderSeedPhrase,
-      renderCheckBox,
-    ],
+      renderCheckBox
+    ]
   );
 
   const onChangePassword = (
-    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     setPassword(event.target.value);
     setPasswordsNotEqual(false);
   };
 
   const onChangeConfirmedPassword = (
-    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     setConfirmedPassword(event.target.value);
     setPasswordsNotEqual(false);
@@ -211,35 +209,35 @@ const BackupComponent: FC<BackupProps> = ({
         <div className={styles.title}>{t('enterPasswordEncryptYour')}</div>
         <div className={styles.passwordForm}>
           <OutlinedInput
-            id="password"
-            name="password"
+            id='password'
+            name='password'
             placeholder={t('password')!}
             className={styles.passwordInput}
             value={password}
             onChange={onChangePassword}
-            autoComplete="new-password"
-            size="small"
+            autoComplete='new-password'
+            size='small'
             type={'password'}
             disabled={isCreateWalletLoading || isWithoutPassword}
           />
           <OutlinedInput
-            id="confirmedPassword"
-            name="confirmedPassword"
+            id='confirmedPassword'
+            name='confirmedPassword'
             placeholder={t('repeatPassword')!}
             className={styles.passwordInput}
             value={confirmedPassword}
             onChange={onChangeConfirmedPassword}
             type={'password'}
             error={passwordsNotEqual}
-            autoComplete="new-password"
-            size="small"
+            autoComplete='new-password'
+            size='small'
             errorMessage={t('oopsPasswordsDidntMatch')!}
             disabled={isCreateWalletLoading || isWithoutPassword}
           />
           <Button
             className={styles.button}
-            variant="contained"
-            size="large"
+            variant='contained'
+            size='large'
             onClick={onClickNext}
             loading={isCreateWalletLoading}
             disabled={passwordsNotEqual || (!password && !isWithoutPassword)}
@@ -256,8 +254,8 @@ const BackupComponent: FC<BackupProps> = ({
       onClickNext,
       password,
       passwordsNotEqual,
-      t,
-    ],
+      t
+    ]
   );
 
   const onClickExportAccount = useCallback(() => {
@@ -270,7 +268,7 @@ const BackupComponent: FC<BackupProps> = ({
         } else {
           routeTo(WalletRoutesEnum.root);
         }
-      },
+      }
     });
   }, [
     dataOrReferrer,
@@ -278,7 +276,7 @@ const BackupComponent: FC<BackupProps> = ({
     isAddressInParams,
     password,
     routeTo,
-    setNextStep,
+    setNextStep
   ]);
 
   const renderRegistrationCompleted = useCallback(() => {
@@ -307,8 +305,8 @@ const BackupComponent: FC<BackupProps> = ({
         </div>
         <Button
           className={styles.button}
-          variant="contained"
-          size="large"
+          variant='contained'
+          size='large'
           onClick={onClickExportAccount}
           disabled={passwordsNotEqual}
         >
@@ -322,7 +320,7 @@ const BackupComponent: FC<BackupProps> = ({
     passwordsNotEqual,
     selectedChain,
     walletAddress,
-    t,
+    t
   ]);
 
   const renderContent = useCallback(() => {
@@ -340,7 +338,7 @@ const BackupComponent: FC<BackupProps> = ({
     renderEncryptPrivateKey,
     renderGenerateSeedPhrase,
     renderRegistrationCompleted,
-    backupStep,
+    backupStep
   ]);
 
   return <div className={styles.content}>{renderContent()}</div>;

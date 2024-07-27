@@ -1,3 +1,2 @@
-export const compareTwoStrings = (firstString: string, secondString: string) => (
-  firstString !== '' && firstString === secondString
-);
+export const compareTwoStrings = (firstString: string, secondString: string) =>
+  firstString !== '' && firstString === secondString;

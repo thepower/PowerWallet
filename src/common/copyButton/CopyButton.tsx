@@ -1,8 +1,8 @@
 import React, { useCallback, useRef } from 'react';
 import cn from 'classnames';
 import { toast } from 'react-toastify';
-import { CopySvg } from '../../assets/icons';
 import styles from './CopyButton.module.scss';
+import { CopySvg } from '../../assets/icons';
 
 interface CopyButtonProps {
   textButton: string;
@@ -15,7 +15,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({
   textButton,
   className,
   copyInfo,
-  iconClassName,
+  iconClassName
 }) => {
   const ref = useRef<HTMLButtonElement>(null);
   const handleClick = useCallback(() => {
@@ -26,7 +26,12 @@ const CopyButton: React.FC<CopyButtonProps> = ({
   }, [copyInfo]);
 
   return (
-    <button type="button" className={cn(styles.copyData, className)} ref={ref} onClick={handleClick}>
+    <button
+      type='button'
+      className={cn(styles.copyData, className)}
+      ref={ref}
+      onClick={handleClick}
+    >
       {textButton}
       <CopySvg className={cn(styles.icon, iconClassName)} />
     </button>

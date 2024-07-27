@@ -11,7 +11,9 @@ class AddButton extends React.PureComponent<AddButtonProps> {
   render() {
     const { children, ...props } = this.props;
     return (
-      <Button {...props} size="small" classes={styles}>{children}</Button>
+      <Button {...props} size='small' classes={styles}>
+        {children}
+      </Button>
     );
   }
 }

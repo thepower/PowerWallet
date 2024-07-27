@@ -1,10 +1,15 @@
 import { AddressApi, NetworkApi } from '@thepowereco/tssdk';
 
+import axios, { AxiosResponse } from 'axios';
+import { push } from 'connected-react-router';
+import { range } from 'lodash';
+import { toast } from 'react-toastify';
+import { all, put, select, call } from 'typed-redux-saga';
+import abis from 'abis';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
 
 import { getNetworkApi, getNetworkChainID } from 'application/selectors';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { push } from 'connected-react-router';
 import i18n from 'locales/initTranslation';
 import { getTokenByID, getTokens } from 'myAssets/selectors/tokensSelectors';
 import {
@@ -12,16 +17,9 @@ import {
   addToken,
   addTokenTrigger,
   getErc721TokensTrigger,
-  updateTokenAmount,
+  updateTokenAmount
 } from 'myAssets/slices/tokensSlice';
-import { toast } from 'react-toastify';
-import {
-  all, put, select, call,
-} from 'typed-redux-saga';
 
-import abis from 'abis';
-import { range } from 'lodash';
-import axios, { AxiosResponse } from 'axios';
 import { TokenKind } from 'myAssets/types';
 
 export function* getIsErc721(network: NetworkApi, address: string) {
@@ -30,7 +28,7 @@ export function* getIsErc721(network: NetworkApi, address: string) {
       AddressApi.textAddressToHex(address),
       'supportsInterface',
       ['0x80ac58cd'],
-      abis.erc721.abi,
+      abis.erc721.abi
     );
     return isErc721;
   } catch {
@@ -39,7 +37,7 @@ export function* getIsErc721(network: NetworkApi, address: string) {
 }
 
 export function* addTokenSaga({
-  payload: { address, withoutRedirect, additionalActionOnSuccess },
+  payload: { address, withoutRedirect, additionalActionOnSuccess }
 }: ReturnType<typeof addTokenTrigger>) {
   try {
     const tokens = yield* select(getTokens);
@@ -53,9 +51,8 @@ export function* addTokenSaga({
 
     const networkAPI = (yield* select(getNetworkApi))!;
     const contractNetworkApi = networkAPI;
-    const { chain }: { chain?: number } = yield networkAPI.getAddressChain(
-      address,
-    );
+    const { chain }: { chain?: number } =
+      yield networkAPI.getAddressChain(address);
 
     if (!chain) {
       toast.error(i18n.t('addressNotFound'));
@@ -67,7 +64,7 @@ export function* addTokenSaga({
 
     const isErc721 = yield* getIsErc721(
       contractNetworkApi as NetworkApi,
-      address,
+      address
     );
 
     if (isErc721) {
@@ -77,19 +74,19 @@ export function* addTokenSaga({
         AddressApi.textAddressToHex(address),
         'name',
         [],
-        abis.erc721.abi,
+        abis.erc721.abi
       );
       const symbol: string = yield contractNetworkApi.executeCall(
         AddressApi.textAddressToHex(address),
         'symbol',
         [],
-        abis.erc721.abi,
+        abis.erc721.abi
       );
       const balanceBigint: bigint = yield contractNetworkApi.executeCall(
         AddressApi.textAddressToHex(address),
         'balanceOf',
         [AddressApi.textAddressToEvmAddress(walletAddress)],
-        abis.erc721.abi,
+        abis.erc721.abi
       );
       const balance = balanceBigint.toString();
       yield put(
@@ -101,8 +98,8 @@ export function* addTokenSaga({
           type: TokenKind.Erc721,
           chainId: chain!,
           amount: balance,
-          isShow: true,
-        }),
+          isShow: true
+        })
       );
     } else {
       const walletAddress: string = yield* select(getWalletAddress);
@@ -111,26 +108,26 @@ export function* addTokenSaga({
         AddressApi.textAddressToHex(address),
         'name',
         [],
-        abis.erc20.abi,
+        abis.erc20.abi
       );
       const symbol: string = yield contractNetworkApi.executeCall(
         AddressApi.textAddressToHex(address),
         'symbol',
         [],
-        abis.erc20.abi,
+        abis.erc20.abi
       );
       const balanceBigint: bigint = yield contractNetworkApi.executeCall(
         AddressApi.textAddressToHex(address),
         'balanceOf',
         [AddressApi.textAddressToEvmAddress(walletAddress)],
-        abis.erc20.abi,
+        abis.erc20.abi
       );
       const balance = balanceBigint.toString();
       const decimalsBigint: bigint = yield contractNetworkApi.executeCall(
         AddressApi.textAddressToHex(address),
         'decimals',
         [],
-        abis.erc20.abi,
+        abis.erc20.abi
       );
       const decimals = decimalsBigint.toString();
 
@@ -143,8 +140,8 @@ export function* addTokenSaga({
           chainId: chain!,
           type: TokenKind.Erc20,
           amount: balance,
-          isShow: true,
-        }),
+          isShow: true
+        })
       );
     }
     if (!withoutRedirect) yield* put(push(WalletRoutesEnum.root));
@@ -154,12 +151,16 @@ export function* addTokenSaga({
   }
 }
 
-export function* updateTokenAmountSaga({ address }: { address: string, isErc721?: boolean }) {
+export function* updateTokenAmountSaga({
+  address
+}: {
+  address: string;
+  isErc721?: boolean;
+}) {
   const networkAPI = (yield* select(getNetworkApi))!;
   const contractNetworkApi = networkAPI;
-  const { chain }: { chain?: number } = yield networkAPI.getAddressChain(
-    address,
-  );
+  const { chain }: { chain?: number } =
+    yield networkAPI.getAddressChain(address);
 
   if (!chain) {
     toast.error(i18n.t('addressNotFound'));
@@ -177,7 +178,7 @@ export function* updateTokenAmountSaga({ address }: { address: string, isErc721?
       AddressApi.textAddressToHex(address),
       'balanceOf',
       [AddressApi.textAddressToEvmAddress(walletAddress)],
-      abis.erc721.abi,
+      abis.erc721.abi
     );
     const balance = balanceBigint.toString();
 
@@ -189,7 +190,7 @@ export function* updateTokenAmountSaga({ address }: { address: string, isErc721?
       AddressApi.textAddressToHex(address),
       'balanceOf',
       [AddressApi.textAddressToEvmAddress(walletAddress)],
-      abis.erc20.abi,
+      abis.erc20.abi
     );
 
     const balance = balanceBigint.toString();
@@ -204,7 +205,7 @@ export function* updateTokensAmountsSaga() {
   const chainTokens = tokens.filter((token) => token?.chainId === chainId);
 
   yield all(
-    chainTokens.map(({ address }) => ({ address })).map(updateTokenAmountSaga),
+    chainTokens.map(({ address }) => ({ address })).map(updateTokenAmountSaga)
   );
 }
 
@@ -230,7 +231,7 @@ export function* getErc721Token(id: number, address: string) {
     AddressApi.textAddressToHex(address),
     'tokenOfOwnerByIndex',
     [AddressApi.textAddressToEvmAddress(walletAddress), id],
-    abis.erc721.abi,
+    abis.erc721.abi
   );
 
   const tokenId = tokenIdBigint.toString();
@@ -239,7 +240,7 @@ export function* getErc721Token(id: number, address: string) {
     AddressApi.textAddressToHex(address),
     'tokenURI',
     [tokenId],
-    abis.erc721.abi,
+    abis.erc721.abi
   );
 
   if (!uri) {
@@ -253,14 +254,14 @@ export function* getErc721Token(id: number, address: string) {
       id: tokenId,
       name: metadata?.name || '',
       description: metadata?.description || '',
-      image: metadata?.image || '',
+      image: metadata?.image || ''
     };
   }
   return { id: tokenId, image: uri };
 }
 
 export function* getErc721TokensSaga({
-  payload: { address },
+  payload: { address }
 }: ReturnType<typeof getErc721TokensTrigger>) {
   yield put(addErc721Tokens([]));
 
@@ -271,12 +272,12 @@ export function* getErc721TokensSaga({
     AddressApi.textAddressToHex(address),
     'balanceOf',
     [AddressApi.textAddressToEvmAddress(walletAddress)],
-    abis.erc721.abi,
+    abis.erc721.abi
   );
   const balance = Number(balanceBigint);
 
   const tokens = yield* all(
-    range(0, balance).map((id) => getErc721Token(id, address)),
+    range(0, balance).map((id) => getErc721Token(id, address))
   );
 
   yield put(addErc721Tokens(tokens));

@@ -1,8 +1,17 @@
-export { ReactComponent as DiscordSvg } from './discord.svg';
-export { ReactComponent as FbMessengerSvg } from './fb_messenger.svg';
-export { ReactComponent as TelegramSvg } from './telegram.svg';
-export { ReactComponent as TwitterSvg } from './twitter.svg';
-export { ReactComponent as WechatSvg } from './wechat.svg';
-export { ReactComponent as WhatsappSvg } from './whatsapp.svg';
+import DiscordSvg from './discord.svg?react';
+import FbMessengerSvg from './fb_messenger.svg?react';
+import SuccessSvg from './success.svg?react';
+import TelegramSvg from './telegram.svg?react';
+import TwitterSvg from './twitter.svg?react';
+import WechatSvg from './wechat.svg?react';
+import WhatsappSvg from './whatsapp.svg?react';
 
-export { ReactComponent as SuccessSvg } from './success.svg';
+export {
+  DiscordSvg,
+  FbMessengerSvg,
+  SuccessSvg,
+  TelegramSvg,
+  TwitterSvg,
+  WechatSvg,
+  WhatsappSvg
+};

@@ -6,5 +6,5 @@ export type BreadcrumbsDataType = {
 
 export enum BreadcrumbsTypeEnum {
   direction = 'direction',
-  tab = 'tab',
+  tab = 'tab'
 }

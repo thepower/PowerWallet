@@ -6,7 +6,9 @@ interface RegistrationBackgroundProps extends React.PropsWithChildren {
   className?: string;
 }
 
-export const RegistrationBackground: React.FC<RegistrationBackgroundProps> = (props) => (
+export const RegistrationBackground: React.FC<RegistrationBackgroundProps> = (
+  props
+) => (
   <div className={classnames(styles.registrationBackground, props.className)}>
     {props.children}
   </div>

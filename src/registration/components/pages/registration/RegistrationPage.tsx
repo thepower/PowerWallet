@@ -1,44 +1,40 @@
-import {
-  BreadcrumbsTypeEnum, Checkbox, LangMenu, Wizard,
-} from 'common';
+import React, { FC, useCallback, useEffect, useMemo } from 'react';
+import { FormControlLabel } from '@mui/material';
+import { AddressApi } from '@thepowereco/tssdk';
 import { push } from 'connected-react-router';
-import React, {
-  FC, useCallback, useEffect, useMemo,
-} from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
-import { FormControlLabel } from '@mui/material';
+import { Link, RouteComponentProps } from 'react-router-dom';
+import { getWalletAddress } from 'account/selectors/accountSelectors';
+import { RootState } from 'application/store';
+import { BreadcrumbsTypeEnum, Checkbox, LangMenu, Wizard } from 'common';
+import {
+  getCurrentCreatingStep,
+  getIsRandomChain,
+  getIsWithoutPassword,
+  getCurrentBackupStep
+} from 'registration/selectors/registrationSelectors';
 import {
   setCreatingStep,
   setSelectedNetwork,
   setIsRandomChain,
   setIsWithoutPassword,
-  setSelectedChain,
+  setSelectedChain
 } from 'registration/slice/registrationSlice';
-import { RootState } from 'application/store';
-import {
-  getCurrentCreatingStep,
-  getIsRandomChain,
-  getIsWithoutPassword,
-  getCurrentBackupStep,
-} from 'registration/selectors/registrationSelectors';
-import { Link, RouteComponentProps } from 'react-router-dom';
 import { stringToObject } from 'sso/utils';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { AddressApi } from '@thepowereco/tssdk';
+import styles from './RegistrationPage.module.scss';
 import {
   AppQueryParams,
-  WalletRoutesEnum,
+  WalletRoutesEnum
 } from '../../../../application/typings/routes';
 import {
   BackupAccountStepsEnum,
   CreateAccountStepsEnum,
-  getRegistrationTabs,
+  getRegistrationTabs
 } from '../../../typings/registrationTypes';
-import styles from './RegistrationPage.module.scss';
-import { SelectNetwork } from '../../scenes/selectNetwork/SelectNetwork';
 import { Backup } from '../../scenes/backup/Backup';
 import { LoginToDapp } from '../../scenes/loginToDapp/LoginToDapp';
+import { SelectNetwork } from '../../scenes/selectNetwork/SelectNetwork';
 
 type OwnProps = RouteComponentProps<{ dataOrReferrer?: string }>;
 
@@ -48,7 +44,7 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
   creatingStep: getCurrentCreatingStep(state),
   backupStep: getCurrentBackupStep(state),
   isRandomChain: getIsRandomChain(state),
-  isWithoutPassword: getIsWithoutPassword(state),
+  isWithoutPassword: getIsWithoutPassword(state)
 });
 
 const mapDispatchToProps = {
@@ -57,7 +53,7 @@ const mapDispatchToProps = {
   setSelectedNetwork,
   setCreatingStep,
   setIsWithoutPassword,
-  setSelectedChain,
+  setSelectedChain
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -75,17 +71,18 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
   backupStep,
   setCreatingStep,
   walletAddress,
-  setSelectedChain,
+  setSelectedChain
 }) => {
   const { t } = useTranslation();
 
   const isAddressInParams = useMemo(
     () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
-    [dataOrReferrer],
+    [dataOrReferrer]
   );
 
   const parsedData: AppQueryParams = useMemo(() => {
-    if (!isAddressInParams && dataOrReferrer) return stringToObject(dataOrReferrer);
+    if (!isAddressInParams && dataOrReferrer)
+      return stringToObject(dataOrReferrer);
     return null;
   }, [dataOrReferrer, isAddressInParams]);
 
@@ -110,32 +107,33 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
   };
 
   const getRegistrationBreadcrumbs = useMemo(
-    () => (!isAddressInParams && parsedData
-      ? [
-        {
-          label: getRegistrationTabs(t).selectNetwork,
-          component: SelectNetwork,
-        },
-        {
-          label: getRegistrationTabs(t).backup,
-          component: Backup,
-        },
-        {
-          label: getRegistrationTabs(t).login,
-          component: LoginToDapp,
-        },
-      ]
-      : [
-        {
-          label: getRegistrationTabs(t).selectNetwork,
-          component: SelectNetwork,
-        },
-        {
-          label: getRegistrationTabs(t).backup,
-          component: Backup,
-        },
-      ]),
-    [parsedData, isAddressInParams, t],
+    () =>
+      !isAddressInParams && parsedData
+        ? [
+            {
+              label: getRegistrationTabs(t).selectNetwork,
+              component: SelectNetwork
+            },
+            {
+              label: getRegistrationTabs(t).backup,
+              component: Backup
+            },
+            {
+              label: getRegistrationTabs(t).login,
+              component: LoginToDapp
+            }
+          ]
+        : [
+            {
+              label: getRegistrationTabs(t).selectNetwork,
+              component: SelectNetwork
+            },
+            {
+              label: getRegistrationTabs(t).backup,
+              component: Backup
+            }
+          ],
+    [parsedData, isAddressInParams, t]
   );
 
   const onSelectBreadCrumb = (nextStep: number) => {
@@ -195,7 +193,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
     isRandomChain,
     isWithoutPassword,
     setIsWithoutPassword,
-    toggleRandomChainHandler,
+    toggleRandomChainHandler
   ]);
 
   const renderRegistration = useCallback(
@@ -230,8 +228,8 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
       getRegistrationBreadcrumbs,
       onSelectBreadCrumb,
       renderCheckBox,
-      resetStage,
-    ],
+      resetStage
+    ]
   );
 
   return <div className={styles.registrationPage}>{renderRegistration()}</div>;

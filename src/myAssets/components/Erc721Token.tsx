@@ -1,7 +1,7 @@
 import React, { FC, memo } from 'react';
-import { TErc721Token, TToken } from 'myAssets/types';
 import cn from 'classnames';
 import { Checkbox, Divider } from 'common';
+import { TErc721Token, TToken } from 'myAssets/types';
 
 import styles from './Erc721Token.module.scss';
 
@@ -18,7 +18,7 @@ const Erc721TokenComponent: FC<TokenProps> = ({
   collection,
   token,
   isCheckBoxChecked,
-  onClickCheckBox,
+  onClickCheckBox
 }) => {
   const onClickToken = () => {
     if (onClickCheckBox) {
@@ -26,7 +26,9 @@ const Erc721TokenComponent: FC<TokenProps> = ({
     }
   };
 
-  const renderIcon = () => <img className={styles.icon} src={token?.image} alt={token?.name} />;
+  const renderIcon = () => (
+    <img className={styles.icon} src={token?.image} alt={token?.name} />
+  );
 
   const renderRightCol = () => {
     if (onClickCheckBox) {
@@ -50,9 +52,7 @@ const Erc721TokenComponent: FC<TokenProps> = ({
           <div className={cn(styles.icon)}>{renderIcon()}</div>
           <div className={styles.info}>
             <span className={styles.symbol}>
-              {collection?.symbol}
-              {' '}
-              {token.id}
+              {collection?.symbol} {token.id}
             </span>
             <span className={styles.name}>{collection?.name}</span>
           </div>

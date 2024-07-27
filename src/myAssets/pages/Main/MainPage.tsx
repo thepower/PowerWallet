@@ -1,36 +1,29 @@
-import {
-  Button,
-  CardLink, CopyButton, PageTemplate, Tabs,
-} from 'common';
-import {
-  BuySvg, FaucetSvg, LogoIcon, SendSvg,
-} from 'assets/icons';
-import { getTokens } from 'myAssets/selectors/tokensSelectors';
-import { updateTokensAmountsTrigger } from 'myAssets/slices/tokensSlice';
-import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
-import React, {
-  FC, useCallback, useEffect, useState,
-} from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import appEnvs from 'appEnvs';
-import { useTranslation } from 'react-i18next';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
+import appEnvs from 'appEnvs';
 import { getNetworkChainID } from 'application/selectors';
 import { setShowUnderConstruction } from 'application/slice/applicationSlice';
 import { RootState } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import {
-  getWalletNativeTokens,
-  getWalletNativeTokensAmounts,
-} from '../../selectors/walletSelectors';
+import { BuySvg, FaucetSvg, LogoIcon, SendSvg } from 'assets/icons';
+import { Button, CardLink, CopyButton, PageTemplate, Tabs } from 'common';
+import { getTokens } from 'myAssets/selectors/tokensSelectors';
+import { updateTokensAmountsTrigger } from 'myAssets/slices/tokensSlice';
+import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
+import styles from './MainPage.module.scss';
 import AddButton from '../../components/AddButton';
 import { Token } from '../../components/Token';
-import styles from './MainPage.module.scss';
+import {
+  getWalletNativeTokens,
+  getWalletNativeTokensAmounts
+} from '../../selectors/walletSelectors';
 
 const mapDispatchToProps = {
   updateTokensAmountsTrigger,
-  setShowUnderConstruction,
+  setShowUnderConstruction
 };
 
 const mapStateToProps = (state: RootState) => ({
@@ -38,7 +31,7 @@ const mapStateToProps = (state: RootState) => ({
   nativeTokens: getWalletNativeTokens(state),
   tokens: getTokens(state),
   walletAddress: getWalletAddress(state),
-  chainId: getNetworkChainID(state),
+  chainId: getNetworkChainID(state)
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -52,7 +45,7 @@ const MainPageComponent: FC<MainPageProps> = ({
   chainId,
   updateTokensAmountsTrigger,
   setShowUnderConstruction,
-  walletAddress,
+  walletAddress
 }) => {
   const { t } = useTranslation();
 
@@ -72,19 +65,21 @@ const MainPageComponent: FC<MainPageProps> = ({
   };
 
   const erc20tokens = tokens.filter(
-    (token) => token.isShow &&
+    (token) =>
+      token.isShow &&
       token.type === TokenKind.Erc20 &&
-      token?.chainId === chainId,
+      token?.chainId === chainId
   );
   const erc721tokens = tokens.filter(
-    (token) => token.isShow &&
+    (token) =>
+      token.isShow &&
       token.type === TokenKind.Erc721 &&
-      token?.chainId === chainId,
+      token?.chainId === chainId
   );
 
   const tokensMap = {
     [MyAssetsTabs.Erc20]: [...nativeTokens, ...erc20tokens],
-    [MyAssetsTabs.Erc721]: erc721tokens,
+    [MyAssetsTabs.Erc721]: erc721tokens
   };
 
   const currentTokens = tokensMap[tab];
@@ -136,8 +131,8 @@ const MainPageComponent: FC<MainPageProps> = ({
               label={t('faucet')}
               isAnchor
               to={appEnvs.FAUCET_THEPOWER_URL}
-              target="_blank"
-              rel="noreferrer"
+              target='_blank'
+              rel='noreferrer'
             >
               <FaucetSvg />
             </CardLink>
@@ -145,7 +140,7 @@ const MainPageComponent: FC<MainPageProps> = ({
               to={WalletRoutesEnum.tokenSelection}
               label={t('send')}
               target={'_self'}
-              rel="noreferrer"
+              rel='noreferrer'
             >
               <SendSvg />
             </CardLink>
@@ -163,7 +158,7 @@ const MainPageComponent: FC<MainPageProps> = ({
           <Button
             to={WalletRoutesEnum.referralProgram}
             className={styles.referralBtn}
-            variant="contained"
+            variant='contained'
           >
             {t('inviteFriendsEarnRewards')}
           </Button>

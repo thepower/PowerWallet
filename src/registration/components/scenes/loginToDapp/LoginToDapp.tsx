@@ -1,17 +1,17 @@
 import React, { useCallback, useMemo } from 'react';
-import { RootState } from 'application/store';
-import { ConnectedProps, connect } from 'react-redux';
-import { Button, WizardComponentProps } from 'common';
-import { LogoIcon } from 'assets/icons';
-import { useParams } from 'react-router';
-import { objectToString, stringToObject } from 'sso/utils';
-import { AppQueryParams } from 'application/typings/routes';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { useTranslation } from 'react-i18next';
+import { ConnectedProps, connect } from 'react-redux';
+import { useParams } from 'react-router';
+import { getWalletAddress } from 'account/selectors/accountSelectors';
+import { RootState } from 'application/store';
+import { AppQueryParams } from 'application/typings/routes';
+import { LogoIcon } from 'assets/icons';
+import { Button, WizardComponentProps } from 'common';
+import { objectToString, stringToObject } from 'sso/utils';
 import styles from './LoginToDapp.module.scss';
 
 const mapStateToProps = (state: RootState) => ({
-  walletAddress: getWalletAddress(state),
+  walletAddress: getWalletAddress(state)
 });
 
 const connector = connect(mapStateToProps);
@@ -19,7 +19,7 @@ const connector = connect(mapStateToProps);
 type LoginToDappProps = ConnectedProps<typeof connector> & WizardComponentProps;
 
 const LoginToDappComponent: React.FC<LoginToDappProps> = ({
-  walletAddress,
+  walletAddress
 }) => {
   const { t } = useTranslation();
 
@@ -34,7 +34,7 @@ const LoginToDappComponent: React.FC<LoginToDappProps> = ({
     if (parsedData?.callbackUrl) {
       const stringData = objectToString({
         address: walletAddress,
-        returnUrl: parsedData?.returnUrl,
+        returnUrl: parsedData?.returnUrl
       });
       window.location.replace(`${parsedData.callbackUrl}sso/${stringData}`);
     }
@@ -48,8 +48,8 @@ const LoginToDappComponent: React.FC<LoginToDappProps> = ({
       <LogoIcon className={styles.logo} />
       <Button
         className={styles.button}
-        variant="contained"
-        size="large"
+        variant='contained'
+        size='large'
         onClick={onClickLoginHandler}
       >
         {t('loginToDApp')}

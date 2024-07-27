@@ -3,8 +3,6 @@
 @include icon-colors('.card');
 
 .card {
-  @include border-gradient($card-gradient);
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -17,6 +15,8 @@
     inset 4px 4px 20px rgb(27 34 44 / 20%),
     inset -4px -4px 20px rgb(27 34 44 / 20%);
   text-decoration: none;
+
+  @include border-gradient($card-gradient);
 
   @include mobile {
     @include border-gradient($card-hover-gradient);

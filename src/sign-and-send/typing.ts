@@ -6,13 +6,13 @@ export enum TxKindByName {
   'block' = 20,
   'lstore' = 22,
   'notify' = 23,
-  'chkey' = 24,
+  'chkey' = 24
 }
 
 // TODO export from lib
 export enum TxTag {
   PUBLIC_KEY = 0x02,
-  SIGNATURE = 0xFF,
+  SIGNATURE = 0xff
 }
 
 export enum TxPurpose {
@@ -20,7 +20,7 @@ export enum TxPurpose {
   SRCFEE = 0x01,
   SPONSOR_SRCFEE = 0x21,
   GAS = 0x03,
-  SPONSOR_GAS = 0x23,
+  SPONSOR_GAS = 0x23
 }
 
 export enum TxKind {
@@ -28,7 +28,7 @@ export enum TxKind {
   REGISTER = 0x11,
   DEPLOY = 0x12,
   PATCH = 0x13,
-  LSTORE = 22,
+  LSTORE = 22
 }
 
 export interface TxBody {
@@ -39,10 +39,10 @@ export interface TxBody {
   s: number;
   p: Array<[TxPurpose, string, number]>;
   e?: {
-    sponsor?: Buffer[],
+    sponsor?: Buffer[];
     msg?: string;
   };
-  c?: [string, Buffer]
+  c?: [string, Buffer];
   pa?: Buffer;
   // return url
   ru?: string;

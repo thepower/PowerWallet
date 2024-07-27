@@ -1,17 +1,17 @@
-import { getNetworkChainID } from 'application/selectors';
-import { useAppSelector } from 'application/store';
-import cn from 'classnames';
-import { Button } from 'common';
 import React from 'react';
+import cn from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { SentData } from 'send/slices/sendSlice';
 import appEnvs from 'appEnvs';
-import styles from './TxResult.module.scss';
+import { getNetworkChainID } from 'application/selectors';
+import { useAppSelector } from 'application/store';
+import { Button } from 'common';
+import { SentData } from 'send/slices/sendSlice';
 import { SuccessSvg } from './icons';
+import styles from './TxResult.module.scss';
 
 type TxResultProps = {
-  sentData: SentData
+  sentData: SentData;
   className?: string;
 };
 
@@ -24,16 +24,15 @@ type TxResultProps = {
 //   { Icon: WhatsappSvg, url: '' },
 // ];
 
-const TxResult: React.FC<TxResultProps> = ({
-  sentData,
-  className,
-}) => {
+const TxResult: React.FC<TxResultProps> = ({ sentData, className }) => {
   const { t } = useTranslation();
   const chainID = useAppSelector(getNetworkChainID);
   const txExplorerLink = `${appEnvs.EXPLORER_THEPOWER_URL}/${chainID}/transaction/${sentData.txId}`;
 
   const onClickClose = () => {
-    if (sentData.returnURL) { window.close(); }
+    if (sentData.returnURL) {
+      window.close();
+    }
   };
 
   const onCopyClick = () => {
@@ -76,12 +75,25 @@ const TxResult: React.FC<TxResultProps> = ({
         {socialLinks.map(({ Icon, url }) => <Icon className={styles.socialsIcon} />)}
       </div> */}
       <div className={styles.buttons}>
-        <Button onClick={onCopyClick} variant="outlined" fullWidth>{t('share')}</Button>
-        <a target="_blank" href={txExplorerLink} style={{ width: '100%' }} rel="noreferrer">
-          <Button variant="contained" fullWidth>{t('explorer')}</Button>
+        <Button onClick={onCopyClick} variant='outlined' fullWidth>
+          {t('share')}
+        </Button>
+        <a
+          target='_blank'
+          href={txExplorerLink}
+          style={{ width: '100%' }}
+          rel='noreferrer'
+        >
+          <Button variant='contained' fullWidth>
+            {t('explorer')}
+          </Button>
         </a>
       </div>
-      {sentData.returnURL && <Button onClick={onClickClose} variant="contained" fullWidth>{t('close')}</Button>}
+      {sentData.returnURL && (
+        <Button onClick={onClickClose} variant='contained' fullWidth>
+          {t('close')}
+        </Button>
+      )}
       {/* </div> */}
     </div>
   );

@@ -1,34 +1,71 @@
-export { ReactComponent as ChevronLeftIcon } from './chevron_left.svg';
-export { ReactComponent as BellIcon } from './bell.svg';
-export { ReactComponent as LogoIcon } from './logo.svg';
-export { ReactComponent as MoneyBugIcon } from './money-bug.svg';
-export { ReactComponent as CopySvg } from './copy.svg';
-export { ReactComponent as WalletsSvg } from './wallets.svg';
-export { ReactComponent as SendSvg } from './send.svg';
-export { ReactComponent as FaucetSvg } from './faucet.svg';
-export { ReactComponent as BuySvg } from './buy.svg';
-export { ReactComponent as CreateIcon } from './create.svg';
-export { ReactComponent as ExportIcon } from './export.svg';
-export { ReactComponent as ImportIcon } from './import.svg';
-export { ReactComponent as ResetIcon } from './reset.svg';
-export { ReactComponent as SupportIcon } from './support.svg';
-export { ReactComponent as ChevronDown } from './chevron_down.svg';
-export { ReactComponent as ChevronUp } from './chevron_up.svg';
-export { ReactComponent as CheckedIcon } from './select.svg';
-export { ReactComponent as UnCheckedIcon } from './unSelect.svg';
-export { ReactComponent as ArrowL } from './arrowL.svg';
-export { ReactComponent as ArrowR } from './arrowR.svg';
-export { ReactComponent as ArrowLDisabled } from './arrowLDisabled.svg';
-export { ReactComponent as ArrowRDisabled } from './arrowRDisabled.svg';
-export { ReactComponent as FavIcon } from './fav.svg';
-export { ReactComponent as CloseIcon } from './close.svg';
-export { ReactComponent as HeartIcon } from './heart.svg';
-export { ReactComponent as ShareIcon } from './share.svg';
-export { ReactComponent as RefreshIcon } from './refresh.svg';
-export { ReactComponent as SearchIcon } from './searchIcon.svg';
-export { ReactComponent as MenuIcon } from './menu.svg';
-export { ReactComponent as LangIcon } from './lang.svg';
-export { ReactComponent as OneLayersIcon } from './one-layer.svg';
-export { ReactComponent as TwoLayersIcon } from './two-layers.svg';
-export { ReactComponent as ThreeLayersIcon } from './three-layers.svg';
-export { ReactComponent as ChevronRightIcon } from './chevron_right.svg';
+import ArrowL from './arrowL.svg?react';
+import ArrowLDisabled from './arrowLDisabled.svg?react';
+import ArrowR from './arrowR.svg?react';
+import ArrowRDisabled from './arrowRDisabled.svg?react';
+import BellIcon from './bell.svg?react';
+import BuySvg from './buy.svg?react';
+import ChevronDown from './chevron_down.svg?react';
+import ChevronLeftIcon from './chevron_left.svg?react';
+import ChevronRightIcon from './chevron_right.svg?react';
+import ChevronUp from './chevron_up.svg?react';
+import CloseIcon from './close.svg?react';
+import CopySvg from './copy.svg?react';
+import CreateIcon from './create.svg?react';
+import ExportIcon from './export.svg?react';
+import FaucetSvg from './faucet.svg?react';
+import FavIcon from './fav.svg?react';
+import HeartIcon from './heart.svg?react';
+import ImportIcon from './import.svg?react';
+import LangIcon from './lang.svg?react';
+import LogoIcon from './logo.svg?react';
+import MenuIcon from './menu.svg?react';
+import MoneyBugIcon from './money-bug.svg?react';
+import OneLayersIcon from './one-layer.svg?react';
+import RefreshIcon from './refresh.svg?react';
+import ResetIcon from './reset.svg?react';
+import SearchIcon from './searchIcon.svg?react';
+import CheckedIcon from './select.svg?react';
+import SendSvg from './send.svg?react';
+import ShareIcon from './share.svg?react';
+import SupportIcon from './support.svg?react';
+import ThreeLayersIcon from './three-layers.svg?react';
+import TwoLayersIcon from './two-layers.svg?react';
+import UnCheckedIcon from './unSelect.svg?react';
+import WalletsSvg from './wallets.svg?react';
+
+export {
+  ChevronLeftIcon,
+  BellIcon,
+  LogoIcon,
+  MoneyBugIcon,
+  CopySvg,
+  WalletsSvg,
+  SendSvg,
+  FaucetSvg,
+  BuySvg,
+  CreateIcon,
+  ExportIcon,
+  ImportIcon,
+  ResetIcon,
+  SupportIcon,
+  ChevronDown,
+  ChevronUp,
+  CheckedIcon,
+  UnCheckedIcon,
+  ArrowL,
+  ArrowR,
+  ArrowLDisabled,
+  ArrowRDisabled,
+  FavIcon,
+  CloseIcon,
+  HeartIcon,
+  ShareIcon,
+  RefreshIcon,
+  SearchIcon,
+  MenuIcon,
+  LangIcon,
+  OneLayersIcon,
+  TwoLayersIcon,
+  ThreeLayersIcon,
+  ChevronRightIcon
+};

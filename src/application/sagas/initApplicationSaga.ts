@@ -1,11 +1,11 @@
-import { call, put, select } from 'typed-redux-saga';
-import { push, createMatchSelector } from 'connected-react-router';
 import { NetworkApi, WalletApi } from '@thepowereco/tssdk';
-import { setDynamicApis, setNetworkChains } from '../slice/applicationSlice';
-import { getKeyFromApplicationStorage } from '../utils/localStorageUtils';
+import { push, createMatchSelector } from 'connected-react-router';
+import { call, put, select } from 'typed-redux-saga';
 import { loginToWalletSaga } from '../../account/sagas/accountSaga';
 import { setWalletData } from '../../account/slice/accountSlice';
+import { setDynamicApis, setNetworkChains } from '../slice/applicationSlice';
 import { WalletRoutesEnum } from '../typings/routes';
+import { getKeyFromApplicationStorage } from '../utils/localStorageUtils';
 
 export const defaultChain = 1025; // TODO: move to config
 
@@ -36,8 +36,8 @@ export function* initApplicationSaga() {
   const matchSelector = createMatchSelector({
     path: [
       `${WalletRoutesEnum.signup}/:dataOrReferrer?`,
-      `${WalletRoutesEnum.sso}/:data?`,
-    ],
+      `${WalletRoutesEnum.sso}/:data?`
+    ]
   });
   const match = yield* select(matchSelector);
 
@@ -45,15 +45,15 @@ export function* initApplicationSaga() {
     yield loginToWalletSaga({
       payload: {
         address,
-        encryptedWif,
-      },
+        encryptedWif
+      }
     });
 
     yield* put(
       setWalletData({
         address,
-        encryptedWif,
-      }),
+        encryptedWif
+      })
     );
 
     yield* put(push(window.location.pathname));

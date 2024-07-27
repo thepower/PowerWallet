@@ -16,20 +16,23 @@ type InitialState = {
 };
 
 const initialState: InitialState = {
-  sentData: null,
+  sentData: null
 };
 
 const sendSlice = createSlice({
   name: 'send',
   initialState,
   reducers: {
-    setSentData: (state, { payload }: PayloadAction<NonNullable<InitialState['sentData']>>) => {
+    setSentData: (
+      state,
+      { payload }: PayloadAction<NonNullable<InitialState['sentData']>>
+    ) => {
       state.sentData = payload;
     },
     clearSentData: (state) => {
       state.sentData = null;
-    },
-  },
+    }
+  }
 });
 
 export const sendTrxTrigger = createAction<{
@@ -42,8 +45,8 @@ export const sendTrxTrigger = createAction<{
 export const sendTokenTrxTrigger = createAction<{
   wif: string;
   to: string;
-  address: string,
-  decimals: string,
+  address: string;
+  decimals: string;
   amount: number;
 }>('send/sendTokenTrxTrigger');
 export const sendErc721TokenTrxTrigger = createAction<{
@@ -53,10 +56,15 @@ export const sendErc721TokenTrxTrigger = createAction<{
   id: string;
 }>('send/sendErc721TokenTrxTrigger');
 
-export const signAndSendTrxTrigger = createAction<AddActionOnSuccessAndErrorType<{
-  wif: string;
-  decodedTxBody: TxBody;
-  returnURL?: string;
-}>>('send/signAndSendTrxTrigger');
+export const signAndSendTrxTrigger = createAction<
+  AddActionOnSuccessAndErrorType<{
+    wif: string;
+    decodedTxBody: TxBody;
+    returnURL?: string;
+  }>
+>('send/signAndSendTrxTrigger');
 
-export const { actions: { setSentData, clearSentData }, reducer: sendReducer } = sendSlice;
+export const {
+  actions: { setSentData, clearSentData },
+  reducer: sendReducer
+} = sendSlice;

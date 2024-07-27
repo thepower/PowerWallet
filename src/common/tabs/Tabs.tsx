@@ -3,7 +3,7 @@ import {
   Tab,
   Box,
   Tabs as MUITabs,
-  TabsProps as MUITabsProps,
+  TabsProps as MUITabsProps
 } from '@mui/material';
 import classnames from 'classnames';
 import styles from './Tabs.module.scss';
@@ -16,7 +16,7 @@ interface TabsProps extends MUITabsProps {
   tabClassName?: string;
   tabIndicatorClassName?: string;
   tabSelectedClassName?: string;
-  disabledTabs?: string[]
+  disabledTabs?: string[];
 }
 
 class TabsComponent extends React.PureComponent<TabsProps> {
@@ -26,7 +26,7 @@ class TabsComponent extends React.PureComponent<TabsProps> {
     const { tabSelectedClassName } = this.props;
 
     return {
-      selected: classnames(styles.selectedTab, tabSelectedClassName),
+      selected: classnames(styles.selectedTab, tabSelectedClassName)
     };
   };
 
@@ -35,14 +35,12 @@ class TabsComponent extends React.PureComponent<TabsProps> {
     return {
       root: classnames(styles.tabsRoot, tabsRootClassName),
       flexContainer: styles.tabsFlexContainer,
-      indicator: classnames(styles.tabsIndicator, tabIndicatorClassName),
+      indicator: classnames(styles.tabsIndicator, tabIndicatorClassName)
     };
   };
 
   renderTab = (key: string) => {
-    const {
-      tabs, tabsLabels, tabClassName, disabledTabs,
-    } = this.props;
+    const { tabs, tabsLabels, tabClassName, disabledTabs } = this.props;
     const labels = tabsLabels || tabs;
 
     return (
@@ -61,9 +59,7 @@ class TabsComponent extends React.PureComponent<TabsProps> {
   };
 
   render() {
-    const {
-      value, onChange, tabs, tabsHolderClassName,
-    } = this.props;
+    const { value, onChange, tabs, tabsHolderClassName } = this.props;
 
     return (
       <Box

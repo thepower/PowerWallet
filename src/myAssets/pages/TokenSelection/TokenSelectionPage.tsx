@@ -1,37 +1,33 @@
-import React, {
-  useState, useEffect, useMemo, useCallback,
-} from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Skeleton } from '@mui/material';
+import { push } from 'connected-react-router';
+import { range } from 'lodash';
+import { useTranslation } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
-import {
-  Button, Divider, PageTemplate, Tabs,
-} from 'common';
+import { Link, RouteComponentProps } from 'react-router-dom';
+import { getNetworkChainID } from 'application/selectors';
 import { RootState } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
+import { Button, Divider, PageTemplate, Tabs } from 'common';
+import { Erc721Token } from 'myAssets/components/Erc721Token';
+import { Token } from 'myAssets/components/Token';
 import {
   getErc721Tokens,
   getTokenByID,
-  getTokens,
+  getTokens
 } from 'myAssets/selectors/tokensSelectors';
 import {
   getWalletNativeTokens,
-  getWalletNativeTokensAmountBySymbol,
+  getWalletNativeTokensAmountBySymbol
 } from 'myAssets/selectors/walletSelectors';
 import {
   getErc721TokensTrigger,
   toggleTokenShow,
-  updateTokensAmountsTrigger,
+  updateTokensAmountsTrigger
 } from 'myAssets/slices/tokensSlice';
 
-import { useTranslation } from 'react-i18next';
-import { Link, RouteComponentProps } from 'react-router-dom';
 import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
-import { Token } from 'myAssets/components/Token';
-import { push } from 'connected-react-router';
-import { Erc721Token } from 'myAssets/components/Erc721Token';
 import { checkIfLoading } from 'network/selectors';
-import { range } from 'lodash';
-import { Skeleton } from '@mui/material';
-import { getNetworkChainID } from 'application/selectors';
 import styles from './TokenSelectionPage.module.scss';
 
 type OwnProps = RouteComponentProps<{ address: string }>;
@@ -40,7 +36,7 @@ const mapDispatchToProps = {
   toggleTokenShow,
   updateTokensAmountsTrigger,
   pushTo: push,
-  getErc721TokensTrigger,
+  getErc721TokensTrigger
 };
 
 const mapStateToProps = (state: RootState, props: OwnProps) => ({
@@ -50,8 +46,9 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
   erc721Tokens: getErc721Tokens(state),
   isGetErc721TokensLoading: checkIfLoading(state, getErc721TokensTrigger.type),
   getTokenByID: (address: string) => getTokenByID(state, address),
-  getWalletNativeTokensAmountBySymbol: (address: string) => getWalletNativeTokensAmountBySymbol(state, address),
-  chainId: getNetworkChainID(state),
+  getWalletNativeTokensAmountBySymbol: (address: string) =>
+    getWalletNativeTokensAmountBySymbol(state, address),
+  chainId: getNetworkChainID(state)
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -67,7 +64,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   erc721Tokens,
   isGetErc721TokensLoading,
   getErc721TokensTrigger,
-  chainId,
+  chainId
 }) => {
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
   const [selectedToken, setSelectedToken] = useState<string>('');
@@ -94,19 +91,25 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     (token: string) => {
       setSelectedToken((prevState) => (prevState === token ? '' : token));
     },
-    [setSelectedToken],
+    [setSelectedToken]
   );
 
   const erc20tokens = tokens.filter(
-    (token) => token.isShow && token.type === TokenKind.Erc20 && token?.chainId === chainId,
+    (token) =>
+      token.isShow &&
+      token.type === TokenKind.Erc20 &&
+      token?.chainId === chainId
   );
   const erc721tokens = tokens.filter(
-    (token) => token.isShow && token.type === TokenKind.Erc721 && token?.chainId === chainId,
+    (token) =>
+      token.isShow &&
+      token.type === TokenKind.Erc721 &&
+      token?.chainId === chainId
   );
 
   const tokensMap = {
     [MyAssetsTabs.Erc20]: [...nativeTokens, ...erc20tokens],
-    [MyAssetsTabs.Erc721]: erc721tokens,
+    [MyAssetsTabs.Erc721]: erc721tokens
   };
 
   const currentTokens = tokensMap[tab];
@@ -128,7 +131,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
                   transformOrigin: 'unset',
                   borderRadius: '5px',
                   mt: '40px',
-                  mb: '32px',
+                  mb: '32px'
                 }}
               />
               <Divider />
@@ -181,7 +184,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     selectedToken,
     onClickCheckBox,
     tab,
-    isGetErc721TokensLoading,
+    isGetErc721TokensLoading
   ]);
 
   const nativeAssetAmount = getWalletNativeTokensAmountBySymbol(selectedToken);
@@ -200,7 +203,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     collection?.address,
     nativeAssetAmount,
     selectedToken,
-    token?.address,
+    token?.address
   ]);
 
   const tokenType = nativeAssetAmount
@@ -215,25 +218,27 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   return (
     <PageTemplate
       topBarChild={t('tokenSelection')}
-      backUrl="/"
+      backUrl='/'
       backUrlText={t('home')!}
     >
       <div className={styles.tokenSelection}>
-        {!collectionAddress && <Tabs
-          tabs={MyAssetsTabs}
-          tabsLabels={getMyAssetsTabsLabels()}
-          value={tab}
-          onChange={onChangeTab}
-          tabsRootClassName={styles.myAssetsTabsRoot}
-          tabIndicatorClassName={styles.myAssetsTabIndicator}
-          tabSelectedClassName={styles.myAssetsTabSelected}
-        />}
+        {!collectionAddress && (
+          <Tabs
+            tabs={MyAssetsTabs}
+            tabsLabels={getMyAssetsTabsLabels()}
+            value={tab}
+            onChange={onChangeTab}
+            tabsRootClassName={styles.myAssetsTabsRoot}
+            tabIndicatorClassName={styles.myAssetsTabIndicator}
+            tabSelectedClassName={styles.myAssetsTabSelected}
+          />
+        )}
         <div className={styles.tokens}>{renderAssetsList()}</div>
         <Link to={nextLink}>
           <Button
             disabled={!token && !nativeAssetAmount && !selectedToken}
             className={styles.tokenSelectionFixedButton}
-            variant="contained"
+            variant='contained'
           >
             {t('next')}
           </Button>

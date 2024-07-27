@@ -2,37 +2,45 @@ import {
   AddressApi,
   CryptoApi,
   RegisteredAccount,
-  WalletApi,
+  WalletApi
 } from '@thepowereco/tssdk';
+import bs58 from 'bs58';
 import { push } from 'connected-react-router';
+import { ECPairInterface } from 'ecpair';
 import { toast } from 'react-toastify';
 import { put, select } from 'typed-redux-saga';
 import i18n from 'locales/initTranslation';
-import {
-  ECPairInterface,
-} from 'ecpair';
-import bs58 from 'bs58';
 import { getWalletData } from '../../account/selectors/accountSelectors';
 import { loginToWallet, setWalletData } from '../../account/slice/accountSlice';
 import { WalletRoutesEnum } from '../../application/typings/routes';
 import {
-  getSelectedChain, getGeneratedSeedPhrase, getSelectedNetwork, getIsRandomChain,
+  getSelectedChain,
+  getGeneratedSeedPhrase,
+  getSelectedNetwork,
+  getIsRandomChain
 } from '../selectors/registrationSelectors';
 import {
-  createWallet, loginToWalletFromRegistration, setSeedPhrase, setSelectedChain,
+  createWallet,
+  loginToWalletFromRegistration,
+  setSeedPhrase,
+  setSelectedChain
 } from '../slice/registrationSlice';
 import { CreateAccountStepsEnum } from '../typings/registrationTypes';
 
 export function* generateSeedPhraseSaga() {
   const phrase: string = yield CryptoApi.generateSeedPhrase();
 
-  yield* put(setSeedPhrase({
-    seedPhrase: phrase,
-    nextStep: CreateAccountStepsEnum.backup,
-  }));
+  yield* put(
+    setSeedPhrase({
+      seedPhrase: phrase,
+      nextStep: CreateAccountStepsEnum.backup
+    })
+  );
 }
 
-export function* createWalletSaga({ payload }: ReturnType<typeof createWallet>) {
+export function* createWalletSaga({
+  payload
+}: ReturnType<typeof createWallet>) {
   const { password, referrer, additionalActionOnSuccess } = payload;
   const seedPhrase = yield* select(getGeneratedSeedPhrase);
   const isRandomChain = yield* select(getIsRandomChain);
@@ -46,21 +54,31 @@ export function* createWalletSaga({ payload }: ReturnType<typeof createWallet>) 
   try {
     if (isRandomChain) {
       if (network) {
-        account = yield WalletApi.registerRandomChain({ network, customSeed: seedPhrase!, referrer });
+        account = yield WalletApi.registerRandomChain({
+          network,
+          customSeed: seedPhrase!,
+          referrer
+        });
         yield* put(setSelectedChain(account.chain));
       } else {
         return;
       }
     } else {
-      account = yield WalletApi.registerCertainChain({ chain: chain!, customSeed: seedPhrase!, referrer });
+      account = yield WalletApi.registerCertainChain({
+        chain: chain!,
+        customSeed: seedPhrase!,
+        referrer
+      });
     }
 
     const encryptedWif = CryptoApi.encryptWif(account.wif, password);
 
-    yield put(setWalletData({
-      address: account.address,
-      encryptedWif,
-    }));
+    yield put(
+      setWalletData({
+        address: account.address,
+        encryptedWif
+      })
+    );
 
     additionalActionOnSuccess?.();
   } catch (e) {
@@ -69,10 +87,10 @@ export function* createWalletSaga({ payload }: ReturnType<typeof createWallet>) 
   }
 }
 
-export function* loginToWalletSaga({ payload }: ReturnType<typeof loginToWalletFromRegistration>) {
-  const {
-    address, seedOrPrivateKey, password,
-  } = payload;
+export function* loginToWalletSaga({
+  payload
+}: ReturnType<typeof loginToWalletFromRegistration>) {
+  const { address, seedOrPrivateKey, password } = payload;
 
   try {
     yield AddressApi.parseTextAddress(address);
@@ -102,7 +120,10 @@ export function* loginToWalletSaga({ payload }: ReturnType<typeof loginToWalletF
     let encryptedWif = null;
     if (isValidSeed) {
       const keyPair: ECPairInterface =
-        yield CryptoApi.generateKeyPairFromSeedPhraseAndAddress(seedOrPrivateKey, address);
+        yield CryptoApi.generateKeyPairFromSeedPhraseAndAddress(
+          seedOrPrivateKey,
+          address
+        );
       encryptedWif = keyPair && CryptoApi.encryptWif(keyPair.toWIF(), password);
     } else if (!isValidSeed && isValidPrivateKey) {
       encryptedWif = CryptoApi.encryptWif(seedOrPrivateKey, password);

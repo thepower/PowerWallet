@@ -1,17 +1,17 @@
-import { Button, LangMenu } from 'common';
-import { push } from 'connected-react-router';
 import React, { FC, useEffect } from 'react';
+import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
+import { Link, RouteComponentProps } from 'react-router-dom';
+import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { RootState } from 'application/store';
+import { WalletRoutesEnum } from 'application/typings/routes';
+import { Button, LangMenu } from 'common';
 import {
   getCurrentBackupStep,
   getCurrentCreatingStep,
-  getIsWithoutPassword,
+  getIsWithoutPassword
 } from 'registration/selectors/registrationSelectors';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { WalletRoutesEnum } from 'application/typings/routes';
 
 import styles from './WelcomePage.module.scss';
 
@@ -22,11 +22,11 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
   walletAddress: getWalletAddress(state),
   creatingStep: getCurrentCreatingStep(state),
   backupStep: getCurrentBackupStep(state),
-  isWithoutPassword: getIsWithoutPassword(state),
+  isWithoutPassword: getIsWithoutPassword(state)
 });
 
 const mapDispatchToProps = {
-  routeTo: push,
+  routeTo: push
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -50,17 +50,17 @@ const WelcomePageComponent: FC<WelcomePageProps> = ({ routeTo, referrer }) => {
       <div className={styles.registrationDesc}>{t('registrationPageDesc')}</div>
       <div className={styles.buttonsHolder}>
         <Button
-          size="large"
-          variant="contained"
-          type="button"
+          size='large'
+          variant='contained'
+          type='button'
           to={WalletRoutesEnum.signup}
         >
           {t('registrationPageJoinButton')}
         </Button>
         <Button
-          size="large"
-          variant="outlined"
-          type="button"
+          size='large'
+          variant='outlined'
+          type='button'
           to={WalletRoutesEnum.login}
         >
           {t('registrationPageImportAccountButton')}

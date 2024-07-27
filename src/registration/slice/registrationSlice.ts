@@ -5,7 +5,7 @@ import {
   BackupAccountStepsEnum,
   CreateAccountStepsEnum,
   LoginToWalletInputType,
-  SetSeedPhraseInput,
+  SetSeedPhraseInput
 } from '../typings/registrationTypes';
 
 const SLICE_NAME = 'registration';
@@ -27,7 +27,7 @@ const initialState: RegistrationState = {
   creatingStep: CreateAccountStepsEnum.selectNetwork,
   backupStep: BackupAccountStepsEnum.generateSeedPhrase,
   isWithoutPassword: false,
-  isRandomChain: true,
+  isRandomChain: true
 };
 
 const registrationSlice = createSlice({
@@ -36,48 +36,48 @@ const registrationSlice = createSlice({
   reducers: {
     setSelectedNetwork: (
       state: RegistrationState,
-      action: PayloadAction<Maybe<NetworkEnum>>,
+      action: PayloadAction<Maybe<NetworkEnum>>
     ) => {
       state.selectedNetwork = action.payload;
     },
     setSelectedChain: (
       state: RegistrationState,
-      action: PayloadAction<Maybe<number>>,
+      action: PayloadAction<Maybe<number>>
     ) => {
       state.selectedChain = action.payload;
     },
     setSeedPhrase: (
       state: RegistrationState,
-      action: PayloadAction<SetSeedPhraseInput>,
+      action: PayloadAction<SetSeedPhraseInput>
     ) => {
       state.seedPhrase = action.payload.seedPhrase;
       state.creatingStep = action.payload.nextStep;
     },
     setCreatingStep: (
       state: RegistrationState,
-      action: PayloadAction<CreateAccountStepsEnum>,
+      action: PayloadAction<CreateAccountStepsEnum>
     ) => {
       state.creatingStep = action.payload;
     },
     setBackupStep: (
       state: RegistrationState,
-      action: PayloadAction<BackupAccountStepsEnum>,
+      action: PayloadAction<BackupAccountStepsEnum>
     ) => {
       state.backupStep = action.payload;
     },
     setIsRandomChain: (
       state: RegistrationState,
-      action: PayloadAction<boolean>,
+      action: PayloadAction<boolean>
     ) => {
       state.isRandomChain = action.payload;
     },
     setIsWithoutPassword: (
       state: RegistrationState,
-      action: PayloadAction<boolean>,
+      action: PayloadAction<boolean>
     ) => {
       state.isWithoutPassword = action.payload;
-    },
-  },
+    }
+  }
 });
 
 export const {
@@ -89,18 +89,18 @@ export const {
     setCreatingStep,
     setBackupStep,
     setIsRandomChain,
-    setIsWithoutPassword,
-  },
+    setIsWithoutPassword
+  }
 } = registrationSlice;
 
 export const generateSeedPhrase = createAction(
-  `${SLICE_NAME}/generateSeedPhrase`,
+  `${SLICE_NAME}/generateSeedPhrase`
 );
 export const createWallet = createAction<
-AddActionOnSuccessType<{
-  password: string;
-  referrer?: string;
-}>
+  AddActionOnSuccessType<{
+    password: string;
+    referrer?: string;
+  }>
 >(`${SLICE_NAME}/createWallet`);
 export const loginToWalletFromRegistration =
   createAction<LoginToWalletInputType>(`${SLICE_NAME}/loginToWallet`);
