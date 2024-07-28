@@ -13,7 +13,8 @@
     "build-test": "vite build --mode test",
     "build-prod": "vite build --mode prod",
     "preview": "vite preview",
-    "loadLocales": "node --experimental-modules --es-module-specifier-resolution=node src/loadLocales.mjs"
+    "loadLocales": "node --experimental-modules --es-module-specifier-resolution=node src/loadLocales.mjs",
+    "bundle-size": "vite-bundle-visualizer"
   },
   "dependencies": {
     "@emotion/react": "^11.9.0",
@@ -88,6 +89,7 @@
     "sass": "^1.77.8",
     "typescript": "5.2.2",
     "vite": "4.4.9",
+    "vite-bundle-visualizer": "^1.2.1",
     "vite-plugin-checker": "^0.7.2",
     "vite-plugin-node-polyfills": "^0.22.0",
     "vite-plugin-svgr": "4.0.0",

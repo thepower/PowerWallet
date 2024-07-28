@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import { push } from 'connected-react-router';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { useTranslation } from 'react-i18next';
 import { InView } from 'react-intersection-observer';
 import { connect, ConnectedProps } from 'react-redux';

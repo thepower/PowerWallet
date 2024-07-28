@@ -2,7 +2,7 @@ import React from 'react';
 import { Collapse } from '@mui/material';
 import cn from 'classnames';
 import { format } from 'date-fns';
-import { isArray } from 'lodash';
+import isArray from 'lodash/isArray';
 import { WithTranslation, withTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { CopyButton, Divider } from 'common';

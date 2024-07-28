@@ -2,7 +2,9 @@ import React from 'react';
 import { AddressApi, CryptoApi, TransactionsApi } from '@thepowereco/tssdk';
 import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
 import cn from 'classnames';
-import { isEmpty, isObject } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import isObject from 'lodash/isObject';
+
 import { WithTranslation, withTranslation } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
 

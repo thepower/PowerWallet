@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { format } from 'date-fns';
-import { groupBy } from 'lodash';
+import groupBy from 'lodash/groupBy';
 import { RootState } from '../../application/store';
 import { transactionsAdapter } from '../slices/transactionsSlice';
 

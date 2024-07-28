@@ -9,7 +9,7 @@ import {
   TransactionsApi
 } from '@thepowereco/tssdk';
 import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
-import { clone } from 'lodash';
+import clone from 'lodash/clone';
 import { toast } from 'react-toastify';
 import { call, put, select } from 'typed-redux-saga';
 import abis from 'abis';

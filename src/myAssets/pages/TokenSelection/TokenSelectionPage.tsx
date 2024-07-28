@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Skeleton } from '@mui/material';
 import { push } from 'connected-react-router';
-import { range } from 'lodash';
+import range from 'lodash/range';
 import { useTranslation } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';

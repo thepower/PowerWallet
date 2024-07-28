@@ -1,5 +1,5 @@
 import { takeLatest } from 'typed-redux-saga';
-import { manageSagaState } from 'common';
+import manageSagaState from 'common/manageSagaState';
 import { initApplicationSaga } from './initApplicationSaga';
 import { initApplication } from '../slice/applicationSlice';
 

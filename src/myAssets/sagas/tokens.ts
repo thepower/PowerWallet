@@ -2,7 +2,7 @@ import { AddressApi, NetworkApi } from '@thepowereco/tssdk';
 
 import axios, { AxiosResponse } from 'axios';
 import { push } from 'connected-react-router';
-import { range } from 'lodash';
+import range from 'lodash/range';
 import { toast } from 'react-toastify';
 import { all, put, select, call } from 'typed-redux-saga';
 import abis from 'abis';
