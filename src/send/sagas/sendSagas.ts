@@ -1,8 +1,6 @@
 import { BigNumber, parseFixed } from '@ethersproject/bignumber';
 import {
   AddressApi,
-  Evm20Contract,
-  Evm721Contract,
   EvmContract,
   EvmCore,
   NetworkApi,
@@ -64,7 +62,7 @@ export function* sendTrxSaga({
   }
 }
 
-export async function* sendTokenTrxSaga({
+export function* sendTokenTrxSaga({
   payload: { wif, to, amount, decimals, address }
 }: ReturnType<typeof sendTokenTrxTrigger>) {
   try {
@@ -73,24 +71,23 @@ export async function* sendTokenTrxSaga({
 
     const EVM: EvmCore = yield EvmCore.build(networkAPI as NetworkApi);
 
-    const contract: EvmContract = yield EvmContract.build(
-      EVM,
-      address,
-      abis.erc20.abi
-    );
-
-    const erc20contract = new Evm20Contract(contract, abis.erc20.abi);
+    const erc20contract: EvmContract = yield EvmContract.build(EVM, address);
 
     const calculatedAmount = parseFixed(
       BigNumber.from(amount).toString(),
       decimals
     ).toBigInt();
 
-    const { txId } = yield erc20contract.transfer(to, calculatedAmount, {
-      wif,
-      address: walletAddress
-    });
-    yield* put(
+    const { txId } = yield erc20contract.scSet(
+      {
+        abi: abis.erc20.abi,
+        functionName: 'transfer',
+        args: [AddressApi.textAddressToEvmAddress(to), calculatedAmount]
+      },
+      { key: { wif, address: walletAddress } }
+    );
+
+    yield put(
       setSentData({
         txId,
         comment: '',
@@ -115,22 +112,23 @@ export function* sendErc721TokenTrxSaga({
 
     const EVM: EvmCore = yield EvmCore.build(networkAPI as NetworkApi);
 
-    const Erc721Contract: EvmContract = yield EvmContract.build(
-      EVM,
-      address,
-      abis.erc721.abi
-    );
-
-    const erc721contract = new Evm721Contract(Erc721Contract, abis.erc721.abi);
+    const Erc721Contract: EvmContract = yield EvmContract.build(EVM, address);
 
     const walletAddress = yield* select(getWalletAddress);
 
-    const { txId } = yield erc721contract.transferFrom(
-      walletAddress,
-      to,
-      BigInt(id),
-      { wif, address: walletAddress }
+    const { txId } = yield Erc721Contract.scSet(
+      {
+        abi: abis.erc721.abi,
+        functionName: 'transferFrom',
+        args: [
+          AddressApi.textAddressToEvmAddress(walletAddress),
+          AddressApi.textAddressToEvmAddress(to),
+          BigInt(id)
+        ]
+      },
+      { key: { wif, address: walletAddress } }
     );
+
     yield* put(
       setSentData({
         txId,
@@ -220,7 +218,7 @@ export function* singAndSendTrxSaga({
 
     const comment = newDecodedTxBody?.e?.msg;
     const sequence = yield* getWalletSequence();
-    const newSequence = sequence + 1;
+    const newSequence = BigInt(sequence + 1);
 
     newDecodedTxBody.s = newSequence;
 

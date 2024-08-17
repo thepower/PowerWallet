@@ -32,11 +32,11 @@ export enum TxKind {
 }
 
 export interface TxBody {
-  k: number;
-  t: TxKind;
+  k: TxKind;
+  t: bigint;
   f: Buffer;
   to: Buffer;
-  s: number;
+  s: bigint;
   p: Array<[TxPurpose, string, number]>;
   e?: {
     sponsor?: Buffer[];

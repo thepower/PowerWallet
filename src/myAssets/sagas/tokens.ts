@@ -25,11 +25,14 @@ import { TokenKind } from 'myAssets/types';
 export function* getIsErc721(network: NetworkApi, address: string) {
   try {
     const isErc721: boolean = yield network.executeCall(
-      AddressApi.textAddressToHex(address),
-      'supportsInterface',
-      ['0x80ac58cd'],
-      abis.erc721.abi
+      {
+        abi: abis.erc721.abi,
+        functionName: 'supportsInterface',
+        args: ['0x80ac58cd']
+      },
+      { address }
     );
+
     return isErc721;
   } catch {
     return false;
@@ -71,23 +74,35 @@ export function* addTokenSaga({
       const walletAddress: string = yield* select(getWalletAddress);
 
       const name: string = yield contractNetworkApi.executeCall(
-        AddressApi.textAddressToHex(address),
-        'name',
-        [],
-        abis.erc721.abi
+        {
+          abi: abis.erc721.abi,
+          functionName: 'name',
+          args: []
+        },
+        {
+          address
+        }
       );
       const symbol: string = yield contractNetworkApi.executeCall(
-        AddressApi.textAddressToHex(address),
-        'symbol',
-        [],
-        abis.erc721.abi
+        {
+          abi: abis.erc721.abi,
+          functionName: 'symbol',
+          args: []
+        },
+        {
+          address
+        }
       );
+
       const balanceBigint: bigint = yield contractNetworkApi.executeCall(
-        AddressApi.textAddressToHex(address),
-        'balanceOf',
-        [AddressApi.textAddressToEvmAddress(walletAddress)],
-        abis.erc721.abi
+        {
+          abi: abis.erc721.abi,
+          functionName: 'balanceOf',
+          args: [AddressApi.textAddressToEvmAddress(walletAddress)]
+        },
+        { address }
       );
+
       const balance = balanceBigint.toString();
       yield put(
         addToken({
@@ -105,30 +120,49 @@ export function* addTokenSaga({
       const walletAddress: string = yield* select(getWalletAddress);
 
       const name: string = yield contractNetworkApi.executeCall(
-        AddressApi.textAddressToHex(address),
-        'name',
-        [],
-        abis.erc20.abi
+        {
+          abi: abis.erc20.abi,
+          functionName: 'name',
+          args: []
+        },
+        {
+          address
+        }
       );
+
       const symbol: string = yield contractNetworkApi.executeCall(
-        AddressApi.textAddressToHex(address),
-        'symbol',
-        [],
-        abis.erc20.abi
+        {
+          abi: abis.erc20.abi,
+          functionName: 'symbol',
+          args: []
+        },
+        {
+          address
+        }
       );
       const balanceBigint: bigint = yield contractNetworkApi.executeCall(
-        AddressApi.textAddressToHex(address),
-        'balanceOf',
-        [AddressApi.textAddressToEvmAddress(walletAddress)],
-        abis.erc20.abi
+        {
+          abi: abis.erc20.abi,
+          functionName: 'balanceOf',
+          args: [AddressApi.textAddressToEvmAddress(walletAddress)]
+        },
+        {
+          address
+        }
       );
+
       const balance = balanceBigint.toString();
       const decimalsBigint: bigint = yield contractNetworkApi.executeCall(
-        AddressApi.textAddressToHex(address),
-        'decimals',
-        [],
-        abis.erc20.abi
+        {
+          abi: abis.erc20.abi,
+          functionName: 'decimals',
+          args: []
+        },
+        {
+          address
+        }
       );
+
       const decimals = decimalsBigint.toString();
 
       yield put(
@@ -175,11 +209,14 @@ export function* updateTokenAmountSaga({
   if (token.type === TokenKind.Erc721) {
     const walletAddress: string = yield* select(getWalletAddress);
     const balanceBigint: bigint = yield contractNetworkApi.executeCall(
-      AddressApi.textAddressToHex(address),
-      'balanceOf',
-      [AddressApi.textAddressToEvmAddress(walletAddress)],
-      abis.erc721.abi
+      {
+        abi: abis.erc721.abi,
+        functionName: 'balanceOf',
+        args: [AddressApi.textAddressToEvmAddress(walletAddress)]
+      },
+      { address }
     );
+
     const balance = balanceBigint.toString();
 
     yield put(updateTokenAmount({ address, amount: balance }));
@@ -187,10 +224,14 @@ export function* updateTokenAmountSaga({
     const walletAddress: string = yield* select(getWalletAddress);
 
     const balanceBigint: bigint = yield contractNetworkApi.executeCall(
-      AddressApi.textAddressToHex(address),
-      'balanceOf',
-      [AddressApi.textAddressToEvmAddress(walletAddress)],
-      abis.erc20.abi
+      {
+        abi: abis.erc20.abi,
+        functionName: 'balanceOf',
+        args: [AddressApi.textAddressToEvmAddress(walletAddress)]
+      },
+      {
+        address
+      }
     );
 
     const balance = balanceBigint.toString();
@@ -228,19 +269,19 @@ export function* getErc721Token(id: number, address: string) {
   const walletAddress: string = yield* select(getWalletAddress);
 
   const tokenIdBigint: bigint = yield networkAPI.executeCall(
-    AddressApi.textAddressToHex(address),
-    'tokenOfOwnerByIndex',
-    [AddressApi.textAddressToEvmAddress(walletAddress), id],
-    abis.erc721.abi
+    {
+      abi: abis.erc721.abi,
+      functionName: 'tokenOfOwnerByIndex',
+      args: [AddressApi.textAddressToEvmAddress(walletAddress), BigInt(id)]
+    },
+    { address: address }
   );
 
   const tokenId = tokenIdBigint.toString();
 
   const uri: string = yield networkAPI.executeCall(
-    AddressApi.textAddressToHex(address),
-    'tokenURI',
-    [tokenId],
-    abis.erc721.abi
+    { abi: abis.erc721.abi, functionName: 'tokenURI', args: [tokenIdBigint] },
+    { address }
   );
 
   if (!uri) {
@@ -269,11 +310,14 @@ export function* getErc721TokensSaga({
   const walletAddress: string = yield* select(getWalletAddress);
 
   const balanceBigint: bigint = yield networkAPI.executeCall(
-    AddressApi.textAddressToHex(address),
-    'balanceOf',
-    [AddressApi.textAddressToEvmAddress(walletAddress)],
-    abis.erc721.abi
+    {
+      abi: abis.erc721.abi,
+      functionName: 'balanceOf',
+      args: [AddressApi.textAddressToEvmAddress(walletAddress)]
+    },
+    { address: address }
   );
+
   const balance = Number(balanceBigint);
 
   const tokens = yield* all(

@@ -9,6 +9,7 @@ import { ConnectedRouter } from 'connected-react-router';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { AppRoutes } from './AppRoutes';
+import InitGradientsSvg from './initGradientsSvg.svg?react';
 import { UnderConstruction } from '../../common';
 import { ToastNotification } from '../../notification/ToastNotification';
 import { store, persistor } from '../store';
@@ -23,6 +24,8 @@ export const App = () => (
           <StyledEngineProvider injectFirst>
             <MuiThemeProvider theme={MUITheme}>
               <CssBaseline>
+                <InitGradientsSvg className='initSvgClass' />
+
                 <ToastNotification />
                 <UnderConstruction />
                 <AppRoutes />

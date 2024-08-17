@@ -25,8 +25,7 @@
     "@mui/material": "^5.6.2",
     "@mui/styles": "^5.6.2",
     "@reduxjs/toolkit": "^1.8.6",
-    "@thepowereco/msgpack": "^1.5.3",
-    "@thepowereco/tssdk": "^2.1.2",
+    "@thepowereco/tssdk": "^2.2.0",
     "axios": "^1.6.8",
     "base64url": "^3.0.1",
     "classnames": "^2.3.1",
@@ -93,6 +92,8 @@
     "vite-plugin-checker": "^0.7.2",
     "vite-plugin-node-polyfills": "^0.22.0",
     "vite-plugin-svgr": "4.0.0",
+    "vite-plugin-top-level-await": "^1.4.2",
+    "vite-plugin-wasm": "^3.3.0",
     "vite-tsconfig-paths": "4.2.1"
   },
   "browserslist": {

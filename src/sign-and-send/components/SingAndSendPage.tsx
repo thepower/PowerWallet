@@ -102,7 +102,7 @@ class SignAndSendPage extends React.Component<
       }
 
       decodedTxBody.f = Buffer.from(AddressApi.parseTextAddress(address));
-      decodedTxBody.t = Date.now();
+      decodedTxBody.t = BigInt(Date.now());
 
       if (sponsor) {
         decodedTxBody.e.sponsor = [
