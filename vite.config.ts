@@ -4,8 +4,6 @@ import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import svgrPlugin from 'vite-plugin-svgr';
-import topLevelAwait from 'vite-plugin-top-level-await';
-import wasm from 'vite-plugin-wasm';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
@@ -25,9 +23,7 @@ export default defineConfig({
     nodePolyfills(),
     checker({
       typescript: true
-    }),
-    topLevelAwait(),
-    wasm()
+    })
   ],
   build: {
     outDir: 'build',
@@ -45,9 +41,6 @@ export default defineConfig({
         }
       }
     }
-  },
-  optimizeDeps: {
-    exclude: ['rustbn-wasm']
   },
   preview: {
     port: 3002,

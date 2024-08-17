@@ -2,7 +2,6 @@ import { BigNumber, parseFixed } from '@ethersproject/bignumber';
 import {
   AddressApi,
   EvmContract,
-  EvmCore,
   NetworkApi,
   TransactionsApi
 } from '@thepowereco/tssdk';
@@ -69,9 +68,10 @@ export function* sendTokenTrxSaga({
     const networkAPI = (yield* select(getNetworkApi))!;
     const walletAddress = yield* select(getWalletAddress);
 
-    const EVM: EvmCore = yield EvmCore.build(networkAPI as NetworkApi);
-
-    const erc20contract: EvmContract = yield EvmContract.build(EVM, address);
+    const erc20contract: EvmContract = new EvmContract(
+      networkAPI as NetworkApi,
+      address
+    );
 
     const calculatedAmount = parseFixed(
       BigNumber.from(amount).toString(),
@@ -110,9 +110,10 @@ export function* sendErc721TokenTrxSaga({
   try {
     const networkAPI = (yield* select(getNetworkApi))!;
 
-    const EVM: EvmCore = yield EvmCore.build(networkAPI as NetworkApi);
-
-    const Erc721Contract: EvmContract = yield EvmContract.build(EVM, address);
+    const Erc721Contract: EvmContract = new EvmContract(
+      networkAPI as NetworkApi,
+      address
+    );
 
     const walletAddress = yield* select(getWalletAddress);
 
