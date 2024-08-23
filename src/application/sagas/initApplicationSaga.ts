@@ -1,14 +1,11 @@
-import { call, put, select } from 'typed-redux-saga';
+import { NetworkApi, WalletApi } from '@thepowereco/tssdk';
 import { push, createMatchSelector } from 'connected-react-router';
-import { AddressApi, NetworkApi, WalletApi } from '@thepowereco/tssdk';
-import { getRouterParamsDataOrReferrer } from 'router/selectors';
-import { toast } from 'react-toastify';
-import i18n from 'locales/initTranslation';
-import { setDynamicApis, setNetworkChains } from '../slice/applicationSlice';
-import { getKeyFromApplicationStorage } from '../utils/localStorageUtils';
+import { call, put, select } from 'typed-redux-saga';
 import { loginToWalletSaga } from '../../account/sagas/accountSaga';
 import { setWalletData } from '../../account/slice/accountSlice';
+import { setDynamicApis, setNetworkChains } from '../slice/applicationSlice';
 import { WalletRoutesEnum } from '../typings/routes';
+import { getKeyFromApplicationStorage } from '../utils/localStorageUtils';
 
 export const defaultChain = 1025; // TODO: move to config
 
@@ -39,44 +36,28 @@ export function* initApplicationSaga() {
   const matchSelector = createMatchSelector({
     path: [
       `${WalletRoutesEnum.signup}/:dataOrReferrer?`,
-      `${WalletRoutesEnum.sso}/:data?`,
-    ],
+      `${WalletRoutesEnum.sso}/:data?`
+    ]
   });
   const match = yield* select(matchSelector);
-  const dataOrReferrer = yield* select(getRouterParamsDataOrReferrer);
 
   if (address && encryptedWif) {
     yield loginToWalletSaga({
       payload: {
         address,
-        encryptedWif,
-      },
+        encryptedWif
+      }
     });
 
     yield* put(
       setWalletData({
         address,
-        encryptedWif,
-      }),
+        encryptedWif
+      })
     );
 
-    const isAddressInParams =
-      dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer);
-    if (isAddressInParams) {
-      toast.warning(i18n.t('sorryReferralLinkIsOnly'));
-      yield* put(push(WalletRoutesEnum.root));
-    } else {
-      yield* put(push(window.location.pathname));
-    }
+    yield* put(push(window.location.pathname));
   } else if (!match) {
-    if (dataOrReferrer) {
-      if (dataOrReferrer === 'sign-and-send') {
-        yield* put(push(WalletRoutesEnum.signup));
-      } else {
-        yield* put(push(`${WalletRoutesEnum.signup}/${dataOrReferrer}`));
-      }
-    } else {
-      yield* put(push(WalletRoutesEnum.signup));
-    }
+    yield* put(push(WalletRoutesEnum.root));
   }
 }

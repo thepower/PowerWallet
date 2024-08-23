@@ -1,5 +1,5 @@
-@import '../../styles/variables';
-@import '../../styles/mixins';
+@import 'src/styles/variables';
+@import 'src/styles/mixins';
 
 .registrationPage {
   position: relative;
@@ -131,7 +131,7 @@
 
   @include mobile {
     width: 100%;
-    padding-bottom: 24px;
+    padding: 0 16px 24px 16px;
   }
 }
 
@@ -187,9 +187,10 @@
   text-transform: unset;
 
   &_outlined {
-    @include border-gradient;
     padding: 0 !important;
     background: #121923;
+
+    @include border-gradient;
 
     @include mobile {
       margin-top: 0;

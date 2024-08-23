@@ -1,39 +1,42 @@
 import React from 'react';
+import { AddressApi, CryptoApi, TransactionsApi } from '@thepowereco/tssdk';
+import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
+import cn from 'classnames';
+import isEmpty from 'lodash/isEmpty';
+import isObject from 'lodash/isObject';
+
+import { WithTranslation, withTranslation } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
 
-import { getWalletAddress, getWalletData } from 'account/selectors/accountSelectors';
-import { getNetworkFeeSettings, getNetworkGasSettings } from 'application/selectors';
-import { RootState } from 'application/store';
-import cn from 'classnames';
+import { RouteComponentProps } from 'react-router';
 import {
-  Button,
-  FullScreenLoader,
-  TxResult,
-} from 'common';
+  getWalletAddress,
+  getWalletData
+} from 'account/selectors/accountSelectors';
+import {
+  getNetworkFeeSettings,
+  getNetworkGasSettings
+} from 'application/selectors';
+import { RootState } from 'application/store';
+import { Button, FullScreenLoader, TxResult } from 'common';
+import CardTable from 'common/cardTable/CardTable';
+import CardTableKeyAccordion from 'common/cardTableKeyAccordion/CardTableKeyAccordion';
 import { getWalletNativeTokensAmounts } from 'myAssets/selectors/walletSelectors';
+import { checkIfLoading } from 'network/selectors';
 import { getSentData } from 'send/selectors/sendSelectors';
 import { clearSentData, signAndSendTrxTrigger } from 'send/slices/sendSlice';
 
-import { AddressApi, CryptoApi, TransactionsApi } from '@thepowereco/tssdk';
-import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
-import CardTable from 'common/cardTable/CardTable';
-import CardTableKeyAccordion from 'common/cardTableKeyAccordion/CardTableKeyAccordion';
-import {
-  isEmpty, isObject,
-} from 'lodash';
-import { checkIfLoading } from 'network/selectors';
-import { WithTranslation, withTranslation } from 'react-i18next';
-import { RouteComponentProps } from 'react-router';
 import { TxBody, TxKindByName, TxPurpose } from 'sign-and-send/typing';
 import { objectToString, stringToObject } from 'sso/utils';
-import ConfirmModal from '../../common/confirmModal/ConfirmModal';
 import styles from './SingAndSendPage.module.scss';
 import { ThePowerLogoIcon } from './ThePowerLogoIcon';
+import ConfirmModal from '../../common/confirmModal/ConfirmModal';
 
 const { autoAddFee, autoAddGas } = TransactionsApi;
 
-const txKindMap: { [key: number]: string } =
-  Object.entries(TxKindByName).reduce((obj, [key, value]) => (Object.assign(obj, { [key]: value })), {});
+const txKindMap: { [key: number]: string } = Object.entries(
+  TxKindByName
+).reduce((obj, [key, value]) => Object.assign(obj, { [key]: value }), {});
 
 type OwnProps = RouteComponentProps<{ message: string }>;
 
@@ -45,42 +48,41 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
   message: props?.match?.params?.message,
   feeSettings: getNetworkFeeSettings(state),
   gasSettings: getNetworkGasSettings(state),
-  encryptedWif: getWalletData(state).encryptedWif,
+  encryptedWif: getWalletData(state).encryptedWif
 });
 
 const mapDispatchToProps = {
   clearSentData,
-  signAndSendTrxTrigger,
+  signAndSendTrxTrigger
 };
 
-const connector = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
+const connector = connect(mapStateToProps, mapDispatchToProps);
 
-type SignAndSendProps = ConnectedProps<typeof connector> & WithTranslation & {
-  className?: string
-};
+type SignAndSendProps = ConnectedProps<typeof connector> &
+  WithTranslation & {
+    className?: string;
+  };
 
 type SignAndSendState = {
   isConfirmModalOpen: boolean;
   returnURL?: string;
-  decodedTxBody?: TxBody
+  decodedTxBody?: TxBody;
 };
 
-class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState> {
+class SignAndSendPage extends React.Component<
+  SignAndSendProps,
+  SignAndSendState
+> {
   constructor(props: SignAndSendProps) {
     super(props);
 
     this.state = {
-      isConfirmModalOpen: false,
+      isConfirmModalOpen: false
     };
   }
 
   componentDidMount(): void {
-    const {
-      message, address, gasSettings, feeSettings,
-    } = this.props;
+    const { message, address, gasSettings, feeSettings } = this.props;
 
     try {
       const decodedMessage = stringToObject(message);
@@ -88,18 +90,24 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
       this.setState({ returnURL: decodedMessage?.returnUrl });
       const sponsor = decodedMessage?.sponsor;
 
-      const srcFee = decodedTxBody?.p?.find((purpose) => purpose?.[0] === TxPurpose.SRCFEE);
-      const gas = decodedTxBody?.p?.find((purpose) => purpose?.[0] === TxPurpose.GAS);
+      const srcFee = decodedTxBody?.p?.find(
+        (purpose) => purpose?.[0] === TxPurpose.SRCFEE
+      );
+      const gas = decodedTxBody?.p?.find(
+        (purpose) => purpose?.[0] === TxPurpose.GAS
+      );
 
       if (!decodedTxBody?.e) {
         decodedTxBody.e = {};
       }
 
       decodedTxBody.f = Buffer.from(AddressApi.parseTextAddress(address));
-      decodedTxBody.t = Date.now();
+      decodedTxBody.t = BigInt(Date.now());
 
       if (sponsor) {
-        decodedTxBody.e.sponsor = [Buffer.from(AddressApi.parseTextAddress(sponsor))];
+        decodedTxBody.e.sponsor = [
+          Buffer.from(AddressApi.parseTextAddress(sponsor))
+        ];
       }
 
       if (!gas) {
@@ -147,9 +155,9 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
             window.opener.postMessage?.(
               objectToString({
                 type: 'signAndSendMessageResponse',
-                data: txResponse,
+                data: txResponse
               }),
-              returnURL,
+              returnURL
             );
             window.close();
           },
@@ -157,12 +165,12 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
             window.opener.postMessage?.(
               objectToString({
                 type: 'signAndSendMessageError',
-                data: error,
+                data: error
               }),
-              returnURL,
+              returnURL
             );
             window.close();
-          },
+          }
         });
       }
     } catch {
@@ -175,9 +183,9 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
     window.opener.postMessage?.(
       objectToString({
         type: 'signAndSendMessageError',
-        data: 'reject',
+        data: 'reject'
       }),
-      returnURL,
+      returnURL
     );
     window.close();
   };
@@ -195,20 +203,20 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
           window.opener.postMessage?.(
             objectToString({
               type: 'signAndSendMessageResponse',
-              data: txResponse,
+              data: txResponse
             }),
-            returnURL,
+            returnURL
           );
         },
         additionalActionOnError(error) {
           window.opener.postMessage?.(
             objectToString({
               type: 'signAndSendMessageError',
-              data: error,
+              data: error
             }),
-            returnURL,
+            returnURL
           );
-        },
+        }
       });
       closeModal();
     }
@@ -226,36 +234,49 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
           <div className={styles.headerText}>POWER WALLET</div>
         </div>
       </header>
-    </div>);
+    </div>
+  );
 
   renderExtraDataTable = () => {
     const { decodedTxBody } = this.state;
 
     if (!decodedTxBody?.e || isEmpty(decodedTxBody?.e)) return null;
 
-    return <CardTable items={Object.entries(decodedTxBody?.e).map(([key, value]) => ({ key, value: value.toString() }))} />;
+    return (
+      <CardTable
+        items={Object.entries(decodedTxBody?.e).map(([key, value]) => ({
+          key,
+          value: value.toString()
+        }))}
+      />
+    );
   };
 
   renderContent = () => {
-    const {
-      address,
-    } = this.props;
+    const { address } = this.props;
     const { returnURL, decodedTxBody } = this.state;
-    const {
-      handleClickSignAndSend,
-      handleClickBack,
-      renderExtraDataTable,
-    } = this;
+    const { handleClickSignAndSend, handleClickBack, renderExtraDataTable } =
+      this;
 
     const txKind = decodedTxBody?.k as number;
     const txKindName = txKind && txKindMap[txKind];
-    const to = decodedTxBody?.to && AddressApi.hexToTextAddress(Buffer.from(decodedTxBody?.to).toString('hex'));
+    const to =
+      decodedTxBody?.to &&
+      AddressApi.hexToTextAddress(
+        Buffer.from(decodedTxBody?.to).toString('hex')
+      );
 
-    const transfer = decodedTxBody?.p?.find((item) => item?.[0] === TxPurpose.TRANSFER);
-    const transferAmount = transfer?.[2] ? correctAmount(transfer?.[2], transfer?.[1]) : null;
+    const transfer = decodedTxBody?.p?.find(
+      (item) => item?.[0] === TxPurpose.TRANSFER
+    );
+    const transferAmount = transfer?.[2]
+      ? correctAmount(transfer?.[2], transfer?.[1])
+      : null;
     const transferCur = transfer?.[1];
 
-    const fee = decodedTxBody?.p?.find((item) => item?.[0] === TxPurpose.SRCFEE);
+    const fee = decodedTxBody?.p?.find(
+      (item) => item?.[0] === TxPurpose.SRCFEE
+    );
     const feeAmount = fee?.[2] ? correctAmount(fee?.[2], fee?.[1]) : null;
     const feeCur = fee?.[1];
 
@@ -271,32 +292,58 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
       <div className={styles.content}>
         <div className={styles.title}>{this.props.t('confirmYourAction')}</div>
         <div className={styles.buttons}>
-          <Button onClick={handleClickBack} variant="outlined">{this.props.t('cancel')}</Button>
-          <Button onClick={handleClickSignAndSend} fullWidth variant="contained">{this.props.t('signAndSend')}</Button>
+          <Button onClick={handleClickBack} variant='outlined'>
+            {this.props.t('cancel')}
+          </Button>
+          <Button
+            onClick={handleClickSignAndSend}
+            fullWidth
+            variant='contained'
+          >
+            {this.props.t('signAndSend')}
+          </Button>
         </div>
-        <div className={styles.text}>{this.props.t('byClickingSignAndSend')}</div>
+        <div className={styles.text}>
+          {this.props.t('byClickingSignAndSend')}
+        </div>
         <div className={styles.table}>
-          <div className={styles.tableTitle}>{this.props.t('transactionType')}</div>
+          <div className={styles.tableTitle}>
+            {this.props.t('transactionType')}
+          </div>
           <div className={styles.tableValue}>{txKindName || '-'}</div>
 
           <div className={styles.tableTitle}>{this.props.t('fee')}</div>
-          <div className={styles.tableValue}>{(feeAmount && feeCur) && `${feeAmount} ${feeCur}` || '-'}</div>
-
-          <div className={styles.tableTitle}>{this.props.t('senderAddress')}</div>
-          <div className={styles.tableValue}>{address || '-'}</div>
-
-          <div className={styles.tableTitle}>{this.props.t('addressOfTheRecipient')}</div>
-          <div className={styles.tableValue}>{to || '-'}</div>
-
-          <div className={styles.tableTitle}>{this.props.t('transactionSubject')}</div>
           <div className={styles.tableValue}>
-            {(transferAmount && transferCur) ? `${transferAmount} ${transferCur}` : '-'}
+            {(feeAmount && feeCur && `${feeAmount} ${feeCur}`) || '-'}
           </div>
 
-          <div className={styles.tableTitle}>{this.props.t('functionCall')}</div>
+          <div className={styles.tableTitle}>
+            {this.props.t('senderAddress')}
+          </div>
+          <div className={styles.tableValue}>{address || '-'}</div>
+
+          <div className={styles.tableTitle}>
+            {this.props.t('addressOfTheRecipient')}
+          </div>
+          <div className={styles.tableValue}>{to || '-'}</div>
+
+          <div className={styles.tableTitle}>
+            {this.props.t('transactionSubject')}
+          </div>
+          <div className={styles.tableValue}>
+            {transferAmount && transferCur
+              ? `${transferAmount} ${transferCur}`
+              : '-'}
+          </div>
+
+          <div className={styles.tableTitle}>
+            {this.props.t('functionCall')}
+          </div>
           <div className={styles.tableValue}>{functionName || '-'}</div>
 
-          <CardTableKeyAccordion valueLabel={this.props.t('callArguments')}>{functionArguments || '-'}</CardTableKeyAccordion>
+          <CardTableKeyAccordion valueLabel={this.props.t('callArguments')}>
+            {functionArguments || '-'}
+          </CardTableKeyAccordion>
 
           {/* <div className={styles.tableTitle}>Details</div>
           <div className={styles.tableValue}>?</div> */}
@@ -307,26 +354,21 @@ class SignAndSendPage extends React.Component<SignAndSendProps, SignAndSendState
           <div className={styles.tableTitle}>{this.props.t('returnURL')}</div>
           <div className={styles.tableValue}>{returnURL || '-'}</div>
 
-          {!isExtDataEmpty && <CardTableKeyAccordion valueLabel={this.props.t('extraData')}>{renderExtraDataTable()}</CardTableKeyAccordion>}
-
+          {!isExtDataEmpty && (
+            <CardTableKeyAccordion valueLabel={this.props.t('extraData')}>
+              {renderExtraDataTable()}
+            </CardTableKeyAccordion>
+          )}
         </div>
-
-      </div>);
+      </div>
+    );
   };
 
   render() {
-    const {
-      signAndSendCallback,
-      renderHeader,
-      renderContent,
-      closeModal,
-    } = this;
+    const { signAndSendCallback, renderHeader, renderContent, closeModal } =
+      this;
     const { isConfirmModalOpen, decodedTxBody } = this.state;
-    const {
-      loading,
-      className,
-      sentData,
-    } = this.props;
+    const { loading, className, sentData } = this.props;
 
     if (loading) {
       return <FullScreenLoader />;

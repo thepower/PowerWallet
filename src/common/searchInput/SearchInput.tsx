@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { SearchIcon } from 'assets/icons';
 import { useTranslation } from 'react-i18next';
-import styles from './SearchInput.module.scss';
+import { SearchIcon } from 'assets/icons';
 import MUIOutlinedInput, { OutlinedInputProps } from './OutlinedInput';
+import styles from './SearchInput.module.scss';
 
 interface SearchInputProps extends OutlinedInputProps {
   className?: string;
@@ -11,7 +11,11 @@ interface SearchInputProps extends OutlinedInputProps {
   onClickSearch: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-const SearchInput: React.FC<SearchInputProps> = ({ onClickSearch, className, ...otherProps }) => {
+const SearchInput: React.FC<SearchInputProps> = ({
+  onClickSearch,
+  className,
+  ...otherProps
+}) => {
   const { t } = useTranslation();
   const getEndAdornment = () => (
     <div className={styles.endAdornment} onClick={onClickSearch}>
@@ -22,7 +26,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ onClickSearch, className, ...
     <MUIOutlinedInput
       className={className}
       placeholder={t('searchAnyNameOrAttribute')!}
-      size="small"
+      size='small'
       fullWidth
       autoComplete={'off'}
       endAdornment={getEndAdornment()}

@@ -8,9 +8,13 @@ interface IconButtonProps {
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const IconButton: React.FC<IconButtonProps> = ({ children, onClick, className }) => (
+const IconButton: React.FC<IconButtonProps> = ({
+  children,
+  onClick,
+  className
+}) => (
   <button
-    type="button"
+    type='button'
     onClick={onClick}
     className={cn(styles.button, className)}
   >

@@ -63,9 +63,9 @@
 }
 
 .outlined {
+  background: #121923;
   @include border-gradient();
 
-  background: #121923;
 
   span {
     @include text-gradient();
@@ -88,11 +88,12 @@
   }
 
   &:disabled {
-    @include border-gradient(#26354d);
-
     background: #26354d;
     background-color: #26354d !important;
     pointer-events: none;
+
+    @include border-gradient(#26354d);
+
 
     span {
       @include text-gradient(#79789d);

@@ -1,31 +1,29 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
-export const getApplicationState = (state: RootState) => (
-  state.applicationData
-);
+export const getApplicationState = (state: RootState) => state.applicationData;
 
 export const getNetworkApi = createSelector(
   getApplicationState,
-  (applicationData) => applicationData.networkApi,
+  (applicationData) => applicationData.networkApi
 );
 export const getNetworkFeeSettings = createSelector(
   getApplicationState,
-  (applicationData) => applicationData.networkApi?.feeSettings,
+  (applicationData) => applicationData.networkApi?.feeSettings
 );
 export const getNetworkGasSettings = createSelector(
   getApplicationState,
-  (applicationData) => applicationData.networkApi?.gasSettings,
+  (applicationData) => applicationData.networkApi?.gasSettings
 );
 export const getNetworkChainID = createSelector(
   getApplicationState,
-  (applicationData) => applicationData.networkApi?.getChain(),
+  (applicationData) => applicationData.networkApi?.getChain()
 );
 export const getWalletApi = createSelector(
   getApplicationState,
-  (applicationData) => applicationData.walletApi,
+  (applicationData) => applicationData.walletApi
 );
 export const getNetworksChains = createSelector(
   getApplicationState,
-  (applicationData) => applicationData.networksChains,
+  (applicationData) => applicationData.networksChains
 );

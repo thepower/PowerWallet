@@ -1,9 +1,9 @@
-import classnames from 'classnames';
-import { Button, Modal, OutlinedInput } from 'common';
-import { Form, Formik, FormikHelpers } from 'formik';
 import React from 'react';
+import classnames from 'classnames';
+import { Form, Formik, FormikHelpers } from 'formik';
 import { WithTranslation, withTranslation } from 'react-i18next';
-import styles from '../Registration.module.scss';
+import { Button, Modal, OutlinedInput } from 'common';
+import styles from '../pages/registration/RegistrationPage.module.scss';
 
 interface ImportAccountModalProps {
   open: boolean;
@@ -14,8 +14,13 @@ interface ImportAccountModalProps {
 const initialValues = { password: '' };
 type Values = typeof initialValues;
 
-class ImportAccountModalComponent extends React.PureComponent<ImportAccountModalProps & WithTranslation> {
-  handleSubmitImportModal = (values: Values, formikHelpers: FormikHelpers<Values>) => {
+class ImportAccountModalComponent extends React.PureComponent<
+  ImportAccountModalProps & WithTranslation
+> {
+  handleSubmitImportModal = (
+    values: Values,
+    formikHelpers: FormikHelpers<Values>
+  ) => {
     const { onSubmit } = this.props;
 
     onSubmit(values.password);
@@ -23,10 +28,7 @@ class ImportAccountModalComponent extends React.PureComponent<ImportAccountModal
   };
 
   render() {
-    const {
-      open,
-      onClose,
-    } = this.props;
+    const { open, onClose } = this.props;
 
     return (
       <Modal
@@ -34,7 +36,10 @@ class ImportAccountModalComponent extends React.PureComponent<ImportAccountModal
         onClose={onClose}
         open={open}
       >
-        <Formik initialValues={initialValues} onSubmit={this.handleSubmitImportModal}>
+        <Formik
+          initialValues={initialValues}
+          onSubmit={this.handleSubmitImportModal}
+        >
           {(formikProps) => (
             <Form className={styles.exportModalForm}>
               <div className={styles.exportModalTitleHolder}>
@@ -48,20 +53,26 @@ class ImportAccountModalComponent extends React.PureComponent<ImportAccountModal
               <OutlinedInput
                 inputRef={(input) => input && input.focus()}
                 placeholder={this.props.t('password')!}
-                className={classnames(styles.passwordInput, styles.importModalPasswordInput)}
-                name="password"
+                className={classnames(
+                  styles.passwordInput,
+                  styles.importModalPasswordInput
+                )}
+                name='password'
                 value={formikProps.values.password}
                 onChange={formikProps.handleChange}
                 onBlur={formikProps.handleBlur}
                 type={'password'}
                 autoFocus
                 errorMessage={formikProps.errors.password}
-                error={formikProps.touched.password && Boolean(formikProps.errors.password)}
+                error={
+                  formikProps.touched.password &&
+                  Boolean(formikProps.errors.password)
+                }
               />
               <Button
-                size="medium"
-                variant="contained"
-                type="submit"
+                size='medium'
+                variant='contained'
+                type='submit'
                 disabled={!formikProps.dirty}
               >
                 {this.props.t('next')}
@@ -70,9 +81,10 @@ class ImportAccountModalComponent extends React.PureComponent<ImportAccountModal
           )}
         </Formik>
       </Modal>
-
     );
   }
 }
 
-export const ImportAccountModal = withTranslation()(ImportAccountModalComponent);
+export const ImportAccountModal = withTranslation()(
+  ImportAccountModalComponent
+);

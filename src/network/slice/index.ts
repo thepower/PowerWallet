@@ -2,16 +2,19 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import isEqual from 'lodash/isEqual';
 import remove from 'lodash/remove';
 
-interface Action { name: string; params?: any; }
+interface Action {
+  name: string;
+  params?: any;
+}
 
 export interface NetworkState {
-  actions: Action[],
+  actions: Action[];
   loading: boolean;
 }
 
 const initialState: NetworkState = {
   actions: [],
-  loading: false,
+  loading: false
 };
 
 const networkSlice = createSlice({
@@ -21,16 +24,19 @@ const networkSlice = createSlice({
     startAction: (state, { payload }: PayloadAction<Action>) => {
       state.actions.push(payload);
     },
-    stopAction: (state, { payload: { name, params } }: PayloadAction<Action>) => {
-      remove(state.actions, (a) => a.name === name && isEqual(a.params, params));
-    },
-  },
+    stopAction: (
+      state,
+      { payload: { name, params } }: PayloadAction<Action>
+    ) => {
+      remove(
+        state.actions,
+        (a) => a.name === name && isEqual(a.params, params)
+      );
+    }
+  }
 });
 
 export const {
   reducer: networkReducer,
-  actions: {
-    startAction,
-    stopAction,
-  },
+  actions: { startAction, stopAction }
 } = networkSlice;

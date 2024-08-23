@@ -1,16 +1,11 @@
+import React from 'react';
 import { Collapse } from '@mui/material';
 import cn from 'classnames';
-import { CopyButton, Divider } from 'common';
 import { format } from 'date-fns';
-import { isArray } from 'lodash';
-import React from 'react';
+import isArray from 'lodash/isArray';
 import { WithTranslation, withTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
-import { getWalletAddress } from '../../account/selectors/accountSelectors';
-import { RootState } from '../../application/store';
-import { FaucetSvg, SendSvg } from '../../assets/icons';
-import { TransactionType } from '../slices/transactionsSlice';
-import styles from './Transaction.module.scss';
+import { CopyButton, Divider } from 'common';
 import {
   BarCodeIcon,
   CoinIcon,
@@ -22,26 +17,34 @@ import {
   MinimizeIcon,
   SuccessIcon,
   ToArrowIcon,
-  WatchIcon,
+  WatchIcon
 } from './icons';
+import styles from './Transaction.module.scss';
+import { getWalletAddress } from '../../account/selectors/accountSelectors';
+import { RootState } from '../../application/store';
+import { FaucetSvg, SendSvg } from '../../assets/icons';
+import { TransactionType } from '../slices/transactionsSlice';
 
 type OwnProps = { trx: TransactionType };
 
-const connector = connect(
-  (state: RootState) => ({
-    currentAddress: getWalletAddress(state),
-  }),
-);
+const connector = connect((state: RootState) => ({
+  currentAddress: getWalletAddress(state)
+}));
 
-type TransactionProps = ConnectedProps<typeof connector> & OwnProps & WithTranslation;
+type TransactionProps = ConnectedProps<typeof connector> &
+  OwnProps &
+  WithTranslation;
 type TransactionState = { expanded: boolean };
 
-class Transaction extends React.PureComponent<TransactionProps, TransactionState> {
+class Transaction extends React.PureComponent<
+  TransactionProps,
+  TransactionState
+> {
   constructor(props: TransactionProps) {
     super(props);
 
     this.state = {
-      expanded: false,
+      expanded: false
     };
   }
 
@@ -64,11 +67,23 @@ class Transaction extends React.PureComponent<TransactionProps, TransactionState
       { Icon: <ToArrowIcon />, key: this.props.t('to'), value: trx.to },
       { Icon: <CoinIcon />, key: this.props.t('amount'), value: trx.amount },
       { Icon: <LogoIcon />, key: this.props.t('cur'), value: trx.cur },
-      { Icon: <WatchIcon />, key: this.props.t('timestamp'), value: format(trx.timestamp, 'MMMM dd, yyyy, \'at\' p') },
+      {
+        Icon: <WatchIcon />,
+        key: this.props.t('timestamp'),
+        value: format(trx.timestamp, 'MMMM dd, yyyy, \'at\' p')
+      },
       { Icon: <BarCodeIcon />, key: this.props.t('seq'), value: trx.seq },
-      { Icon: <KeyIcon />, key: this.props.t('publicKey'), value: trx?.sigverify?.pubkeys?.[0] },
-      { Icon: <FingerPrintIcon />, key: this.props.t('signature'), value: trx.sig[trx.sigverify?.pubkeys?.[0]] },
-      { Icon: <CubeIcon />, key: this.props.t('inBlock'), value: trx.inBlock },
+      {
+        Icon: <KeyIcon />,
+        key: this.props.t('publicKey'),
+        value: trx?.sigverify?.pubkeys?.[0]
+      },
+      {
+        Icon: <FingerPrintIcon />,
+        key: this.props.t('signature'),
+        value: trx.sig[trx.sigverify?.pubkeys?.[0]]
+      },
+      { Icon: <CubeIcon />, key: this.props.t('inBlock'), value: trx.inBlock }
     ];
 
     return (
@@ -97,13 +112,15 @@ class Transaction extends React.PureComponent<TransactionProps, TransactionState
             onClick={this.handleClick}
             onKeyDown={this.handleKeyDown}
             tabIndex={0}
-            role="button"
+            role='button'
           >
             <div className={styles.row}>
               <div className={cn(styles.icon)}>
-                {isReceived
-                  ? <FaucetSvg className={styles.receiveIcon} />
-                  : <SendSvg className={styles.sendIcon} />}
+                {isReceived ? (
+                  <FaucetSvg className={styles.receiveIcon} />
+                ) : (
+                  <SendSvg className={styles.sendIcon} />
+                )}
               </div>
               <div className={styles.info}>
                 <span className={styles.name}>{this.props.t('myWallet')}</span>
@@ -114,25 +131,27 @@ class Transaction extends React.PureComponent<TransactionProps, TransactionState
                   {format(trx.timestamp, '\'at\' p')}
                 </span>
               </div>
-              {trx.amount && <span className={styles.amount}>
-                {`${isReceived ? '+' : '-'} ${trx.amount.toFixed?.(2) || trx.amount} ${trx.cur}`}
-              </span>}
+              {trx.amount && (
+                <span className={styles.amount}>
+                  {`${isReceived ? '+' : '-'} ${
+                    trx.amount.toFixed?.(2) || trx.amount
+                  } ${trx.cur}`}
+                </span>
+              )}
             </div>
             {!isArray(trx.txext) && (
               <div className={styles.comment}>
                 <div className={styles.commentTitle}>
                   {this.props.t('comment')}
                 </div>
-                <div className={styles.msg}>
-                  {trx.txext.msg}
-                </div>
+                <div className={styles.msg}>{trx.txext.msg}</div>
               </div>
             )}
           </div>
           <Collapse in={expanded}>
             <div className={styles.content}>
               <div
-                role="button"
+                role='button'
                 tabIndex={0}
                 className={styles.row}
                 onClick={this.handleClick}
@@ -141,7 +160,12 @@ class Transaction extends React.PureComponent<TransactionProps, TransactionState
                 <span className={styles.title}>
                   {`${this.props.t('transaction')} #${trx.timestamp}`}
                 </span>
-                <MinimizeIcon className={cn(styles.minimizedIcon, expanded && styles.expandMinimizedIcon)} />
+                <MinimizeIcon
+                  className={cn(
+                    styles.minimizedIcon,
+                    expanded && styles.expandMinimizedIcon
+                  )}
+                />
               </div>
               {this.renderGrid()}
               <CopyButton textButton={this.props.t('copy')} copyInfo={trx.id} />

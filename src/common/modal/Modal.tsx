@@ -1,11 +1,6 @@
 import React from 'react';
-import {
-  DialogProps,
-  Dialog,
-  DialogContent,
-  IconButton,
-} from '@mui/material';
 import { Close } from '@mui/icons-material';
+import { DialogProps, Dialog, DialogContent, IconButton } from '@mui/material';
 import classnames from 'classnames';
 import styles from './Modal.module.scss';
 import { PELogo } from '../../assets/icons/PELogo';
@@ -20,7 +15,7 @@ export interface ModalProps extends DialogProps {
 }
 
 const dialogClasses = {
-  paper: styles.modal,
+  paper: styles.modal
 };
 
 export const Modal: React.FC<ModalProps> = (props: ModalProps) => {
@@ -31,26 +26,31 @@ export const Modal: React.FC<ModalProps> = (props: ModalProps) => {
     className,
     contentClassName,
     hideIcon = false,
-    alwaysShowCloseIcon = false,
+    alwaysShowCloseIcon = false
   } = props;
 
-  return <Dialog
-    open={open}
-    onClose={onClose}
-    className={classnames(styles.modalRoot, className)}
-    classes={dialogClasses}
-  >
-    <DialogContent className={classnames(contentClassName, styles.modalContent)}>
-      <IconButton
-        className={classnames(styles.closeIcon, alwaysShowCloseIcon && styles.alwaysShowCloseIcon)}
-        onClick={onClose}
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      className={classnames(styles.modalRoot, className)}
+      classes={dialogClasses}
+    >
+      <DialogContent
+        className={classnames(contentClassName, styles.modalContent)}
       >
-        <Close />
-      </IconButton>
-      <div>
-        { !hideIcon && <PELogo /> }
-      </div>
-      {children}
-    </DialogContent>
-  </Dialog>;
+        <IconButton
+          className={classnames(
+            styles.closeIcon,
+            alwaysShowCloseIcon && styles.alwaysShowCloseIcon
+          )}
+          onClick={onClose}
+        >
+          <Close />
+        </IconButton>
+        <div>{!hideIcon && <PELogo />}</div>
+        {children}
+      </DialogContent>
+    </Dialog>
+  );
 };

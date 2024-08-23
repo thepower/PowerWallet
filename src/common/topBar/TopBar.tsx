@@ -1,14 +1,14 @@
-import cn from 'classnames';
 import React, { useCallback } from 'react';
-import i18n from 'locales/initTranslation';
-import { BellIcon, MenuIcon } from 'assets/icons';
+import cn from 'classnames';
+import { toggleOpenedAccountMenu } from 'account/slice/accountSlice';
 import { setShowUnderConstruction } from 'application/slice/applicationSlice';
 import { useAppDispatch } from 'application/store';
-import { toggleOpenedAccountMenu } from 'account/slice/accountSlice';
+import { BellIcon, MenuIcon } from 'assets/icons';
+import i18n from 'locales/initTranslation';
+import styles from './TopBar.module.scss';
 import ArrowLink from '../arrowLink/ArrowLink';
 import IconButton from '../iconButton/IconButton';
 import { LangMenu } from '../langMenu/LangMenu';
-import styles from './TopBar.module.scss';
 
 type TopBarProps = {
   backUrl?: string;
@@ -21,7 +21,7 @@ const TopBar: React.FC<TopBarProps> = ({
   children,
   backUrl,
   backUrlText = i18n.t('back')!,
-  className,
+  className
 }) => {
   const dispatch = useAppDispatch();
   const handleShowUnderConstruction = useCallback(() => {
@@ -37,19 +37,17 @@ const TopBar: React.FC<TopBarProps> = ({
       return (
         <ArrowLink
           to={backUrl}
-          direction="left"
+          direction='left'
           hideTextOnMobile
-          size="small"
-          defaultColor="lilac"
+          size='small'
+          defaultColor='lilac'
         >
           {backUrlText}
         </ArrowLink>
       );
     }
     return (
-      <IconButton
-        onClick={toggleAccountMenu}
-      >
+      <IconButton onClick={toggleAccountMenu}>
         <MenuIcon />
       </IconButton>
     );
@@ -57,11 +55,7 @@ const TopBar: React.FC<TopBarProps> = ({
 
   const renderCenter = useCallback(() => {
     if (children) {
-      return (
-        <div className={styles.centerText}>
-          {children}
-        </div>
-      );
+      return <div className={styles.centerText}>{children}</div>;
     }
 
     return <div className={styles.title}>Power Wallet</div>;
@@ -73,9 +67,7 @@ const TopBar: React.FC<TopBarProps> = ({
       {renderCenter()}
       <div className={cn(styles.controlsSet)}>
         <LangMenu />
-        <IconButton
-          onClick={handleShowUnderConstruction}
-        >
+        <IconButton onClick={handleShowUnderConstruction}>
           <BellIcon />
         </IconButton>
       </div>

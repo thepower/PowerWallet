@@ -1,38 +1,38 @@
-import {
-  CopyButton,
-  PageTemplate, Tabs,
-} from 'common';
-
-import React, {
-  FC, useMemo, useState,
-} from 'react';
-import { ConnectedProps, connect } from 'react-redux';
+import React, { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ConnectedProps, connect } from 'react-redux';
 
+import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { RootState } from 'application/store';
 
-import { ReferralProgramTabs, getReferralProgramTabsLabels } from 'referral-program/types';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
+import { CopyButton, PageTemplate, Tabs } from 'common';
+import {
+  ReferralProgramTabs,
+  getReferralProgramTabsLabels
+} from 'referral-program/types';
 import styles from './ReferralProgramPage.module.scss';
 
-const mapDispatchToProps = {
-
-};
+const mapDispatchToProps = {};
 
 const mapStateToProps = (state: RootState) => ({
-  walletAddress: getWalletAddress(state),
+  walletAddress: getWalletAddress(state)
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type ReferralProgramPageProps = ConnectedProps<typeof connector>;
 
-const ReferralProgramPageComponent: FC<ReferralProgramPageProps> = ({ walletAddress }) => {
+const ReferralProgramPageComponent: FC<ReferralProgramPageProps> = ({
+  walletAddress
+}) => {
   const { t } = useTranslation();
 
   const [tab, setTab] = useState(ReferralProgramTabs.referralLink);
 
-  const onChangeTab = (_event: React.SyntheticEvent, value: ReferralProgramTabs) => {
+  const onChangeTab = (
+    _event: React.SyntheticEvent,
+    value: ReferralProgramTabs
+  ) => {
     setTab(value);
   };
 
@@ -42,22 +42,19 @@ const ReferralProgramPageComponent: FC<ReferralProgramPageProps> = ({ walletAddr
   }, [walletAddress]);
 
   return (
-    <PageTemplate
-      backUrl="/"
-      backUrlText={t('home')!}
-    >
+    <PageTemplate backUrl='/' backUrlText={t('home')!}>
       <div className={styles.wrapper}>
         <div className={styles.firstBlock}>
           <div className={styles.title}>{t('inviteFriendsEarnRewards')}</div>
-          <div className={styles.subtitle}>{t('welcomeToPowerWalletReferral')}</div>
-          <div className={styles.text}>
-            {t('helpUsGrowOurCommunity')}
+          <div className={styles.subtitle}>
+            {t('welcomeToPowerWalletReferral')}
           </div>
+          <div className={styles.text}>{t('helpUsGrowOurCommunity')}</div>
         </div>
-        <div className={styles.title}>
+        {/* <div className={styles.title}>
           {t('myFriends')}
           : 0
-        </div>
+        </div> */}
         <Tabs
           tabs={ReferralProgramTabs}
           tabsLabels={getReferralProgramTabsLabels(t)}

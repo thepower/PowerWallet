@@ -1,8 +1,11 @@
 import React from 'react';
-import cn from 'classnames';
 import ChevronRight from '@mui/icons-material/ChevronRight';
+import cn from 'classnames';
 import styles from './Breadcrumbs.module.scss';
-import { BreadcrumbsDataType, BreadcrumbsTypeEnum } from '../typings/breadcrumbsTypings';
+import {
+  BreadcrumbsDataType,
+  BreadcrumbsTypeEnum
+} from '../typings/breadcrumbsTypings';
 
 interface BreadcrumbsProps {
   currentStep: number;
@@ -23,46 +26,44 @@ export class Breadcrumbs extends React.PureComponent<BreadcrumbsProps, any> {
     }
   };
 
-  renderBreadcrumb = (breadcrumb: BreadcrumbsDataType, index: number): React.ReactNode => {
-    const {
-      currentStep,
-      breadcrumbs,
-      breadCrumbClassName,
-      type,
-    } = this.props;
+  renderBreadcrumb = (
+    breadcrumb: BreadcrumbsDataType,
+    index: number
+  ): React.ReactNode => {
+    const { currentStep, breadcrumbs, breadCrumbClassName, type } = this.props;
 
     const isSelectedBreadcrumb = index === currentStep;
     const isLastBreadcrumb = index === breadcrumbs.length - 1;
     const { label } = breadcrumb;
 
-    return <div
-      key={index}
-      onClick={this.handleSetCurrentBreadcrumb(index)}
-      className={cn(styles.breadcrumb, isSelectedBreadcrumb && styles.selectedBreadcrumb, breadCrumbClassName)}
-    >
-      {
-        type === BreadcrumbsTypeEnum.direction &&
-        <span className={styles.breadcrumbIndex}>{index + 1}</span>
-      }
-      <span className={styles.breadcrumbLabel}>{label}</span>
-      {!isLastBreadcrumb && (
-        <ChevronRight
-          className={cn(
-            styles.breadcrumbIcon,
-            isSelectedBreadcrumb && styles.selectedBreadcrumbIcon,
-          )}
-        />
-      )}
-    </div>;
+    return (
+      <div
+        key={index}
+        onClick={this.handleSetCurrentBreadcrumb(index)}
+        className={cn(
+          styles.breadcrumb,
+          isSelectedBreadcrumb && styles.selectedBreadcrumb,
+          breadCrumbClassName
+        )}
+      >
+        {type === BreadcrumbsTypeEnum.direction && (
+          <span className={styles.breadcrumbIndex}>{index + 1}</span>
+        )}
+        <span className={styles.breadcrumbLabel}>{label}</span>
+        {!isLastBreadcrumb && (
+          <ChevronRight
+            className={cn(
+              styles.breadcrumbIcon,
+              isSelectedBreadcrumb && styles.selectedBreadcrumbIcon
+            )}
+          />
+        )}
+      </div>
+    );
   };
 
   render() {
-    const {
-      breadcrumbs,
-      className,
-      type,
-      breadCrumbHasBorder,
-    } = this.props;
+    const { breadcrumbs, className, type, breadCrumbHasBorder } = this.props;
 
     const breadcrumbsData = Array.from(breadcrumbs.values());
     const notDirectionMode = type !== BreadcrumbsTypeEnum.direction;
@@ -72,13 +73,18 @@ export class Breadcrumbs extends React.PureComponent<BreadcrumbsProps, any> {
     }
 
     return (
-      <div className={cn(styles.breadcrumbs, breadCrumbHasBorder && styles.breadcrumbsHolderBordered)}>
+      <div
+        className={cn(
+          styles.breadcrumbs,
+          breadCrumbHasBorder && styles.breadcrumbsHolderBordered
+        )}
+      >
         <div
           className={cn(
             className,
             styles.breadcrumbsHolder,
             notDirectionMode && styles.tabsBreadcrumbsHolder,
-            styles[`tabsBreadcrumbsHolder_${type}`],
+            styles[`tabsBreadcrumbsHolder_${type}`]
           )}
         >
           {breadcrumbsData.map(this.renderBreadcrumb)}

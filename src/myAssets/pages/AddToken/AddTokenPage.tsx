@@ -1,41 +1,42 @@
-import { push } from 'connected-react-router';
 import React, { FC, useCallback, useState } from 'react';
+import { OutlinedInput } from '@mui/material';
+import { push } from 'connected-react-router';
+import { useTranslation } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
 
-import { OutlinedInput } from '@mui/material';
+import { getNetworkChainID } from 'application/selectors';
 import { RootState } from 'application/store';
 import { Button, PageTemplate, Tabs } from 'common';
 import { Token } from 'myAssets/components/Token';
 import { getTokens } from 'myAssets/selectors/tokensSelectors';
+import { addTokenTrigger, toggleTokenShow } from 'myAssets/slices/tokensSlice';
 import {
-  addTokenTrigger,
-  toggleTokenShow,
-} from 'myAssets/slices/tokensSlice';
-import { AddTokensTabs, TokenKind, getAddTokenTabsLabels } from 'myAssets/types';
-import { useTranslation } from 'react-i18next';
-import { getNetworkChainID } from 'application/selectors';
-import SearchInput from '../../../common/searchInput/SearchInput';
+  AddTokensTabs,
+  TokenKind,
+  getAddTokenTabsLabels
+} from 'myAssets/types';
 import styles from './AddTokenPage.module.scss';
+import SearchInput from '../../../common/searchInput/SearchInput';
 
 const mapDispatchToProps = {
   routeTo: push,
   addTokenTrigger,
-  toggleTokenShow,
+  toggleTokenShow
 };
 
 const mapStateToProps = (state: RootState) => ({
   tokens: getTokens(state),
-  chainId: getNetworkChainID(state),
+  chainId: getNetworkChainID(state)
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
-type AddTokenPageProps = ConnectedProps<typeof connector> ;
+type AddTokenPageProps = ConnectedProps<typeof connector>;
 
-const AddTokenPageComponent:FC<AddTokenPageProps> = ({
+const AddTokenPageComponent: FC<AddTokenPageProps> = ({
   tokens,
   addTokenTrigger,
   toggleTokenShow,
-  chainId,
+  chainId
 }) => {
   const { t } = useTranslation();
   const [search, setSearch] = useState<string>('');
@@ -47,13 +48,13 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
   };
 
   const onChangeAddressInput = (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     setAddress(e.target.value);
   };
 
   const onChangeSearchInput = (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     setSearch(e.target.value);
   };
@@ -62,38 +63,45 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
     addTokenTrigger({ address });
   }, [addTokenTrigger, address]);
 
-  const renderAddTokenForm = useCallback(() => (
-    <div className={styles.addAssetsPageForm}>
-      <div className={styles.addAssetsPageFormTip}>
-        {t('youCanAddAnyStandardToken')}
+  const renderAddTokenForm = useCallback(
+    () => (
+      <div className={styles.addAssetsPageForm}>
+        <div className={styles.addAssetsPageFormTip}>
+          {t('youCanAddAnyStandardToken')}
+        </div>
+
+        <OutlinedInput
+          placeholder={t('assetsAddress')!}
+          fullWidth
+          size='small'
+          className={styles.addAssetsPageFormInput}
+          value={address}
+          onChange={onChangeAddressInput}
+        />
+        <Button
+          className={styles.addAssetsPageFormButton}
+          onClick={onClickAddToken}
+          variant='contained'
+          disabled={!address}
+        >
+          {t('addToken')}
+        </Button>
       </div>
+    ),
+    [address, onClickAddToken, t]
+  );
 
-      <OutlinedInput
-        placeholder={t('assetsAddress')!}
-        fullWidth
-        size="small"
-        className={styles.addAssetsPageFormInput}
-        value={address}
-        onChange={onChangeAddressInput}
-      />
-      <Button
-        className={styles.addAssetsPageFormButton}
-        onClick={onClickAddToken}
-        variant="contained"
-        disabled={!address}
-      >
-        {t('addToken')}
-      </Button>
-    </div>
-  ), [address, onClickAddToken, t]);
-
-  const erc20tokens = tokens.filter((token) => token.type === TokenKind.Erc20 && token?.chainId === chainId);
-  const erc721tokens = tokens.filter((token) => token.type === TokenKind.Erc721 && token?.chainId === chainId);
+  const erc20tokens = tokens.filter(
+    (token) => token.type === TokenKind.Erc20 && token?.chainId === chainId
+  );
+  const erc721tokens = tokens.filter(
+    (token) => token.type === TokenKind.Erc721 && token?.chainId === chainId
+  );
 
   const tokensMap = {
     [AddTokensTabs.Erc20]: erc20tokens,
     [AddTokensTabs.Erc721]: erc721tokens,
-    [AddTokensTabs.AddTokens]: [],
+    [AddTokensTabs.AddTokens]: []
   };
 
   const currentTokens = tokensMap[tab];
@@ -106,16 +114,10 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
 
   const renderAssetsList = useCallback(() => {
     if (!filteredTokens.length && search) {
-      return (
-        <div className={styles.noTokens}>{t('tokenNotFound')}</div>
-      );
+      return <div className={styles.noTokens}>{t('tokenNotFound')}</div>;
     }
     if (!filteredTokens.length) {
-      return (
-        <div className={styles.noTokens}>
-          {t('yourTokensWillBeHere')}
-        </div>
-      );
+      return <div className={styles.noTokens}>{t('yourTokensWillBeHere')}</div>;
     }
     return (
       <ul className={styles.tokensList}>
@@ -123,10 +125,12 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
           <li key={token.address}>
             <Token
               token={token}
-              onClickSwitch={() => toggleTokenShow({
-                address: token.address,
-                isShow: !token.isShow,
-              })}
+              onClickSwitch={() =>
+                toggleTokenShow({
+                  address: token.address,
+                  isShow: !token.isShow
+                })
+              }
             />
           </li>
         ))}
@@ -137,7 +141,7 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
   return (
     <PageTemplate
       topBarChild={t('addToken')}
-      backUrl="/"
+      backUrl='/'
       backUrlText={t('home')!}
     >
       <div className={styles.addAssetsPage}>
@@ -157,9 +161,7 @@ const AddTokenPageComponent:FC<AddTokenPageProps> = ({
         {tab === AddTokensTabs.AddTokens ? (
           renderAddTokenForm()
         ) : (
-          <div className={styles.tokens}>
-            {renderAssetsList()}
-          </div>
+          <div className={styles.tokens}>{renderAssetsList()}</div>
         )}
       </div>
     </PageTemplate>

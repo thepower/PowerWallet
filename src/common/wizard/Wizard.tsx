@@ -3,7 +3,10 @@ import classnames from 'classnames';
 
 import styles from './Wizard.module.scss';
 import { Breadcrumbs } from '../breadcrumbs/components/Breadcrumbs';
-import { BreadcrumbsTypeEnum, BreadcrumbsDataType } from '../breadcrumbs/typings/breadcrumbsTypings';
+import {
+  BreadcrumbsTypeEnum,
+  BreadcrumbsDataType
+} from '../breadcrumbs/typings/breadcrumbsTypings';
 
 export interface WizardProps {
   breadcrumbs: BreadcrumbsDataType[];
@@ -85,20 +88,22 @@ export class Wizard extends React.Component<WizardProps> {
       className,
       type,
       breadCrumbHasBorder,
-      breadCrumbClassName,
+      breadCrumbClassName
     } = this.props;
     const { currentStep } = this.props;
 
-    return <div className={classnames(styles.wizard, className)}>
-      <Breadcrumbs
-        currentStep={currentStep}
-        breadcrumbs={breadcrumbs}
-        setCurrentStep={this.setCurrentStep}
-        type={type}
-        breadCrumbHasBorder={breadCrumbHasBorder}
-        breadCrumbClassName={breadCrumbClassName}
-      />
-      {this.renderComponent()}
-    </div>;
+    return (
+      <div className={classnames(styles.wizard, className)}>
+        <Breadcrumbs
+          currentStep={currentStep}
+          breadcrumbs={breadcrumbs}
+          setCurrentStep={this.setCurrentStep}
+          type={type}
+          breadCrumbHasBorder={breadCrumbHasBorder}
+          breadCrumbClassName={breadCrumbClassName}
+        />
+        {this.renderComponent()}
+      </div>
+    );
   }
 }

@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
-import { Link, LinkProps } from 'react-router-dom';
 import cn from 'classnames';
+import { Link, LinkProps } from 'react-router-dom';
 import styles from './CardLink.module.scss';
 
 type CardLinkProps = LinkProps & {
@@ -26,9 +26,7 @@ const CardLink: React.FC<PropsWithChildren<CardLinkProps>> = ({
         className={cn(styles.card, className)}
       >
         {children}
-        <span className={styles.text}>
-          {label}
-        </span>
+        <span className={styles.text}>{label}</span>
       </a>
     );
   }
@@ -40,9 +38,7 @@ const CardLink: React.FC<PropsWithChildren<CardLinkProps>> = ({
       className={cn(styles.card, className)}
     >
       {children}
-      <span className={styles.text}>
-        {label}
-      </span>
+      <span className={styles.text}>{label}</span>
     </Link>
   );
 };

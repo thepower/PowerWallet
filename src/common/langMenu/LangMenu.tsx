@@ -4,27 +4,29 @@ import {
   MenuItem,
   MenuItemClasses,
   Menu,
-  MenuClasses,
+  MenuClasses
 } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
-import { buildYupLocale, langsKeys } from 'locales/initTranslation';
 import { LangIcon } from 'assets/icons';
 import { IconButton } from 'common';
+import { buildYupLocale, langsKeys } from 'locales/initTranslation';
 import styles from './LangMenu.module.scss';
 
 type SelectProps = Omit<MuiMenuProps, 'open'>;
 
-const menuClasses: Partial<MenuClasses> = { list: styles.menuList, paper: styles.menuPaper, root: styles.menuRoot };
+const menuClasses: Partial<MenuClasses> = {
+  list: styles.menuList,
+  paper: styles.menuPaper,
+  root: styles.menuRoot
+};
 
 const menuItemClasses: Partial<MenuItemClasses> = {
   selected: styles.menuItemSelected,
-  root: styles.menuItemRoot,
+  root: styles.menuItemRoot
 };
 
-export const LangMenu: FC<SelectProps> = ({
-  className,
-}) => {
+export const LangMenu: FC<SelectProps> = ({ className }) => {
   const { t, i18n } = useTranslation();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -44,30 +46,27 @@ export const LangMenu: FC<SelectProps> = ({
         buildYupLocale(null, t);
       }
     },
-    [t, i18n],
+    [t, i18n]
   );
 
   return (
     <div>
-      <IconButton
-        onClick={handleClick}
-        className={className}
-      >
+      <IconButton onClick={handleClick} className={className}>
         <LangIcon />
       </IconButton>
       <Menu
-        id="lang-menu"
+        id='lang-menu'
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
         classes={menuClasses}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'center',
+          horizontal: 'center'
         }}
         transformOrigin={{
           vertical: 'top',
-          horizontal: 'center',
+          horizontal: 'center'
         }}
       >
         {langsKeys.map((rowsPerPageOption) => (

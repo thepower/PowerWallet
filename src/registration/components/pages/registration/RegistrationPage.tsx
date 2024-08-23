@@ -1,49 +1,40 @@
-import {
-  BreadcrumbsTypeEnum,
-  Button,
-  Checkbox,
-  LangMenu,
-  Wizard,
-} from 'common';
+import React, { FC, useCallback, useEffect, useMemo } from 'react';
+import { FormControlLabel } from '@mui/material';
+import { AddressApi } from '@thepowereco/tssdk';
 import { push } from 'connected-react-router';
-import React, {
-  FC, useCallback, useEffect, useMemo, useState,
-} from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
-import { FormControlLabel } from '@mui/material';
+import { Link, RouteComponentProps } from 'react-router-dom';
+import { getWalletAddress } from 'account/selectors/accountSelectors';
+import { RootState } from 'application/store';
+import { BreadcrumbsTypeEnum, Checkbox, LangMenu, Wizard } from 'common';
+import {
+  getCurrentCreatingStep,
+  getIsRandomChain,
+  getIsWithoutPassword,
+  getCurrentBackupStep
+} from 'registration/selectors/registrationSelectors';
 import {
   setCreatingStep,
   setSelectedNetwork,
   setIsRandomChain,
-  toggleIsWithoutPassword,
-  generateSeedPhrase,
-  setSelectedChain,
+  setIsWithoutPassword,
+  setSelectedChain
 } from 'registration/slice/registrationSlice';
-import { RootState } from 'application/store';
-import {
-  getCurrentBackupStep,
-  getCurrentCreatingStep,
-  getIsRandomChain,
-  getIsWithoutPassword,
-} from 'registration/selectors/registrationSelectors';
-import { Link, RouteComponentProps } from 'react-router-dom';
 import { stringToObject } from 'sso/utils';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { AddressApi } from '@thepowereco/tssdk';
+import styles from './RegistrationPage.module.scss';
 import {
   AppQueryParams,
-  WalletRoutesEnum,
-} from '../../application/typings/routes';
+  WalletRoutesEnum
+} from '../../../../application/typings/routes';
 import {
   BackupAccountStepsEnum,
   CreateAccountStepsEnum,
-  getRegistrationTabs,
-} from '../typings/registrationTypes';
-import styles from './Registration.module.scss';
-import { SelectNetwork } from './scenes/selectNetwork/SelectNetwork';
-import { Backup } from './scenes/backup/Backup';
-import { LoginToDapp } from './scenes/loginToDapp/LoginToDapp';
+  getRegistrationTabs
+} from '../../../typings/registrationTypes';
+import { Backup } from '../../scenes/backup/Backup';
+import { LoginToDapp } from '../../scenes/loginToDapp/LoginToDapp';
+import { SelectNetwork } from '../../scenes/selectNetwork/SelectNetwork';
 
 type OwnProps = RouteComponentProps<{ dataOrReferrer?: string }>;
 
@@ -53,7 +44,7 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
   creatingStep: getCurrentCreatingStep(state),
   backupStep: getCurrentBackupStep(state),
   isRandomChain: getIsRandomChain(state),
-  isWithoutPassword: getIsWithoutPassword(state),
+  isWithoutPassword: getIsWithoutPassword(state)
 });
 
 const mapDispatchToProps = {
@@ -61,9 +52,8 @@ const mapDispatchToProps = {
   setIsRandomChain,
   setSelectedNetwork,
   setCreatingStep,
-  toggleIsWithoutPassword,
-  generateSeedPhrase,
-  setSelectedChain,
+  setIsWithoutPassword,
+  setSelectedChain
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -73,7 +63,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
   dataOrReferrer,
   routeTo,
   setIsRandomChain,
-  toggleIsWithoutPassword,
+  setIsWithoutPassword,
   isRandomChain,
   isWithoutPassword,
   setSelectedNetwork,
@@ -81,121 +71,77 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
   backupStep,
   setCreatingStep,
   walletAddress,
-  setSelectedChain,
+  setSelectedChain
 }) => {
   const { t } = useTranslation();
 
-  const [enterButtonPressed, setEnterButtonPressed] = useState(false);
-
-  const isAddressInParams = useMemo(() => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer), [dataOrReferrer]);
+  const isAddressInParams = useMemo(
+    () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
+    [dataOrReferrer]
+  );
 
   const parsedData: AppQueryParams = useMemo(() => {
-    if (!isAddressInParams && dataOrReferrer) return stringToObject(dataOrReferrer);
+    if (!isAddressInParams && dataOrReferrer)
+      return stringToObject(dataOrReferrer);
     return null;
   }, [dataOrReferrer, isAddressInParams]);
 
   useEffect(() => {
     if (walletAddress) {
-      routeTo(`${WalletRoutesEnum.sso}/${dataOrReferrer}`);
+      if (!isAddressInParams) {
+        routeTo(`${WalletRoutesEnum.sso}/${dataOrReferrer}`);
+      } else {
+        routeTo(WalletRoutesEnum.root);
+      }
     } else if (parsedData?.chainID) {
-      setEnterButtonPressed(true);
       setCreatingStep(CreateAccountStepsEnum.backup);
       setIsRandomChain(false);
       setSelectedChain(parsedData.chainID);
     }
-  }, [
-    dataOrReferrer,
-    parsedData?.chainID,
-  ]);
+  }, [dataOrReferrer]);
 
   const resetStage = () => {
-    setEnterButtonPressed(false);
     setCreatingStep(CreateAccountStepsEnum.selectNetwork);
     setIsRandomChain(true);
     setSelectedChain(null);
   };
 
   const getRegistrationBreadcrumbs = useMemo(
-    () => (
-      dataOrReferrer
+    () =>
+      !isAddressInParams && parsedData
         ? [
-          {
-            label: getRegistrationTabs(t).selectNetwork,
-            component: SelectNetwork,
-          },
-          {
-            label: getRegistrationTabs(t).backup,
-            component: Backup,
-          },
-          {
-            label: getRegistrationTabs(t).login,
-            component: LoginToDapp,
-          },
-        ]
+            {
+              label: getRegistrationTabs(t).selectNetwork,
+              component: SelectNetwork
+            },
+            {
+              label: getRegistrationTabs(t).backup,
+              component: Backup
+            },
+            {
+              label: getRegistrationTabs(t).login,
+              component: LoginToDapp
+            }
+          ]
         : [
-          {
-            label: getRegistrationTabs(t).selectNetwork,
-            component: SelectNetwork,
-          },
-          {
-            label: getRegistrationTabs(t).backup,
-            component: Backup,
-          },
-        ]),
-    [dataOrReferrer, t],
+            {
+              label: getRegistrationTabs(t).selectNetwork,
+              component: SelectNetwork
+            },
+            {
+              label: getRegistrationTabs(t).backup,
+              component: Backup
+            }
+          ],
+    [parsedData, isAddressInParams, t]
   );
-
-  const handleProceedToRegistration = useCallback(() => {
-    setEnterButtonPressed(true);
-  }, [setEnterButtonPressed]);
-
-  const handleProceedToLogin = useCallback(() => {
-    routeTo(WalletRoutesEnum.login);
-  }, [routeTo]);
 
   const onSelectBreadCrumb = (nextStep: number) => {
     setCreatingStep(nextStep);
   };
 
-  const renderWelcome = useCallback(
-    () => (
-      <>
-        <LangMenu className={styles.langSelect} />
-        <Link
-          to={walletAddress ? WalletRoutesEnum.root : WalletRoutesEnum.signup}
-          className={styles.registrationTitle}
-          onClick={resetStage}
-        >
-          Power Wallet
-        </Link>
-        <div className={styles.registrationDesc}>
-          {t('registrationPageDesc')}
-        </div>
-        <div className={styles.buttonsHolder}>
-          <Button
-            size="large"
-            variant="contained"
-            type="button"
-            onClick={handleProceedToRegistration}
-          >
-            {t('registrationPageJoinButton')}
-          </Button>
-          <Button
-            size="large"
-            variant="outlined"
-            type="button"
-            onClick={handleProceedToLogin}
-          >
-            {t('registrationPageImportAccountButton')}
-          </Button>
-        </div>
-      </>
-    ),
-    [t, handleProceedToLogin, handleProceedToRegistration],
-  );
-
   const toggleRandomChainHandler = useCallback(() => {
-    if (isRandomChain) setSelectedNetwork(null);
+    if (!isRandomChain) setSelectedNetwork(null);
     setIsRandomChain(!isRandomChain);
   }, [isRandomChain, setSelectedNetwork, setIsRandomChain]);
 
@@ -229,7 +175,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
               <Checkbox
                 size={'medium'}
                 checked={isWithoutPassword}
-                onClick={() => toggleIsWithoutPassword()}
+                onClick={() => setIsWithoutPassword(!isWithoutPassword)}
                 disableRipple
               />
             }
@@ -246,8 +192,8 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
     creatingStep,
     isRandomChain,
     isWithoutPassword,
-    toggleIsWithoutPassword,
-    toggleRandomChainHandler,
+    setIsWithoutPassword,
+    toggleRandomChainHandler
   ]);
 
   const renderRegistration = useCallback(
@@ -256,7 +202,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
         <div className={styles.registrationPageHeader}>
           <div style={{ width: '48px' }} />
           <Link
-            to={walletAddress ? WalletRoutesEnum.root : WalletRoutesEnum.signup}
+            to={WalletRoutesEnum.root}
             className={styles.registrationPageTitle}
             onClick={resetStage}
           >
@@ -282,14 +228,11 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
       getRegistrationBreadcrumbs,
       onSelectBreadCrumb,
       renderCheckBox,
-    ],
+      resetStage
+    ]
   );
 
-  return (
-    <div className={styles.registrationPage}>
-      {enterButtonPressed ? renderRegistration() : renderWelcome()}
-    </div>
-  );
+  return <div className={styles.registrationPage}>{renderRegistration()}</div>;
 };
 
 export const RegistrationPage = connector(RegistrationPageComponent);

@@ -4,7 +4,6 @@ dump.rdb
 /build
 /dist
 /uploads
-tp-cli.json
 
 # Logs
 *.log
@@ -35,7 +34,12 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 src/regal-sun-332215-9c9a74b9465e.json
-.env
-.env.network
+*.local
+

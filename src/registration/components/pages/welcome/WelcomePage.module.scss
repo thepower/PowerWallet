@@ -1,0 +1,76 @@
+@import 'src/styles/variables';
+@import 'src/styles/mixins';
+
+.registrationPage {
+  position: relative;
+  display: flex;
+  width: 100%;
+
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.langSelect {
+  position: absolute;
+  z-index: 100001;
+  top: 16px;
+  right: calc(10vw + 32px);
+
+  @include mobile {
+    top: 40px;
+    right: 16px;
+  }
+}
+
+.registrationTitle {
+  @include text-gradient();
+  font-size: 80px;
+
+  font-weight: 700;
+  line-height: 64px;
+
+  @media screen and (max-width: $tablet) {
+    font-size: 48px;
+    line-height: 40px;
+  }
+}
+
+.registrationDesc {
+  @include text-gradient();
+
+  margin-top: 32px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 32px;
+
+  text-align: center;
+
+  @media screen and (max-width: $tablet) {
+    margin-top: 20px;
+    font-size: 16px;
+    line-height: 32px;
+  }
+}
+
+
+.buttonsHolder {
+  z-index: 10000;
+  display: flex;
+  flex-direction: row;
+  margin-top: 60px;
+
+  @include mobile {
+    flex-direction: column;
+
+    a:first-child {
+      margin-right: 0 !important;
+      margin-bottom: 32px;
+    }
+  }
+
+  a:first-child {
+    margin-right: 60px;
+  }
+}

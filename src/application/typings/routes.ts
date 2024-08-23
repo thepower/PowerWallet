@@ -9,7 +9,7 @@ export enum WalletRoutesEnum {
   signup = '/signup',
   root = '/',
   login = '/login',
-  sso = '/sso',
+  sso = '/sso'
 }
 
 export type AppQueryParams = {

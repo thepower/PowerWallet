@@ -1,40 +1,36 @@
+import React, { FC, useCallback, useEffect, useMemo } from 'react';
 import { BigNumber, formatFixed } from '@ethersproject/bignumber';
 import { InputAdornment, TextField } from '@mui/material';
 import { AddressApi, CryptoApi } from '@thepowereco/tssdk';
 import cn from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
-import { getTokenByID } from 'myAssets/selectors/tokensSelectors';
-import { getWalletNativeTokensAmountBySymbol } from 'myAssets/selectors/walletSelectors';
-import { TokenKind } from 'myAssets/types';
-import React, {
-  FC, useCallback, useEffect, useMemo,
-} from 'react';
+import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import * as yup from 'yup';
 import {
   getWalletAddress,
-  getWalletData,
+  getWalletData
 } from 'account/selectors/accountSelectors';
 import { RootState } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import {
-  Button, PageTemplate, Divider, FullScreenLoader,
-} from 'common';
 import { LogoIcon, MoneyBugIcon } from 'assets/icons';
+import { Button, PageTemplate, Divider, FullScreenLoader } from 'common';
 import TxResult from 'common/txResult/TxResult';
-import { checkIfLoading } from 'network/selectors';
-import { useTranslation } from 'react-i18next';
+import { getTokenByID } from 'myAssets/selectors/tokensSelectors';
+import { getWalletNativeTokensAmountBySymbol } from 'myAssets/selectors/walletSelectors';
 import { addTokenTrigger } from 'myAssets/slices/tokensSlice';
+import { TokenKind } from 'myAssets/types';
+import { checkIfLoading } from 'network/selectors';
+import ConfirmSendModal from './ConfirmSendModal';
+import styles from './SendPage.module.scss';
 import { getSentData } from '../selectors/sendSelectors';
 import {
   clearSentData,
   sendErc721TokenTrxTrigger,
   sendTokenTrxTrigger,
-  sendTrxTrigger,
+  sendTrxTrigger
 } from '../slices/sendSlice';
-import ConfirmSendModal from './ConfirmSendModal';
-import styles from './SendPage.module.scss';
 
 type OwnProps = RouteComponentProps<{
   type: TokenKind;
@@ -47,7 +43,7 @@ const mapDispatchToProps = {
   sendTrxTrigger,
   sendTokenTrxTrigger,
   sendErc721TokenTrxTrigger,
-  addTokenTrigger,
+  addTokenTrigger
 };
 
 const mapStateToProps = (state: RootState, props: OwnProps) => ({
@@ -57,7 +53,7 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
   getTokenByID: (address: string) => getTokenByID(state, address),
   nativeTokenAmount: getWalletNativeTokensAmountBySymbol(
     state,
-    props?.match?.params?.address,
+    props?.match?.params?.address
   ),
   tokenType: props?.match?.params?.type,
   tokenAddress: props?.match?.params?.address,
@@ -66,7 +62,7 @@ const mapStateToProps = (state: RootState, props: OwnProps) => ({
     checkIfLoading(state, sendTokenTrxTrigger.type) ||
     checkIfLoading(state, sendErc721TokenTrxTrigger.type),
   isAddTokenLoading: checkIfLoading(state, addTokenTrigger.type),
-  encryptedWif: getWalletData(state).encryptedWif,
+  encryptedWif: getWalletData(state).encryptedWif
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -82,11 +78,11 @@ export type FormValues = {
 const initialValues: FormValues = {
   amount: 0,
   comment: '',
-  address: '',
+  address: ''
 };
 
 const InputLabelProps = {
-  className: styles.label,
+  className: styles.label
 };
 
 const SendPageComponent: FC<SendProps> = ({
@@ -104,7 +100,7 @@ const SendPageComponent: FC<SendProps> = ({
   addTokenTrigger,
   nativeTokenAmount,
   encryptedWif,
-  erc721TokenId,
+  erc721TokenId
 }) => {
   const { t } = useTranslation();
 
@@ -112,27 +108,27 @@ const SendPageComponent: FC<SendProps> = ({
 
   const token = useMemo(
     () => getTokenByID(tokenAddress),
-    [getTokenByID, tokenAddress],
+    [getTokenByID, tokenAddress]
   );
 
-  useEffect(
-    () => {
-      clearSentData();
-    },
-    [],
+  useEffect(() => {
+    clearSentData();
+  }, []);
+
+  const isNativeToken = useMemo(
+    () => tokenType === TokenKind.Native,
+    [tokenType]
+  );
+  const isErc721Token = useMemo(
+    () => tokenType === TokenKind.Erc721,
+    [tokenType]
   );
 
-  const isNativeToken = useMemo(() => tokenType === TokenKind.Native, [tokenType]);
-  const isErc721Token = useMemo(() => tokenType === TokenKind.Erc721, [tokenType]);
-
-  useEffect(
-    () => {
-      if (!token && tokenAddress && !isNativeToken) {
-        addTokenTrigger({ address: tokenAddress, withoutRedirect: true });
-      }
-    },
-    [addTokenTrigger, isNativeToken, token, tokenAddress],
-  );
+  useEffect(() => {
+    if (!token && tokenAddress && !isNativeToken) {
+      addTokenTrigger({ address: tokenAddress, withoutRedirect: true });
+    }
+  }, [addTokenTrigger, isNativeToken, token, tokenAddress]);
 
   const formattedAmount = useMemo(() => {
     switch (tokenType) {
@@ -159,11 +155,11 @@ const SendPageComponent: FC<SendProps> = ({
             .moreThan(0)
             .lessThan(
               Number(formattedAmount?.toString()),
-              t('balanceExceededReduceAmount')!,
+              t('balanceExceededReduceAmount')!
             )
             .nullable(),
           address: yup.string().required().length(20),
-          comment: yup.string().max(1024),
+          comment: yup.string().max(1024)
         });
       case TokenKind.Erc20:
         return yup.object().shape({
@@ -173,14 +169,14 @@ const SendPageComponent: FC<SendProps> = ({
             .moreThan(0)
             .lessThan(
               Number(formattedAmount?.toString()),
-              t('balanceExceededReduceAmount')!,
+              t('balanceExceededReduceAmount')!
             )
             .nullable(),
-          address: yup.string().required().length(20),
+          address: yup.string().required().length(20)
         });
       case TokenKind.Erc721:
         return yup.object().shape({
-          address: yup.string().required().length(20),
+          address: yup.string().required().length(20)
         });
       default:
         return undefined;
@@ -191,19 +187,18 @@ const SendPageComponent: FC<SendProps> = ({
 
   const send = async ({
     values,
-    decryptedWif,
+    decryptedWif
   }: {
     values: FormValues;
     decryptedWif: string;
   }) => {
     switch (tokenType) {
       case TokenKind.Native:
-        console.log({ tokenType });
         sendTrxTrigger({
           to: values.address!,
           comment: values.comment,
           amount: values.amount,
-          wif: decryptedWif,
+          wif: decryptedWif
         });
         break;
       case TokenKind.Erc20:
@@ -213,7 +208,7 @@ const SendPageComponent: FC<SendProps> = ({
             amount: values.amount,
             decimals: token.decimals,
             to: values.address!,
-            wif: decryptedWif,
+            wif: decryptedWif
           });
         }
         break;
@@ -222,7 +217,7 @@ const SendPageComponent: FC<SendProps> = ({
           to: values.address!,
           address: tokenAddress!,
           id: erc721TokenId!,
-          wif: decryptedWif,
+          wif: decryptedWif
         });
         break;
       default:
@@ -231,7 +226,7 @@ const SendPageComponent: FC<SendProps> = ({
 
   const handleSubmit = async (
     values: FormValues,
-    formikHelpers: FormikHelpers<FormValues>,
+    formikHelpers: FormikHelpers<FormValues>
   ) => {
     if (!AddressApi.isTextAddressValid(values.address!)) {
       formikHelpers.setFieldError('address', t('invalidAddress')!);
@@ -255,7 +250,7 @@ const SendPageComponent: FC<SendProps> = ({
   const formik = useFormik({
     initialValues,
     onSubmit: handleSubmit,
-    validationSchema: getValidationSchema(),
+    validationSchema: getValidationSchema()
   });
 
   const renderForm = () => (
@@ -271,11 +266,11 @@ const SendPageComponent: FC<SendProps> = ({
         <div className={styles.fields}>
           {!isErc721Token && (
             <TextField
-              variant="standard"
+              variant='standard'
               label={t('amount')}
-              type="number"
-              placeholder="00.000"
-              name="amount"
+              type='number'
+              placeholder='00.000'
+              name='amount'
               value={formik.values.amount}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -284,22 +279,22 @@ const SendPageComponent: FC<SendProps> = ({
               InputLabelProps={InputLabelProps}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">
+                  <InputAdornment position='start'>
                     <MoneyBugIcon
                       className={cn(
-                        formik.values.amount && styles.activeBugIcon,
+                        formik.values.amount && styles.activeBugIcon
                       )}
                     />
                   </InputAdornment>
-                ),
+                )
               }}
             />
           )}
           <TextField
-            variant="standard"
+            variant='standard'
             label={t('addressOfTheRecipient')}
-            placeholder="AA000000000000000000"
-            name="address"
+            placeholder='AA000000000000000000'
+            name='address'
             value={formik.values.address}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -308,11 +303,11 @@ const SendPageComponent: FC<SendProps> = ({
           />
           {isNativeToken && (
             <TextField
-              variant="outlined"
+              variant='outlined'
               placeholder={t('addComment')!}
               multiline
               minRows={2}
-              name="comment"
+              name='comment'
               value={formik.values.comment}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -322,10 +317,10 @@ const SendPageComponent: FC<SendProps> = ({
           )}
         </div>
         <Button
-          size="large"
-          variant="contained"
+          size='large'
+          variant='contained'
           className={styles.button}
-          type="submit"
+          type='submit'
           disabled={!formik.dirty}
         >
           {t('send')}
@@ -351,7 +346,7 @@ const SendPageComponent: FC<SendProps> = ({
         <TxResult
           sentData={{
             ...sentData,
-            amount: `${sentData.amount} ${tokenSymbol}`,
+            amount: `${sentData.amount} ${tokenSymbol}`
           }}
         />
       </PageTemplate>

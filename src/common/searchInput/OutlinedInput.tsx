@@ -3,7 +3,7 @@ import {
   FormControl,
   FormHelperText,
   OutlinedInput as MuiOutlinedInput,
-  OutlinedInputProps as MuiOutlinedInputProps,
+  OutlinedInputProps as MuiOutlinedInputProps
 } from '@mui/material';
 import styles from './OutlinedInput.module.scss';
 
@@ -12,11 +12,18 @@ export interface OutlinedInputProps extends MuiOutlinedInputProps {
 }
 
 export const OutlinedInput: React.FC<OutlinedInputProps> = ({
-  errorMessage, className, error, ...otherProps
+  errorMessage,
+  className,
+  error,
+  ...otherProps
 }) => (
   <FormControl className={className}>
     <MuiOutlinedInput classes={styles} {...otherProps} />
-    {error && <FormHelperText className={styles.errorMessage}>{errorMessage}</FormHelperText>}
+    {error && (
+      <FormHelperText className={styles.errorMessage}>
+        {errorMessage}
+      </FormHelperText>
+    )}
   </FormControl>
 );
 

@@ -2,7 +2,7 @@ import {
   createAction,
   createSlice,
   Draft,
-  PayloadAction,
+  PayloadAction
 } from '@reduxjs/toolkit';
 import { ChainNetwork, NetworkApi, WalletApi } from '@thepowereco/tssdk';
 import { Maybe } from '../../typings/common';
@@ -20,7 +20,7 @@ const initialState: ApplicationDataState = {
   showUnderConstruction: false,
   networkApi: null,
   walletApi: null,
-  networksChains: null,
+  networksChains: null
 };
 
 const applicationDataSlice = createSlice({
@@ -29,27 +29,31 @@ const applicationDataSlice = createSlice({
   reducers: {
     setDynamicApis: (
       state: ApplicationDataState,
-      { payload }: PayloadAction<{ networkApi: NetworkApi, walletApi: WalletApi }>,
+      {
+        payload
+      }: PayloadAction<{ networkApi: NetworkApi; walletApi: WalletApi }>
     ) => {
       state.networkApi = payload.networkApi;
       state.walletApi = payload.walletApi;
     },
-    setShowUnderConstruction: (state: ApplicationDataState, action: PayloadAction<boolean>) => {
+    setShowUnderConstruction: (
+      state: ApplicationDataState,
+      action: PayloadAction<boolean>
+    ) => {
       state.showUnderConstruction = action.payload;
     },
-    setNetworkChains: (state: ApplicationDataState, action: PayloadAction<ChainNetwork>) => {
+    setNetworkChains: (
+      state: ApplicationDataState,
+      action: PayloadAction<ChainNetwork>
+    ) => {
       state.networksChains = action.payload;
-    },
-  },
+    }
+  }
 });
 
 export const initApplication = createAction(`${SLICE_NAME}/initApplication`);
 
 export const {
   reducer: applicationDataReducer,
-  actions: {
-    setDynamicApis,
-    setShowUnderConstruction,
-    setNetworkChains,
-  },
+  actions: { setDynamicApis, setShowUnderConstruction, setNetworkChains }
 } = applicationDataSlice;

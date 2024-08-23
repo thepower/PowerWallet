@@ -32,7 +32,6 @@ export { BreadcrumbsTypeEnum } from './breadcrumbs/typings/breadcrumbsTypings';
 export type { WizardComponentProps } from './wizard/Wizard';
 
 // utils
-export { default as manageSagaState } from './manageSagaState';
 export { branchCallFunction } from './utils/common';
 export { FileReaderType, getFileData } from './utils/files';
 

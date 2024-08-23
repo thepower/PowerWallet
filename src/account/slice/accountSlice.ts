@@ -1,6 +1,13 @@
 import { createSlice, createAction, PayloadAction } from '@reduxjs/toolkit';
-import { AddActionOnDecryptErrorType, AddActionOnSuccessAndErrorType } from '../../typings/common';
-import { ExportAccountInputType, ImportAccountInputType, LoginToWalletSagaInput } from '../typings/accountTypings';
+import {
+  AddActionOnDecryptErrorType,
+  AddActionOnSuccessAndErrorType
+} from '../../typings/common';
+import {
+  ExportAccountInputType,
+  ImportAccountInputType,
+  LoginToWalletSagaInput
+} from '../typings/accountTypings';
 
 export type WalletData = {
   address: string;
@@ -13,17 +20,27 @@ export interface AccountState {
 }
 
 const SLICE_NAME = 'account';
-const loginToWallet = createAction<LoginToWalletSagaInput>(`${SLICE_NAME}/loginToWallet`);
-const resetAccount = createAction<AddActionOnDecryptErrorType<{ password: string }>>(`${SLICE_NAME}/resetAccount`);
-const exportAccount = createAction<AddActionOnSuccessAndErrorType<AddActionOnDecryptErrorType<ExportAccountInputType>>>(`${SLICE_NAME}/exportAccount`);
-const importAccountFromFile = createAction<AddActionOnDecryptErrorType<ImportAccountInputType>>(`${SLICE_NAME}/importAccount`);
+const loginToWallet = createAction<LoginToWalletSagaInput>(
+  `${SLICE_NAME}/loginToWallet`
+);
+const resetAccount = createAction<
+  AddActionOnDecryptErrorType<{ password: string }>
+>(`${SLICE_NAME}/resetAccount`);
+const exportAccount = createAction<
+  AddActionOnSuccessAndErrorType<
+    AddActionOnDecryptErrorType<ExportAccountInputType>
+  >
+>(`${SLICE_NAME}/exportAccount`);
+const importAccountFromFile = createAction<
+  AddActionOnDecryptErrorType<ImportAccountInputType>
+>(`${SLICE_NAME}/importAccount`);
 
 const initialState: AccountState = {
   walletData: {
     address: '',
-    encryptedWif: '',
+    encryptedWif: ''
   },
-  openedMenu: false,
+  openedMenu: false
 };
 
 const accountSlice = createSlice({
@@ -33,7 +50,7 @@ const accountSlice = createSlice({
     setWalletData: (state: AccountState, action: PayloadAction<WalletData>) => {
       state.walletData = {
         ...state.walletData,
-        ...action.payload,
+        ...action.payload
       };
     },
     clearAccountData: () => initialState,
@@ -42,8 +59,8 @@ const accountSlice = createSlice({
     },
     closeAccountMenu: (state: AccountState) => {
       state.openedMenu = false;
-    },
-  },
+    }
+  }
 });
 
 const {
@@ -52,8 +69,8 @@ const {
     setWalletData,
     clearAccountData,
     toggleOpenedAccountMenu,
-    closeAccountMenu,
-  },
+    closeAccountMenu
+  }
 } = accountSlice;
 
 export {
@@ -65,5 +82,5 @@ export {
   clearAccountData,
   exportAccount,
   toggleOpenedAccountMenu,
-  closeAccountMenu,
+  closeAccountMenu
 };

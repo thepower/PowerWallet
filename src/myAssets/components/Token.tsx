@@ -1,12 +1,12 @@
 import React, { FC, memo } from 'react';
-import { TToken, TokenKind } from 'myAssets/types';
-import cn from 'classnames';
-import { Checkbox, Divider, Switch } from 'common';
 import { BigNumber, formatFixed } from '@ethersproject/bignumber';
+import cn from 'classnames';
 
 import { Link } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { LogoIcon } from 'assets/icons';
+import { Checkbox, Divider, Switch } from 'common';
+import { TToken, TokenKind } from 'myAssets/types';
 import styles from './Token.module.scss';
 
 type OwnProps = {
@@ -24,11 +24,13 @@ const TokenComponent: FC<TokenProps> = ({
   isCheckBoxChecked,
   isErc721Collection,
   onClickSwitch,
-  onClickCheckBox,
+  onClickCheckBox
 }) => {
   const { amount, decimals, type } = token;
   const formattedAmount =
-    type === TokenKind.Erc20 ? formatFixed(BigNumber.from(amount), decimals) : amount;
+    type === TokenKind.Erc20
+      ? formatFixed(BigNumber.from(amount), decimals)
+      : amount;
 
   const onClickToken = () => {
     if (onClickSwitch) {
@@ -102,7 +104,7 @@ const TokenComponent: FC<TokenProps> = ({
             <span className={styles.name}>{token?.name}</span>
           </div>
           {renderRightCol()}
-        </div>,
+        </div>
       )}
       <Divider className={styles.divider} />
     </>

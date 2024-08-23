@@ -33,7 +33,8 @@ export const useSmoothHorizontalScroll = (): UseSmoothHorizontalScroll => {
   useEffect(() => {
     if (!scrollContainerRef.current) return;
     setIsAtEnd(
-      scrollContainerRef.current.scrollWidth === scrollContainerRef.current.offsetWidth,
+      scrollContainerRef.current.scrollWidth ===
+        scrollContainerRef.current.offsetWidth
     );
   }, [scrollContainerRef]);
 
@@ -43,15 +44,16 @@ export const useSmoothHorizontalScroll = (): UseSmoothHorizontalScroll => {
     setIsAtStart(scrollContainerRef.current.scrollLeft === 0);
     setIsAtEnd(
       Math.floor(
-        scrollContainerRef.current.scrollWidth - scrollContainerRef.current.scrollLeft,
-      ) <= scrollContainerRef.current.offsetWidth,
+        scrollContainerRef.current.scrollWidth -
+          scrollContainerRef.current.scrollLeft
+      ) <= scrollContainerRef.current.offsetWidth
     );
   };
 
   const scrollTo = (shift: number) => {
     scrollContainerRef.current?.scrollTo({
       left: scrollContainerRef.current.scrollLeft + shift,
-      behavior: 'smooth',
+      behavior: 'smooth'
     });
   };
 
@@ -64,11 +66,13 @@ export const useSmoothHorizontalScroll = (): UseSmoothHorizontalScroll => {
         const containerRect = container.getBoundingClientRect();
         const elementRect = element.getBoundingClientRect();
         const containerCenter = containerRect.width / 2;
-        const elementCenter = elementRect.left - containerRect.left + elementRect.width / 2;
-        const scrollToPosition = elementCenter - containerCenter + container.scrollLeft;
+        const elementCenter =
+          elementRect.left - containerRect.left + elementRect.width / 2;
+        const scrollToPosition =
+          elementCenter - containerCenter + container.scrollLeft;
         container.scrollTo({
           left: scrollToPosition,
-          behavior: 'smooth',
+          behavior: 'smooth'
         });
         setCurrentIndex(index);
       }
@@ -88,7 +92,8 @@ export const useSmoothHorizontalScroll = (): UseSmoothHorizontalScroll => {
     const container = scrollContainerRef.current;
     if (container) {
       const children = container.children;
-      const previousIndex = (currentIndex - 1 + children.length) % children.length;
+      const previousIndex =
+        (currentIndex - 1 + children.length) % children.length;
       scrollToElementByIndex(previousIndex);
     }
   };
@@ -101,6 +106,6 @@ export const useSmoothHorizontalScroll = (): UseSmoothHorizontalScroll => {
     scrollToNext,
     scrollToPrevious,
     isAtStart,
-    isAtEnd,
+    isAtEnd
   };
 };

@@ -1,31 +1,41 @@
-import { call, put, select } from 'typed-redux-saga';
-import { CryptoApi } from '@thepowereco/tssdk';
-import fileSaver from 'file-saver';
-import { FileReaderType, getFileData } from 'common';
+import { CryptoApi, WalletApi } from '@thepowereco/tssdk';
 import { push } from 'connected-react-router';
+import fileSaver from 'file-saver';
 import { toast } from 'react-toastify';
+import { call, put, select } from 'typed-redux-saga';
+import { FileReaderType, getFileData } from 'common';
 import i18n from 'locales/initTranslation';
 import { getSelectedChain } from 'registration/selectors/registrationSelectors';
+import { reInitApis } from '../../application/sagas/initApplicationSaga';
+import { getNetworkApi, getNetworkChainID } from '../../application/selectors';
+import { WalletRoutesEnum } from '../../application/typings/routes';
+import {
+  clearApplicationStorage,
+  setKeyToApplicationStorage
+} from '../../application/utils/localStorageUtils';
+import { loadBalanceTrigger } from '../../myAssets/slices/walletSlice';
+import { getWalletData } from '../selectors/accountSelectors';
 import {
   clearAccountData,
   exportAccount,
   importAccountFromFile,
   resetAccount,
-  setWalletData,
+  setWalletData
 } from '../slice/accountSlice';
-import { getWalletData } from '../selectors/accountSelectors';
 import {
   GetChainResultType,
-  LoginToWalletSagaInput,
+  LoginToWalletSagaInput
 } from '../typings/accountTypings';
-import { clearApplicationStorage, setKeyToApplicationStorage } from '../../application/utils/localStorageUtils';
-import { getNetworkApi, getNetworkChainID, getWalletApi } from '../../application/selectors';
-import { WalletRoutesEnum } from '../../application/typings/routes';
-import { reInitApis } from '../../application/sagas/initApplicationSaga';
-import { loadBalanceTrigger } from '../../myAssets/slices/walletSlice';
 
-export function* loginToWalletSaga({ payload }: { payload?: LoginToWalletSagaInput } = {}) {
+export function* loginToWalletSaga({
+  payload
+}: { payload?: LoginToWalletSagaInput } = {}) {
   const { address, encryptedWif } = payload!;
+
+  if (!address || !encryptedWif) {
+    return;
+  }
+
   let NetworkAPI = (yield* select(getNetworkApi))!;
 
   try {
@@ -47,10 +57,12 @@ export function* loginToWalletSaga({ payload }: { payload?: LoginToWalletSagaInp
 
     yield setKeyToApplicationStorage('address', address);
     yield setKeyToApplicationStorage('wif', encryptedWif);
-    yield* put(setWalletData({
-      address: payload?.address!,
-      encryptedWif: payload?.encryptedWif!,
-    }));
+    yield* put(
+      setWalletData({
+        address,
+        encryptedWif
+      })
+    );
 
     yield* put(loadBalanceTrigger());
   } catch (e) {
@@ -60,19 +72,29 @@ export function* loginToWalletSaga({ payload }: { payload?: LoginToWalletSagaInp
   }
 }
 
-export function* importAccountFromFileSaga({ payload }: ReturnType<typeof importAccountFromFile>) {
+export function* importAccountFromFileSaga({
+  payload
+}: ReturnType<typeof importAccountFromFile>) {
   const { accountFile, password, additionalActionOnDecryptError } = payload;
-  const WalletAPI = (yield* select(getWalletApi))!;
 
   try {
     const data = yield* call(getFileData, accountFile, FileReaderType.binary);
-    const walletData = yield* call(WalletAPI.parseExportData, data!, password);
-    const encryptedWif = yield* call(CryptoApi.encryptWif, walletData.wif!, password);
+    const walletData = yield* call(WalletApi.parseExportData, data!, password);
+    const encryptedWif = yield* call(
+      CryptoApi.encryptWif,
+      walletData.wif!,
+      password
+    );
 
-    yield* loginToWalletSaga({ payload: { address: walletData.address, encryptedWif } });
+    yield* loginToWalletSaga({
+      payload: { address: walletData.address, encryptedWif }
+    });
     yield* put(push(WalletRoutesEnum.root));
   } catch (e: any) {
-    if (additionalActionOnDecryptError && e.message === 'unable to decrypt data') {
+    if (
+      additionalActionOnDecryptError &&
+      e.message === 'unable to decrypt data'
+    ) {
       additionalActionOnDecryptError?.();
     } else {
       toast.error(i18n.t('importAccountError'));
@@ -80,25 +102,41 @@ export function* importAccountFromFileSaga({ payload }: ReturnType<typeof import
   }
 }
 
-export function* exportAccountSaga({ payload }: ReturnType<typeof exportAccount>) {
+export function* exportAccountSaga({
+  payload
+}: ReturnType<typeof exportAccount>) {
   const { encryptedWif, address } = yield* select(getWalletData);
   const {
-    password, hint, isWithoutGoHome, additionalActionOnSuccess, additionalActionOnDecryptError,
+    password,
+    hint,
+    isWithoutGoHome,
+    additionalActionOnSuccess,
+    additionalActionOnDecryptError
   } = payload;
-  const WalletAPI = (yield* select(getWalletApi))!;
   const currentNetworkChain = yield* select(getNetworkChainID);
   const currentRegistrationChain = yield* select(getSelectedChain);
   try {
-    const decryptedWif: string = yield CryptoApi.decryptWif(encryptedWif, password);
-    const exportedData: string = yield WalletAPI.getExportData(decryptedWif, address, password, hint);
+    const decryptedWif: string = yield CryptoApi.decryptWif(
+      encryptedWif,
+      password
+    );
+    const exportedData: string = yield WalletApi.getExportData(
+      decryptedWif,
+      address,
+      password,
+      hint
+    );
 
     const blob: Blob = yield new Blob([exportedData], { type: 'octet-stream' });
 
     yield* loginToWalletSaga({ payload: { address, encryptedWif } });
 
-    const fileName = currentNetworkChain || currentRegistrationChain ?
-      `power_wallet_${currentRegistrationChain || currentNetworkChain}_${address}.pem` :
-      `power_wallet_${address}.pem`;
+    const fileName =
+      currentNetworkChain || currentRegistrationChain
+        ? `power_wallet_${
+            currentRegistrationChain || currentNetworkChain
+          }_${address}.pem`
+        : `power_wallet_${address}.pem`;
 
     yield fileSaver.saveAs(blob, fileName, { autoBom: true });
 
@@ -110,7 +148,10 @@ export function* exportAccountSaga({ payload }: ReturnType<typeof exportAccount>
   } catch (e: any) {
     console.error('exportAccountSaga', e);
 
-    if (additionalActionOnDecryptError && e.message === 'unable to decrypt data') {
+    if (
+      additionalActionOnDecryptError &&
+      e.message === 'unable to decrypt data'
+    ) {
       additionalActionOnDecryptError?.();
     } else {
       toast.error(i18n.t('exportAccountError'));
@@ -118,15 +159,20 @@ export function* exportAccountSaga({ payload }: ReturnType<typeof exportAccount>
   }
 }
 
-export function* resetAccountSaga({ payload: { password, additionalActionOnDecryptError } }: ReturnType<typeof resetAccount>) {
+export function* resetAccountSaga({
+  payload: { password, additionalActionOnDecryptError }
+}: ReturnType<typeof resetAccount>) {
   const { encryptedWif } = yield* select(getWalletData);
   try {
     yield CryptoApi.decryptWif(encryptedWif, password);
     yield clearApplicationStorage();
     yield put(clearAccountData());
-    yield put(push(WalletRoutesEnum.signup));
+    yield put(push(WalletRoutesEnum.root));
   } catch (e: any) {
-    if (additionalActionOnDecryptError && e.message === 'unable to decrypt data') {
+    if (
+      additionalActionOnDecryptError &&
+      e.message === 'unable to decrypt data'
+    ) {
       additionalActionOnDecryptError?.();
     } else {
       toast.error(i18n.t('resetAccountError'));

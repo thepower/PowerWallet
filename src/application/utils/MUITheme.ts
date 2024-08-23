@@ -7,22 +7,22 @@ declare module '@mui/styles/defaultTheme' {
 
 const MUITheme = createTheme({
   typography: {
-    fontFamily: 'Ubuntu, sans-serif',
+    fontFamily: 'Ubuntu, sans-serif'
   },
   palette: {
     background: {
-      default: '#020409',
+      default: '#020409'
     },
     primary: {
-      main: '#2997ff',
+      main: '#2997ff'
     },
-    mode: 'dark',
+    mode: 'dark'
   },
   spacing: 4,
   transitions: {
     duration: {
-      standard: 300,
-    },
+      standard: 300
+    }
   },
   breakpoints: {
     values: {
@@ -30,23 +30,23 @@ const MUITheme = createTheme({
       sm: 360,
       md: 768,
       lg: 1280,
-      xl: 1600,
-    },
+      xl: 1600
+    }
   },
   components: {
     MuiTextField: {
       defaultProps: {
         InputLabelProps: {
-          shrink: true,
-        },
-      },
+          shrink: true
+        }
+      }
     },
     MuiInputLabel: {
       styleOverrides: {
         root: {
-          color: '#6B798F !important',
-        },
-      },
+          color: '#6B798F !important'
+        }
+      }
     },
     MuiOutlinedInput: {
       styleOverrides: {
@@ -56,33 +56,33 @@ const MUITheme = createTheme({
           borderRadius: 5,
           background: '#252B35',
           '&:hover': {
-            background: '#2E353D',
+            background: '#2E353D'
           },
           '&:hover .MuiOutlinedInput-input::placeholder': {
-            color: 'rgba(87, 97, 114, 0.7)',
+            color: 'rgba(87, 97, 114, 0.7)'
           },
           '&.Mui-focused': {
             background: '#121923',
             '.MuiOutlinedInput-notchedOutline': {
-              border: '1px solid #F5F5F7',
+              border: '1px solid #F5F5F7'
             },
             '.MuiOutlinedInput-input::placeholder': {
-              color: 'transparent',
-            },
+              color: 'transparent'
+            }
           },
           '&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline': {
-            border: '1px solid #F5F5F7',
-          },
+            border: '1px solid #F5F5F7'
+          }
         },
         input: {
           '&::placeholder': {
-            color: '#6B798F',
-          },
+            color: '#6B798F'
+          }
         },
         notchedOutline: {
-          border: '1px solid #252B35',
-        },
-      },
+          border: '1px solid #252B35'
+        }
+      }
     },
     MuiInput: {
       styleOverrides: {
@@ -90,28 +90,28 @@ const MUITheme = createTheme({
           color: '#F5F5F7',
           '&::placeholder': {
             color: 'inherit',
-            opacity: 0.4,
+            opacity: 0.4
           },
           '&:hover::placeholder': {
-            opacity: 0.6,
-          },
+            opacity: 0.6
+          }
         },
         root: {
           '&::before': {
-            borderColor: '#2E3642',
+            borderColor: '#2E3642'
           },
           '&::after': {
-            borderBottom: 'none !important',
+            borderBottom: 'none !important'
           },
           '&:hover:not(.Mui-disabled)': {
             '&::before': {
-              borderBottom: '1px solid #2E3642',
-            },
-          },
-        },
-      },
-    },
-  },
+              borderBottom: '1px solid #2E3642'
+            }
+          }
+        }
+      }
+    }
+  }
 });
 
 export default MUITheme;

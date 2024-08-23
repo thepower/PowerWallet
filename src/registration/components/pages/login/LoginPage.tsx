@@ -4,51 +4,50 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-  useState,
+  useState
 } from 'react';
+import { FormControlLabel, useMediaQuery } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { getWalletAddress } from 'account/selectors/accountSelectors';
+import { importAccountFromFile } from 'account/slice/accountSlice';
+import { RootState } from 'application/store';
+import { WalletRoutesEnum } from 'application/typings/routes';
+import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import {
   Button,
   Checkbox,
   LangMenu,
   OutlinedInput,
   IconButton,
-  FullScreenLoader,
+  FullScreenLoader
 } from 'common';
-import { importAccountFromFile } from 'account/slice/accountSlice';
-import { Maybe } from 'typings/common';
-import { RegistrationCard } from 'registration/components/common/registrationCard/RegistrationCard';
-import { FormControlLabel, useMediaQuery } from '@mui/material';
-import { compareTwoStrings } from 'registration/utils/registrationUtils';
-import { Link } from 'react-router-dom';
-import { WalletRoutesEnum } from 'application/typings/routes';
-import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import hooks from 'hooks';
 import { checkIfLoading } from 'network/selectors';
-import { RootState } from 'application/store';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { loginToWalletFromRegistration } from '../../../slice/registrationSlice';
-import registrationStyles from '../../Registration.module.scss';
+import { RegistrationCard } from 'registration/components/common/registrationCard/RegistrationCard';
+import { compareTwoStrings } from 'registration/utils/registrationUtils';
+import { Maybe } from 'typings/common';
 import styles from './LoginPage.module.scss';
-
+import { loginToWalletFromRegistration } from '../../../slice/registrationSlice';
 import { ImportAccountModal } from '../../modals/ImportAccountModal';
+import registrationStyles from '../registration/RegistrationPage.module.scss';
 
 const mapStateToProps = (state: RootState) => ({
   isImportAccountFromFileLoading: checkIfLoading(
     state,
-    importAccountFromFile.type,
+    importAccountFromFile.type
   ),
   isLoginToWalletFromRegistrationLoading: checkIfLoading(
     state,
-    loginToWalletFromRegistration.type,
+    loginToWalletFromRegistration.type
   ),
-  walletAddress: getWalletAddress(state),
+  walletAddress: getWalletAddress(state)
 });
 
 const mapDispatchToProps = {
   importAccountFromFile,
-  loginToWalletFromRegistration,
+  loginToWalletFromRegistration
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -59,7 +58,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
   loginToWalletFromRegistration,
   isImportAccountFromFileLoading,
   isLoginToWalletFromRegistrationLoading,
-  walletAddress,
+  walletAddress
 }) => {
   const { t } = useTranslation();
 
@@ -79,7 +78,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
     scrollContainerRef,
     scrollToElementByIndex,
     scrollToNext,
-    scrollToPrevious,
+    scrollToPrevious
   } = hooks.useSmoothHorizontalScroll();
 
   const resetStage = () => {
@@ -116,23 +115,23 @@ const LoginPageComponent: FC<LoginPageProps> = ({
         additionalActionOnDecryptError: () => {
           setAccountFile(accountFile);
           setOpenedPasswordModal(true);
-        },
+        }
       });
     },
-    [importAccountFromFile],
+    [importAccountFromFile]
   );
   const closePasswordModal = () => {
     setOpenedPasswordModal(false);
   };
 
   const onChangeAddress = (
-    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     setAddress(event.target.value);
   };
 
   const onChangeSeedOrPrivateKey = (
-    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     setSeedOrPrivateKey(event.target.value);
   };
@@ -143,7 +142,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
   };
 
   const onChangeConfirmedPassword = (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setConfirmedPassword(event.target.value);
     setPasswordsNotEqual(false);
@@ -154,12 +153,12 @@ const LoginPageComponent: FC<LoginPageProps> = ({
       loginToWalletFromRegistration({
         address,
         seedOrPrivateKey,
-        password: '',
+        password: ''
       });
     } else {
       const passwordsNotEqual = !compareTwoStrings(
         password!,
-        confirmedPassword!,
+        confirmedPassword!
       );
 
       if (passwordsNotEqual) {
@@ -173,13 +172,13 @@ const LoginPageComponent: FC<LoginPageProps> = ({
     seedOrPrivateKey,
     password,
     confirmedPassword,
-    isWithoutPassword,
+    isWithoutPassword
   ]);
 
   const handleImportAccount = (password: string) => {
     importAccountFromFile({
       password,
-      accountFile: accountFile!,
+      accountFile: accountFile!
     });
 
     closePasswordModal();
@@ -242,8 +241,8 @@ const LoginPageComponent: FC<LoginPageProps> = ({
         </div>
         <Button
           className={styles.button}
-          variant="contained"
-          size="large"
+          variant='contained'
+          size='large'
           onClick={loginToAccount}
           disabled={isButtonDisabled}
           loading={isLoginToWalletFromRegistrationLoading}
@@ -261,7 +260,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
     t,
     confirmedPassword,
     loginToAccount,
-    isLoginToWalletFromRegistrationLoading,
+    isLoginToWalletFromRegistrationLoading
   ]);
 
   const renderInitCards = useCallback(
@@ -272,14 +271,14 @@ const LoginPageComponent: FC<LoginPageProps> = ({
           ref={importAccountRef}
           className={registrationStyles.importAccountInput}
           onChange={setAccountFileHandler}
-          type="file"
+          type='file'
         />
         <div ref={scrollContainerRef} className={styles.cards}>
           <RegistrationCard
             title={t('loginToAccount')}
             iconType={2}
             description={t('enterAddressAndSeedPhrase')}
-            buttonVariant="outlined"
+            buttonVariant='outlined'
             buttonLabel={t('enter')}
             onSelect={() => setIsEnterToAccPressed(true)}
           />
@@ -287,7 +286,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
             title={t('importAccount')}
             iconType={3}
             description={t('uploadPEMFileToImportAccount')}
-            buttonVariant="contained"
+            buttonVariant='contained'
             buttonLabel={t('selectFile')}
             isWithBorder
             onSelect={handleOpenImportFile}
@@ -306,8 +305,8 @@ const LoginPageComponent: FC<LoginPageProps> = ({
       scrollContainerRef,
       scrollToNext,
       scrollToPrevious,
-      setAccountFileHandler,
-    ],
+      setAccountFileHandler
+    ]
   );
 
   if (isImportAccountFromFileLoading) {
@@ -325,7 +324,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
         <div className={registrationStyles.registrationPageHeader}>
           <div style={{ width: '48px' }} />
           <Link
-            to={walletAddress ? WalletRoutesEnum.root : WalletRoutesEnum.signup}
+            to={WalletRoutesEnum.root}
             className={registrationStyles.registrationPageTitle}
             onClick={resetStage}
           >
