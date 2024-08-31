@@ -7,7 +7,7 @@ import { ConnectedProps, connect } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { exportAccount } from 'account/slice/accountSlice';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import {
   Button,

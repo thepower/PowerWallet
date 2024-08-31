@@ -80,7 +80,6 @@
     "operator-linebreak": "off",
     "function-paren-newline": "off",
     "react/require-default-props": "off",
-    "react-hooks/exhaustive-deps": "off",
     "react/jsx-curly-newline": "off",
     "react/jsx-wrap-multilines": "off",
     "react/destructuring-assignment": "off",

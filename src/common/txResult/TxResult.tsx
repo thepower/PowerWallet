@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import appEnvs from 'appEnvs';
 import { getNetworkChainID } from 'application/selectors';
-import { useAppSelector } from 'application/store';
+import { useAppSelector } from 'application/reduxStore';
 import { Button } from 'common';
 import { SentData } from 'send/slices/sendSlice';
 import { SuccessSvg } from './icons';

@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 
 export const getRegistrationState = (state: RootState) => state.registration;
 

@@ -1,4 +1,4 @@
-import { RootState } from '../../application/store';
+import { RootState } from '../../application/reduxStore';
 
 export const getWalletData = (state: RootState) => state.account.walletData;
 export const getWalletAddress = (state: RootState) =>

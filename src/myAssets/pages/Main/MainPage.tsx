@@ -6,7 +6,7 @@ import { getWalletAddress } from 'account/selectors/accountSelectors';
 import appEnvs from 'appEnvs';
 import { getNetworkChainID } from 'application/selectors';
 import { setShowUnderConstruction } from 'application/slice/applicationSlice';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { BuySvg, FaucetSvg, LogoIcon, SendSvg } from 'assets/icons';
 import { Button, CardLink, CopyButton, PageTemplate, Tabs } from 'common';

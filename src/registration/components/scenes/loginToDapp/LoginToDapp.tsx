@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { useParams } from 'react-router';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 import { AppQueryParams } from 'application/typings/routes';
 import { LogoIcon } from 'assets/icons';
 import { Button, WizardComponentProps } from 'common';

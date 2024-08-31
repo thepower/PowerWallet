@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
 import styles from './underConstruction.module.scss';
 import { setShowUnderConstruction } from '../../application/slice/applicationSlice';
-import { RootState } from '../../application/store';
+import { RootState } from '../../application/reduxStore';
 import { WalletRoutesEnum } from '../../application/typings/routes';
 import { Modal } from '../modal/Modal';
 

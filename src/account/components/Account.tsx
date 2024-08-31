@@ -18,7 +18,7 @@ import styles from './Account.module.scss';
 import { AccountActionsList } from './AccountActionsList';
 import { ResetAccountModal } from './ResetAccountModal';
 import { setShowUnderConstruction } from '../../application/slice/applicationSlice';
-import { RootState } from '../../application/store';
+import { RootState } from '../../application/reduxStore';
 import { ExportAccountModal } from '../../registration/components/modals/ExportAccountModal';
 import { ImportAccountModal } from '../../registration/components/modals/ImportAccountModal';
 import { Maybe } from '../../typings/common';

@@ -1,16 +1,13 @@
 import { FC, useEffect, useMemo } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import { RouteComponentProps, useHistory } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 
 import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
 import { objectToString, stringToObject } from 'sso/utils';
 
-type OwnProps = RouteComponentProps<{ data?: string }>;
-
-const mapStateToProps = (state: RootState, props: OwnProps) => ({
-  data: props.match.params.data,
+const mapStateToProps = (state: RootState) => ({
   address: getWalletAddress(state)
 });
 
@@ -18,8 +15,10 @@ const connector = connect(mapStateToProps);
 
 type WalletSSOProps = ConnectedProps<typeof connector>;
 
-const WalletSSOPage: FC<WalletSSOProps> = ({ data, address }) => {
-  const h = useHistory();
+const WalletSSOPage: FC<WalletSSOProps> = ({ address }) => {
+  const { data } = useParams<{ data: string }>();
+
+  const navigate = useNavigate();
   const parsedData: AppQueryParams = useMemo(() => {
     if (data) return stringToObject(data);
     return null;
@@ -27,7 +26,7 @@ const WalletSSOPage: FC<WalletSSOProps> = ({ data, address }) => {
 
   useEffect(() => {
     if (!address) {
-      h.push(WalletRoutesEnum.signup);
+      navigate(WalletRoutesEnum.signup);
     } else {
       const stringData = objectToString({
         address,

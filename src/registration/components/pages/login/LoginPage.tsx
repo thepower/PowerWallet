@@ -12,7 +12,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { importAccountFromFile } from 'account/slice/accountSlice';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import {

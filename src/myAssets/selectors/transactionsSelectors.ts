@@ -1,7 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { format } from 'date-fns';
 import groupBy from 'lodash/groupBy';
-import { RootState } from '../../application/store';
+import { RootState } from '../../application/reduxStore';
 import { transactionsAdapter } from '../slices/transactionsSlice';
 
 const { selectAll } = transactionsAdapter.getSelectors(

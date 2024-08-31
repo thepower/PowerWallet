@@ -6,7 +6,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import styles from './ConfirmModal.module.scss';
 import { Button, Modal, OutlinedInput } from '..';
 import { getWalletData } from '../../account/selectors/accountSelectors';
-import { RootState } from '../../application/store';
+import { RootState } from '../../application/reduxStore';
 
 interface OwnProps {
   open: boolean;

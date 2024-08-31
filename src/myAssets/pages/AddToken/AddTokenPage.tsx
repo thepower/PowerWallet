@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { getNetworkChainID } from 'application/selectors';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 import { Button, PageTemplate, Tabs } from 'common';
 import { Token } from 'myAssets/components/Token';
 import { getTokens } from 'myAssets/selectors/tokensSelectors';

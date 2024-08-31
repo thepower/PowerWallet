@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { push } from 'connected-react-router';
 import isEmpty from 'lodash/isEmpty';
 import { useTranslation } from 'react-i18next';
 import { InView } from 'react-intersection-observer';
 import { connect, ConnectedProps } from 'react-redux';
 
-import { RouteComponentProps } from 'react-router';
-import { RootState } from 'application/store';
+import { useParams } from 'react-router-dom';
+import { RootState } from 'application/reduxStore';
 import { PageTemplate, FullScreenLoader } from 'common';
 
 import Transaction from 'myAssets/components/Transaction';
@@ -21,8 +21,6 @@ import { TokenKind } from 'myAssets/types';
 import { checkIfLoading } from 'network/selectors';
 import styles from './TokenTransactionsPage.module.scss';
 
-type OwnProps = RouteComponentProps<{ type: TokenKind; address: string }>;
-
 const mapDispatchToProps = {
   routeTo: push,
   loadTransactionsTrigger,
@@ -30,28 +28,32 @@ const mapDispatchToProps = {
   resetTransactionsState
 };
 
-const mapStateToProps = (state: RootState, props: OwnProps) => ({
+const mapStateToProps = (state: RootState) => ({
   loading: checkIfLoading(state, loadTransactionsTrigger.type),
   transactions: getGroupedWalletTransactions(state),
-  type: props.match?.params?.type,
-  address: props.match?.params?.address,
-  token: getTokenByID(state, props.match?.params?.address)
+  getTokenByID: (address: string) => getTokenByID(state, address)
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 type TokenTransactionsPageProps = ConnectedProps<typeof connector>;
 
 const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
-  type,
-  address,
-  token,
   loading,
   transactions,
   setLastBlockToInitialLastBlock,
   resetTransactionsState,
-  loadTransactionsTrigger
+  loadTransactionsTrigger,
+  getTokenByID
 }) => {
   const { t } = useTranslation();
+
+  const { type, address } = useParams<{
+    type: TokenKind;
+    address: string;
+    id: string;
+  }>();
+
+  const token = useMemo(() => getTokenByID(address!), [getTokenByID, address]);
 
   useEffect(() => {
     setLastBlockToInitialLastBlock();

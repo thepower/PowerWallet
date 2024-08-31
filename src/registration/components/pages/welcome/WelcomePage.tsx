@@ -2,9 +2,9 @@ import React, { FC, useEffect } from 'react';
 import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
-import { Link, RouteComponentProps } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { Button, LangMenu } from 'common';
 import {
@@ -15,10 +15,7 @@ import {
 
 import styles from './WelcomePage.module.scss';
 
-type OwnProps = RouteComponentProps<{ referrer?: string }>;
-
-const mapStateToProps = (state: RootState, props: OwnProps) => ({
-  referrer: props?.match?.params?.referrer,
+const mapStateToProps = (state: RootState) => ({
   walletAddress: getWalletAddress(state),
   creatingStep: getCurrentCreatingStep(state),
   backupStep: getCurrentBackupStep(state),
@@ -32,8 +29,9 @@ const mapDispatchToProps = {
 const connector = connect(mapStateToProps, mapDispatchToProps);
 type WelcomePageProps = ConnectedProps<typeof connector>;
 
-const WelcomePageComponent: FC<WelcomePageProps> = ({ routeTo, referrer }) => {
+const WelcomePageComponent: FC<WelcomePageProps> = ({ routeTo }) => {
   const { t } = useTranslation();
+  const { referrer } = useParams<{ referrer: string }>();
 
   useEffect(() => {
     if (referrer) {

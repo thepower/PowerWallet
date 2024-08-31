@@ -4,7 +4,7 @@ import { NetworkEnum } from '@thepowereco/tssdk';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { getNetworksChains } from 'application/selectors';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import { Button, IconButton, WizardComponentProps } from 'common';
 import ChainSelect from 'common/chainSelect/ChainSelect';

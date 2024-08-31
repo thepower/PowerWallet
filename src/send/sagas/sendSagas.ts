@@ -171,7 +171,7 @@ export function* singAndSendTrxSaga({
 }: ReturnType<typeof signAndSendTrxTrigger>) {
   try {
     const networkAPI = (yield* select(getNetworkApi))!;
-
+    console.log({ decodedTxBody });
     const walletAddress = yield* select(getWalletAddress);
 
     const WalletAPI = (yield* select(getWalletApi))!;

@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import cn from 'classnames';
 import { toggleOpenedAccountMenu } from 'account/slice/accountSlice';
 import { setShowUnderConstruction } from 'application/slice/applicationSlice';
-import { useAppDispatch } from 'application/store';
+import { useAppDispatch } from 'application/reduxStore';
 import { BellIcon, MenuIcon } from 'assets/icons';
 import i18n from 'locales/initTranslation';
 import styles from './TopBar.module.scss';

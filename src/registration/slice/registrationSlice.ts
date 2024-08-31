@@ -104,4 +104,3 @@ export const createWallet = createAction<
 >(`${SLICE_NAME}/createWallet`);
 export const loginToWalletFromRegistration =
   createAction<LoginToWalletInputType>(`${SLICE_NAME}/loginToWallet`);
-export const proceedToWallet = createAction(`${SLICE_NAME}/proceedToWallet`);

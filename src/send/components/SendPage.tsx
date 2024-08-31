@@ -5,14 +5,14 @@ import { AddressApi, CryptoApi } from '@thepowereco/tssdk';
 import cn from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
-import { RouteComponentProps } from 'react-router';
+import { ConnectedProps, connect, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import * as yup from 'yup';
 import {
   getWalletAddress,
   getWalletData
 } from 'account/selectors/accountSelectors';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { LogoIcon, MoneyBugIcon } from 'assets/icons';
 import { Button, PageTemplate, Divider, FullScreenLoader } from 'common';
@@ -32,12 +32,6 @@ import {
   sendTrxTrigger
 } from '../slices/sendSlice';
 
-type OwnProps = RouteComponentProps<{
-  type: TokenKind;
-  address: string;
-  id: string;
-}>;
-
 const mapDispatchToProps = {
   clearSentData,
   sendTrxTrigger,
@@ -46,17 +40,10 @@ const mapDispatchToProps = {
   addTokenTrigger
 };
 
-const mapStateToProps = (state: RootState, props: OwnProps) => ({
-  erc721TokenId: props?.match?.params?.id,
+const mapStateToProps = (state: RootState) => ({
   address: getWalletAddress(state),
   sentData: getSentData(state),
   getTokenByID: (address: string) => getTokenByID(state, address),
-  nativeTokenAmount: getWalletNativeTokensAmountBySymbol(
-    state,
-    props?.match?.params?.address
-  ),
-  tokenType: props?.match?.params?.type,
-  tokenAddress: props?.match?.params?.address,
   loading:
     checkIfLoading(state, sendTrxTrigger.type) ||
     checkIfLoading(state, sendTokenTrxTrigger.type) ||
@@ -86,10 +73,8 @@ const InputLabelProps = {
 };
 
 const SendPageComponent: FC<SendProps> = ({
-  address,
   sentData,
-  tokenType,
-  tokenAddress,
+  address,
   loading,
   isAddTokenLoading,
   getTokenByID,
@@ -98,16 +83,27 @@ const SendPageComponent: FC<SendProps> = ({
   sendTokenTrxTrigger,
   sendErc721TokenTrxTrigger,
   addTokenTrigger,
-  nativeTokenAmount,
-  encryptedWif,
-  erc721TokenId
+  encryptedWif
 }) => {
   const { t } = useTranslation();
 
   const [openModal, setOpenModal] = React.useState(false);
+  const {
+    type: tokenType,
+    address: tokenAddress,
+    id: erc721TokenId
+  } = useParams<{
+    type: TokenKind;
+    address: string;
+    id: string;
+  }>();
+
+  const nativeTokenAmount = useSelector((state) =>
+    getWalletNativeTokensAmountBySymbol(state, tokenAddress)
+  );
 
   const token = useMemo(
-    () => getTokenByID(tokenAddress),
+    () => getTokenByID(tokenAddress!),
     [getTokenByID, tokenAddress]
   );
 

@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 import { TokenKind, type TToken } from 'myAssets/types';
 
 const getWalletState = (state: RootState) => state.wallet;

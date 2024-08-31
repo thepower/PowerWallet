@@ -1,57 +1,82 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { connectRouter, routerMiddleware } from 'connected-react-router';
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
-import createSagaMiddleware from 'redux-saga';
-import { tokensReducer } from 'myAssets/slices/tokensSlice';
-import rootSaga from './sagas/rootSaga';
-import { applicationDataReducer } from './slice/applicationSlice';
-import history from './utils/history';
-import { accountReducer } from '../account/slice/accountSlice';
-import { transactionsReducer } from '../myAssets/slices/transactionsSlice';
-import { walletReducer } from '../myAssets/slices/walletSlice';
-import { networkReducer } from '../network/slice';
-import { registrationReducer } from '../registration/slice/registrationSlice';
-import { sendReducer } from '../send/slices/sendSlice';
+import { Store } from '@tanstack/react-store';
+import { NetworkEnum } from '@thepowereco/tssdk';
+import {
+  BackupAccountStepsEnum,
+  CreateAccountStepsEnum
+} from 'registration/typings/registrationTypes';
+import { Maybe } from 'typings/common';
 
-const routeMiddleware = routerMiddleware(history);
-const sagaMiddleware = createSagaMiddleware();
+interface State {
+  selectedNetwork: Maybe<NetworkEnum>;
+  selectedChain: Maybe<number>;
+  seedPhrase: Maybe<string>;
+  creatingStep: CreateAccountStepsEnum;
+  backupStep: BackupAccountStepsEnum;
+  isWithoutPassword: boolean;
+  isRandomChain: boolean;
+}
 
-const tokensPersistConfig = {
-  key: 'PowerWallet/tokens',
-  storage
+const initialState: State = {
+  selectedNetwork: null,
+  selectedChain: null,
+  seedPhrase: null,
+  creatingStep: CreateAccountStepsEnum.selectNetwork,
+  backupStep: BackupAccountStepsEnum.generateSeedPhrase,
+  isWithoutPassword: false,
+  isRandomChain: true
 };
 
-const reducer = {
-  router: connectRouter(history),
-  account: accountReducer,
-  applicationData: applicationDataReducer,
-  registration: registrationReducer,
-  wallet: walletReducer,
-  network: networkReducer,
-  tokens: persistReducer(tokensPersistConfig, tokensReducer),
-  transactions: transactionsReducer,
-  send: sendReducer
+export const store = new Store<State>(initialState);
+
+export const { setState } = store;
+
+export const setSelectedNetwork = (network: NetworkEnum) => {
+  setState((prevState) => ({
+    ...prevState,
+    selectedNetwork: network
+  }));
 };
 
-const store = configureStore({
-  reducer,
-  devTools: import.meta.env.VITE_NODE_ENV !== 'production',
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false
-    }).concat([routeMiddleware, sagaMiddleware])
-});
+export const setSelectedChain = (chainId: number) => {
+  setState((prevState) => ({
+    ...prevState,
+    selectedChain: chainId
+  }));
+};
 
-sagaMiddleware.run(rootSaga);
+export const setSeedPhrase = (seedPhrase: string) => {
+  setState((prevState) => ({
+    ...prevState,
+    seedPhrase: seedPhrase
+  }));
+};
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export const setCreatingStep = (step: CreateAccountStepsEnum) => {
+  setState((prevState) => ({
+    ...prevState,
+    creatingStep: step
+  }));
+};
 
-export const useAppDispatch: () => AppDispatch = useDispatch;
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+export const setBackupStep = (step: BackupAccountStepsEnum) => {
+  setState((prevState) => ({
+    ...prevState,
+    backupStep: step
+  }));
+};
 
-const persistor = persistStore(store);
+export const setIsRandomChain = (isRandomChain: boolean) => {
+  setState((prevState) => ({
+    ...prevState,
+    isRandomChain
+  }));
+};
 
-export { store, persistor };
+export const setIsWithoutPassword = (isWithoutPassword: boolean) => {
+  setState((prevState) => ({
+    ...prevState,
+    isWithoutPassword
+  }));
+};
+
+export const resetStore = () => setState(() => initialState);

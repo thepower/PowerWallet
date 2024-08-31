@@ -4,9 +4,9 @@ import { push } from 'connected-react-router';
 import range from 'lodash/range';
 import { useTranslation } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
-import { Link, RouteComponentProps } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getNetworkChainID } from 'application/selectors';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { Button, Divider, PageTemplate, Tabs } from 'common';
 import { Erc721Token } from 'myAssets/components/Erc721Token';
@@ -30,8 +30,6 @@ import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
 import { checkIfLoading } from 'network/selectors';
 import styles from './TokenSelectionPage.module.scss';
 
-type OwnProps = RouteComponentProps<{ address: string }>;
-
 const mapDispatchToProps = {
   toggleTokenShow,
   updateTokensAmountsTrigger,
@@ -39,8 +37,7 @@ const mapDispatchToProps = {
   getErc721TokensTrigger
 };
 
-const mapStateToProps = (state: RootState, props: OwnProps) => ({
-  collectionAddress: props?.match?.params?.address,
+const mapStateToProps = (state: RootState) => ({
   nativeTokens: getWalletNativeTokens(state),
   tokens: getTokens(state),
   erc721Tokens: getErc721Tokens(state),
@@ -60,7 +57,6 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   getWalletNativeTokensAmountBySymbol,
   nativeTokens,
   updateTokensAmountsTrigger,
-  collectionAddress,
   erc721Tokens,
   isGetErc721TokensLoading,
   getErc721TokensTrigger,
@@ -69,6 +65,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
   const [selectedToken, setSelectedToken] = useState<string>('');
   const { t } = useTranslation();
+  const { address: collectionAddress } = useParams<{ address: string }>();
 
   useEffect(() => {
     updateTokensAmountsTrigger();

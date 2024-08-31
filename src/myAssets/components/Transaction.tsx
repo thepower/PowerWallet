@@ -21,7 +21,7 @@ import {
 } from './icons';
 import styles from './Transaction.module.scss';
 import { getWalletAddress } from '../../account/selectors/accountSelectors';
-import { RootState } from '../../application/store';
+import { RootState } from '../../application/reduxStore';
 import { FaucetSvg, SendSvg } from '../../assets/icons';
 import { TransactionType } from '../slices/transactionsSlice';
 

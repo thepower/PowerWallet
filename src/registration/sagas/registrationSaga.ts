@@ -10,7 +10,6 @@ import { ECPairInterface } from 'ecpair';
 import { toast } from 'react-toastify';
 import { put, select } from 'typed-redux-saga';
 import i18n from 'locales/initTranslation';
-import { getWalletData } from '../../account/selectors/accountSelectors';
 import { loginToWallet, setWalletData } from '../../account/slice/accountSlice';
 import { WalletRoutesEnum } from '../../application/typings/routes';
 import {
@@ -139,10 +138,4 @@ export function* loginToWalletSaga({
     console.error('loginToWalletSaga isValidSeed', e);
     toast.error(i18n.t('loginError'));
   }
-}
-
-export function* proceedToWalletSaga() {
-  const { encryptedWif, address } = yield* select(getWalletData);
-  yield* put(loginToWallet({ address, encryptedWif }));
-  yield* put(push(WalletRoutesEnum.root));
 }

@@ -3,14 +3,12 @@ import manageSagaState from 'common/manageSagaState';
 import {
   createWalletSaga,
   generateSeedPhraseSaga,
-  loginToWalletSaga,
-  proceedToWalletSaga
+  loginToWalletSaga
 } from './registrationSaga';
 import {
   createWallet,
   generateSeedPhrase,
-  loginToWalletFromRegistration,
-  proceedToWallet
+  loginToWalletFromRegistration
 } from '../slice/registrationSlice';
 
 export default function* () {
@@ -23,5 +21,4 @@ export default function* () {
     manageSagaState(loginToWalletSaga)
   );
   yield* takeLatest(createWallet, manageSagaState(createWalletSaga));
-  yield* takeLatest(proceedToWallet, manageSagaState(proceedToWalletSaga));
 }

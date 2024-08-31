@@ -4,9 +4,9 @@ import { AddressApi } from '@thepowereco/tssdk';
 import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
-import { Link, RouteComponentProps } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { RootState } from 'application/store';
+import { RootState } from 'application/reduxStore';
 import { BreadcrumbsTypeEnum, Checkbox, LangMenu, Wizard } from 'common';
 import {
   getCurrentCreatingStep,
@@ -36,11 +36,8 @@ import { Backup } from '../../scenes/backup/Backup';
 import { LoginToDapp } from '../../scenes/loginToDapp/LoginToDapp';
 import { SelectNetwork } from '../../scenes/selectNetwork/SelectNetwork';
 
-type OwnProps = RouteComponentProps<{ dataOrReferrer?: string }>;
-
-const mapStateToProps = (state: RootState, props: OwnProps) => ({
+const mapStateToProps = (state: RootState) => ({
   walletAddress: getWalletAddress(state),
-  dataOrReferrer: props?.match?.params?.dataOrReferrer,
   creatingStep: getCurrentCreatingStep(state),
   backupStep: getCurrentBackupStep(state),
   isRandomChain: getIsRandomChain(state),
@@ -60,7 +57,6 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type RegistrationPageProps = ConnectedProps<typeof connector>;
 
 const RegistrationPageComponent: FC<RegistrationPageProps> = ({
-  dataOrReferrer,
   routeTo,
   setIsRandomChain,
   setIsWithoutPassword,
@@ -74,7 +70,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
   setSelectedChain
 }) => {
   const { t } = useTranslation();
-
+  const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
   const isAddressInParams = useMemo(
     () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
     [dataOrReferrer]

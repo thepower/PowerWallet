@@ -5,35 +5,38 @@ import {
   StyledEngineProvider
 } from '@mui/material/styles';
 import { StylesProvider } from '@mui/styles';
-import { ConnectedRouter } from 'connected-react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 import { AppRoutes } from './AppRoutes';
 import InitGradientsSvg from './initGradientsSvg.svg?react';
 import { UnderConstruction } from '../../common';
 import { ToastNotification } from '../../notification/ToastNotification';
-import { store, persistor } from '../store';
-import history from '../utils/history';
+import { store, persistor } from '../reduxStore';
 import MUITheme from '../utils/MUITheme';
 
-export const App = () => (
-  <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-      <ConnectedRouter history={history}>
-        <StylesProvider injectFirst>
-          <StyledEngineProvider injectFirst>
-            <MuiThemeProvider theme={MUITheme}>
-              <CssBaseline>
-                <InitGradientsSvg className='initSvgClass' />
+const queryClient = new QueryClient();
 
-                <ToastNotification />
-                <UnderConstruction />
-                <AppRoutes />
-              </CssBaseline>
-            </MuiThemeProvider>
-          </StyledEngineProvider>
-        </StylesProvider>
-      </ConnectedRouter>
-    </PersistGate>
-  </Provider>
+export const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <BrowserRouter>
+          <StylesProvider injectFirst>
+            <StyledEngineProvider injectFirst>
+              <MuiThemeProvider theme={MUITheme}>
+                <CssBaseline>
+                  <InitGradientsSvg className='initSvgClass' />
+                  <ToastNotification />
+                  <UnderConstruction />
+                  <AppRoutes />
+                </CssBaseline>
+              </MuiThemeProvider>
+            </StyledEngineProvider>
+          </StylesProvider>
+        </BrowserRouter>
+      </PersistGate>
+    </Provider>
+  </QueryClientProvider>
 );

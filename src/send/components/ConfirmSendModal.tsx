@@ -6,7 +6,7 @@ import { TToken } from 'myAssets/types';
 import styles from './ConfirmSendModal.module.scss';
 import { FormValues } from './SendPage';
 import { getWalletAddress } from '../../account/selectors/accountSelectors';
-import { RootState } from '../../application/store';
+import { RootState } from '../../application/reduxStore';
 import { Button, Modal, OutlinedInput } from '../../common';
 
 interface OwnProps {

@@ -33,13 +33,14 @@ export function* initApplicationSaga() {
 
   encryptedWif = yield getKeyFromApplicationStorage('wif');
 
-  const matchSelector = createMatchSelector({
-    path: [
-      `${WalletRoutesEnum.signup}/:dataOrReferrer?`,
-      `${WalletRoutesEnum.sso}/:data?`
-    ]
-  });
-  const match = yield* select(matchSelector);
+  // const matchSelector = createMatchSelector({
+  //   path: [
+  //     `${WalletRoutesEnum.signup}/:dataOrReferrer?`,
+  //     `${WalletRoutesEnum.sso}/:data?`
+  //   ]
+  // });
+
+  // const match = yield* select(matchSelector);
 
   if (address && encryptedWif) {
     yield loginToWalletSaga({
@@ -57,7 +58,8 @@ export function* initApplicationSaga() {
     );
 
     yield* put(push(window.location.pathname));
-  } else if (!match) {
-    yield* put(push(WalletRoutesEnum.root));
   }
+  // else if (!match) {
+  //   yield* put(push(WalletRoutesEnum.root));
+  // }
 }
