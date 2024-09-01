@@ -4,8 +4,8 @@ import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
 
-import { getNetworkChainID } from 'application/selectors';
 import { RootState } from 'application/reduxStore';
+import { useWallets } from 'application/utils/localStorageUtils';
 import { Button, PageTemplate, Tabs } from 'common';
 import { Token } from 'myAssets/components/Token';
 import { getTokens } from 'myAssets/selectors/tokensSelectors';
@@ -25,8 +25,7 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = (state: RootState) => ({
-  tokens: getTokens(state),
-  chainId: getNetworkChainID(state)
+  tokens: getTokens(state)
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -35,13 +34,13 @@ type AddTokenPageProps = ConnectedProps<typeof connector>;
 const AddTokenPageComponent: FC<AddTokenPageProps> = ({
   tokens,
   addTokenTrigger,
-  toggleTokenShow,
-  chainId
+  toggleTokenShow
 }) => {
   const { t } = useTranslation();
   const [search, setSearch] = useState<string>('');
   const [address, setAddress] = useState<string>('');
   const [tab, setTab] = useState<AddTokensTabs>(AddTokensTabs.Erc20);
+  const { activeWallet } = useWallets();
 
   const onChangeTab = (_event: React.SyntheticEvent, value: AddTokensTabs) => {
     setTab(value);
@@ -92,10 +91,13 @@ const AddTokenPageComponent: FC<AddTokenPageProps> = ({
   );
 
   const erc20tokens = tokens.filter(
-    (token) => token.type === TokenKind.Erc20 && token?.chainId === chainId
+    (token) =>
+      token.type === TokenKind.Erc20 && token?.chainId === activeWallet?.chainId
   );
   const erc721tokens = tokens.filter(
-    (token) => token.type === TokenKind.Erc721 && token?.chainId === chainId
+    (token) =>
+      token.type === TokenKind.Erc721 &&
+      token?.chainId === activeWallet?.chainId
   );
 
   const tokensMap = {

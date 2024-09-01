@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { WalletApi } from '@thepowereco/tssdk';
-import { WalletData } from 'account/slice/accountSlice';
 import { useWallets } from 'application/utils/localStorageUtils';
+import { LoadBalanceType } from 'myAssets/types';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 
 export const useWalletData = () => {
@@ -32,7 +32,7 @@ export const useWalletData = () => {
     data: walletData,
     isLoading,
     isSuccess
-  } = useQuery<WalletData>({
+  } = useQuery<LoadBalanceType>({
     queryKey: ['walletData', activeWallet?.address],
     queryFn: () => getBalance(activeWallet?.address),
     enabled: !!activeWallet?.address && !!networkApi

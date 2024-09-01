@@ -14,6 +14,9 @@ interface State {
   backupStep: BackupAccountStepsEnum;
   isWithoutPassword: boolean;
   isRandomChain: boolean;
+
+  isAccountMenuOpened: boolean;
+  isShowUnderConstruction: boolean;
 }
 
 const initialState: State = {
@@ -23,7 +26,10 @@ const initialState: State = {
   creatingStep: CreateAccountStepsEnum.selectNetwork,
   backupStep: BackupAccountStepsEnum.generateSeedPhrase,
   isWithoutPassword: false,
-  isRandomChain: true
+  isRandomChain: true,
+
+  isAccountMenuOpened: false,
+  isShowUnderConstruction: false
 };
 
 export const store = new Store<State>(initialState);
@@ -76,6 +82,22 @@ export const setIsWithoutPassword = (isWithoutPassword: boolean) => {
   setState((prevState) => ({
     ...prevState,
     isWithoutPassword
+  }));
+};
+
+export const setIsAccountMenuOpened = (isAccountMenuOpened: boolean) => {
+  setState((prevState) => ({
+    ...prevState,
+    isAccountMenuOpened
+  }));
+};
+
+export const setIsShowUnderConstruction = (
+  isShowUnderConstruction: boolean
+) => {
+  setState((prevState) => ({
+    ...prevState,
+    isShowUnderConstruction
   }));
 };
 

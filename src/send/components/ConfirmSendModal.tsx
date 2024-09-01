@@ -1,12 +1,10 @@
 import React, { useCallback, useMemo } from 'react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { connect, ConnectedProps } from 'react-redux';
+import { useWallets } from 'application/utils/localStorageUtils';
 import { TToken } from 'myAssets/types';
 import styles from './ConfirmSendModal.module.scss';
 import { FormValues } from './SendPage';
-import { getWalletAddress } from '../../account/selectors/accountSelectors';
-import { RootState } from '../../application/reduxStore';
 import { Button, Modal, OutlinedInput } from '../../common';
 
 interface OwnProps {
@@ -24,21 +22,20 @@ interface OwnProps {
 const initialValues = { password: '' };
 type Values = typeof initialValues;
 
-const connector = connect((state: RootState) => ({
-  from: getWalletAddress(state)
-}));
-
-type ConfirmSendModalProps = ConnectedProps<typeof connector> & OwnProps;
+type ConfirmSendModalProps = OwnProps;
 
 const ConfirmSendModal: React.FC<ConfirmSendModalProps> = ({
   onClose,
   open,
   trxValues,
-  from,
   token,
   onSubmit
 }) => {
   const { t } = useTranslation();
+  const { activeWallet } = useWallets();
+
+  const from = activeWallet?.address;
+
   const handleSubmit = useCallback(
     async (values: Values, formikHelpers: FormikHelpers<Values>) => {
       try {
@@ -106,4 +103,4 @@ const ConfirmSendModal: React.FC<ConfirmSendModalProps> = ({
   );
 };
 
-export default connector(ConfirmSendModal);
+export default ConfirmSendModal;

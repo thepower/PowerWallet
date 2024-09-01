@@ -1,9 +1,8 @@
-import React, { FC, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { Button, LangMenu } from 'common';
@@ -16,7 +15,6 @@ import {
 import styles from './WelcomePage.module.scss';
 
 const mapStateToProps = (state: RootState) => ({
-  walletAddress: getWalletAddress(state),
   creatingStep: getCurrentCreatingStep(state),
   backupStep: getCurrentBackupStep(state),
   isWithoutPassword: getIsWithoutPassword(state)

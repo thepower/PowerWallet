@@ -4,9 +4,6 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
 import createSagaMiddleware from 'redux-saga';
 import { tokensReducer } from 'myAssets/slices/tokensSlice';
-import rootSaga from './sagas/rootSaga';
-import { applicationDataReducer } from './slice/applicationSlice';
-import { accountReducer } from '../account/slice/accountSlice';
 import { transactionsReducer } from '../myAssets/slices/transactionsSlice';
 import { walletReducer } from '../myAssets/slices/walletSlice';
 import { networkReducer } from '../network/slice';
@@ -21,8 +18,6 @@ const tokensPersistConfig = {
 };
 
 const reducer = {
-  account: accountReducer,
-  applicationData: applicationDataReducer,
   registration: registrationReducer,
   wallet: walletReducer,
   network: networkReducer,
@@ -40,8 +35,6 @@ const store = configureStore({
       serializableCheck: false
     }).concat([sagaMiddleware])
 });
-
-sagaMiddleware.run(rootSaga);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

@@ -1,12 +1,14 @@
 import i18n from 'locales/initTranslation';
 
-export type LoadBalancePayloadType = {
+export type LoadBalanceType = {
   amount: {
     [key: string]: number;
   };
   lastblk: string;
   preblk: string;
   pubkey: string;
+  seq: number;
+  t: number;
 };
 
 export type TransactionPayloadType = {

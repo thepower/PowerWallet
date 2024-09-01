@@ -8,12 +8,13 @@ import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import * as yup from 'yup';
-import {
-  getWalletAddress,
-  getWalletData
-} from 'account/selectors/accountSelectors';
+// import {
+//   getWalletAddress,
+//   getWalletData
+// } from 'account/selectors/accountSelectors';
 import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
+import { useWallets } from 'application/utils/localStorageUtils';
 import { LogoIcon, MoneyBugIcon } from 'assets/icons';
 import { Button, PageTemplate, Divider, FullScreenLoader } from 'common';
 import TxResult from 'common/txResult/TxResult';
@@ -41,15 +42,13 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = (state: RootState) => ({
-  address: getWalletAddress(state),
   sentData: getSentData(state),
   getTokenByID: (address: string) => getTokenByID(state, address),
   loading:
     checkIfLoading(state, sendTrxTrigger.type) ||
     checkIfLoading(state, sendTokenTrxTrigger.type) ||
     checkIfLoading(state, sendErc721TokenTrxTrigger.type),
-  isAddTokenLoading: checkIfLoading(state, addTokenTrigger.type),
-  encryptedWif: getWalletData(state).encryptedWif
+  isAddTokenLoading: checkIfLoading(state, addTokenTrigger.type)
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -74,7 +73,6 @@ const InputLabelProps = {
 
 const SendPageComponent: FC<SendProps> = ({
   sentData,
-  address,
   loading,
   isAddTokenLoading,
   getTokenByID,
@@ -82,11 +80,10 @@ const SendPageComponent: FC<SendProps> = ({
   sendTrxTrigger,
   sendTokenTrxTrigger,
   sendErc721TokenTrxTrigger,
-  addTokenTrigger,
-  encryptedWif
+  addTokenTrigger
 }) => {
   const { t } = useTranslation();
-
+  const { activeWallet } = useWallets();
   const [openModal, setOpenModal] = React.useState(false);
   const {
     type: tokenType,
@@ -228,7 +225,13 @@ const SendPageComponent: FC<SendProps> = ({
       formikHelpers.setFieldError('address', t('invalidAddress')!);
     } else {
       try {
-        const decryptedWif = CryptoApi.decryptWif(encryptedWif, '');
+        if (!activeWallet) {
+          throw new Error('Wallet not found');
+        }
+        const decryptedWif = CryptoApi.decryptWif(
+          activeWallet.encryptedWif,
+          ''
+        );
 
         await send({ values, decryptedWif });
       } catch (error) {
@@ -238,7 +241,13 @@ const SendPageComponent: FC<SendProps> = ({
   };
 
   const onSubmit = async (values: FormValues, password: string) => {
-    const decryptedWif = CryptoApi.decryptWif(encryptedWif, password);
+    if (!activeWallet) {
+      throw new Error('Wallet not found');
+    }
+    const decryptedWif = CryptoApi.decryptWif(
+      activeWallet.encryptedWif,
+      password
+    );
 
     await send({ values, decryptedWif });
   };
@@ -358,7 +367,7 @@ const SendPageComponent: FC<SendProps> = ({
       <div className={styles.content}>
         <div className={styles.walletInfo}>
           <span className={styles.titleBalance}>{t('totalBalance')}</span>
-          <span className={styles.address}>{address}</span>
+          <span className={styles.address}>{activeWallet?.address || '-'}</span>
           <span className={styles.amount}>
             {isNativeToken && (
               <LogoIcon

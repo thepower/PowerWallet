@@ -2,16 +2,16 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { push } from 'connected-react-router';
 import isEmpty from 'lodash/isEmpty';
 import { useTranslation } from 'react-i18next';
-import { InView } from 'react-intersection-observer';
+// import { InView } from 'react-intersection-observer';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { useParams } from 'react-router-dom';
 import { RootState } from 'application/reduxStore';
 import { PageTemplate, FullScreenLoader } from 'common';
 
-import Transaction from 'myAssets/components/Transaction';
+// import Transaction from 'myAssets/components/Transaction';
+// import { useTransactions } from 'myAssets/hooks/useLoadTransactions';
 import { getTokenByID } from 'myAssets/selectors/tokensSelectors';
-import { getGroupedWalletTransactions } from 'myAssets/selectors/transactionsSelectors';
 import {
   loadTransactionsTrigger,
   resetTransactionsState
@@ -30,7 +30,9 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState) => ({
   loading: checkIfLoading(state, loadTransactionsTrigger.type),
-  transactions: getGroupedWalletTransactions(state),
+  // transactions: getGroupedWalletTransactions(state),
+  transactions: [],
+
   getTokenByID: (address: string) => getTokenByID(state, address)
 });
 
@@ -39,10 +41,9 @@ type TokenTransactionsPageProps = ConnectedProps<typeof connector>;
 
 const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
   loading,
-  transactions,
+  transactions = [],
   setLastBlockToInitialLastBlock,
   resetTransactionsState,
-  loadTransactionsTrigger,
   getTokenByID
 }) => {
   const { t } = useTranslation();
@@ -55,20 +56,22 @@ const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
 
   const token = useMemo(() => getTokenByID(address!), [getTokenByID, address]);
 
+  // useTransactions({ tokenAddress });
+
   useEffect(() => {
     setLastBlockToInitialLastBlock();
     resetTransactionsState();
   }, []);
 
-  const handleChangeView = (inView: boolean) => {
-    if (inView) {
-      if (type === TokenKind.Native) {
-        loadTransactionsTrigger();
-      } else {
-        loadTransactionsTrigger({ tokenAddress: address });
-      }
-    }
-  };
+  // const handleChangeView = (inView: boolean) => {
+  //   if (inView) {
+  //     if (type === TokenKind.Native) {
+  //       loadTransactionsTrigger();
+  //     } else {
+  //       loadTransactionsTrigger({ tokenAddress: address });
+  //     }
+  //   }
+  // };
 
   const renderTransactionsList = useCallback(
     () =>
@@ -76,11 +79,11 @@ const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
         <li key={date}>
           <p className={styles.date}>{date}</p>
           <ul className={styles.transactionsList}>
-            {transactions.map((trx) => (
+            {/* {transactions.map((trx) => (
               <li key={trx.id}>
                 <Transaction trx={trx} />
               </li>
-            ))}
+            ))} */}
           </ul>
         </li>
       )),
@@ -103,9 +106,9 @@ const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
         <div className={styles.transactions}>
           <ul className={styles.groupByDates}>{renderTransactionsList()}</ul>
         </div>
-        <InView onChange={handleChangeView}>
+        {/* <InView onChange={handleChangeView}>
           <div />
-        </InView>
+        </InView> */}
       </div>
     </PageTemplate>
   );

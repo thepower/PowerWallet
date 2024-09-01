@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { AddressApi, CryptoApi, TransactionsApi } from '@thepowereco/tssdk';
 import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
 import cn from 'classnames';
@@ -8,15 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
 
-import {
-  getWalletAddress,
-  getWalletData
-} from 'account/selectors/accountSelectors';
-import {
-  getNetworkFeeSettings,
-  getNetworkGasSettings
-} from 'application/selectors';
+import { useNetworkApi } from 'application/hooks/useNetworkApi';
 import { RootState } from 'application/reduxStore';
+
+import { useWallets } from 'application/utils/localStorageUtils';
 import { Button, FullScreenLoader, TxResult } from 'common';
 import CardTable from 'common/cardTable/CardTable';
 import CardTableKeyAccordion from 'common/cardTableKeyAccordion/CardTableKeyAccordion';
@@ -39,23 +34,17 @@ const txKindMap: { [key: number]: string } = Object.entries(
 const SignAndSendPage: FC = () => {
   const { t } = useTranslation();
   const { message } = useParams<{ message: string }>();
+  const { activeWallet } = useWallets();
+  const { networkApi } = useNetworkApi({ chainId: activeWallet?.chainId });
 
   const dispatch = useDispatch();
 
-  const address = useSelector((state: RootState) => getWalletAddress(state));
   const sentData = useSelector((state: RootState) => getSentData(state));
   const loading = useSelector((state: RootState) =>
     checkIfLoading(state, signAndSendTrxTrigger.type)
   );
-  const feeSettings = useSelector((state: RootState) =>
-    getNetworkFeeSettings(state)
-  );
-  const gasSettings = useSelector((state: RootState) =>
-    getNetworkGasSettings(state)
-  );
-  const encryptedWif = useSelector(
-    (state: RootState) => getWalletData(state).encryptedWif
-  );
+  const feeSettings = networkApi?.feeSettings;
+  const gasSettings = networkApi?.gasSettings;
 
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
   const [returnURL, setReturnURL] = useState<string | undefined>();
@@ -65,6 +54,9 @@ const SignAndSendPage: FC = () => {
     try {
       if (!message) {
         throw new Error('Message not found');
+      }
+      if (!activeWallet) {
+        throw new Error('Wallet not found');
       }
 
       const decodedMessage = stringToObject(message);
@@ -81,7 +73,7 @@ const SignAndSendPage: FC = () => {
         txBody.e = {};
       }
 
-      txBody.f = Buffer.from(AddressApi.parseTextAddress(address));
+      txBody.f = Buffer.from(AddressApi.parseTextAddress(activeWallet.address));
       txBody.t = BigInt(Date.now());
 
       if (sponsor) {
@@ -113,7 +105,7 @@ const SignAndSendPage: FC = () => {
     } catch (err) {
       console.log(err);
     }
-  }, [message, address, gasSettings, feeSettings]);
+  }, [message, activeWallet, gasSettings, feeSettings]);
 
   useEffect(() => {
     return () => {
@@ -123,8 +115,10 @@ const SignAndSendPage: FC = () => {
 
   const handleClickSignAndSend = () => {
     try {
-      const decryptedWif = CryptoApi.decryptWif(encryptedWif, '');
-      console.log({ decodedTxBody });
+      if (!activeWallet) {
+        throw new Error('Wallet not found');
+      }
+      const decryptedWif = CryptoApi.decryptWif(activeWallet.encryptedWif, '');
       if (decodedTxBody) {
         dispatch(
           signAndSendTrxTrigger({
@@ -287,7 +281,9 @@ const SignAndSendPage: FC = () => {
           </div>
 
           <div className={styles.tableTitle}>{t('senderAddress')}</div>
-          <div className={styles.tableValue}>{address || '-'}</div>
+          <div className={styles.tableValue}>
+            {activeWallet?.address || '-'}
+          </div>
 
           <div className={styles.tableTitle}>{t('addressOfTheRecipient')}</div>
           <div className={styles.tableValue}>{to || '-'}</div>

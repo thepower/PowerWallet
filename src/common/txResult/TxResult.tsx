@@ -3,8 +3,7 @@ import cn from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import appEnvs from 'appEnvs';
-import { getNetworkChainID } from 'application/selectors';
-import { useAppSelector } from 'application/reduxStore';
+import { useWallets } from 'application/utils/localStorageUtils';
 import { Button } from 'common';
 import { SentData } from 'send/slices/sendSlice';
 import { SuccessSvg } from './icons';
@@ -15,19 +14,10 @@ type TxResultProps = {
   className?: string;
 };
 
-// const socialLinks = [
-//   { Icon: TelegramSvg, url: '' },
-//   { Icon: DiscordSvg, url: '' },
-//   { Icon: FbMessengerSvg, url: '' },
-//   { Icon: TwitterSvg, url: '' },
-//   { Icon: WechatSvg, url: '' },
-//   { Icon: WhatsappSvg, url: '' },
-// ];
-
 const TxResult: React.FC<TxResultProps> = ({ sentData, className }) => {
   const { t } = useTranslation();
-  const chainID = useAppSelector(getNetworkChainID);
-  const txExplorerLink = `${appEnvs.EXPLORER_THEPOWER_URL}/${chainID}/transaction/${sentData.txId}`;
+  const { activeWallet } = useWallets();
+  const txExplorerLink = `${appEnvs.EXPLORER_THEPOWER_URL}/${activeWallet?.chainId}/transaction/${sentData.txId}`;
 
   const onClickClose = () => {
     if (sentData.returnURL) {

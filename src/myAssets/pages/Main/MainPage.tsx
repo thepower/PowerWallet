@@ -2,36 +2,29 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
 import appEnvs from 'appEnvs';
-import { getNetworkChainID } from 'application/selectors';
-import { setShowUnderConstruction } from 'application/slice/applicationSlice';
 import { RootState } from 'application/reduxStore';
+import { setIsShowUnderConstruction } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
+import { useWallets } from 'application/utils/localStorageUtils';
 import { BuySvg, FaucetSvg, LogoIcon, SendSvg } from 'assets/icons';
 import { Button, CardLink, CopyButton, PageTemplate, Tabs } from 'common';
+import { useWalletData } from 'myAssets/hooks/useWalletData';
 import { getTokens } from 'myAssets/selectors/tokensSelectors';
 import { updateTokensAmountsTrigger } from 'myAssets/slices/tokensSlice';
 import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
 import styles from './MainPage.module.scss';
 import AddButton from '../../components/AddButton';
 import { Token } from '../../components/Token';
-import {
-  getWalletNativeTokens,
-  getWalletNativeTokensAmounts
-} from '../../selectors/walletSelectors';
+import { getWalletNativeTokens } from '../../selectors/walletSelectors';
 
 const mapDispatchToProps = {
-  updateTokensAmountsTrigger,
-  setShowUnderConstruction
+  updateTokensAmountsTrigger
 };
 
 const mapStateToProps = (state: RootState) => ({
-  amounts: getWalletNativeTokensAmounts(state),
   nativeTokens: getWalletNativeTokens(state),
-  tokens: getTokens(state),
-  walletAddress: getWalletAddress(state),
-  chainId: getNetworkChainID(state)
+  tokens: getTokens(state)
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -39,17 +32,18 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type MainPageProps = ConnectedProps<typeof connector>;
 
 const MainPageComponent: FC<MainPageProps> = ({
-  amounts,
   nativeTokens,
   tokens,
-  chainId,
-  updateTokensAmountsTrigger,
-  setShowUnderConstruction,
-  walletAddress
+  updateTokensAmountsTrigger
 }) => {
   const { t } = useTranslation();
 
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
+  const { activeWallet } = useWallets();
+
+  const chainId = activeWallet?.chainId;
+
+  const { walletData } = useWalletData();
 
   useEffect(() => {
     updateTokensAmountsTrigger();
@@ -61,7 +55,7 @@ const MainPageComponent: FC<MainPageProps> = ({
 
   const handleShowUnderConstruction = (event: React.MouseEvent) => {
     event.preventDefault();
-    setShowUnderConstruction(true);
+    setIsShowUnderConstruction(true);
   };
 
   const erc20tokens = tokens.filter(
@@ -106,7 +100,7 @@ const MainPageComponent: FC<MainPageProps> = ({
         <div className={styles.account}>
           <div className={styles.title}>{t('accountNumber')}</div>
           <CopyButton
-            textButton={walletAddress}
+            textButton={activeWallet?.address || ''}
             className={styles.addressButton}
             iconClassName={styles.copyIcon}
           />
@@ -117,12 +111,12 @@ const MainPageComponent: FC<MainPageProps> = ({
             <div className={styles.infoTitle}>{t('skBalance')}</div>
             <div className={styles.balance}>
               <LogoIcon className={styles.icon} />
-              {!amounts?.SK || amounts?.SK === '0' ? (
+              {!walletData?.amount?.SK || walletData?.amount?.SK === 0 ? (
                 <span className={styles.emptyTitle}>
                   {t('yourTokensWillBeHere')}
                 </span>
               ) : (
-                amounts?.SK
+                walletData?.amount?.SK
               )}
             </div>
           </div>

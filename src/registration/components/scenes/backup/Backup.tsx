@@ -5,10 +5,11 @@ import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { exportAccount } from 'account/slice/accountSlice';
+import { useExportAccount } from 'account/hooks';
+// import { exportAccount } from 'account/slice/accountSlice';
 import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
+import { useWallets } from 'application/utils/localStorageUtils';
 import {
   Button,
   Checkbox,
@@ -35,7 +36,6 @@ import styles from './Backup.module.scss';
 const mapStateToProps = (state: RootState) => ({
   backupStep: getCurrentBackupStep(state),
   generatedSeedPhrase: getGeneratedSeedPhrase(state),
-  walletAddress: getWalletAddress(state),
   isCreateWalletLoading: checkIfLoading(state, createWallet.type),
   selectedChain: getSelectedChain(state),
   isWithoutPassword: getIsWithoutPassword(state)
@@ -44,7 +44,7 @@ const mapStateToProps = (state: RootState) => ({
 const mapDispatchToProps = {
   generateSeedPhrase,
   createWallet,
-  exportAccount,
+  // exportAccount,
   setBackupStep,
   routeTo: push
 };
@@ -56,11 +56,9 @@ const BackupComponent: FC<BackupProps> = ({
   backupStep,
   setBackupStep,
   selectedChain,
-  walletAddress,
   generateSeedPhrase,
   generatedSeedPhrase,
   createWallet,
-  exportAccount,
   isCreateWalletLoading,
   isWithoutPassword,
   setNextStep,
@@ -74,6 +72,16 @@ const BackupComponent: FC<BackupProps> = ({
   const [isSeedPhraseSaved, setIsSeedPhraseSaved] = useState(false);
 
   const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
+  const { activeWallet } = useWallets();
+  const { exportAccountMutation } = useExportAccount({
+    onSuccess: () => {
+      if (dataOrReferrer && !isAddressInParams) {
+        setNextStep();
+      } else {
+        routeTo(WalletRoutesEnum.root);
+      }
+    }
+  });
 
   const isAddressInParams = useMemo(
     () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
@@ -259,30 +267,16 @@ const BackupComponent: FC<BackupProps> = ({
   );
 
   const onClickExportAccount = useCallback(() => {
-    exportAccount({
+    exportAccountMutation({
       password,
-      isWithoutGoHome: true,
-      additionalActionOnSuccess: () => {
-        if (dataOrReferrer && !isAddressInParams) {
-          setNextStep();
-        } else {
-          routeTo(WalletRoutesEnum.root);
-        }
-      }
+      isWithoutGoHome: true
     });
-  }, [
-    dataOrReferrer,
-    exportAccount,
-    isAddressInParams,
-    password,
-    routeTo,
-    setNextStep
-  ]);
+  }, [exportAccountMutation, password]);
 
   const renderRegistrationCompleted = useCallback(() => {
     const fileName = selectedChain
-      ? `power_wallet_${selectedChain}_${walletAddress}.pem`
-      : `power_wallet_${walletAddress}.pem`;
+      ? `power_wallet_${selectedChain}_${activeWallet?.address}.pem`
+      : `power_wallet_${activeWallet?.address}.pem`;
 
     return (
       <div className={styles.registrationCompleted}>
@@ -292,7 +286,7 @@ const BackupComponent: FC<BackupProps> = ({
           {t('registrationCompleted')}
         </div>
         <div className={styles.label}>{t('yourAccountNumber')}</div>
-        <div className={styles.text}>{walletAddress}</div>
+        <div className={styles.text}>{activeWallet?.address}</div>
         <div className={styles.label}>{t('yourSeedPhrase')}</div>
         <div className={styles.text}>{generatedSeedPhrase}</div>
         <div className={styles.instruction}>
@@ -319,7 +313,7 @@ const BackupComponent: FC<BackupProps> = ({
     onClickExportAccount,
     passwordsNotEqual,
     selectedChain,
-    walletAddress,
+    activeWallet,
     t
   ]);
 

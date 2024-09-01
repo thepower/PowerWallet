@@ -5,8 +5,8 @@ import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
 import { RootState } from 'application/reduxStore';
+import { useWallets } from 'application/utils/localStorageUtils';
 import { BreadcrumbsTypeEnum, Checkbox, LangMenu, Wizard } from 'common';
 import {
   getCurrentCreatingStep,
@@ -37,7 +37,6 @@ import { LoginToDapp } from '../../scenes/loginToDapp/LoginToDapp';
 import { SelectNetwork } from '../../scenes/selectNetwork/SelectNetwork';
 
 const mapStateToProps = (state: RootState) => ({
-  walletAddress: getWalletAddress(state),
   creatingStep: getCurrentCreatingStep(state),
   backupStep: getCurrentBackupStep(state),
   isRandomChain: getIsRandomChain(state),
@@ -66,7 +65,6 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
   creatingStep,
   backupStep,
   setCreatingStep,
-  walletAddress,
   setSelectedChain
 }) => {
   const { t } = useTranslation();
@@ -75,6 +73,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
     () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
     [dataOrReferrer]
   );
+  const { activeWallet } = useWallets();
 
   const parsedData: AppQueryParams = useMemo(() => {
     if (!isAddressInParams && dataOrReferrer)
@@ -83,7 +82,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
   }, [dataOrReferrer, isAddressInParams]);
 
   useEffect(() => {
-    if (walletAddress) {
+    if (activeWallet?.address) {
       if (!isAddressInParams) {
         routeTo(`${WalletRoutesEnum.sso}/${dataOrReferrer}`);
       } else {

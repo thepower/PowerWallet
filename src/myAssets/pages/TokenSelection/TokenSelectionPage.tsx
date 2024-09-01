@@ -5,9 +5,9 @@ import range from 'lodash/range';
 import { useTranslation } from 'react-i18next';
 import { connect, ConnectedProps } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { getNetworkChainID } from 'application/selectors';
 import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
+import { useWallets } from 'application/utils/localStorageUtils';
 import { Button, Divider, PageTemplate, Tabs } from 'common';
 import { Erc721Token } from 'myAssets/components/Erc721Token';
 import { Token } from 'myAssets/components/Token';
@@ -44,8 +44,7 @@ const mapStateToProps = (state: RootState) => ({
   isGetErc721TokensLoading: checkIfLoading(state, getErc721TokensTrigger.type),
   getTokenByID: (address: string) => getTokenByID(state, address),
   getWalletNativeTokensAmountBySymbol: (address: string) =>
-    getWalletNativeTokensAmountBySymbol(state, address),
-  chainId: getNetworkChainID(state)
+    getWalletNativeTokensAmountBySymbol(state, address)
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -59,13 +58,14 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   updateTokensAmountsTrigger,
   erc721Tokens,
   isGetErc721TokensLoading,
-  getErc721TokensTrigger,
-  chainId
+  getErc721TokensTrigger
 }) => {
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
   const [selectedToken, setSelectedToken] = useState<string>('');
   const { t } = useTranslation();
   const { address: collectionAddress } = useParams<{ address: string }>();
+
+  const { activeWallet } = useWallets();
 
   useEffect(() => {
     updateTokensAmountsTrigger();
@@ -95,13 +95,13 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     (token) =>
       token.isShow &&
       token.type === TokenKind.Erc20 &&
-      token?.chainId === chainId
+      token?.chainId === activeWallet?.chainId
   );
   const erc721tokens = tokens.filter(
     (token) =>
       token.isShow &&
       token.type === TokenKind.Erc721 &&
-      token?.chainId === chainId
+      token?.chainId === activeWallet?.chainId
   );
 
   const tokensMap = {

@@ -12,11 +12,13 @@ import { useWallets } from 'application/utils/localStorageUtils';
 
 type Args = {
   password: string;
-  hint: string;
-  isWithoutGoHome: boolean;
+  hint?: string;
+  isWithoutGoHome?: boolean;
 };
 
-export const useExportAccount = () => {
+export const useExportAccount = (
+  args: { onSuccess: () => void } | undefined
+) => {
   const { activeWallet } = useWallets();
   const { selectedChain } = useStore(store);
   const navigate = useNavigate();
@@ -80,11 +82,12 @@ export const useExportAccount = () => {
     onError: (error) => {
       toast.error(error.message);
     },
-    onSuccess: () => {
-      // queryClient.invalidateQueries({
-      //   queryKey: ['walletData', walletAddress]
-      // });
-    }
+    onSuccess: args?.onSuccess
+    // onSuccess: () => {
+    // queryClient.invalidateQueries({
+    //   queryKey: ['walletData', walletAddress]
+    // });
+    // }
   });
 
   return {

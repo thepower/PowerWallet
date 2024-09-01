@@ -3,7 +3,7 @@ import { useMediaQuery } from '@mui/material';
 import { NetworkEnum } from '@thepowereco/tssdk';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
-import { getNetworksChains } from 'application/selectors';
+import { useNetworkChains } from 'application/hooks/useNetworkChains';
 import { RootState } from 'application/reduxStore';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import { Button, IconButton, WizardComponentProps } from 'common';
@@ -24,8 +24,7 @@ import registrationStyles from '../../pages/registration/RegistrationPage.module
 
 const mapStateToProps = (state: RootState) => ({
   selectedNetwork: getSelectedNetwork(state),
-  isRandomChain: getIsRandomChain(state),
-  networksChains: getNetworksChains(state)
+  isRandomChain: getIsRandomChain(state)
 });
 
 const mapDispatchToProps = {
@@ -43,7 +42,6 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
   isRandomChain,
   setSelectedNetwork,
   setSelectedChain,
-  networksChains,
   setNextStep
 }) => {
   const { t } = useTranslation();
@@ -63,9 +61,11 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
     }
   }, []);
 
+  const { networkChains } = useNetworkChains();
+
   const selectedChains = useMemo(
-    () => (selectedNetwork ? networksChains?.[selectedNetwork] || [] : []),
-    [networksChains, selectedNetwork]
+    () => (selectedNetwork ? networkChains?.[selectedNetwork] || [] : []),
+    [networkChains, selectedNetwork]
   );
   const [chain, setChain] = React.useState<Maybe<number>>(null);
 

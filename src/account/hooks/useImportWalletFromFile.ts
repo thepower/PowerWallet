@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { FileReaderType, getFileData } from 'common';
+import i18n from 'locales/initTranslation';
+import { AddActionOnDecryptErrorType } from 'typings/common';
 import { useAccountLoginToWallet } from './useAccountLoginToWallet';
 
 type Args = {
@@ -22,9 +24,13 @@ export const useImportWalletFromFile = () => {
   const { mutate: importWalletFromFileMutation, isPending } = useMutation<
     void,
     Error,
-    Args
+    AddActionOnDecryptErrorType<Args>
   >({
-    mutationFn: async ({ accountFile, password }) => {
+    mutationFn: async ({
+      accountFile,
+      password,
+      additionalActionOnDecryptError
+    }) => {
       try {
         const data = await getFileData(accountFile, FileReaderType.binary);
         const walletData = WalletApi.parseExportData(data!, password);
@@ -33,14 +39,14 @@ export const useImportWalletFromFile = () => {
         await loginMutation({ address: walletData.address, encryptedWif });
         navigate(WalletRoutesEnum.root);
       } catch (e: any) {
-        // if (
-        //   additionalActionOnDecryptError &&
-        //   e.message === 'unable to decrypt data'
-        // ) {
-        //   additionalActionOnDecryptError?.();
-        // } else {
-        //   toast.error(i18n.t('importAccountError'));
-        // }
+        if (
+          additionalActionOnDecryptError &&
+          e.message === 'unable to decrypt data'
+        ) {
+          additionalActionOnDecryptError?.();
+        } else {
+          toast.error(i18n.t('importAccountError'));
+        }
       }
     },
     onError: (error) => {

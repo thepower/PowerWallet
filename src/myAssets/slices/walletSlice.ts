@@ -1,6 +1,6 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Maybe } from '../../typings/common';
-import { LoadBalancePayloadType } from '../types';
+import { LoadBalanceType } from '../types';
 
 type InitialState = {
   amounts: { [key: string]: string };
@@ -24,7 +24,7 @@ const walletSlice = createSlice({
   reducers: {
     setWalletBalanceData: {
       reducer: (_state, { payload }: PayloadAction<InitialState>) => payload,
-      prepare: ({ amount, ...otherData }: LoadBalancePayloadType) => ({
+      prepare: ({ amount, ...otherData }: LoadBalanceType) => ({
         payload: {
           ...otherData,
           initialLastBlock: otherData.lastblk,
