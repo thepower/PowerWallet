@@ -50,16 +50,16 @@ const tokensSlice = createSlice({
         id: payload.address,
         changes: { isShow: payload.isShow }
       });
-    },
-    updateTokenAmount: (
-      state,
-      { payload }: PayloadAction<{ address: string; amount: string }>
-    ) => {
-      tokensAdapter.updateOne(state.list, {
-        id: payload.address,
-        changes: { amount: payload.amount }
-      });
     }
+    // updateTokenAmount: (
+    //   state,
+    //   { payload }: PayloadAction<{ address: string; amount: string }>
+    // ) => {
+    //   tokensAdapter.updateOne(state.list, {
+    //     id: payload.address,
+    //     changes: { amount: payload.amount }
+    //   });
+    // }
   }
 });
 
@@ -81,8 +81,8 @@ export const {
     addToken,
     addTokens,
     addErc721Tokens,
-    toggleTokenShow,
-    updateTokenAmount
+    toggleTokenShow
+    // updateTokenAmount
   },
   reducer: tokensReducer
 } = tokensSlice;

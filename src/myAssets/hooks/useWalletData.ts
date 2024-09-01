@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { WalletApi } from '@thepowereco/tssdk';
-import { useWallets } from 'application/utils/localStorageUtils';
-import { LoadBalanceType } from 'myAssets/types';
+import { useWallets, Wallet } from 'application/utils/localStorageUtils';
+import { LoadBalanceType, TokenKind, TToken } from 'myAssets/types';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 
-export const useWalletData = () => {
+export const useWalletData = (wallet: Wallet | null) => {
+  const { networkApi } = useNetworkApi({ chainId: wallet?.chainId });
   const { activeWallet } = useWallets();
-  const { networkApi } = useNetworkApi({ chainId: activeWallet?.chainId });
 
   const getBalance = async (address: string | null | undefined) => {
     try {
@@ -33,13 +33,33 @@ export const useWalletData = () => {
     isLoading,
     isSuccess
   } = useQuery<LoadBalanceType>({
-    queryKey: ['walletData', activeWallet?.address],
-    queryFn: () => getBalance(activeWallet?.address),
-    enabled: !!activeWallet?.address && !!networkApi
+    queryKey: ['walletData', wallet?.address],
+    queryFn: () => getBalance(wallet?.address),
+    enabled: !!wallet?.address && !!networkApi
   });
 
+  const nativeTokens = Object.entries(walletData?.amount || {}).map(
+    ([symbol, amount]) =>
+      ({
+        type: TokenKind.Native,
+        name: symbol,
+        address: symbol,
+        symbol,
+        decimals: '9',
+        amount,
+        isShow: true,
+        chainId: activeWallet?.chainId
+      }) as TToken
+  );
+
+  const getNativeTokenAmountBySymbol = (symbol?: string) => {
+    return symbol && walletData?.amount?.[symbol];
+  };
+
   return {
+    nativeTokens,
     walletData,
+    getNativeTokenAmountBySymbol,
     isLoading,
     isSuccess
   };

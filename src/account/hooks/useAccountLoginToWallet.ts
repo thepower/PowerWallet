@@ -35,29 +35,18 @@ export const useAccountLoginToWallet = ({
       return;
     }
 
-    try {
-      let subChain: GetChainResultType;
+    const subChain: GetChainResultType = await networkApi?.getAddressChain(
+      address!
+    );
 
-      do {
-        subChain = await networkApi?.getAddressChain(address!);
-
-        if (subChain.result === 'other_chain') {
-          if (subChain.chain === null) {
-            toast.error(i18n.t('portationInProgress'));
-            return;
-          }
-        }
-      } while (subChain.result !== 'found');
-
-      queryClient.invalidateQueries({
-        queryKey: ['walletData', address]
-      });
-      return {
-        chainId: subChain.chain,
-        address,
-        encryptedWif
-      };
-    } catch (e) {}
+    queryClient.invalidateQueries({
+      queryKey: ['walletData', address]
+    });
+    return {
+      chainId: subChain.chain,
+      address,
+      encryptedWif
+    };
   };
 
   const { mutateAsync: loginMutation, isPending } = useMutation<
@@ -68,6 +57,7 @@ export const useAccountLoginToWallet = ({
     mutationFn: loginToWallet,
     onSuccess: async (params) => {
       if (params) {
+        console.log({ params });
         await addWallet({
           chainId: params.chainId,
           address: params.address,

@@ -3,9 +3,9 @@ import cn from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import appEnvs from 'appEnvs';
+import { SentData } from 'application/store';
 import { useWallets } from 'application/utils/localStorageUtils';
 import { Button } from 'common';
-import { SentData } from 'send/slices/sendSlice';
 import { SuccessSvg } from './icons';
 import styles from './TxResult.module.scss';
 

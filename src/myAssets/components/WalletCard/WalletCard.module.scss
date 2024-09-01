@@ -1,0 +1,42 @@
+.walletCard {
+  width: 280px;
+  height: 156px;
+
+  padding: 20px 24px;
+
+  border-radius: 5px;
+  border: 1px solid;
+
+  box-shadow: 20px 30px 110px 0px rgba(0, 0, 0, 0.12), 5px 5px 10px 0px rgba(229, 23, 208, 0.10), -5px -5px 10px 0px rgba(229, 23, 208, 0.10);
+  backdrop-filter: blur(65px);
+  cursor: pointer;
+}
+
+.chainId {
+  color: #F5F5F7;
+
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+
+  margin-bottom: 12px;
+}
+
+.balance {
+  color: #F5F5F7;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+
+  margin-bottom: 30px;
+}
+
+.address {
+  color: #F5F5F7;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+}

@@ -28,3 +28,7 @@ export type AddActionOnSuccessAndErrorType<InputType> = InputType &
 
 export type AddActionOnDecryptErrorType<InputType> = InputType &
   AdditionalActionOnDecryptErrorType;
+
+export type AddActionOnSuccessAndDecryptType<InputType> = InputType &
+  AdditionalActionOnSuccessType &
+  AdditionalActionOnDecryptErrorType;

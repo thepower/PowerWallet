@@ -10,7 +10,8 @@ import { RootState } from 'application/reduxStore';
 import { PageTemplate, FullScreenLoader } from 'common';
 
 // import Transaction from 'myAssets/components/Transaction';
-// import { useTransactions } from 'myAssets/hooks/useLoadTransactions';
+import Transaction from 'myAssets/components/Transaction';
+import { useTransactions } from 'myAssets/hooks/useLoadTransactions';
 import { getTokenByID } from 'myAssets/selectors/tokensSelectors';
 import {
   loadTransactionsTrigger,
@@ -30,9 +31,6 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState) => ({
   loading: checkIfLoading(state, loadTransactionsTrigger.type),
-  // transactions: getGroupedWalletTransactions(state),
-  transactions: [],
-
   getTokenByID: (address: string) => getTokenByID(state, address)
 });
 
@@ -41,7 +39,6 @@ type TokenTransactionsPageProps = ConnectedProps<typeof connector>;
 
 const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
   loading,
-  transactions = [],
   setLastBlockToInitialLastBlock,
   resetTransactionsState,
   getTokenByID
@@ -56,7 +53,7 @@ const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
 
   const token = useMemo(() => getTokenByID(address!), [getTokenByID, address]);
 
-  // useTransactions({ tokenAddress });
+  const { transactions } = useTransactions({ tokenAddress: address });
 
   useEffect(() => {
     setLastBlockToInitialLastBlock();
@@ -75,15 +72,16 @@ const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
 
   const renderTransactionsList = useCallback(
     () =>
+      transactions &&
       Object.entries(transactions).map(([date, transactions]) => (
         <li key={date}>
           <p className={styles.date}>{date}</p>
           <ul className={styles.transactionsList}>
-            {/* {transactions.map((trx) => (
+            {transactions.map((trx) => (
               <li key={trx.id}>
                 <Transaction trx={trx} />
               </li>
-            ))} */}
+            ))}
           </ul>
         </li>
       )),

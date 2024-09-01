@@ -1,73 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import localForage from 'localforage';
+import { useCallback, useMemo } from 'react';
+import { useLocalStorage } from 'usehooks-ts';
+import { TToken } from 'myAssets/types';
 
-type ApplicationStorageKeyType = 'address' | 'wif' | 'test';
-
-const applicationStorage = localForage.createInstance({
-  driver: localForage.LOCALSTORAGE,
-  name: 'thepowereco',
-  version: 1.0
-});
-
-export const getKeyFromApplicationStorage = <T>(
-  key: ApplicationStorageKeyType
-) => applicationStorage.getItem<T>(key);
-export const setKeyToApplicationStorage = (
-  key: ApplicationStorageKeyType,
-  value: any
-) => applicationStorage.setItem(key, value);
-export const clearApplicationStorage = async () => {
-  // await applicationStorage.removeItem('tokens');
-  await applicationStorage.removeItem('address');
-  await applicationStorage.removeItem('wif');
-};
-
-interface Wallet {
+export interface Wallet {
   chainId: number;
   address: string;
   encryptedWif: string;
 }
 
 export const useWallets = () => {
-  const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [activeAddress, setActiveAddress] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Загрузка данных из localForage при монтировании компонента
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const storedWallets =
-        await applicationStorage.getItem<Wallet[]>('wallets');
-      const storedActiveAddress =
-        await applicationStorage.getItem<string>('activeAddress');
-
-      setWallets(storedWallets || []);
-      setActiveAddress(storedActiveAddress ?? null);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load data.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  // Синхронизация состояния с другими вкладками
-  useEffect(() => {
-    const handleStorageChange = () => {
-      fetchData();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [fetchData]);
+  const [wallets, setWallets] = useLocalStorage<Wallet[]>(
+    'thepowereco/wallets',
+    []
+  );
+  const [activeAddress, setActiveAddress] = useLocalStorage<string | null>(
+    'thepowereco/activeAddress',
+    null
+  );
 
   // Функция для проверки уникальности адреса
   const isAddressUnique = useCallback(
@@ -80,82 +29,50 @@ export const useWallets = () => {
   // Функция для добавления нового кошелька
   const addWallet = useCallback(
     async (newWallet: Wallet) => {
-      setLoading(true);
-      try {
-        if (!isAddressUnique(newWallet.address)) {
-          setError('Wallet with this address already exists.');
-          return;
-        }
-
-        const updatedWallets = [...wallets, newWallet];
-        setWallets(updatedWallets);
-        await applicationStorage.setItem('wallets', updatedWallets);
-
-        if (activeAddress === null) {
-          setActiveAddress(newWallet.address);
-          await applicationStorage.setItem('activeAddress', newWallet.address);
-        }
-        setError(null);
-      } catch (err) {
-        setError('Failed to add wallet.');
-      } finally {
-        setLoading(false);
+      if (!isAddressUnique(newWallet.address)) {
+        return;
       }
+
+      const updatedWallets = [...wallets, newWallet];
+      setWallets(updatedWallets);
+
+      setActiveAddress(newWallet.address);
     },
-    [isAddressUnique, wallets, activeAddress]
+    [isAddressUnique, setActiveAddress, setWallets, wallets]
   );
 
   // Функция для обновления кошелька по адресу
   const updateWallet = useCallback(
     async (address: string, updatedData: Partial<Wallet>) => {
-      setLoading(true);
-      try {
-        const updatedWallets = wallets.map((wallet) =>
-          wallet.address === address ? { ...wallet, ...updatedData } : wallet
-        );
-        setWallets(updatedWallets);
-        await applicationStorage.setItem('wallets', updatedWallets);
-        setError(null);
-      } catch (err) {
-        setError('Failed to update wallet.');
-      } finally {
-        setLoading(false);
-      }
+      const updatedWallets = wallets.map((wallet) =>
+        wallet.address === address ? { ...wallet, ...updatedData } : wallet
+      );
+      setWallets(updatedWallets);
     },
-    [wallets]
+    [setWallets, wallets]
   );
 
   // Функция для удаления кошелька по адресу
   const removeWallet = useCallback(
     async (address: string) => {
-      setLoading(true);
-      try {
-        const updatedWallets = wallets.filter(
-          (wallet) => wallet.address !== address
-        );
-        setWallets(updatedWallets);
-        await applicationStorage.setItem('wallets', updatedWallets);
+      const updatedWallets = wallets.filter(
+        (wallet) => wallet.address !== address
+      );
+      setWallets(updatedWallets);
 
-        if (activeAddress === address) {
-          const newActiveAddress =
-            updatedWallets.length > 0 ? updatedWallets[0].address : null;
-          setActiveAddress(newActiveAddress);
-          await applicationStorage.setItem('activeAddress', newActiveAddress);
-        }
-        setError(null);
-      } catch (err) {
-        setError('Failed to remove wallet.');
-      } finally {
-        setLoading(false);
+      if (activeAddress === address) {
+        const newActiveAddress =
+          updatedWallets.length > 0 ? updatedWallets[0].address : null;
+        setActiveAddress(newActiveAddress);
       }
     },
-    [wallets, activeAddress]
+    [wallets, setWallets, activeAddress, setActiveAddress]
   );
 
   // Функция для получения кошелька по адресу
   const getWalletByAddress = useCallback(
-    (address: string): Wallet | undefined => {
-      return wallets.find((wallet) => wallet.address === address);
+    (address: string) => {
+      return wallets.find((wallet) => wallet.address === address) || null;
     },
     [wallets]
   );
@@ -167,51 +84,110 @@ export const useWallets = () => {
 
   // Функция для установки активного кошелька
   const setActiveWalletByAddress = useCallback(
-    async (address: string) => {
-      setLoading(true);
-      try {
-        if (getWalletByAddress(address)) {
-          setActiveAddress(address);
-          await applicationStorage.setItem('activeAddress', address);
-          setError(null);
-        } else {
-          setError('Wallet not found.');
-        }
-      } catch (err) {
-        setError('Failed to set active wallet.');
-      } finally {
-        setLoading(false);
+    (address: string) => {
+      if (getWalletByAddress(address)) {
+        setActiveAddress(address);
       }
     },
-    [getWalletByAddress]
+    [getWalletByAddress, setActiveAddress]
   );
 
   // Очистка всех кошельков
   const clearWallets = useCallback(async () => {
-    setLoading(true);
-    try {
-      setWallets([]);
-      setActiveAddress(null);
-      await applicationStorage.removeItem('wallets');
-      await applicationStorage.removeItem('activeAddress');
-      setError(null);
-    } catch (err) {
-      setError('Failed to clear wallets.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    setWallets([]);
+    setActiveAddress(null);
+  }, [setActiveAddress, setWallets]);
 
   return {
     wallets,
     activeWallet,
-    loading,
-    error,
     addWallet,
     updateWallet,
     removeWallet,
     getWalletByAddress,
     setActiveWalletByAddress,
     clearWallets
+  };
+};
+
+export const useTokens = () => {
+  const [tokens, setTokens] = useLocalStorage<TToken[]>(
+    'thepowereco/tokens',
+    []
+  );
+
+  // Function to check if a token address is unique
+  const isAddressUnique = useCallback(
+    (address: string): boolean => {
+      return !tokens.some((token) => token.address === address);
+    },
+    [tokens]
+  );
+
+  // Function to add a new token
+  const addToken = useCallback(
+    async (newToken: TToken) => {
+      if (!isAddressUnique(newToken.address)) {
+        return;
+      }
+
+      const updatedTokens = [...tokens, newToken];
+      setTokens(updatedTokens);
+    },
+    [isAddressUnique, setTokens, tokens]
+  );
+
+  // Function to update a token by address
+  const updateToken = useCallback(
+    async (address: string, updatedData: Partial<TToken>) => {
+      const updatedTokens = tokens.map((token) =>
+        token.address === address ? { ...token, ...updatedData } : token
+      );
+      setTokens(updatedTokens);
+    },
+    [setTokens, tokens]
+  );
+
+  // Function to remove a token by address
+  const removeToken = useCallback(
+    async (address: string) => {
+      const updatedTokens = tokens.filter((token) => token.address !== address);
+      setTokens(updatedTokens);
+    },
+    [setTokens, tokens]
+  );
+
+  // Function to get a token by address
+  const getTokenByAddress = useCallback(
+    (address: string) => {
+      return tokens.find((token) => token.address === address) || null;
+    },
+    [tokens]
+  );
+
+  // Function to toggle the `isShow` property of a token by address
+  const toggleTokenVisibility = useCallback(
+    async (address: string) => {
+      const token = getTokenByAddress(address);
+      if (token) {
+        updateToken(address, { isShow: !token.isShow });
+      }
+    },
+    [getTokenByAddress, updateToken]
+  );
+
+  // Function to clear all tokens
+  const clearTokens = useCallback(async () => {
+    setTokens([]);
+  }, [setTokens]);
+
+  return {
+    tokens,
+    addToken,
+    updateToken,
+    removeToken,
+    getTokenByAddress,
+    toggleTokenVisibility,
+    clearTokens
   };
 };

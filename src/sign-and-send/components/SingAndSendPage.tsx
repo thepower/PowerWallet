@@ -1,23 +1,21 @@
 import { useState, useEffect, FC } from 'react';
+import { useStore } from '@tanstack/react-store';
 import { AddressApi, CryptoApi, TransactionsApi } from '@thepowereco/tssdk';
 import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
 import cn from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import isObject from 'lodash/isObject';
 import { useTranslation } from 'react-i18next';
-import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
 
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
-import { RootState } from 'application/reduxStore';
 
+import { setSentData, store } from 'application/store';
 import { useWallets } from 'application/utils/localStorageUtils';
 import { Button, FullScreenLoader, TxResult } from 'common';
 import CardTable from 'common/cardTable/CardTable';
 import CardTableKeyAccordion from 'common/cardTableKeyAccordion/CardTableKeyAccordion';
-import { checkIfLoading } from 'network/selectors';
-import { getSentData } from 'send/selectors/sendSelectors';
-import { clearSentData, signAndSendTrxTrigger } from 'send/slices/sendSlice';
+import { useSignAndSendTx } from 'send/hooks/useSignAndSendTx';
 
 import { TxBody, TxKindByName, TxPurpose } from 'sign-and-send/typing';
 import { objectToString, stringToObject } from 'sso/utils';
@@ -31,18 +29,17 @@ const txKindMap: { [key: number]: string } = Object.entries(
   TxKindByName
 ).reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {});
 
-const SignAndSendPage: FC = () => {
+const SignAndSendPageComponent: FC = () => {
   const { t } = useTranslation();
   const { message } = useParams<{ message: string }>();
   const { activeWallet } = useWallets();
   const { networkApi } = useNetworkApi({ chainId: activeWallet?.chainId });
 
-  const dispatch = useDispatch();
+  const { signAndSendTxMutation, isPending } = useSignAndSendTx({
+    throwOnError: true
+  });
+  const { sentData } = useStore(store);
 
-  const sentData = useSelector((state: RootState) => getSentData(state));
-  const loading = useSelector((state: RootState) =>
-    checkIfLoading(state, signAndSendTrxTrigger.type)
-  );
   const feeSettings = networkApi?.feeSettings;
   const gasSettings = networkApi?.gasSettings;
 
@@ -109,7 +106,7 @@ const SignAndSendPage: FC = () => {
 
   useEffect(() => {
     return () => {
-      dispatch(clearSentData());
+      setSentData(null);
     };
   }, []);
 
@@ -120,33 +117,31 @@ const SignAndSendPage: FC = () => {
       }
       const decryptedWif = CryptoApi.decryptWif(activeWallet.encryptedWif, '');
       if (decodedTxBody) {
-        dispatch(
-          signAndSendTrxTrigger({
-            wif: decryptedWif,
-            decodedTxBody,
-            returnURL,
-            additionalActionOnSuccess: (txResponse) => {
-              window.opener.postMessage?.(
-                objectToString({
-                  type: 'signAndSendMessageResponse',
-                  data: txResponse
-                }),
-                returnURL
-              );
-              window.close();
-            },
-            additionalActionOnError(error) {
-              window.opener.postMessage?.(
-                objectToString({
-                  type: 'signAndSendMessageError',
-                  data: error
-                }),
-                returnURL
-              );
-              window.close();
-            }
-          })
-        );
+        signAndSendTxMutation({
+          wif: decryptedWif,
+          decodedTxBody,
+          returnURL,
+          additionalActionOnSuccess: (txResponse) => {
+            window.opener.postMessage?.(
+              objectToString({
+                type: 'signAndSendMessageResponse',
+                data: txResponse
+              }),
+              returnURL
+            );
+            window.close();
+          },
+          additionalActionOnError(error) {
+            window.opener.postMessage?.(
+              objectToString({
+                type: 'signAndSendMessageError',
+                data: error
+              }),
+              returnURL
+            );
+            window.close();
+          }
+        });
       }
     } catch (err) {
       console.error({ err });
@@ -167,31 +162,30 @@ const SignAndSendPage: FC = () => {
 
   const signAndSendCallback = (decryptedWif: string) => {
     if (decodedTxBody) {
-      dispatch(
-        signAndSendTrxTrigger({
-          wif: decryptedWif,
-          decodedTxBody,
-          returnURL,
-          additionalActionOnSuccess: (txResponse) => {
-            window.opener.postMessage?.(
-              objectToString({
-                type: 'signAndSendMessageResponse',
-                data: txResponse
-              }),
-              returnURL
-            );
-          },
-          additionalActionOnError: (error) => {
-            window.opener.postMessage?.(
-              objectToString({
-                type: 'signAndSendMessageError',
-                data: error
-              }),
-              returnURL
-            );
-          }
-        })
-      );
+      signAndSendTxMutation({
+        wif: decryptedWif,
+        decodedTxBody,
+        returnURL,
+        additionalActionOnSuccess: (txResponse) => {
+          window.opener.postMessage?.(
+            objectToString({
+              type: 'signAndSendMessageResponse',
+              data: txResponse
+            }),
+            returnURL
+          );
+        },
+        additionalActionOnError: (error) => {
+          window.opener.postMessage?.(
+            objectToString({
+              type: 'signAndSendMessageError',
+              data: error
+            }),
+            returnURL
+          );
+        }
+      });
+
       setConfirmModalOpen(false);
     }
   };
@@ -318,7 +312,7 @@ const SignAndSendPage: FC = () => {
     );
   };
 
-  if (loading) {
+  if (isPending) {
     return <FullScreenLoader />;
   }
 
@@ -339,4 +333,4 @@ const SignAndSendPage: FC = () => {
   );
 };
 
-export default SignAndSendPage;
+export const SignAndSendPage = SignAndSendPageComponent;

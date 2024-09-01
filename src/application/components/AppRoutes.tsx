@@ -14,8 +14,8 @@ import { LoginPage } from 'registration/components/pages/login/LoginPage';
 import { RegistrationPage } from 'registration/components/pages/registration/RegistrationPage';
 import { WelcomePage } from 'registration/components/pages/welcome/WelcomePage';
 import { SendPage } from 'send/components/SendPage';
-import SignAndSendPage from 'sign-and-send/components/SingAndSendPage';
-import WalletSSOPage from 'sso/components/pages/WalletSSOPage';
+import { SignAndSendPage } from 'sign-and-send/components/SingAndSendPage';
+import { WalletSSOPage } from 'sso/components/pages/WalletSSOPage';
 
 import { WalletRoutesEnum } from '../typings/routes';
 
@@ -40,7 +40,6 @@ const AppRoutesComponent: React.FC = () => {
 
   return (
     <Routes>
-      {/* <Route path={'/'}> */}
       <Route
         path={walletAddress ? '/' : '/:referrer?'}
         element={walletAddress ? <MainPage /> : <WelcomePage />}
@@ -80,7 +79,6 @@ const AppRoutesComponent: React.FC = () => {
         path={`/:type/:address${WalletRoutesEnum.transactions}`}
         element={<TokenTransactionsPage />}
       />
-      {/* </Route> */}
     </Routes>
   );
 };

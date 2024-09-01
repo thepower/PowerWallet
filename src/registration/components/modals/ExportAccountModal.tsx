@@ -2,21 +2,12 @@ import React, { useState } from 'react';
 import { Button } from '@mui/material';
 import classnames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { connect, ConnectedProps } from 'react-redux';
 import { useExportAccount } from 'account/hooks';
 import { Modal, OutlinedInput } from '../../../common';
 import { compareTwoStrings } from '../../utils/registrationUtils';
 import styles from '../pages/registration/RegistrationPage.module.scss';
 
-// import { exportAccount } from '../../../account/slice/accountSlice';
-
-const mapDispatchToProps = {
-  // exportAccount
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-type ExportAccountModalProps = ConnectedProps<typeof connector> & {
+type ExportAccountModalProps = {
   open: boolean;
   onClose: () => void;
 };
@@ -31,16 +22,7 @@ const ExportAccountModalComponent: React.FC<ExportAccountModalProps> = ({
   const [passwordsNotEqual, setPasswordsNotEqual] = useState(false);
   const { t } = useTranslation();
 
-  const { exportAccountMutation } = useExportAccount({
-    onSuccess: () => {
-      setPassword('');
-      setConfirmedPassword('');
-      setHint('');
-      setPasswordsNotEqual(false);
-
-      onClose();
-    }
-  });
+  const { exportAccountMutation } = useExportAccount();
 
   const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
@@ -66,7 +48,18 @@ const ExportAccountModalComponent: React.FC<ExportAccountModalProps> = ({
       return;
     }
 
-    exportAccountMutation({ password, hint });
+    exportAccountMutation({
+      password,
+      hint,
+      additionalActionOnSuccess: () => {
+        setPassword('');
+        setConfirmedPassword('');
+        setHint('');
+        setPasswordsNotEqual(false);
+
+        onClose();
+      }
+    });
   };
 
   return (
@@ -122,4 +115,4 @@ const ExportAccountModalComponent: React.FC<ExportAccountModalProps> = ({
   );
 };
 
-export const ExportAccountModal = connector(ExportAccountModalComponent);
+export const ExportAccountModal = ExportAccountModalComponent;

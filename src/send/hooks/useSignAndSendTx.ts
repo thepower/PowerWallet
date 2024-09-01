@@ -3,18 +3,20 @@ import { AddressApi, TransactionsApi, WalletApi } from '@thepowereco/tssdk';
 import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
 import { toast } from 'react-toastify';
 
+import { setSentData } from 'application/store';
 import { useWallets } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { LoadBalanceType } from 'myAssets/types';
 import { TxBody, TxPurpose } from 'sign-and-send/typing';
+import { AddActionOnSuccessAndErrorType } from 'typings/common';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 const { packAndSignTX } = TransactionsApi;
 
-type Args = {
+type Args = AddActionOnSuccessAndErrorType<{
   wif: string;
   decodedTxBody: TxBody;
   returnURL?: string;
-};
+}>;
 
 export const useSignAndSendTx = ({
   throwOnError
@@ -35,7 +37,13 @@ export const useSignAndSendTx = ({
     }
   };
 
-  const signAndSendTx = async ({ wif, decodedTxBody, returnURL }: Args) => {
+  const signAndSendTx = async ({
+    wif,
+    decodedTxBody,
+    returnURL,
+    additionalActionOnError,
+    additionalActionOnSuccess
+  }: Args) => {
     try {
       if (!networkApi) {
         throw new Error('Network API is not ready');
@@ -102,27 +110,22 @@ export const useSignAndSendTx = ({
       const txId = (response as { txId: string }).txId;
 
       if (txId) {
-        // yield *
-        //   put(
-        //     setSentData({
-        //       txId,
-        //       comment: comment || '',
-        //       amount:
-        //         amount && transferToken
-        //           ? `${amount} ${transferToken}`
-        //           : '-' || 0,
-        //       from: walletAddress,
-        //       to,
-        //       returnURL
-        //     })
-        //   );
-        // additionalActionOnSuccess?.(txResponse);
+        setSentData({
+          txId,
+          comment: comment || '',
+          amount:
+            amount && transferToken ? `${amount} ${transferToken}` : '-' || 0,
+          from: activeWallet.address,
+          to,
+          returnURL
+        });
+        additionalActionOnSuccess?.(response);
       } else {
-        // additionalActionOnError?.(txResponse);
+        additionalActionOnError?.(response);
         console.error('singAndSendTrxSagaNoTxId');
       }
     } catch (error: any) {
-      // additionalActionOnError?.(error?.message);
+      additionalActionOnError?.(error?.message);
       console.error('singAndSendTrxSaga', error);
       toast.error(`${i18n.t('somethingWentWrongTransaction')} ${error}`);
     }

@@ -33,16 +33,7 @@ import { Maybe } from '../../typings/common';
 
 type AccountProps = { className?: string };
 
-const Account: React.FC<AccountProps> = ({
-  // walletAddress,
-  // openedMenu,
-  // setShowUnderConstruction,
-  // importAccountFromFile,
-  // toggleOpenedAccountMenu,
-  // resetAccount,
-  // exportAccount,
-  className
-}) => {
+const Account: React.FC<AccountProps> = ({ className }) => {
   const [accountFile, setAccountFile] = useState<Maybe<File>>(null);
   const [openedImportAccountModal, setOpenedImportAccountModal] =
     useState<boolean>(false);
@@ -52,11 +43,12 @@ const Account: React.FC<AccountProps> = ({
     useState<boolean>(false);
   const importAccountInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
-  const { exportAccountMutation } = useExportAccount(undefined);
+  const { exportAccountMutation } = useExportAccount();
   const { importWalletFromFileMutation } = useImportWalletFromFile();
   const { resetWallet } = useResetWallet();
   const { isAccountMenuOpened } = useStore(store);
   const { activeWallet } = useWallets();
+
   // const handleReferralProgram = () => {
   //   routeTo(WalletRoutesEnum.referralProgram);
   //   toggleOpenedAccountMenu();
@@ -68,10 +60,10 @@ const Account: React.FC<AccountProps> = ({
 
   const handleExportAccount = () => {
     exportAccountMutation({
-      password: ''
-      // additionalActionOnDecryptError: () => {
-      //   setOpenedExportAccountModal(true);
-      // }
+      password: '',
+      additionalActionOnDecryptError: () => {
+        setOpenedExportAccountModal(true);
+      }
     });
   };
 
@@ -120,13 +112,10 @@ const Account: React.FC<AccountProps> = ({
   };
 
   const handleResetAccount = () => {
-    resetWallet(
-      ''
-      //   {
-      //   password: '',
-      //   additionalActionOnDecryptError: () => setOpenedResetAccountModal(true)
-      // }
-    );
+    resetWallet({
+      password: '',
+      additionalActionOnDecryptError: () => setOpenedResetAccountModal(true)
+    });
   };
 
   const closeResetAccountModal = () => {

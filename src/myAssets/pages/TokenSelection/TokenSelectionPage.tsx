@@ -11,15 +11,12 @@ import { useWallets } from 'application/utils/localStorageUtils';
 import { Button, Divider, PageTemplate, Tabs } from 'common';
 import { Erc721Token } from 'myAssets/components/Erc721Token';
 import { Token } from 'myAssets/components/Token';
+import { useWalletData } from 'myAssets/hooks/useWalletData';
 import {
   getErc721Tokens,
   getTokenByID,
   getTokens
 } from 'myAssets/selectors/tokensSelectors';
-import {
-  getWalletNativeTokens,
-  getWalletNativeTokensAmountBySymbol
-} from 'myAssets/selectors/walletSelectors';
 import {
   getErc721TokensTrigger,
   toggleTokenShow,
@@ -38,13 +35,10 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = (state: RootState) => ({
-  nativeTokens: getWalletNativeTokens(state),
   tokens: getTokens(state),
   erc721Tokens: getErc721Tokens(state),
   isGetErc721TokensLoading: checkIfLoading(state, getErc721TokensTrigger.type),
-  getTokenByID: (address: string) => getTokenByID(state, address),
-  getWalletNativeTokensAmountBySymbol: (address: string) =>
-    getWalletNativeTokensAmountBySymbol(state, address)
+  getTokenByID: (address: string) => getTokenByID(state, address)
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -53,8 +47,6 @@ type TokenSelectionPageProps = ConnectedProps<typeof connector>;
 const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   tokens,
   getTokenByID,
-  getWalletNativeTokensAmountBySymbol,
-  nativeTokens,
   updateTokensAmountsTrigger,
   erc721Tokens,
   isGetErc721TokensLoading,
@@ -66,7 +58,8 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   const { address: collectionAddress } = useParams<{ address: string }>();
 
   const { activeWallet } = useWallets();
-
+  const { nativeTokens, getNativeTokenAmountBySymbol } =
+    useWalletData(activeWallet);
   useEffect(() => {
     updateTokensAmountsTrigger();
   }, []);
@@ -184,7 +177,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     isGetErc721TokensLoading
   ]);
 
-  const nativeAssetAmount = getWalletNativeTokensAmountBySymbol(selectedToken);
+  const nativeAssetAmount = getNativeTokenAmountBySymbol(selectedToken);
   const token = getTokenByID(selectedToken);
 
   const assetIdentifier = useMemo(() => {

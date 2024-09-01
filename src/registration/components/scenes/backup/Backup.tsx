@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { useExportAccount } from 'account/hooks';
-// import { exportAccount } from 'account/slice/accountSlice';
 import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { useWallets } from 'application/utils/localStorageUtils';
@@ -73,15 +72,7 @@ const BackupComponent: FC<BackupProps> = ({
 
   const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
   const { activeWallet } = useWallets();
-  const { exportAccountMutation } = useExportAccount({
-    onSuccess: () => {
-      if (dataOrReferrer && !isAddressInParams) {
-        setNextStep();
-      } else {
-        routeTo(WalletRoutesEnum.root);
-      }
-    }
-  });
+  const { exportAccountMutation } = useExportAccount();
 
   const isAddressInParams = useMemo(
     () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
@@ -269,7 +260,14 @@ const BackupComponent: FC<BackupProps> = ({
   const onClickExportAccount = useCallback(() => {
     exportAccountMutation({
       password,
-      isWithoutGoHome: true
+      isWithoutGoHome: true,
+      additionalActionOnSuccess: () => {
+        if (dataOrReferrer && !isAddressInParams) {
+          setNextStep();
+        } else {
+          routeTo(WalletRoutesEnum.root);
+        }
+      }
     });
   }, [exportAccountMutation, password]);
 

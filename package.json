@@ -41,7 +41,6 @@
     "i18next": "^23.2.8",
     "i18next-browser-languagedetector": "^7.1.0",
     "i18next-http-backend": "^2.2.1",
-    "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "qhistory": "^1.1.0",
     "qs": "^6.10.3",

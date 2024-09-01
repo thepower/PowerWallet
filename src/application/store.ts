@@ -6,6 +6,15 @@ import {
 } from 'registration/typings/registrationTypes';
 import { Maybe } from 'typings/common';
 
+export type SentData = {
+  from: string;
+  to: string;
+  amount: number | string;
+  comment: Maybe<string>;
+  txId: string;
+  returnURL?: string;
+};
+
 interface State {
   selectedNetwork: Maybe<NetworkEnum>;
   selectedChain: Maybe<number>;
@@ -17,6 +26,8 @@ interface State {
 
   isAccountMenuOpened: boolean;
   isShowUnderConstruction: boolean;
+
+  sentData: Maybe<SentData>;
 }
 
 const initialState: State = {
@@ -29,7 +40,9 @@ const initialState: State = {
   isRandomChain: true,
 
   isAccountMenuOpened: false,
-  isShowUnderConstruction: false
+  isShowUnderConstruction: false,
+
+  sentData: null
 };
 
 export const store = new Store<State>(initialState);
@@ -98,6 +111,13 @@ export const setIsShowUnderConstruction = (
   setState((prevState) => ({
     ...prevState,
     isShowUnderConstruction
+  }));
+};
+
+export const setSentData = (sentData: Maybe<SentData>) => {
+  setState((prevState) => ({
+    ...prevState,
+    sentData
   }));
 };
 

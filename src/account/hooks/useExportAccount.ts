@@ -9,21 +9,32 @@ import { toast } from 'react-toastify';
 import { store } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { useWallets } from 'application/utils/localStorageUtils';
+import i18n from 'locales/initTranslation';
+import {
+  AddActionOnSuccessType,
+  AddActionOnDecryptErrorType
+} from 'typings/common';
 
-type Args = {
-  password: string;
-  hint?: string;
-  isWithoutGoHome?: boolean;
-};
+type Args = AddActionOnDecryptErrorType<
+  AddActionOnSuccessType<{
+    password: string;
+    hint?: string;
+    isWithoutGoHome?: boolean;
+  }>
+>;
 
-export const useExportAccount = (
-  args: { onSuccess: () => void } | undefined
-) => {
+export const useExportAccount = () => {
   const { activeWallet } = useWallets();
   const { selectedChain } = useStore(store);
   const navigate = useNavigate();
 
-  const exportAccount = async ({ hint, password, isWithoutGoHome }: Args) => {
+  const exportAccount = async ({
+    hint,
+    password,
+    isWithoutGoHome,
+    additionalActionOnSuccess,
+    additionalActionOnDecryptError
+  }: Args) => {
     const currentNetworkChain = activeWallet?.chainId;
     const currentRegistrationChain = selectedChain;
     const address = activeWallet!.address;
@@ -43,8 +54,6 @@ export const useExportAccount = (
         type: 'octet-stream'
       });
 
-      // yield * loginToWalletSaga({ payload: { address, encryptedWif } });
-
       const fileName =
         currentNetworkChain || currentRegistrationChain
           ? `power_wallet_${
@@ -58,18 +67,18 @@ export const useExportAccount = (
         navigate(WalletRoutesEnum.root);
       }
 
-      // additionalActionOnSuccess?.();
+      additionalActionOnSuccess?.();
     } catch (e: any) {
       console.error('exportAccountSaga', e);
 
-      // if (
-      //   additionalActionOnDecryptError &&
-      //   e.message === 'unable to decrypt data'
-      // ) {
-      //   additionalActionOnDecryptError?.();
-      // } else {
-      //   toast.error(i18n.t('exportAccountError'));
-      // }
+      if (
+        additionalActionOnDecryptError &&
+        e.message === 'unable to decrypt data'
+      ) {
+        additionalActionOnDecryptError?.();
+      } else {
+        toast.error(i18n.t('exportAccountError'));
+      }
     }
   };
 
@@ -81,13 +90,7 @@ export const useExportAccount = (
     mutationFn: exportAccount,
     onError: (error) => {
       toast.error(error.message);
-    },
-    onSuccess: args?.onSuccess
-    // onSuccess: () => {
-    // queryClient.invalidateQueries({
-    //   queryKey: ['walletData', walletAddress]
-    // });
-    // }
+    }
   });
 
   return {

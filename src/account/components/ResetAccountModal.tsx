@@ -1,29 +1,21 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Button } from '@mui/material';
 import classnames from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { connect, ConnectedProps } from 'react-redux';
 import { useResetWallet } from 'account/hooks';
 import { Modal, OutlinedInput } from 'common';
-import styles from '../../registration/components/pages/registration/RegistrationPage.module.scss';
-// import { resetAccount } from '../slice/accountSlice';
+import styles from 'registration/components/pages/registration/RegistrationPage.module.scss';
 
 const initialValues = { password: '' };
 type Values = typeof initialValues;
 
-const mapDispatchToProps = {
-  // resetAccount
-};
-
-const connector = connect(null, mapDispatchToProps);
-type ResetAccountModalProps = ConnectedProps<typeof connector> & {
+type ResetAccountModalProps = {
   open: boolean;
   onClose: () => void;
 };
 
 const ResetAccountModalComponent: FC<ResetAccountModalProps> = ({
-  // resetAccount,
   onClose,
   open
 }) => {
@@ -35,7 +27,7 @@ const ResetAccountModalComponent: FC<ResetAccountModalProps> = ({
   ) => {
     const { password } = values;
 
-    resetWallet(password);
+    resetWallet({ password });
 
     formikHelpers.setFieldValue('password', '');
     onClose();
@@ -95,4 +87,4 @@ const ResetAccountModalComponent: FC<ResetAccountModalProps> = ({
   );
 };
 
-export const ResetAccountModal = connector(ResetAccountModalComponent);
+export const ResetAccountModal = ResetAccountModalComponent;

@@ -8,7 +8,6 @@ import { transactionsReducer } from '../myAssets/slices/transactionsSlice';
 import { walletReducer } from '../myAssets/slices/walletSlice';
 import { networkReducer } from '../network/slice';
 import { registrationReducer } from '../registration/slice/registrationSlice';
-import { sendReducer } from '../send/slices/sendSlice';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -22,8 +21,7 @@ const reducer = {
   wallet: walletReducer,
   network: networkReducer,
   tokens: persistReducer(tokensPersistConfig, tokensReducer),
-  transactions: transactionsReducer,
-  send: sendReducer
+  transactions: transactionsReducer
 };
 
 const store = configureStore({

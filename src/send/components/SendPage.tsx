@@ -1,53 +1,38 @@
 import React, { FC, useCallback, useEffect, useMemo } from 'react';
 import { BigNumber, formatFixed } from '@ethersproject/bignumber';
 import { InputAdornment, TextField } from '@mui/material';
+import { useStore } from '@tanstack/react-store';
 import { AddressApi, CryptoApi } from '@thepowereco/tssdk';
 import cn from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect, useSelector } from 'react-redux';
+import { ConnectedProps, connect } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import * as yup from 'yup';
-// import {
-//   getWalletAddress,
-//   getWalletData
-// } from 'account/selectors/accountSelectors';
 import { RootState } from 'application/reduxStore';
+import { setSentData, store } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { useWallets } from 'application/utils/localStorageUtils';
 import { LogoIcon, MoneyBugIcon } from 'assets/icons';
 import { Button, PageTemplate, Divider, FullScreenLoader } from 'common';
 import TxResult from 'common/txResult/TxResult';
+import { useWalletData } from 'myAssets/hooks/useWalletData';
 import { getTokenByID } from 'myAssets/selectors/tokensSelectors';
-import { getWalletNativeTokensAmountBySymbol } from 'myAssets/selectors/walletSelectors';
 import { addTokenTrigger } from 'myAssets/slices/tokensSlice';
 import { TokenKind } from 'myAssets/types';
 import { checkIfLoading } from 'network/selectors';
+import { useSendErc721TokenTx } from 'send/hooks/useSendErc721TokenTx';
+import { useSendTokenTx } from 'send/hooks/useSendTokenTx';
+import { useSendTx } from 'send/hooks/useSendTx';
 import ConfirmSendModal from './ConfirmSendModal';
 import styles from './SendPage.module.scss';
-import { getSentData } from '../selectors/sendSelectors';
-import {
-  clearSentData,
-  sendErc721TokenTrxTrigger,
-  sendTokenTrxTrigger,
-  sendTrxTrigger
-} from '../slices/sendSlice';
 
 const mapDispatchToProps = {
-  clearSentData,
-  sendTrxTrigger,
-  sendTokenTrxTrigger,
-  sendErc721TokenTrxTrigger,
   addTokenTrigger
 };
 
 const mapStateToProps = (state: RootState) => ({
-  sentData: getSentData(state),
   getTokenByID: (address: string) => getTokenByID(state, address),
-  loading:
-    checkIfLoading(state, sendTrxTrigger.type) ||
-    checkIfLoading(state, sendTokenTrxTrigger.type) ||
-    checkIfLoading(state, sendErc721TokenTrxTrigger.type),
   isAddTokenLoading: checkIfLoading(state, addTokenTrigger.type)
 });
 
@@ -72,18 +57,13 @@ const InputLabelProps = {
 };
 
 const SendPageComponent: FC<SendProps> = ({
-  sentData,
-  loading,
   isAddTokenLoading,
   getTokenByID,
-  clearSentData,
-  sendTrxTrigger,
-  sendTokenTrxTrigger,
-  sendErc721TokenTrxTrigger,
   addTokenTrigger
 }) => {
   const { t } = useTranslation();
   const { activeWallet } = useWallets();
+  const { sentData } = useStore(store);
   const [openModal, setOpenModal] = React.useState(false);
   const {
     type: tokenType,
@@ -94,18 +74,27 @@ const SendPageComponent: FC<SendProps> = ({
     address: string;
     id: string;
   }>();
+  const { getNativeTokenAmountBySymbol } = useWalletData(activeWallet);
+  const { sendTxMutation, isPending: isSendTxPending } = useSendTx({
+    throwOnError: false
+  });
+  const { sendTokenTxMutation, isPending: isSendTokenTxPending } =
+    useSendTokenTx({ throwOnError: false });
 
-  const nativeTokenAmount = useSelector((state) =>
-    getWalletNativeTokensAmountBySymbol(state, tokenAddress)
-  );
+  const { sendErc721TokenTxMutation, isPending: isSendErc721TokenTxPending } =
+    useSendErc721TokenTx({
+      throwOnError: false
+    });
 
   const token = useMemo(
     () => getTokenByID(tokenAddress!),
     [getTokenByID, tokenAddress]
   );
 
+  const nativeTokenAmount = getNativeTokenAmountBySymbol(tokenAddress);
+
   useEffect(() => {
-    clearSentData();
+    setSentData(null);
   }, []);
 
   const isNativeToken = useMemo(
@@ -187,7 +176,7 @@ const SendPageComponent: FC<SendProps> = ({
   }) => {
     switch (tokenType) {
       case TokenKind.Native:
-        sendTrxTrigger({
+        sendTxMutation({
           to: values.address!,
           comment: values.comment,
           amount: values.amount,
@@ -196,7 +185,7 @@ const SendPageComponent: FC<SendProps> = ({
         break;
       case TokenKind.Erc20:
         if (token) {
-          sendTokenTrxTrigger({
+          sendTokenTxMutation({
             address: token.address,
             amount: values.amount,
             decimals: token.decimals,
@@ -206,7 +195,7 @@ const SendPageComponent: FC<SendProps> = ({
         }
         break;
       case TokenKind.Erc721:
-        sendErc721TokenTrxTrigger({
+        sendErc721TokenTxMutation({
           to: values.address!,
           address: tokenAddress!,
           id: erc721TokenId!,
@@ -337,7 +326,12 @@ const SendPageComponent: FC<SendProps> = ({
   const tokenSymbol = isNativeToken ? tokenAddress : token?.symbol;
   const formattedAmountString = formattedAmount?.toString();
 
-  if (loading || isAddTokenLoading) {
+  if (
+    isSendTxPending ||
+    isSendTokenTxPending ||
+    isSendErc721TokenTxPending ||
+    isAddTokenLoading
+  ) {
     return <FullScreenLoader />;
   }
 

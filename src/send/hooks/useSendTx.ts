@@ -17,7 +17,11 @@ type Args = {
   comment: Maybe<string>;
 };
 
-export const useSendTx = ({ throwOnError }: { throwOnError?: boolean }) => {
+export const useSendTx = ({
+  throwOnError = false
+}: {
+  throwOnError?: boolean;
+}) => {
   const { activeWallet } = useWallets();
   const { networkApi, isLoading: isNetworkApiFetching } = useNetworkApi({
     chainId: activeWallet?.chainId

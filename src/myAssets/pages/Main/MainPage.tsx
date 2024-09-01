@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConnectedProps, connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { WalletRoutesEnum } from 'application/typings/routes';
 import { useWallets } from 'application/utils/localStorageUtils';
 import { BuySvg, FaucetSvg, LogoIcon, SendSvg } from 'assets/icons';
 import { Button, CardLink, CopyButton, PageTemplate, Tabs } from 'common';
+import WalletCard from 'myAssets/components/WalletCard/WalletCard';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
 import { getTokens } from 'myAssets/selectors/tokensSelectors';
 import { updateTokensAmountsTrigger } from 'myAssets/slices/tokensSlice';
@@ -16,14 +17,12 @@ import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
 import styles from './MainPage.module.scss';
 import AddButton from '../../components/AddButton';
 import { Token } from '../../components/Token';
-import { getWalletNativeTokens } from '../../selectors/walletSelectors';
 
 const mapDispatchToProps = {
   updateTokensAmountsTrigger
 };
 
 const mapStateToProps = (state: RootState) => ({
-  nativeTokens: getWalletNativeTokens(state),
   tokens: getTokens(state)
 });
 
@@ -32,18 +31,18 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type MainPageProps = ConnectedProps<typeof connector>;
 
 const MainPageComponent: FC<MainPageProps> = ({
-  nativeTokens,
   tokens,
   updateTokensAmountsTrigger
 }) => {
   const { t } = useTranslation();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
-  const { activeWallet } = useWallets();
+  const { activeWallet, wallets } = useWallets();
 
   const chainId = activeWallet?.chainId;
 
-  const { walletData } = useWalletData();
+  const { walletData, nativeTokens } = useWalletData(activeWallet);
 
   useEffect(() => {
     updateTokensAmountsTrigger();
@@ -93,6 +92,36 @@ const MainPageComponent: FC<MainPageProps> = ({
       </ul>
     );
   }, [t, currentTokens]);
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY !== 0 && scrollContainerRef.current) {
+        e.preventDefault();
+        scrollContainerRef.current.scrollLeft += e.deltaY;
+      }
+    };
+
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('wheel', handleWheel);
+    }
+
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('wheel', handleWheel);
+      }
+    };
+  }, []);
+
+  const renderWallets = useCallback(() => {
+    return (
+      <div ref={scrollContainerRef} className={styles.wallets}>
+        {wallets.map((wallet, i) => (
+          <WalletCard index={i} wallet={wallet} />
+        ))}
+      </div>
+    );
+  }, [wallets]);
 
   return (
     <PageTemplate>
@@ -148,6 +177,7 @@ const MainPageComponent: FC<MainPageProps> = ({
             </CardLink>
           </div>
         </div>
+        {renderWallets()}
         <div className={styles.btnWrapper}>
           <Button
             to={WalletRoutesEnum.referralProgram}

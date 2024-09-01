@@ -3,7 +3,7 @@ import { WalletRoutesEnum } from 'application/typings/routes';
 import { useWallets } from 'application/utils/localStorageUtils';
 
 export const useInitApp = () => {
-  const { activeWallet, loading: isLoading } = useWallets();
+  const { activeWallet } = useWallets();
   const isSignupPage = useMatch(`${WalletRoutesEnum.signup}/:dataOrReferrer?`);
   const isSSOPage = useMatch(`${WalletRoutesEnum.sso}/:data?`);
 
@@ -17,7 +17,6 @@ export const useInitApp = () => {
   };
 
   return {
-    initApp,
-    isLoading
+    initApp
   };
 };

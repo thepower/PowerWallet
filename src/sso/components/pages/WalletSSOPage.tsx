@@ -5,7 +5,7 @@ import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
 import { useWallets } from 'application/utils/localStorageUtils';
 import { objectToString, stringToObject } from 'sso/utils';
 
-const WalletSSOPage: FC = () => {
+const WalletSSOPageComponent: FC = () => {
   const { data } = useParams<{ data: string }>();
   const { activeWallet } = useWallets();
   const navigate = useNavigate();
@@ -31,4 +31,4 @@ const WalletSSOPage: FC = () => {
   return null;
 };
 
-export default WalletSSOPage;
+export const WalletSSOPage = WalletSSOPageComponent;

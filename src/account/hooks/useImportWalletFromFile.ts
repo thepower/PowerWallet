@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 
-// import { useStore } from '@tanstack/react-store';
 import { CryptoApi, WalletApi } from '@thepowereco/tssdk';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -19,7 +18,6 @@ type Args = {
 export const useImportWalletFromFile = () => {
   const { loginMutation } = useAccountLoginToWallet({ throwOnError: true });
   const navigate = useNavigate();
-  // const queryClient = useQueryClient();
 
   const { mutate: importWalletFromFileMutation, isPending } = useMutation<
     void,
@@ -51,11 +49,6 @@ export const useImportWalletFromFile = () => {
     },
     onError: (error) => {
       toast.error(error.message);
-    },
-    onSuccess: () => {
-      // queryClient.invalidateQueries({
-      //   queryKey: ['walletData', walletAddress]
-      // });
     }
   });
 

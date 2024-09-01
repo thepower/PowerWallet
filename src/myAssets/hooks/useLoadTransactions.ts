@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { WalletApi } from '@thepowereco/tssdk';
+import { format } from 'date-fns';
+import groupBy from 'lodash/groupBy';
 import { useWallets } from 'application/utils/localStorageUtils';
 import { TransactionPayloadType } from 'myAssets/types';
 import { useWalletData } from './useWalletData';
@@ -19,7 +21,7 @@ export const useTransactions = ({
 }) => {
   const [lastBlock, setLastBlock] = useState<string | null>(null);
   const { activeWallet } = useWallets();
-  const { walletData } = useWalletData();
+  const { walletData } = useWalletData(activeWallet);
   const { networkApi } = useNetworkApi({ chainId: activeWallet?.chainId });
   const loadTransactions = async (address: string | null | undefined) => {
     if (!address) {
@@ -49,7 +51,12 @@ export const useTransactions = ({
       transactions.delete('needMore');
 
       setLastBlock(lastblk);
-      return transactions as Map<string, TransactionPayloadType>;
+      return Array.from(
+        transactions as Map<string, TransactionPayloadType>
+      ).map(([key, value]) => ({
+        id: key,
+        ...value
+      }));
     }
   };
 
@@ -60,6 +67,11 @@ export const useTransactions = ({
   } = useQuery({
     queryKey: ['walletData', activeWallet?.address],
     queryFn: () => loadTransactions(activeWallet?.address),
+    select: (transactions) => {
+      return groupBy(transactions, (trx) =>
+        format(trx.timestamp, 'dd MMM yyyy')
+      );
+    },
     enabled: !!activeWallet?.address && !!networkApi
   });
 

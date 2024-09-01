@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import isArray from 'lodash/isArray';
 
 import { useTranslation } from 'react-i18next';
+import { useWallets } from 'application/utils/localStorageUtils';
 import { CopyButton, Divider } from 'common';
 import {
   BarCodeIcon,
@@ -24,12 +25,11 @@ import { FaucetSvg, SendSvg } from '../../assets/icons';
 import { TransactionType } from '../slices/transactionsSlice';
 
 type OwnProps = { trx: TransactionType };
-type TransactionProps = OwnProps & {
-  currentAddress: string;
-};
+type TransactionProps = OwnProps;
 
-const Transaction: React.FC<TransactionProps> = ({ trx, currentAddress }) => {
+const Transaction: React.FC<TransactionProps> = ({ trx }) => {
   const [expanded, setExpanded] = useState(false);
+  const { activeWallet } = useWallets();
   const { t } = useTranslation();
   const handleClick = () => {
     setExpanded((prev) => !prev);
@@ -80,7 +80,7 @@ const Transaction: React.FC<TransactionProps> = ({ trx, currentAddress }) => {
     );
   };
 
-  const isReceived = currentAddress === trx.to;
+  const isReceived = activeWallet?.address === trx.to;
 
   return (
     <>
