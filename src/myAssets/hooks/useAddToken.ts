@@ -1,12 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
-import { AddressApi, NetworkApi } from '@thepowereco/tssdk';
+import { NetworkApi } from '@thepowereco/tssdk';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import abis from 'abis';
 
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useTokens, useWallets } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
+import { TokenKind } from 'myAssets/types';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 
 type Args = { address: string; withoutRedirect?: boolean };
@@ -17,7 +18,7 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
     chainId: activeWallet?.chainId
   });
   const navigate = useNavigate();
-
+  const { addToken, tokens } = useTokens();
   const getIsErc721 = async (network: NetworkApi, address: string) => {
     try {
       const isErc721: boolean = await network.executeCall(
@@ -35,7 +36,7 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
     }
   };
 
-  const addToken = async ({ address, withoutRedirect }: Args) => {
+  const fetchAndAddToken = async ({ address, withoutRedirect }: Args) => {
     if (!networkApi) {
       throw new Error('Network API is not ready');
     }
@@ -44,14 +45,12 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
       throw new Error('Wallet not found');
     }
     try {
-      // const tokens = yield * select(getTokens);
+      const existedToken = tokens.find((token) => token.address === address);
 
-      // const existedToken = tokens.find((token) => token.address === address);
-
-      // if (existedToken && existedToken?.chainId) {
-      //   toast.error(i18n.t('tokenHasAlreadyBeenAdded'));
-      //   return;
-      // }
+      if (existedToken && existedToken?.chainId) {
+        toast.error(i18n.t('tokenHasAlreadyBeenAdded'));
+        return;
+      }
 
       const contractNetworkApi = networkApi;
       const { chain }: { chain?: number } =
@@ -89,28 +88,15 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
           }
         );
 
-        const balanceBigint: bigint = await contractNetworkApi.executeCall(
-          {
-            abi: abis.erc721.abi,
-            functionName: 'balanceOf',
-            args: [AddressApi.textAddressToEvmAddress(activeWallet.address)]
-          },
-          { address }
-        );
-
-        const balance = balanceBigint.toString();
-        // await put(
-        //   addToken({
-        //     name,
-        //     symbol,
-        //     address,
-        //     decimals: '1',
-        //     type: TokenKind.Erc721,
-        //     chainId: chain!,
-        //     amount: balance,
-        //     isShow: true
-        //   })
-        // );
+        addToken({
+          name,
+          symbol,
+          address,
+          decimals: '1',
+          type: TokenKind.Erc721,
+          chainId: chain!,
+          isShow: true
+        });
       } else {
         const name: string = await contractNetworkApi.executeCall(
           {
@@ -133,18 +119,7 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
             address
           }
         );
-        const balanceBigint: bigint = await contractNetworkApi.executeCall(
-          {
-            abi: abis.erc20.abi,
-            functionName: 'balanceOf',
-            args: [AddressApi.textAddressToEvmAddress(activeWallet.address)]
-          },
-          {
-            address
-          }
-        );
 
-        const balance = balanceBigint.toString();
         const decimalsNumber = await contractNetworkApi.executeCall(
           {
             abi: abis.erc20.abi,
@@ -158,21 +133,17 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
 
         const decimals = decimalsNumber.toString();
 
-        // yield put(
-        //   addToken({
-        //     name,
-        //     symbol,
-        //     address,
-        //     decimals,
-        //     chainId: chain!,
-        //     type: TokenKind.Erc20,
-        //     amount: balance,
-        //     isShow: true
-        //   })
-        // );
+        addToken({
+          name,
+          symbol,
+          address,
+          decimals,
+          chainId: chain!,
+          type: TokenKind.Erc20,
+          isShow: true
+        });
       }
       if (!withoutRedirect) navigate(WalletRoutesEnum.root);
-      // additionalActionOnSuccess?.();
     } catch (error: any) {
       toast.error(`${i18n.t('somethingWentWrongCode')} ${error?.code}`);
     }
@@ -183,7 +154,7 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
     Error,
     Args
   >({
-    mutationFn: addToken,
+    mutationFn: fetchAndAddToken,
     onSuccess: async () => {},
     onError: (e) => {
       console.error('loginToWalletSaga', e);

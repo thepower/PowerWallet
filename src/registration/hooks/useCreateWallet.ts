@@ -3,16 +3,28 @@ import { useMutation } from '@tanstack/react-query';
 import { useStore } from '@tanstack/react-store';
 import { CryptoApi, RegisteredAccount, WalletApi } from '@thepowereco/tssdk';
 import { toast } from 'react-toastify';
-import { setBackupStep, setSelectedChain, store } from 'application/store';
+import {
+  setBackupStep,
+  setSeedPhrase,
+  setSelectedChain,
+  store
+} from 'application/store';
 import { useWallets } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { BackupAccountStepsEnum } from 'registration/typings/registrationTypes';
+import { AddActionOnSuccessType } from 'typings/common';
 
-type Args = {
+export async function generateSeedPhrase() {
+  const phrase: string = CryptoApi.generateSeedPhrase();
+
+  setSeedPhrase(phrase);
+}
+
+type Args = AddActionOnSuccessType<{
   password: string;
   seedPhrase: string;
   referrer?: string;
-};
+}>;
 
 type ReturnParams = {
   chainId: number;

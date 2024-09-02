@@ -6,39 +6,23 @@ import { AddressApi, CryptoApi } from '@thepowereco/tssdk';
 import cn from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import * as yup from 'yup';
-import { RootState } from 'application/reduxStore';
 import { setSentData, store } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useTokens, useWallets } from 'application/utils/localStorageUtils';
 import { LogoIcon, MoneyBugIcon } from 'assets/icons';
 import { Button, PageTemplate, Divider, FullScreenLoader } from 'common';
 import TxResult from 'common/txResult/TxResult';
+import { useAddToken } from 'myAssets/hooks/useAddToken';
+import { useTokenBalance } from 'myAssets/hooks/useTokenBalance';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
-import { getTokenByID } from 'myAssets/selectors/tokensSelectors';
-import { addTokenTrigger } from 'myAssets/slices/tokensSlice';
 import { TokenKind } from 'myAssets/types';
-import { checkIfLoading } from 'network/selectors';
 import { useSendErc721TokenTx } from 'send/hooks/useSendErc721TokenTx';
 import { useSendTokenTx } from 'send/hooks/useSendTokenTx';
 import { useSendTx } from 'send/hooks/useSendTx';
 import ConfirmSendModal from './ConfirmSendModal';
 import styles from './SendPage.module.scss';
-
-const mapDispatchToProps = {
-  addTokenTrigger
-};
-
-const mapStateToProps = (state: RootState) => ({
-  getTokenByID: (address: string) => getTokenByID(state, address),
-  isAddTokenLoading: checkIfLoading(state, addTokenTrigger.type)
-});
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-type SendProps = ConnectedProps<typeof connector>;
 
 export type FormValues = {
   amount: number;
@@ -56,11 +40,7 @@ const InputLabelProps = {
   className: styles.label
 };
 
-const SendPageComponent: FC<SendProps> = ({
-  isAddTokenLoading,
-  getTokenByID,
-  addTokenTrigger
-}) => {
+const SendPageComponent: FC = () => {
   const { t } = useTranslation();
   const { activeWallet } = useWallets();
   const { sentData } = useStore(store);
@@ -86,9 +66,15 @@ const SendPageComponent: FC<SendProps> = ({
       throwOnError: false
     });
 
+  const { getTokenByAddress } = useTokens();
+
+  const { addTokenMutation, isPending: isAddTokenLoading } = useAddToken({
+    throwOnError: false
+  });
+
   const token = useMemo(
-    () => getTokenByID(tokenAddress!),
-    [getTokenByID, tokenAddress]
+    () => getTokenByAddress(tokenAddress),
+    [getTokenByAddress, tokenAddress]
   );
 
   const nativeTokenAmount = getNativeTokenAmountBySymbol(tokenAddress);
@@ -106,26 +92,29 @@ const SendPageComponent: FC<SendProps> = ({
     [tokenType]
   );
 
+  const { tokenBalance } = useTokenBalance({
+    tokenAddress,
+    type: tokenType
+  });
+
   useEffect(() => {
     if (!token && tokenAddress && !isNativeToken) {
-      addTokenTrigger({ address: tokenAddress, withoutRedirect: true });
+      addTokenMutation({ address: tokenAddress, withoutRedirect: true });
     }
-  }, [addTokenTrigger, isNativeToken, token, tokenAddress]);
+  }, [addTokenMutation, isNativeToken, token, tokenAddress]);
 
   const formattedAmount = useMemo(() => {
     switch (tokenType) {
       case TokenKind.Erc20:
-        return (
-          token && formatFixed(BigNumber.from(token.amount), token.decimals)
-        );
+      case TokenKind.Erc721:
+        return tokenBalance;
       case TokenKind.Native:
         return nativeTokenAmount;
-      case TokenKind.Erc721:
-        return token?.amount;
+
       default:
         return '0';
     }
-  }, [tokenType, nativeTokenAmount, token]);
+  }, [tokenType, tokenBalance, nativeTokenAmount]);
 
   const getValidationSchema = useCallback(() => {
     switch (tokenType) {
@@ -249,13 +238,15 @@ const SendPageComponent: FC<SendProps> = ({
 
   const renderForm = () => (
     <>
-      <ConfirmSendModal
-        open={openModal}
-        trxValues={formik.values}
-        onClose={handleClose}
-        token={token}
-        onSubmit={onSubmit}
-      />
+      {token && (
+        <ConfirmSendModal
+          open={openModal}
+          trxValues={formik.values}
+          onClose={handleClose}
+          token={token}
+          onSubmit={onSubmit}
+        />
+      )}
       <form className={styles.form} onSubmit={formik.handleSubmit}>
         <div className={styles.fields}>
           {!isErc721Token && (
@@ -381,4 +372,4 @@ const SendPageComponent: FC<SendProps> = ({
     </PageTemplate>
   );
 };
-export const SendPage = connector(SendPageComponent);
+export const SendPage = SendPageComponent;

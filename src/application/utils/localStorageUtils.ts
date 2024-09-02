@@ -8,13 +8,15 @@ export interface Wallet {
   encryptedWif: string;
 }
 
+export const localStorageRootPath = 'thepowereco/PowerWallet';
+
 export const useWallets = () => {
   const [wallets, setWallets] = useLocalStorage<Wallet[]>(
-    'thepowereco/wallets',
+    `${localStorageRootPath}/wallets`,
     []
   );
   const [activeAddress, setActiveAddress] = useLocalStorage<string | null>(
-    'thepowereco/activeAddress',
+    `${localStorageRootPath}/activeAddress`,
     null
   );
 
@@ -112,7 +114,7 @@ export const useWallets = () => {
 
 export const useTokens = () => {
   const [tokens, setTokens] = useLocalStorage<TToken[]>(
-    'thepowereco/tokens',
+    `${localStorageRootPath}/tokens`,
     []
   );
 
@@ -159,7 +161,7 @@ export const useTokens = () => {
 
   // Function to get a token by address
   const getTokenByAddress = useCallback(
-    (address: string) => {
+    (address?: string) => {
       return tokens.find((token) => token.address === address) || null;
     },
     [tokens]

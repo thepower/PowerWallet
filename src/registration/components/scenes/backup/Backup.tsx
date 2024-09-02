@@ -1,12 +1,11 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormControlLabel } from '@mui/material';
+import { useStore } from '@tanstack/react-store';
 import { AddressApi } from '@thepowereco/tssdk';
-import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useExportAccount } from 'account/hooks';
-import { RootState } from 'application/reduxStore';
+import { setBackupStep, store } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { useWallets } from 'application/utils/localStorageUtils';
 import {
@@ -16,74 +15,41 @@ import {
   OutlinedInput,
   WizardComponentProps
 } from 'common';
-import { checkIfLoading } from 'network/selectors';
 import {
-  getCurrentBackupStep,
-  getGeneratedSeedPhrase,
-  getIsWithoutPassword,
-  getSelectedChain
-} from 'registration/selectors/registrationSelectors';
-import {
-  createWallet,
   generateSeedPhrase,
-  setBackupStep
-} from 'registration/slice/registrationSlice';
+  useCreateWallet
+} from 'registration/hooks/useCreateWallet';
 import { BackupAccountStepsEnum } from 'registration/typings/registrationTypes';
 import { compareTwoStrings } from 'registration/utils/registrationUtils';
 import styles from './Backup.module.scss';
 
-const mapStateToProps = (state: RootState) => ({
-  backupStep: getCurrentBackupStep(state),
-  generatedSeedPhrase: getGeneratedSeedPhrase(state),
-  isCreateWalletLoading: checkIfLoading(state, createWallet.type),
-  selectedChain: getSelectedChain(state),
-  isWithoutPassword: getIsWithoutPassword(state)
-});
+type BackupProps = WizardComponentProps;
 
-const mapDispatchToProps = {
-  generateSeedPhrase,
-  createWallet,
-  // exportAccount,
-  setBackupStep,
-  routeTo: push
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type BackupProps = ConnectedProps<typeof connector> & WizardComponentProps;
-
-const BackupComponent: FC<BackupProps> = ({
-  backupStep,
-  setBackupStep,
-  selectedChain,
-  generateSeedPhrase,
-  generatedSeedPhrase,
-  createWallet,
-  isCreateWalletLoading,
-  isWithoutPassword,
-  setNextStep,
-  routeTo
-}) => {
+const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
   const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [confirmedPassword, setConfirmedPassword] = useState('');
   const [passwordsNotEqual, setPasswordsNotEqual] = useState(false);
 
   const [isSeedPhraseSaved, setIsSeedPhraseSaved] = useState(false);
-
+  const navigate = useNavigate();
+  const { selectedChain, seedPhrase, backupStep, isWithoutPassword } =
+    useStore(store);
   const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
   const { activeWallet } = useWallets();
   const { exportAccountMutation } = useExportAccount();
-
+  const { createWalletMutation, isLoading: isWalletCreating } =
+    useCreateWallet();
   const isAddressInParams = useMemo(
     () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
     [dataOrReferrer]
   );
 
   useEffect(() => {
-    if (!generatedSeedPhrase) {
+    if (!seedPhrase) {
       generateSeedPhrase();
     }
-  }, [generateSeedPhrase, generatedSeedPhrase]);
+  }, [generateSeedPhrase, seedPhrase]);
 
   const onClickNext = useCallback(() => {
     if (backupStep === BackupAccountStepsEnum.generateSeedPhrase) {
@@ -95,28 +61,28 @@ const BackupComponent: FC<BackupProps> = ({
         setPasswordsNotEqual(true);
         return;
       }
-      createWallet({
-        password: isWithoutPassword ? '' : password,
-        referrer: isAddressInParams ? dataOrReferrer : '',
-        additionalActionOnSuccess: () => {
-          setBackupStep(BackupAccountStepsEnum.registrationCompleted);
-        }
-      });
+      if (seedPhrase) {
+        createWalletMutation({
+          seedPhrase,
+          password: isWithoutPassword ? '' : password,
+          referrer: isAddressInParams ? dataOrReferrer : ''
+        });
+      }
     }
   }, [
     backupStep,
-    setBackupStep,
     password,
     confirmedPassword,
     isWithoutPassword,
-    createWallet,
+    seedPhrase,
+    createWalletMutation,
     isAddressInParams,
     dataOrReferrer
   ]);
 
   const renderSeedPhrase = useCallback(() => {
-    if (generatedSeedPhrase) {
-      const words = generatedSeedPhrase.split(' ');
+    if (seedPhrase) {
+      const words = seedPhrase.split(' ');
       return (
         <div className={styles.seedPhrase}>
           {words.map((word) => (
@@ -126,7 +92,7 @@ const BackupComponent: FC<BackupProps> = ({
       );
     }
     return null;
-  }, [generatedSeedPhrase]);
+  }, [seedPhrase]);
 
   const onClickCheckbox = () => {
     setIsSeedPhraseSaved(!isSeedPhraseSaved);
@@ -147,7 +113,7 @@ const BackupComponent: FC<BackupProps> = ({
         label={t('ISavedMySeedPhrase')}
       />
     ),
-    [isSeedPhraseSaved, t]
+    [isSeedPhraseSaved, onClickCheckbox, t]
   );
 
   const renderGenerateSeedPhrase = useCallback(
@@ -157,12 +123,12 @@ const BackupComponent: FC<BackupProps> = ({
           {t('writeDownYourSeedPhraseAndStore')}
         </div>
         {renderSeedPhrase()}
-        {generatedSeedPhrase && (
+        {seedPhrase && (
           <CopyButton
             className={styles.copyButton}
             iconClassName={styles.copyIcon}
             textButton={t('copySeedPhrase')}
-            copyInfo={generatedSeedPhrase}
+            copyInfo={seedPhrase}
           />
         )}
         {renderCheckBox()}
@@ -180,7 +146,7 @@ const BackupComponent: FC<BackupProps> = ({
     ),
     [
       t,
-      generatedSeedPhrase,
+      seedPhrase,
       isSeedPhraseSaved,
       onClickNext,
       renderSeedPhrase,
@@ -217,7 +183,7 @@ const BackupComponent: FC<BackupProps> = ({
             autoComplete='new-password'
             size='small'
             type={'password'}
-            disabled={isCreateWalletLoading || isWithoutPassword}
+            disabled={isWalletCreating || isWithoutPassword}
           />
           <OutlinedInput
             id='confirmedPassword'
@@ -231,14 +197,14 @@ const BackupComponent: FC<BackupProps> = ({
             autoComplete='new-password'
             size='small'
             errorMessage={t('oopsPasswordsDidntMatch')!}
-            disabled={isCreateWalletLoading || isWithoutPassword}
+            disabled={isWalletCreating || isWithoutPassword}
           />
           <Button
             className={styles.button}
             variant='contained'
             size='large'
             onClick={onClickNext}
-            loading={isCreateWalletLoading}
+            loading={isWalletCreating}
             disabled={passwordsNotEqual || (!password && !isWithoutPassword)}
           >
             {t('next')}
@@ -248,7 +214,7 @@ const BackupComponent: FC<BackupProps> = ({
     ),
     [
       confirmedPassword,
-      isCreateWalletLoading,
+      isWalletCreating,
       isWithoutPassword,
       onClickNext,
       password,
@@ -265,11 +231,18 @@ const BackupComponent: FC<BackupProps> = ({
         if (dataOrReferrer && !isAddressInParams) {
           setNextStep();
         } else {
-          routeTo(WalletRoutesEnum.root);
+          navigate(WalletRoutesEnum.root);
         }
       }
     });
-  }, [exportAccountMutation, password]);
+  }, [
+    dataOrReferrer,
+    exportAccountMutation,
+    isAddressInParams,
+    navigate,
+    password,
+    setNextStep
+  ]);
 
   const renderRegistrationCompleted = useCallback(() => {
     const fileName = selectedChain
@@ -286,7 +259,7 @@ const BackupComponent: FC<BackupProps> = ({
         <div className={styles.label}>{t('yourAccountNumber')}</div>
         <div className={styles.text}>{activeWallet?.address}</div>
         <div className={styles.label}>{t('yourSeedPhrase')}</div>
-        <div className={styles.text}>{generatedSeedPhrase}</div>
+        <div className={styles.text}>{seedPhrase}</div>
         <div className={styles.instruction}>
           {t('toLogInItIsMoreConvenient')}
         </div>
@@ -307,7 +280,7 @@ const BackupComponent: FC<BackupProps> = ({
       </div>
     );
   }, [
-    generatedSeedPhrase,
+    seedPhrase,
     onClickExportAccount,
     passwordsNotEqual,
     selectedChain,
@@ -336,4 +309,4 @@ const BackupComponent: FC<BackupProps> = ({
   return <div className={styles.content}>{renderContent()}</div>;
 };
 
-export const Backup = connector(BackupComponent);
+export const Backup = BackupComponent;

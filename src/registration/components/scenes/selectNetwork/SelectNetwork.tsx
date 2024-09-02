@@ -1,51 +1,27 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useMediaQuery } from '@mui/material';
+import { useStore } from '@tanstack/react-store';
 import { NetworkEnum } from '@thepowereco/tssdk';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
 import { useNetworkChains } from 'application/hooks/useNetworkChains';
-import { RootState } from 'application/reduxStore';
+import { setSelectedChain, setSelectedNetwork, store } from 'application/store';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import { Button, IconButton, WizardComponentProps } from 'common';
 import ChainSelect from 'common/chainSelect/ChainSelect';
 import hooks from 'hooks';
 import { RegistrationCard } from 'registration/components/common/registrationCard/RegistrationCard';
-import {
-  getIsRandomChain,
-  getSelectedNetwork
-} from 'registration/selectors/registrationSelectors';
-import {
-  setSelectedChain,
-  setSelectedNetwork
-} from 'registration/slice/registrationSlice';
+
 import { Maybe } from 'typings/common';
 import styles from './SelectNetwork.module.scss';
 import registrationStyles from '../../pages/registration/RegistrationPage.module.scss';
 
-const mapStateToProps = (state: RootState) => ({
-  selectedNetwork: getSelectedNetwork(state),
-  isRandomChain: getIsRandomChain(state)
-});
-
-const mapDispatchToProps = {
-  setSelectedNetwork,
-  setSelectedChain
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-type SelectNetworkProps = ConnectedProps<typeof connector> &
-  WizardComponentProps;
+type SelectNetworkProps = WizardComponentProps;
 
 export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
-  selectedNetwork,
-  isRandomChain,
-  setSelectedNetwork,
-  setSelectedChain,
   setNextStep
 }) => {
   const { t } = useTranslation();
-
+  const { selectedNetwork, isRandomChain } = useStore(store);
   const {
     scrollContainerRef,
     scrollToElementByIndex,
@@ -81,7 +57,7 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
         setNextStep();
       }
     },
-    [isRandomChain, setNextStep, setSelectedNetwork]
+    [isRandomChain, setNextStep]
   );
 
   const onSelectChain = useCallback(
@@ -89,7 +65,7 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
       setSelectedChain(chain || selectedChains[0]);
       setNextStep();
     },
-    [selectedChains, setNextStep, setSelectedChain]
+    [selectedChains, setNextStep]
   );
 
   const onSelectChainHandler = (chain: Maybe<number>) => {
@@ -190,4 +166,4 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
   );
 };
 
-export const SelectNetwork = connector(SelectNetworkComponent);
+export const SelectNetwork = SelectNetworkComponent;

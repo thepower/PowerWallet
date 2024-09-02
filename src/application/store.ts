@@ -49,14 +49,14 @@ export const store = new Store<State>(initialState);
 
 export const { setState } = store;
 
-export const setSelectedNetwork = (network: NetworkEnum) => {
+export const setSelectedNetwork = (network: Maybe<NetworkEnum>) => {
   setState((prevState) => ({
     ...prevState,
     selectedNetwork: network
   }));
 };
 
-export const setSelectedChain = (chainId: number) => {
+export const setSelectedChain = (chainId: Maybe<number>) => {
   setState((prevState) => ({
     ...prevState,
     selectedChain: chainId

@@ -1,26 +1,20 @@
 import React, { FC, useCallback, useEffect, useMemo } from 'react';
 import { FormControlLabel } from '@mui/material';
+import { useStore } from '@tanstack/react-store';
 import { AddressApi } from '@thepowereco/tssdk';
-import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
-import { RootState } from 'application/reduxStore';
-import { useWallets } from 'application/utils/localStorageUtils';
-import { BreadcrumbsTypeEnum, Checkbox, LangMenu, Wizard } from 'common';
-import {
-  getCurrentCreatingStep,
-  getIsRandomChain,
-  getIsWithoutPassword,
-  getCurrentBackupStep
-} from 'registration/selectors/registrationSelectors';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   setCreatingStep,
-  setSelectedNetwork,
   setIsRandomChain,
   setIsWithoutPassword,
-  setSelectedChain
-} from 'registration/slice/registrationSlice';
+  setSelectedChain,
+  setSelectedNetwork,
+  store
+} from 'application/store';
+import { useWallets } from 'application/utils/localStorageUtils';
+import { BreadcrumbsTypeEnum, Checkbox, LangMenu, Wizard } from 'common';
+
 import { stringToObject } from 'sso/utils';
 import styles from './RegistrationPage.module.scss';
 import {
@@ -36,37 +30,7 @@ import { Backup } from '../../scenes/backup/Backup';
 import { LoginToDapp } from '../../scenes/loginToDapp/LoginToDapp';
 import { SelectNetwork } from '../../scenes/selectNetwork/SelectNetwork';
 
-const mapStateToProps = (state: RootState) => ({
-  creatingStep: getCurrentCreatingStep(state),
-  backupStep: getCurrentBackupStep(state),
-  isRandomChain: getIsRandomChain(state),
-  isWithoutPassword: getIsWithoutPassword(state)
-});
-
-const mapDispatchToProps = {
-  routeTo: push,
-  setIsRandomChain,
-  setSelectedNetwork,
-  setCreatingStep,
-  setIsWithoutPassword,
-  setSelectedChain
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type RegistrationPageProps = ConnectedProps<typeof connector>;
-
-const RegistrationPageComponent: FC<RegistrationPageProps> = ({
-  routeTo,
-  setIsRandomChain,
-  setIsWithoutPassword,
-  isRandomChain,
-  isWithoutPassword,
-  setSelectedNetwork,
-  creatingStep,
-  backupStep,
-  setCreatingStep,
-  setSelectedChain
-}) => {
+const RegistrationPageComponent: FC = () => {
   const { t } = useTranslation();
   const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
   const isAddressInParams = useMemo(
@@ -74,19 +38,22 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
     [dataOrReferrer]
   );
   const { activeWallet } = useWallets();
-
+  const { isRandomChain, creatingStep, backupStep, isWithoutPassword } =
+    useStore(store);
   const parsedData: AppQueryParams = useMemo(() => {
     if (!isAddressInParams && dataOrReferrer)
       return stringToObject(dataOrReferrer);
     return null;
   }, [dataOrReferrer, isAddressInParams]);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (activeWallet?.address) {
       if (!isAddressInParams) {
-        routeTo(`${WalletRoutesEnum.sso}/${dataOrReferrer}`);
+        navigate(`${WalletRoutesEnum.sso}/${dataOrReferrer}`);
       } else {
-        routeTo(WalletRoutesEnum.root);
+        navigate(WalletRoutesEnum.root);
       }
     } else if (parsedData?.chainID) {
       setCreatingStep(CreateAccountStepsEnum.backup);
@@ -138,7 +105,7 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
   const toggleRandomChainHandler = useCallback(() => {
     if (!isRandomChain) setSelectedNetwork(null);
     setIsRandomChain(!isRandomChain);
-  }, [isRandomChain, setSelectedNetwork, setIsRandomChain]);
+  }, [isRandomChain]);
 
   const renderCheckBox = useCallback(() => {
     if (creatingStep === CreateAccountStepsEnum.selectNetwork) {
@@ -187,7 +154,6 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
     creatingStep,
     isRandomChain,
     isWithoutPassword,
-    setIsWithoutPassword,
     toggleRandomChainHandler
   ]);
 
@@ -230,4 +196,4 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
   return <div className={styles.registrationPage}>{renderRegistration()}</div>;
 };
 
-export const RegistrationPage = connector(RegistrationPageComponent);
+export const RegistrationPage = RegistrationPageComponent;

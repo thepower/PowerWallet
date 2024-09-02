@@ -1,9 +1,11 @@
 import { experimental_createPersister } from '@tanstack/query-persist-client-core';
 import { useQuery } from '@tanstack/react-query';
 import { NetworkApi } from '@thepowereco/tssdk';
+import { localStorageRootPath } from 'application/utils/localStorageUtils';
 
 export const persister = experimental_createPersister({
-  storage: window.localStorage
+  storage: window.localStorage,
+  prefix: localStorageRootPath
 });
 
 const bootstrap = async (chainId?: number) => {

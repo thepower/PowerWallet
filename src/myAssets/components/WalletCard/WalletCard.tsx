@@ -77,7 +77,6 @@ const WalletCard: FC<WalletCardProps> = ({ index, wallet }) => {
         backgroundColor: colors[index],
         borderColor: lighten(colors[index], 0.2)
       }}
-      key={wallet.address}
       onClick={onClick}
       className={styles.walletCard}
     >

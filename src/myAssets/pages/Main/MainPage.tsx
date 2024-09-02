@@ -1,39 +1,20 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import appEnvs from 'appEnvs';
-import { RootState } from 'application/reduxStore';
 import { setIsShowUnderConstruction } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useTokens, useWallets } from 'application/utils/localStorageUtils';
 import { BuySvg, FaucetSvg, LogoIcon, SendSvg } from 'assets/icons';
 import { Button, CardLink, CopyButton, PageTemplate, Tabs } from 'common';
 import WalletCard from 'myAssets/components/WalletCard/WalletCard';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
-import { getTokens } from 'myAssets/selectors/tokensSelectors';
-import { updateTokensAmountsTrigger } from 'myAssets/slices/tokensSlice';
 import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
 import styles from './MainPage.module.scss';
 import AddButton from '../../components/AddButton';
 import { Token } from '../../components/Token';
 
-const mapDispatchToProps = {
-  updateTokensAmountsTrigger
-};
-
-const mapStateToProps = (state: RootState) => ({
-  tokens: getTokens(state)
-});
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-type MainPageProps = ConnectedProps<typeof connector>;
-
-const MainPageComponent: FC<MainPageProps> = ({
-  tokens,
-  updateTokensAmountsTrigger
-}) => {
+const MainPageComponent: FC = () => {
   const { t } = useTranslation();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -44,8 +25,10 @@ const MainPageComponent: FC<MainPageProps> = ({
 
   const { walletData, nativeTokens } = useWalletData(activeWallet);
 
+  const { tokens } = useTokens();
+
   useEffect(() => {
-    updateTokensAmountsTrigger();
+    // updateTokensAmountsTrigger();
   }, []);
 
   const onChangeTab = (_event: React.SyntheticEvent, value: MyAssetsTabs) => {
@@ -117,7 +100,7 @@ const MainPageComponent: FC<MainPageProps> = ({
     return (
       <div ref={scrollContainerRef} className={styles.wallets}>
         {wallets.map((wallet, i) => (
-          <WalletCard index={i} wallet={wallet} />
+          <WalletCard key={wallet.address} index={i} wallet={wallet} />
         ))}
       </div>
     );
@@ -206,4 +189,4 @@ const MainPageComponent: FC<MainPageProps> = ({
   );
 };
 
-export const MainPage = connector(MainPageComponent);
+export const MainPage = MainPageComponent;

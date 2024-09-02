@@ -8,11 +8,9 @@ import React, {
 } from 'react';
 import { FormControlLabel, useMediaQuery } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { connect, ConnectedProps } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { useImportWalletFromFile } from 'account/hooks';
 // import { importAccountFromFile } from 'account/slice/accountSlice';
-import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import {
@@ -24,41 +22,15 @@ import {
   // FullScreenLoader
 } from 'common';
 import hooks from 'hooks';
-import { checkIfLoading } from 'network/selectors';
 import { RegistrationCard } from 'registration/components/common/registrationCard/RegistrationCard';
+import { useRegistrationLoginToWallet } from 'registration/hooks/useRegistrationLoginToWallet';
 import { compareTwoStrings } from 'registration/utils/registrationUtils';
 import { Maybe } from 'typings/common';
 import styles from './LoginPage.module.scss';
-import { loginToWalletFromRegistration } from '../../../slice/registrationSlice';
 import { ImportAccountModal } from '../../modals/ImportAccountModal';
 import registrationStyles from '../registration/RegistrationPage.module.scss';
 
-const mapStateToProps = (state: RootState) => ({
-  // isImportAccountFromFileLoading: checkIfLoading(
-  //   state,
-  //   importAccountFromFile.type
-  // ),
-  isLoginToWalletFromRegistrationLoading: checkIfLoading(
-    state,
-    loginToWalletFromRegistration.type
-  )
-});
-
-const mapDispatchToProps = {
-  // importAccountFromFile,
-  loginToWalletFromRegistration
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type LoginPageProps = ConnectedProps<typeof connector>;
-
-const LoginPageComponent: FC<LoginPageProps> = ({
-  // importAccountFromFile,
-  loginToWalletFromRegistration,
-  // isImportAccountFromFileLoading,
-  isLoginToWalletFromRegistrationLoading
-  // walletAddress
-}) => {
+const LoginPageComponent: FC = ({}) => {
   const { t } = useTranslation();
 
   const [openedPasswordModal, setOpenedPasswordModal] = useState(false);
@@ -73,6 +45,9 @@ const LoginPageComponent: FC<LoginPageProps> = ({
   const [isWithoutPassword, setIsWithoutPassword] = useState(false);
   const importAccountRef = useRef<HTMLInputElement>(null);
 
+  const { loginMutation, isPending } = useRegistrationLoginToWallet({
+    throwOnError: false
+  });
   const {
     scrollContainerRef,
     scrollToElementByIndex,
@@ -154,7 +129,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
 
   const loginToAccount = useCallback(() => {
     if (isWithoutPassword) {
-      loginToWalletFromRegistration({
+      loginMutation({
         address,
         seedOrPrivateKey,
         password: ''
@@ -169,11 +144,11 @@ const LoginPageComponent: FC<LoginPageProps> = ({
         setPasswordsNotEqual(passwordsNotEqual);
         return;
       }
-      loginToWalletFromRegistration({ address, seedOrPrivateKey, password });
+      loginMutation({ address, seedOrPrivateKey, password });
     }
   }, [
     isWithoutPassword,
-    loginToWalletFromRegistration,
+    loginMutation,
     address,
     seedOrPrivateKey,
     password,
@@ -250,7 +225,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
           size='large'
           onClick={loginToAccount}
           disabled={isButtonDisabled}
-          loading={isLoginToWalletFromRegistrationLoading}
+          loading={isPending}
         >
           {t('login')}
         </Button>
@@ -265,7 +240,7 @@ const LoginPageComponent: FC<LoginPageProps> = ({
     t,
     confirmedPassword,
     loginToAccount,
-    isLoginToWalletFromRegistrationLoading
+    isPending
   ]);
 
   const renderInitCards = useCallback(
@@ -345,4 +320,4 @@ const LoginPageComponent: FC<LoginPageProps> = ({
   );
 };
 
-export const LoginPage = connector(LoginPageComponent);
+export const LoginPage = LoginPageComponent;

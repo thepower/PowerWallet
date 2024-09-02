@@ -7,6 +7,7 @@ import isArray from 'lodash/isArray';
 import { useTranslation } from 'react-i18next';
 import { useWallets } from 'application/utils/localStorageUtils';
 import { CopyButton, Divider } from 'common';
+import { TransactionType } from 'myAssets/types';
 import {
   BarCodeIcon,
   CoinIcon,
@@ -22,7 +23,6 @@ import {
 } from './icons';
 import styles from './Transaction.module.scss';
 import { FaucetSvg, SendSvg } from '../../assets/icons';
-import { TransactionType } from '../slices/transactionsSlice';
 
 type OwnProps = { trx: TransactionType };
 type TransactionProps = OwnProps;

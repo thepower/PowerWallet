@@ -65,7 +65,7 @@ export const useTransactions = ({
     isLoading,
     isSuccess
   } = useQuery({
-    queryKey: ['walletData', activeWallet?.address],
+    queryKey: ['transactions', activeWallet?.address, tokenAddress],
     queryFn: () => loadTransactions(activeWallet?.address),
     select: (transactions) => {
       return groupBy(transactions, (trx) =>

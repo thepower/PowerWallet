@@ -1,57 +1,20 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Skeleton } from '@mui/material';
-import { push } from 'connected-react-router';
 import range from 'lodash/range';
 import { useTranslation } from 'react-i18next';
-import { connect, ConnectedProps } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { RootState } from 'application/reduxStore';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useTokens, useWallets } from 'application/utils/localStorageUtils';
 import { Button, Divider, PageTemplate, Tabs } from 'common';
 import { Erc721Token } from 'myAssets/components/Erc721Token';
 import { Token } from 'myAssets/components/Token';
+import { useERC721Tokens } from 'myAssets/hooks/useERC721Tokens';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
-import {
-  getErc721Tokens,
-  getTokenByID,
-  getTokens
-} from 'myAssets/selectors/tokensSelectors';
-import {
-  getErc721TokensTrigger,
-  toggleTokenShow,
-  updateTokensAmountsTrigger
-} from 'myAssets/slices/tokensSlice';
 
 import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
-import { checkIfLoading } from 'network/selectors';
 import styles from './TokenSelectionPage.module.scss';
 
-const mapDispatchToProps = {
-  toggleTokenShow,
-  updateTokensAmountsTrigger,
-  pushTo: push,
-  getErc721TokensTrigger
-};
-
-const mapStateToProps = (state: RootState) => ({
-  tokens: getTokens(state),
-  erc721Tokens: getErc721Tokens(state),
-  isGetErc721TokensLoading: checkIfLoading(state, getErc721TokensTrigger.type),
-  getTokenByID: (address: string) => getTokenByID(state, address)
-});
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type TokenSelectionPageProps = ConnectedProps<typeof connector>;
-
-const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
-  tokens,
-  getTokenByID,
-  updateTokensAmountsTrigger,
-  erc721Tokens,
-  isGetErc721TokensLoading,
-  getErc721TokensTrigger
-}) => {
+const TokenSelectionPageComponent: React.FC = () => {
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
   const [selectedToken, setSelectedToken] = useState<string>('');
   const { t } = useTranslation();
@@ -60,22 +23,28 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   const { activeWallet } = useWallets();
   const { nativeTokens, getNativeTokenAmountBySymbol } =
     useWalletData(activeWallet);
+
+  const { erc721Tokens, isLoading: isGetErc721TokensLoading } = useERC721Tokens(
+    { tokenAddress: collectionAddress }
+  );
+
+  const { tokens, getTokenByAddress } = useTokens();
   useEffect(() => {
-    updateTokensAmountsTrigger();
+    // updateTokensAmountsTrigger();
   }, []);
 
   useEffect(() => {
     if (collectionAddress) {
-      getErc721TokensTrigger({ address: collectionAddress });
+      // getErc721TokensTrigger({ address: collectionAddress });
     }
-  }, [collectionAddress, getErc721TokensTrigger]);
+  }, [collectionAddress]);
 
   const collection = useMemo(() => {
     if (collectionAddress) {
-      return getTokenByID(collectionAddress);
+      return getTokenByAddress(collectionAddress);
     }
     return null;
-  }, [collectionAddress, getTokenByID]);
+  }, [collectionAddress, getTokenByAddress]);
 
   const onClickCheckBox = useCallback(
     (token: string) => {
@@ -134,16 +103,17 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     if (collectionAddress) {
       return (
         <ul className={styles.tokensList}>
-          {erc721Tokens.map((token) => (
-            <li key={token.id}>
-              <Erc721Token
-                collection={collection!}
-                token={token}
-                isCheckBoxChecked={selectedToken === token.id}
-                onClickCheckBox={onClickCheckBox}
-              />
-            </li>
-          ))}
+          {erc721Tokens &&
+            erc721Tokens.map((token) => (
+              <li key={token.id}>
+                <Erc721Token
+                  collection={collection!}
+                  token={token}
+                  isCheckBoxChecked={selectedToken === token.id}
+                  onClickCheckBox={onClickCheckBox}
+                />
+              </li>
+            ))}
         </ul>
       );
     }
@@ -178,7 +148,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   ]);
 
   const nativeAssetAmount = getNativeTokenAmountBySymbol(selectedToken);
-  const token = getTokenByID(selectedToken);
+  const token = getTokenByAddress(selectedToken);
 
   const assetIdentifier = useMemo(() => {
     if (collectionAddress) {
@@ -238,4 +208,4 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   );
 };
 
-export const TokenSelectionPage = connector(TokenSelectionPageComponent);
+export const TokenSelectionPage = TokenSelectionPageComponent;

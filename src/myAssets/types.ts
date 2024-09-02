@@ -76,7 +76,6 @@ export type TToken = {
   symbol: string;
   chainId: number;
   decimals: string;
-  amount?: number;
   isShow?: boolean;
 };
 
@@ -90,3 +89,5 @@ export type TErc721Token = {
 export type TokenPayloadType = TToken;
 export type Erc721TokenPayloadType = TErc721Token[];
 export const nativeTokensNameMap = { SK: 'Smart key' };
+
+export type TransactionType = TransactionPayloadType & { id: string };

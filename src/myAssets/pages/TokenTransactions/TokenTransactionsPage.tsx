@@ -1,48 +1,19 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { push } from 'connected-react-router';
 import isEmpty from 'lodash/isEmpty';
 import { useTranslation } from 'react-i18next';
 // import { InView } from 'react-intersection-observer';
-import { connect, ConnectedProps } from 'react-redux';
 
 import { useParams } from 'react-router-dom';
-import { RootState } from 'application/reduxStore';
+import { useTokens } from 'application/utils/localStorageUtils';
 import { PageTemplate, FullScreenLoader } from 'common';
 
 // import Transaction from 'myAssets/components/Transaction';
 import Transaction from 'myAssets/components/Transaction';
 import { useTransactions } from 'myAssets/hooks/useLoadTransactions';
-import { getTokenByID } from 'myAssets/selectors/tokensSelectors';
-import {
-  loadTransactionsTrigger,
-  resetTransactionsState
-} from 'myAssets/slices/transactionsSlice';
-import { setLastBlockToInitialLastBlock } from 'myAssets/slices/walletSlice';
 import { TokenKind } from 'myAssets/types';
-import { checkIfLoading } from 'network/selectors';
 import styles from './TokenTransactionsPage.module.scss';
 
-const mapDispatchToProps = {
-  routeTo: push,
-  loadTransactionsTrigger,
-  setLastBlockToInitialLastBlock,
-  resetTransactionsState
-};
-
-const mapStateToProps = (state: RootState) => ({
-  loading: checkIfLoading(state, loadTransactionsTrigger.type),
-  getTokenByID: (address: string) => getTokenByID(state, address)
-});
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type TokenTransactionsPageProps = ConnectedProps<typeof connector>;
-
-const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
-  loading,
-  setLastBlockToInitialLastBlock,
-  resetTransactionsState,
-  getTokenByID
-}) => {
+const TokenTransactionsPageComponent: React.FC = () => {
   const { t } = useTranslation();
 
   const { type, address } = useParams<{
@@ -51,13 +22,18 @@ const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
     id: string;
   }>();
 
-  const token = useMemo(() => getTokenByID(address!), [getTokenByID, address]);
+  const { getTokenByAddress } = useTokens();
+
+  const token = useMemo(
+    () => getTokenByAddress(address!),
+    [getTokenByAddress, address]
+  );
 
   const { transactions } = useTransactions({ tokenAddress: address });
 
   useEffect(() => {
-    setLastBlockToInitialLastBlock();
-    resetTransactionsState();
+    // setLastBlockToInitialLastBlock();
+    // resetTransactionsState();
   }, []);
 
   // const handleChangeView = (inView: boolean) => {
@@ -90,7 +66,10 @@ const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
 
   const tokenSymbol = type === TokenKind.Native ? address : token?.symbol;
 
-  if (loading && isEmpty(transactions)) {
+  if (
+    // loading &&
+    isEmpty(transactions)
+  ) {
     return <FullScreenLoader />;
   }
 
@@ -112,4 +91,4 @@ const TokenTransactionsPageComponent: React.FC<TokenTransactionsPageProps> = ({
   );
 };
 
-export const TokenTransactionsPage = connector(TokenTransactionsPageComponent);
+export const TokenTransactionsPage = TokenTransactionsPageComponent;

@@ -1,15 +1,11 @@
 import React, { FC, useCallback, useState } from 'react';
 import { OutlinedInput } from '@mui/material';
-import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
-import { connect, ConnectedProps } from 'react-redux';
 
-import { RootState } from 'application/reduxStore';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useTokens, useWallets } from 'application/utils/localStorageUtils';
 import { Button, PageTemplate, Tabs } from 'common';
 import { Token } from 'myAssets/components/Token';
-import { getTokens } from 'myAssets/selectors/tokensSelectors';
-import { addTokenTrigger, toggleTokenShow } from 'myAssets/slices/tokensSlice';
+import { useAddToken } from 'myAssets/hooks/useAddToken';
 import {
   AddTokensTabs,
   TokenKind,
@@ -18,29 +14,15 @@ import {
 import styles from './AddTokenPage.module.scss';
 import SearchInput from '../../../common/searchInput/SearchInput';
 
-const mapDispatchToProps = {
-  routeTo: push,
-  addTokenTrigger,
-  toggleTokenShow
-};
-
-const mapStateToProps = (state: RootState) => ({
-  tokens: getTokens(state)
-});
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type AddTokenPageProps = ConnectedProps<typeof connector>;
-
-const AddTokenPageComponent: FC<AddTokenPageProps> = ({
-  tokens,
-  addTokenTrigger,
-  toggleTokenShow
-}) => {
+const AddTokenPageComponent: FC = () => {
   const { t } = useTranslation();
   const [search, setSearch] = useState<string>('');
   const [address, setAddress] = useState<string>('');
   const [tab, setTab] = useState<AddTokensTabs>(AddTokensTabs.Erc20);
   const { activeWallet } = useWallets();
+
+  const { tokens, toggleTokenVisibility } = useTokens();
+  const { addTokenMutation } = useAddToken({ throwOnError: false });
 
   const onChangeTab = (_event: React.SyntheticEvent, value: AddTokensTabs) => {
     setTab(value);
@@ -59,8 +41,8 @@ const AddTokenPageComponent: FC<AddTokenPageProps> = ({
   };
 
   const onClickAddToken = useCallback(() => {
-    addTokenTrigger({ address });
-  }, [addTokenTrigger, address]);
+    addTokenMutation({ address });
+  }, [addTokenMutation, address]);
 
   const renderAddTokenForm = useCallback(
     () => (
@@ -127,18 +109,13 @@ const AddTokenPageComponent: FC<AddTokenPageProps> = ({
           <li key={token.address}>
             <Token
               token={token}
-              onClickSwitch={() =>
-                toggleTokenShow({
-                  address: token.address,
-                  isShow: !token.isShow
-                })
-              }
+              onClickSwitch={() => toggleTokenVisibility(token.address)}
             />
           </li>
         ))}
       </ul>
     );
-  }, [filteredTokens, search, t]);
+  }, [filteredTokens, search, t, toggleTokenVisibility]);
 
   return (
     <PageTemplate
@@ -170,4 +147,4 @@ const AddTokenPageComponent: FC<AddTokenPageProps> = ({
   );
 };
 
-export const AddTokenPage = connector(AddTokenPageComponent);
+export const AddTokenPage = AddTokenPageComponent;
