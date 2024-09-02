@@ -1,10 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { WalletApi } from '@thepowereco/tssdk';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { GetChainResultType } from 'account/typings/accountTypings';
-import appEnvs from 'appEnvs';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { setSentData } from 'application/store';
 import { useWallets } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { Maybe } from 'typings/common';
@@ -49,16 +46,13 @@ export const useSendTx = ({
 
       const { txId } = response as { txId: string; status: string };
 
-      // await *
-      //   put(
-      //     setSentData({
-      //       txId,
-      //       comment,
-      //       amount,
-      //       from: walletAddress,
-      //       to
-      //     })
-      //   );
+      setSentData({
+        txId,
+        comment,
+        amount,
+        from: activeWallet.address,
+        to
+      });
 
       queryClient.invalidateQueries({
         queryKey: ['walletData', activeWallet.address]

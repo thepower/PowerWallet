@@ -21,9 +21,11 @@ async function getMetaData(uri: string) {
 }
 
 export const useERC721Tokens = ({
-  tokenAddress
+  tokenAddress,
+  enabled
 }: {
   tokenAddress?: string;
+  enabled?: boolean;
 }) => {
   const { activeWallet } = useWallets();
   const { networkApi } = useNetworkApi({ chainId: activeWallet?.chainId });
@@ -118,7 +120,8 @@ export const useERC721Tokens = ({
   } = useQuery({
     queryKey: ['ERC721Tokens', activeWallet?.address, tokenAddress],
     queryFn: () => getERC721Tokens(activeWallet?.address),
-    enabled: !!activeWallet?.address && !!networkApi
+    enabled:
+      !!activeWallet?.address && !!networkApi && !!tokenAddress && !!enabled
   });
 
   return {

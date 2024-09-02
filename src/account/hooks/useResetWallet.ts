@@ -18,7 +18,7 @@ export const useResetWallet = () => {
       additionalActionOnDecryptError
     }: Args) => {
       try {
-        if (!activeWallet?.address || !activeWallet.encryptedWif) {
+        if (!activeWallet) {
           throw new Error('Wallet not found');
         }
 

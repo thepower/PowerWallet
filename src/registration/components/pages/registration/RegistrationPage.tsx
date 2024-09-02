@@ -12,15 +12,12 @@ import {
   setSelectedNetwork,
   store
 } from 'application/store';
+import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
 import { useWallets } from 'application/utils/localStorageUtils';
 import { BreadcrumbsTypeEnum, Checkbox, LangMenu, Wizard } from 'common';
 
 import { stringToObject } from 'sso/utils';
 import styles from './RegistrationPage.module.scss';
-import {
-  AppQueryParams,
-  WalletRoutesEnum
-} from '../../../../application/typings/routes';
 import {
   BackupAccountStepsEnum,
   CreateAccountStepsEnum,
@@ -49,24 +46,26 @@ const RegistrationPageComponent: FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (activeWallet?.address) {
-      if (!isAddressInParams) {
-        navigate(`${WalletRoutesEnum.sso}/${dataOrReferrer}`);
-      } else {
-        navigate(WalletRoutesEnum.root);
-      }
-    } else if (parsedData?.chainID) {
+    // if (activeWallet?.address) {
+    //   if (!isAddressInParams) {
+    //     navigate(`${WalletRoutesEnum.sso}/${dataOrReferrer}`);
+    //   } else {
+    //     navigate(WalletRoutesEnum.root);
+    //   }
+    // } else
+
+    if (parsedData?.chainID) {
       setCreatingStep(CreateAccountStepsEnum.backup);
       setIsRandomChain(false);
       setSelectedChain(parsedData.chainID);
     }
-  }, [dataOrReferrer]);
+  }, [activeWallet, dataOrReferrer, isAddressInParams, navigate, parsedData]);
 
-  const resetStage = () => {
+  const resetStage = useCallback(() => {
     setCreatingStep(CreateAccountStepsEnum.selectNetwork);
     setIsRandomChain(true);
     setSelectedChain(null);
-  };
+  }, []);
 
   const getRegistrationBreadcrumbs = useMemo(
     () =>
@@ -98,9 +97,9 @@ const RegistrationPageComponent: FC = () => {
     [parsedData, isAddressInParams, t]
   );
 
-  const onSelectBreadCrumb = (nextStep: number) => {
+  const onSelectBreadCrumb = useCallback((nextStep: number) => {
     setCreatingStep(nextStep);
-  };
+  }, []);
 
   const toggleRandomChainHandler = useCallback(() => {
     if (!isRandomChain) setSelectedNetwork(null);

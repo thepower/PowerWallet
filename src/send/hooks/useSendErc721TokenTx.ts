@@ -1,8 +1,9 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AddressApi, EvmContract } from '@thepowereco/tssdk';
 import { toast } from 'react-toastify';
 import abis from 'abis';
 
+import { setSentData } from 'application/store';
 import { useWallets } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
@@ -23,6 +24,8 @@ export const useSendErc721TokenTx = ({
   const { networkApi, isLoading: isNetworkApiFetching } = useNetworkApi({
     chainId: activeWallet?.chainId
   });
+  const queryClient = useQueryClient();
+
   const sendErc721TokenTx = async ({ wif, to, address, id }: Args) => {
     if (!networkApi) {
       throw new Error('Network API is not ready');
@@ -35,7 +38,7 @@ export const useSendErc721TokenTx = ({
     try {
       const Erc721Contract: EvmContract = new EvmContract(networkApi, address);
 
-      await Erc721Contract.scSet(
+      const response = await Erc721Contract.scSet(
         {
           abi: abis.erc721.abi,
           functionName: 'transferFrom',
@@ -48,18 +51,18 @@ export const useSendErc721TokenTx = ({
         { key: { wif, address: activeWallet.address } }
       );
 
-      // yield *
-      //   put(
-      //     setSentData({
-      //       txId,
-      //       comment: '',
-      //       amount: '1',
-      //       from: walletAddress,
-      //       to
-      //     })
-      //   );
+      const { txId } = response;
 
-      // yield updateTokenAmountSaga({ address });
+      setSentData({
+        txId,
+        comment: '',
+        amount: '1',
+        from: activeWallet.address,
+        to
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['tokenBalance', activeWallet?.address, address]
+      });
     } catch (error: any) {
       console.error(error);
       toast.error(`${i18n.t('anErrorOccurredToken')} ${error}`);

@@ -76,7 +76,7 @@ export const useTokenBalance = ({
     isLoading,
     isSuccess
   } = useQuery({
-    queryKey: ['tokenBalance', activeWallet?.address],
+    queryKey: ['tokenBalance', activeWallet?.address, tokenAddress],
     queryFn: getTokenBalance,
 
     enabled:

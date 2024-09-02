@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Skeleton } from '@mui/material';
 import range from 'lodash/range';
 import { useTranslation } from 'react-i18next';
@@ -25,19 +25,10 @@ const TokenSelectionPageComponent: React.FC = () => {
     useWalletData(activeWallet);
 
   const { erc721Tokens, isLoading: isGetErc721TokensLoading } = useERC721Tokens(
-    { tokenAddress: collectionAddress }
+    { tokenAddress: collectionAddress, enabled: !!collectionAddress }
   );
 
   const { tokens, getTokenByAddress } = useTokens();
-  useEffect(() => {
-    // updateTokensAmountsTrigger();
-  }, []);
-
-  useEffect(() => {
-    if (collectionAddress) {
-      // getErc721TokensTrigger({ address: collectionAddress });
-    }
-  }, [collectionAddress]);
 
   const collection = useMemo(() => {
     if (collectionAddress) {

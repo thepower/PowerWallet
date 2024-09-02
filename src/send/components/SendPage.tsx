@@ -1,5 +1,4 @@
 import React, { FC, useCallback, useEffect, useMemo } from 'react';
-import { BigNumber, formatFixed } from '@ethersproject/bignumber';
 import { InputAdornment, TextField } from '@mui/material';
 import { useStore } from '@tanstack/react-store';
 import { AddressApi, CryptoApi } from '@thepowereco/tssdk';
@@ -352,7 +351,9 @@ const SendPageComponent: FC = () => {
       <div className={styles.content}>
         <div className={styles.walletInfo}>
           <span className={styles.titleBalance}>{t('totalBalance')}</span>
-          <span className={styles.address}>{activeWallet?.address || '-'}</span>
+          <span className={styles.address}>{`${activeWallet?.chainId} - ${
+            activeWallet?.address || '-'
+          }`}</span>
           <span className={styles.amount}>
             {isNativeToken && (
               <LogoIcon

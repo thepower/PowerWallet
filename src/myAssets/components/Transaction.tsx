@@ -6,7 +6,7 @@ import isArray from 'lodash/isArray';
 
 import { useTranslation } from 'react-i18next';
 import { useWallets } from 'application/utils/localStorageUtils';
-import { CopyButton, Divider } from 'common';
+import { Divider } from 'common';
 import { TransactionType } from 'myAssets/types';
 import {
   BarCodeIcon,
@@ -144,7 +144,7 @@ const Transaction: React.FC<TransactionProps> = ({ trx }) => {
               />
             </div>
             {renderGrid()}
-            <CopyButton textButton={t('copy')} copyInfo={trx.id} />
+            {/* <CopyButton textButton={t('copy')} copyInfo={trx.id} /> */}
           </div>
         </Collapse>
       </div>

@@ -11,7 +11,8 @@ export type LoadBalanceType = {
   t: number;
 };
 
-export type TransactionPayloadType = {
+export type TransactionType = {
+  id: string;
   body: string;
   extdata: {
     origin: string;
@@ -89,5 +90,3 @@ export type TErc721Token = {
 export type TokenPayloadType = TToken;
 export type Erc721TokenPayloadType = TErc721Token[];
 export const nativeTokensNameMap = { SK: 'Smart key' };
-
-export type TransactionType = TransactionPayloadType & { id: string };

@@ -160,7 +160,7 @@ const MainPageComponent: FC = () => {
             </CardLink>
           </div>
         </div>
-        {renderWallets()}
+        {wallets.length > 1 && renderWallets()}
         <div className={styles.btnWrapper}>
           <Button
             to={WalletRoutesEnum.referralProgram}

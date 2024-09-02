@@ -1,9 +1,10 @@
 import { BigNumber, parseFixed } from '@ethersproject/bignumber';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AddressApi, EvmContract } from '@thepowereco/tssdk';
 import { toast } from 'react-toastify';
 import abis from 'abis';
 
+import { setSentData } from 'application/store';
 import { useWallets } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
@@ -25,6 +26,7 @@ export const useSendTokenTx = ({
   const { networkApi, isLoading: isNetworkApiFetching } = useNetworkApi({
     chainId: activeWallet?.chainId
   });
+  const queryClient = useQueryClient();
   const sendTokenTx = async ({ wif, to, amount, decimals, address }: Args) => {
     try {
       if (!networkApi) {
@@ -42,7 +44,7 @@ export const useSendTokenTx = ({
         decimals
       ).toBigInt();
 
-      await erc20contract.scSet(
+      const response = await erc20contract.scSet(
         {
           abi: abis.erc20.abi,
           functionName: 'transfer',
@@ -51,17 +53,19 @@ export const useSendTokenTx = ({
         { key: { wif, address: activeWallet.address } }
       );
 
-      // yield put(
-      //   setSentData({
-      //     txId,
-      //     comment: '',
-      //     amount,
-      //     from: walletAddress,
-      //     to
-      //   })
-      // );
+      const { txId } = response;
 
-      // yield updateTokenAmountSaga({ address });
+      setSentData({
+        txId,
+        comment: '',
+        amount,
+        from: activeWallet.address,
+        to
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['tokenBalance', activeWallet?.address, address]
+      });
     } catch (error: any) {
       console.error(error);
       toast.error(`${i18n.t('anErrorOccurredToken')} ${error}`);

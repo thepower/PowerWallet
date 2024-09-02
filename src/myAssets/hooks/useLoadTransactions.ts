@@ -1,83 +1,119 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { WalletApi } from '@thepowereco/tssdk';
 import { format } from 'date-fns';
-import groupBy from 'lodash/groupBy';
+import { groupBy } from 'lodash';
+import { useNetworkApi } from 'application/hooks/useNetworkApi';
 import { useWallets } from 'application/utils/localStorageUtils';
-import { TransactionPayloadType } from 'myAssets/types';
-import { useWalletData } from './useWalletData';
-import { useNetworkApi } from '../../application/hooks/useNetworkApi';
+import { TransactionType } from 'myAssets/types';
 
-export type WalletData = {
-  address: string;
-  encryptedWif: string;
-};
-
-export const useTransactions = ({
-  tokenAddress
+export function useTransactionsHistory({
+  initialBlock,
+  tokenAddress,
+  perPage = 10
 }: {
+  initialBlock?: string;
   tokenAddress?: string;
-  isResetState?: boolean;
-}) => {
-  const [lastBlock, setLastBlock] = useState<string | null>(null);
+  perPage?: number;
+}) {
   const { activeWallet } = useWallets();
-  const { walletData } = useWalletData(activeWallet);
   const { networkApi } = useNetworkApi({ chainId: activeWallet?.chainId });
-  const loadTransactions = async (address: string | null | undefined) => {
-    if (!address) {
-      throw new Error('Address not found');
-    }
+
+  async function fetchTransactionsHistory({
+    pageParam,
+    tokenAddress,
+    perPage = 10
+  }: {
+    pageParam: string;
+    tokenAddress?: string;
+    perPage: number;
+  }): Promise<{
+    transactions: TransactionType[];
+    nextPageParam: string | null;
+  }> {
+    const transactionHistory = new Map<string, TransactionType>();
+    let loadedBlocks = 0;
+    let lastBlock = pageParam;
 
     if (!networkApi) {
-      throw new Error('Network API not available');
+      throw new Error('Network API is not ready');
+    }
+
+    if (!activeWallet) {
+      throw new Error('Wallet not found');
     }
 
     const walletApi = new WalletApi(networkApi);
 
-    const walletAddress = activeWallet?.address;
-    const walletLastBlock = lastBlock || walletData?.lastblk;
+    while (lastBlock !== '0000000000000000' && loadedBlocks < perPage) {
+      const block: any = await walletApi.getBlock(
+        lastBlock,
+        activeWallet.address
+      );
+      loadedBlocks += 1;
 
-    if (walletLastBlock && walletAddress) {
-      const transactions: Map<string, TransactionPayloadType | string> =
-        await walletApi.getRawTransactionsHistory(
-          walletLastBlock,
-          walletAddress,
-          undefined,
-          (_txID, tx: TransactionPayloadType) =>
+      const txs = Object.fromEntries(
+        Object.entries<Omit<TransactionType, 'id'>>(block.txs).filter(
+          ([, tx]) =>
             !tokenAddress || tx.from === tokenAddress || tx.to === tokenAddress
-        );
+        )
+      );
 
-      const lastblk = (transactions.get('needMore') as string) || null;
-      transactions.delete('needMore');
+      for (const [key, tx] of Object.entries(txs)) {
+        transactionHistory.set(key, {
+          id: key,
+          ...tx
+        });
+      }
 
-      setLastBlock(lastblk);
-      return Array.from(
-        transactions as Map<string, TransactionPayloadType>
-      ).map(([key, value]) => ({
-        id: key,
-        ...value
-      }));
+      lastBlock =
+        block.bals[activeWallet.address]?.lastblk || '0000000000000000';
     }
-  };
+
+    return {
+      transactions: Array.from(transactionHistory.values()),
+      nextPageParam: lastBlock !== '0000000000000000' ? lastBlock : null
+    };
+  }
 
   const {
-    data: transactions,
+    data,
     isLoading,
-    isSuccess
-  } = useQuery({
-    queryKey: ['transactions', activeWallet?.address, tokenAddress],
-    queryFn: () => loadTransactions(activeWallet?.address),
-    select: (transactions) => {
-      return groupBy(transactions, (trx) =>
-        format(trx.timestamp, 'dd MMM yyyy')
-      );
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery({
+    queryKey: tokenAddress
+      ? ['transactionsHistory', activeWallet?.address, tokenAddress]
+      : ['transactionsHistory', activeWallet?.address],
+    initialPageParam: initialBlock!,
+
+    queryFn: ({ pageParam }) => {
+      return fetchTransactionsHistory({
+        pageParam,
+        tokenAddress,
+        perPage
+      });
     },
-    enabled: !!activeWallet?.address && !!networkApi
+    getNextPageParam: (lastPage) => lastPage.nextPageParam,
+    enabled: tokenAddress
+      ? !!initialBlock && !!activeWallet?.address
+      : !!initialBlock && !!activeWallet?.address && !!tokenAddress
   });
 
+  const allTransactions =
+    data?.pages.flatMap((page) => page.transactions) || [];
+
+  const groupedTransactions = groupBy(allTransactions, (trx) =>
+    format(new Date(trx.timestamp), 'dd MMM yyyy')
+  );
+
   return {
-    transactions,
+    groupedTransactions,
     isLoading,
-    isSuccess
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
   };
-};
+}

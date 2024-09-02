@@ -3,16 +3,14 @@ import { Drawer, IconButton } from '@mui/material';
 import { useStore } from '@tanstack/react-store';
 import cn from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import {
   useExportAccount,
   useImportWalletFromFile,
   useResetWallet
 } from 'account/hooks';
-import {
-  setIsAccountMenuOpened,
-  setIsShowUnderConstruction,
-  store
-} from 'application/store';
+import { setIsAccountMenuOpened, store } from 'application/store';
+import { WalletRoutesEnum } from 'application/typings/routes';
 import { useWallets } from 'application/utils/localStorageUtils';
 import {
   SupportIcon,
@@ -23,7 +21,6 @@ import {
   CloseIcon
 } from 'assets/icons';
 import { CopyButton } from 'common';
-// import { WalletRoutesEnum } from 'application/typings/routes';
 import styles from './Account.module.scss';
 import { AccountActionsList } from './AccountActionsList';
 import { ResetAccountModal } from './ResetAccountModal';
@@ -42,6 +39,7 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   const [openedResetAccountModal, setOpenedResetAccountModal] =
     useState<boolean>(false);
   const importAccountInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { exportAccountMutation } = useExportAccount();
   const { importWalletFromFileMutation } = useImportWalletFromFile();
@@ -55,7 +53,7 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   // };
 
   const handleCreateAccount = () => {
-    setIsShowUnderConstruction(true);
+    navigate(WalletRoutesEnum.signup);
   };
 
   const handleExportAccount = () => {
@@ -114,6 +112,9 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   const handleResetAccount = () => {
     resetWallet({
       password: '',
+      additionalActionOnSuccess: () => {
+        setIsAccountMenuOpened(false);
+      },
       additionalActionOnDecryptError: () => setOpenedResetAccountModal(true)
     });
   };

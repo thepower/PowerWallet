@@ -24,7 +24,7 @@ export const useAccountLoginToWallet = ({
 }: {
   throwOnError?: boolean;
 }) => {
-  const { networkApi, isLoading: isNetworkApiFetching } = useNetworkApi({
+  const { networkApi } = useNetworkApi({
     chainId: appEnvs.DEFAULT_CHAIN_ID
   });
   const { addWallet } = useWallets();
@@ -32,12 +32,12 @@ export const useAccountLoginToWallet = ({
   const queryClient = useQueryClient();
   const loginToWallet = async ({ address, encryptedWif }: Args) => {
     if (!address || !encryptedWif) {
+      console.error('!address || !encryptedWif');
       return;
     }
 
-    const subChain: GetChainResultType = await networkApi?.getAddressChain(
-      address!
-    );
+    const subChain: GetChainResultType =
+      await networkApi?.getAddressChain(address);
 
     queryClient.invalidateQueries({
       queryKey: ['walletData', address]
@@ -57,7 +57,6 @@ export const useAccountLoginToWallet = ({
     mutationFn: loginToWallet,
     onSuccess: async (params) => {
       if (params) {
-        console.log({ params });
         await addWallet({
           chainId: params.chainId,
           address: params.address,
@@ -69,9 +68,9 @@ export const useAccountLoginToWallet = ({
     onError: (e) => {
       console.error('loginToWalletSaga', e);
 
-      toast.error(i18n.t(`loginError${e}`));
+      toast.error(`${i18n.t('loginError')} ${e}`);
     },
     throwOnError
   });
-  return { loginMutation, isPending, isFetching: isNetworkApiFetching };
+  return { loginMutation, isPending };
 };

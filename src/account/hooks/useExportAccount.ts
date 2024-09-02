@@ -37,10 +37,15 @@ export const useExportAccount = () => {
   }: Args) => {
     const currentNetworkChain = activeWallet?.chainId;
     const currentRegistrationChain = selectedChain;
-    const address = activeWallet!.address;
+
     try {
+      if (!activeWallet) {
+        throw new Error('Wallet not found');
+      }
+      const address = activeWallet.address;
+
       const decryptedWif: string = CryptoApi.decryptWif(
-        activeWallet!.encryptedWif,
+        activeWallet.encryptedWif,
         password
       );
       const exportedData: string = WalletApi.getExportData(
@@ -70,7 +75,6 @@ export const useExportAccount = () => {
       additionalActionOnSuccess?.();
     } catch (e: any) {
       console.error('exportAccountSaga', e);
-
       if (
         additionalActionOnDecryptError &&
         e.message === 'unable to decrypt data'

@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import { useTranslation } from 'react-i18next';
-// import { InView } from 'react-intersection-observer';
 
+import { InView } from 'react-intersection-observer';
 import { useParams } from 'react-router-dom';
-import { useTokens } from 'application/utils/localStorageUtils';
+import { useTokens, useWallets } from 'application/utils/localStorageUtils';
 import { PageTemplate, FullScreenLoader } from 'common';
 
-// import Transaction from 'myAssets/components/Transaction';
 import Transaction from 'myAssets/components/Transaction';
-import { useTransactions } from 'myAssets/hooks/useLoadTransactions';
+import { useTransactionsHistory } from 'myAssets/hooks/useLoadTransactions';
+import { useWalletData } from 'myAssets/hooks/useWalletData';
 import { TokenKind } from 'myAssets/types';
 import styles from './TokenTransactionsPage.module.scss';
 
@@ -22,6 +22,10 @@ const TokenTransactionsPageComponent: React.FC = () => {
     id: string;
   }>();
 
+  const { activeWallet } = useWallets();
+  const { walletData, isLoading: isWalletDataLoading } =
+    useWalletData(activeWallet);
+
   const { getTokenByAddress } = useTokens();
 
   const token = useMemo(
@@ -29,47 +33,44 @@ const TokenTransactionsPageComponent: React.FC = () => {
     [getTokenByAddress, address]
   );
 
-  const { transactions } = useTransactions({ tokenAddress: address });
+  const { groupedTransactions, fetchNextPage, isLoading, isFetchingNextPage } =
+    useTransactionsHistory({
+      initialBlock: walletData?.lastblk,
+      tokenAddress: token?.address
+    });
 
   useEffect(() => {
-    // setLastBlockToInitialLastBlock();
-    // resetTransactionsState();
-  }, []);
+    if (walletData) {
+      fetchNextPage();
+    }
+  }, [walletData]);
 
-  // const handleChangeView = (inView: boolean) => {
-  //   if (inView) {
-  //     if (type === TokenKind.Native) {
-  //       loadTransactionsTrigger();
-  //     } else {
-  //       loadTransactionsTrigger({ tokenAddress: address });
-  //     }
-  //   }
-  // };
-
+  const handleChangeView = (inView: boolean) => {
+    if (inView && !isLoading && !isFetchingNextPage && walletData) {
+      fetchNextPage();
+    }
+  };
   const renderTransactionsList = useCallback(
     () =>
-      transactions &&
-      Object.entries(transactions).map(([date, transactions]) => (
+      groupedTransactions &&
+      Object.entries(groupedTransactions).map(([date, transactions]) => (
         <li key={date}>
           <p className={styles.date}>{date}</p>
           <ul className={styles.transactionsList}>
             {transactions.map((trx) => (
-              <li key={trx.id}>
+              <li key={trx.t}>
                 <Transaction trx={trx} />
               </li>
             ))}
           </ul>
         </li>
       )),
-    [JSON.stringify(transactions)]
+    [groupedTransactions]
   );
 
   const tokenSymbol = type === TokenKind.Native ? address : token?.symbol;
 
-  if (
-    // loading &&
-    isEmpty(transactions)
-  ) {
+  if (isLoading && isEmpty(groupedTransactions)) {
     return <FullScreenLoader />;
   }
 
@@ -83,9 +84,9 @@ const TokenTransactionsPageComponent: React.FC = () => {
         <div className={styles.transactions}>
           <ul className={styles.groupByDates}>{renderTransactionsList()}</ul>
         </div>
-        {/* <InView onChange={handleChangeView}>
+        <InView onChange={handleChangeView}>
           <div />
-        </InView> */}
+        </InView>
       </div>
     </PageTemplate>
   );
