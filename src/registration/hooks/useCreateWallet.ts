@@ -14,7 +14,7 @@ import i18n from 'locales/initTranslation';
 import { BackupAccountStepsEnum } from 'registration/typings/registrationTypes';
 import { AddActionOnSuccessType } from 'typings/common';
 
-export async function generateSeedPhrase() {
+export function generateSeedPhrase() {
   const phrase: string = CryptoApi.generateSeedPhrase();
 
   setSeedPhrase(phrase);

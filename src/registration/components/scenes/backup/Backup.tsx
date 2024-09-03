@@ -49,7 +49,7 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
     if (!seedPhrase) {
       generateSeedPhrase();
     }
-  }, [generateSeedPhrase, seedPhrase]);
+  }, [seedPhrase]);
 
   const onClickNext = useCallback(() => {
     if (backupStep === BackupAccountStepsEnum.generateSeedPhrase) {

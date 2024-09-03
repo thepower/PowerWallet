@@ -70,9 +70,11 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   };
 
   const handleOpenImportFile = () => {
-    if (importAccountInputRef.current) {
-      importAccountInputRef.current.click();
-    }
+    // if (importAccountInputRef.current) {
+    //   importAccountInputRef.current.click();
+    // }
+    navigate(WalletRoutesEnum.login);
+    setIsAccountMenuOpened(!isAccountMenuOpened);
   };
 
   const handleImportAccount = (password: string) => {
