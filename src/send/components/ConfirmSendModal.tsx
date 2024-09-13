@@ -15,7 +15,7 @@ interface OwnProps {
   onSubmit: (values: FormValues, password: string) => Promise<void>;
   token?: TToken;
   trxValues: {
-    amount: number;
+    amount: string;
     comment: string;
     address: string;
   };

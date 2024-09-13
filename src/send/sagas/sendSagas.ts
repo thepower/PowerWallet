@@ -1,4 +1,3 @@
-import { BigNumber, parseFixed } from '@ethersproject/bignumber';
 import {
   AddressApi,
   EvmContract,
@@ -41,7 +40,7 @@ export function* sendTrxSaga({
         from: walletAddress,
         to,
         token: 'SK',
-        inputAmount: amount,
+        inputAmount: BigInt(amount) * BigInt(10) ** BigInt(9),
         message: comment ?? ''
       });
 
@@ -73,10 +72,7 @@ export function* sendTokenTrxSaga({
       address
     );
 
-    const calculatedAmount = parseFixed(
-      BigNumber.from(amount).toString(),
-      decimals
-    ).toBigInt();
+    const calculatedAmount = BigInt(amount) * BigInt(10) ** BigInt(decimals);
 
     const { txId } = yield erc20contract.scSet(
       {

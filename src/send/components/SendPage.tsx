@@ -70,13 +70,13 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type SendProps = ConnectedProps<typeof connector>;
 
 export type FormValues = {
-  amount: number;
+  amount: string;
   comment: string;
   address: string;
 };
 
 const initialValues: FormValues = {
-  amount: 0,
+  amount: '0',
   comment: '',
   address: ''
 };
@@ -268,7 +268,6 @@ const SendPageComponent: FC<SendProps> = ({
             <TextField
               variant='standard'
               label={t('amount')}
-              type='number'
               placeholder='00.000'
               name='amount'
               value={formik.values.amount}

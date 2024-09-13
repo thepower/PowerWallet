@@ -25,7 +25,7 @@
     "@mui/material": "^5.6.2",
     "@mui/styles": "^5.6.2",
     "@reduxjs/toolkit": "^1.8.6",
-    "@thepowereco/tssdk": "^2.2.1",
+    "@thepowereco/tssdk": "^2.2.2",
     "axios": "^1.6.8",
     "base64url": "^3.0.1",
     "classnames": "^2.3.1",

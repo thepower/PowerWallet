@@ -38,7 +38,7 @@ const sendSlice = createSlice({
 export const sendTrxTrigger = createAction<{
   wif: string;
   to: string;
-  amount: number;
+  amount: string;
   comment: Maybe<string>;
 }>('send/sendTrxTrigger');
 
@@ -47,7 +47,7 @@ export const sendTokenTrxTrigger = createAction<{
   to: string;
   address: string;
   decimals: string;
-  amount: number;
+  amount: string;
 }>('send/sendTokenTrxTrigger');
 export const sendErc721TokenTrxTrigger = createAction<{
   wif: string;

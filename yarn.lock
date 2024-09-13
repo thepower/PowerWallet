@@ -1101,10 +1101,10 @@
   dependencies:
     "@swc/counter" "^0.1.3"
 
-"@thepowereco/tssdk@^2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@thepowereco/tssdk/-/tssdk-2.2.1.tgz#c517bcd86603c932045e7b76a2b12587efff1dcc"
-  integrity sha512-ygCl+PwUMLfwWHyUPhfKMAaTZixa6xw4SihmXYAj2XxYhigSg8KvIPDzLaswpLtLeDCEKqZezm1OUv8PmL0RIA==
+"@thepowereco/tssdk@^2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@thepowereco/tssdk/-/tssdk-2.2.2.tgz#69d2aea25aab4ae295c8a3963d8de68cfa5af961"
+  integrity sha512-iUeKy3+oV8DI+fe6q16Xvjh2Vw09iebwNMR75oWWT/0eWYAK3buSJkfG6D1DOU8sg2krlgQKCvPv6P1ExeersA==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.1.1"
     abitype "^1.0.2"
