@@ -448,27 +448,6 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.50.0.tgz#9e93b850f0f3fa35f5fa59adfd03adae8488e484"
   integrity sha512-NCC3zz2+nvYd+Ckfh87rA47zfu2QsQpvc6k1yzTk+b9KzRj0wkGa8LSoGOXN6Zv4lRf/EIoZ80biDh9HOI+RNQ==
 
-"@ethersproject/bignumber@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@ethersproject/bignumber/-/bignumber-5.7.0.tgz#e2f03837f268ba655ffba03a57853e18a18dc9c2"
-  integrity sha512-n1CAdIHRWjSucQO3MC1zPSVgV/6dy/fjL9pMrPP9peL+QxEg9wOsVqwD4+818B6LUEtaXzVHQiuivzRoxPxUGw==
-  dependencies:
-    "@ethersproject/bytes" "^5.7.0"
-    "@ethersproject/logger" "^5.7.0"
-    bn.js "^5.2.1"
-
-"@ethersproject/bytes@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@ethersproject/bytes/-/bytes-5.7.0.tgz#a00f6ea8d7e7534d6d87f47188af1148d71f155d"
-  integrity sha512-nsbxwgFXWh9NyYWo+U8atvmMsSdKJprTcICAkvbBffT75qDocbuggBU0SJiVK2MuTrp0q+xvLkTnGMPK1+uA9A==
-  dependencies:
-    "@ethersproject/logger" "^5.7.0"
-
-"@ethersproject/logger@^5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@ethersproject/logger/-/logger-5.7.0.tgz#6ce9ae168e74fecf287be17062b590852c311892"
-  integrity sha512-0odtFdXu/XHtjQXJYA3u9G0G8btm0ND5Cu8M7i5vhEcE8/HmF4Lbdqanwyv4uQTr2tx6b7fQRmgLrsnpQlmnig==
-
 "@floating-ui/core@^1.6.0":
   version "1.6.5"
   resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-1.6.5.tgz#102335cac0d22035b04d70ca5ff092d2d1a26f2b"
@@ -1095,10 +1074,10 @@
   resolved "https://registry.yarnpkg.com/@tanstack/store/-/store-0.5.5.tgz#84d78568c4a71c885cb15754bf51eca42a776efe"
   integrity sha512-EOSrgdDAJExbvRZEQ/Xhh9iZchXpMN+ga1Bnk8Nmygzs8TfiE6hbzThF+Pr2G19uHL6+DTDTHhJ8VQiOd7l4tA==
 
-"@thepowereco/tssdk@^2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@thepowereco/tssdk/-/tssdk-2.2.1.tgz#c517bcd86603c932045e7b76a2b12587efff1dcc"
-  integrity sha512-ygCl+PwUMLfwWHyUPhfKMAaTZixa6xw4SihmXYAj2XxYhigSg8KvIPDzLaswpLtLeDCEKqZezm1OUv8PmL0RIA==
+"@thepowereco/tssdk@^2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@thepowereco/tssdk/-/tssdk-2.2.2.tgz#69d2aea25aab4ae295c8a3963d8de68cfa5af961"
+  integrity sha512-iUeKy3+oV8DI+fe6q16Xvjh2Vw09iebwNMR75oWWT/0eWYAK3buSJkfG6D1DOU8sg2krlgQKCvPv6P1ExeersA==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.1.1"
     abitype "^1.0.2"

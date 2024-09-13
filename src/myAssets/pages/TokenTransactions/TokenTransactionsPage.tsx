@@ -23,8 +23,7 @@ const TokenTransactionsPageComponent: React.FC = () => {
   }>();
 
   const { activeWallet } = useWallets();
-  const { walletData, isLoading: isWalletDataLoading } =
-    useWalletData(activeWallet);
+  const { walletData } = useWalletData(activeWallet);
 
   const { getTokenByAddress } = useTokens();
 

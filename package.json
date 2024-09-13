@@ -19,7 +19,6 @@
   "dependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
-    "@ethersproject/bignumber": "^5.7.0",
     "@mui/icons-material": "^5.6.2",
     "@mui/lab": "^5.0.0-alpha.78",
     "@mui/material": "^5.6.2",
@@ -28,7 +27,7 @@
     "@tanstack/query-persist-client-core": "^5.52.3",
     "@tanstack/react-query": "^5.52.3",
     "@tanstack/react-store": "^0.5.5",
-    "@thepowereco/tssdk": "^2.2.1",
+    "@thepowereco/tssdk": "^2.2.2",
     "axios": "^1.6.8",
     "base64url": "^3.0.1",
     "classnames": "^2.3.1",

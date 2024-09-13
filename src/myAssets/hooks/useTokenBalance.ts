@@ -1,4 +1,3 @@
-import { BigNumber, formatFixed } from '@ethersproject/bignumber';
 import { useQuery } from '@tanstack/react-query';
 import { AddressApi } from '@thepowereco/tssdk';
 import abis from 'abis';
@@ -42,7 +41,7 @@ export const useTokenBalance = ({
 
       return balance;
     } else if (type === TokenKind.Erc20) {
-      const balanceBigint: bigint = await networkApi.executeCall(
+      const balanceBigint = await networkApi.executeCall(
         {
           abi: abis.erc20.abi,
           functionName: 'balanceOf',
@@ -53,8 +52,7 @@ export const useTokenBalance = ({
         }
       );
 
-      const balance = balanceBigint.toString();
-      const decimalsNumber = await networkApi.executeCall(
+      const decimals = await networkApi.executeCall(
         {
           abi: abis.erc20.abi,
           functionName: 'decimals',
@@ -65,9 +63,7 @@ export const useTokenBalance = ({
         }
       );
 
-      const decimals = decimalsNumber.toString();
-
-      return formatFixed(BigNumber.from(balance), decimals);
+      return (balanceBigint / BigInt(10) ** BigInt(decimals)).toString(10);
     }
   };
 

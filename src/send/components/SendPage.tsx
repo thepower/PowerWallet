@@ -24,13 +24,13 @@ import ConfirmSendModal from './ConfirmSendModal';
 import styles from './SendPage.module.scss';
 
 export type FormValues = {
-  amount: number;
+  amount: string;
   comment: string;
   address: string;
 };
 
 const initialValues: FormValues = {
-  amount: 0,
+  amount: '0',
   comment: '',
   address: ''
 };
@@ -252,7 +252,6 @@ const SendPageComponent: FC = () => {
             <TextField
               variant='standard'
               label={t('amount')}
-              type='number'
               placeholder='00.000'
               name='amount'
               value={formik.values.amount}

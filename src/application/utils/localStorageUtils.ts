@@ -1,5 +1,17 @@
 import { useCallback, useMemo } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
+// interface WalletStore {
+//   wallets: Wallet[];
+//   activeAddress: string | null;
+//   addWallet: (newWallet: Wallet) => void;
+//   updateWallet: (address: string, updatedData: Partial<Wallet>) => void;
+//   removeWallet: (address: string) => void;
+//   getWalletByAddress: (address: string | null) => Wallet | null;
+//   setActiveWalletByAddress: (address: string | null) => void;
+//   clearWallets: () => void;
+//   activeWallet: Wallet | null;
+// }
+
 import { TToken } from 'myAssets/types';
 
 export interface Wallet {
@@ -112,6 +124,93 @@ export const useWallets = () => {
   };
 };
 
+// interface WalletStore {
+//   wallets: Wallet[];
+//   activeAddress: string | null;
+//   addWallet: (newWallet: Wallet) => void;
+//   updateWallet: (address: string, updatedData: Partial<Wallet>) => void;
+//   removeWallet: (address: string) => void;
+//   getWalletByAddress: (address: string | null) => Wallet | null;
+//   setActiveWalletByAddress: (address: string | null) => void;
+//   clearWallets: () => void;
+//   activeWallet: Wallet | null;
+// }
+
+// export const useWalletStore = create<WalletStore>()(
+//   persist(
+//     (set, get) => ({
+//       wallets: [],
+//       activeAddress: null,
+
+//       addWallet: (newWallet) => {
+//         const { wallets, setActiveWalletByAddress } = get();
+//         const isAddressUnique = !wallets.some(
+//           (wallet) => wallet.address === newWallet.address
+//         );
+
+//         if (isAddressUnique) {
+//           const updatedWallets = [...wallets, newWallet];
+//           set({ wallets: updatedWallets });
+//           setActiveWalletByAddress(newWallet.address);
+//         }
+//       },
+
+//       updateWallet: (address, updatedData) => {
+//         set((state) => ({
+//           wallets: state.wallets.map((wallet) =>
+//             wallet.address === address ? { ...wallet, ...updatedData } : wallet
+//           )
+//         }));
+//       },
+
+//       removeWallet: (address) => {
+//         const { wallets, activeAddress, setActiveWalletByAddress } = get();
+//         const updatedWallets = wallets.filter(
+//           (wallet) => wallet.address !== address
+//         );
+
+//         set({ wallets: updatedWallets });
+
+//         if (activeAddress === address) {
+//           const newActiveAddress =
+//             updatedWallets.length > 0 ? updatedWallets[0].address : null;
+//           setActiveWalletByAddress(newActiveAddress);
+//         }
+//       },
+
+//       getWalletByAddress: (address) => {
+//         const { wallets } = get();
+//         return wallets.find((wallet) => wallet.address === address) || null;
+//       },
+
+//       setActiveWalletByAddress: (address) => {
+//         const wallet = get().getWalletByAddress(address);
+//         if (wallet) {
+//           set({ activeAddress: address });
+//         }
+//       },
+
+//       clearWallets: () => {
+//         set({ wallets: [], activeAddress: null });
+//       },
+
+//       activeWallet: null
+//     }),
+//     {
+//       name: `${localStorageRootPath}/wallets`, // ключ в localStorage
+//       onRehydrateStorage: () => (state) => {
+//         // Реинициализация активного кошелька при восстановлении состояния
+//         if (state?.activeAddress) {
+//           state.activeWallet =
+//             state.wallets.find(
+//               (wallet) => wallet.address === state.activeAddress
+//             ) || null;
+//         }
+//       }
+//     }
+//   )
+// );
+
 export const useTokens = () => {
   const [tokens, setTokens] = useLocalStorage<TToken[]>(
     `${localStorageRootPath}/tokens`,
@@ -193,3 +292,65 @@ export const useTokens = () => {
     clearTokens
   };
 };
+
+// interface TokenStore {
+//   tokens: TToken[];
+//   addToken: (newToken: TToken) => void;
+//   updateToken: (address: string, updatedData: Partial<TToken>) => void;
+//   removeToken: (address: string) => void;
+//   getTokenByAddress: (address?: string) => TToken | null;
+//   toggleTokenVisibility: (address: string) => void;
+//   clearTokens: () => void;
+// }
+
+// export const useTokensStore = create<TokenStore>()(
+//   persist(
+//     (set, get) => ({
+//       tokens: [],
+
+//       addToken: (newToken) => {
+//         const { tokens } = get();
+//         const isAddressUnique = !tokens.some(
+//           (token) => token.address === newToken.address
+//         );
+//         if (isAddressUnique) {
+//           set({ tokens: [...tokens, newToken] });
+//         }
+//       },
+
+//       updateToken: (address, updatedData) => {
+//         set((state) => ({
+//           tokens: state.tokens.map((token) =>
+//             token.address === address ? { ...token, ...updatedData } : token
+//           )
+//         }));
+//       },
+
+//       removeToken: (address) => {
+//         set((state) => ({
+//           tokens: state.tokens.filter((token) => token.address !== address)
+//         }));
+//       },
+
+//       getTokenByAddress: (address) => {
+//         const { tokens } = get();
+//         return tokens.find((token) => token.address === address) || null;
+//       },
+
+//       toggleTokenVisibility: (address) => {
+//         const { getTokenByAddress, updateToken } = get();
+//         const token = getTokenByAddress(address);
+//         if (token) {
+//           updateToken(address, { isShow: !token.isShow });
+//         }
+//       },
+
+//       clearTokens: () => {
+//         set({ tokens: [] });
+//       }
+//     }),
+//     {
+//       name: `${localStorageRootPath}/tokens` // название ключа в localStorage
+//     }
+//   )
+// );

@@ -1,4 +1,3 @@
-import { BigNumber, parseFixed } from '@ethersproject/bignumber';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AddressApi, EvmContract } from '@thepowereco/tssdk';
 import { toast } from 'react-toastify';
@@ -14,7 +13,7 @@ type Args = {
   to: string;
   address: string;
   decimals: string;
-  amount: number;
+  amount: string;
 };
 
 export const useSendTokenTx = ({
@@ -39,10 +38,7 @@ export const useSendTokenTx = ({
 
       const erc20contract: EvmContract = new EvmContract(networkApi, address);
 
-      const calculatedAmount = parseFixed(
-        BigNumber.from(amount).toString(),
-        decimals
-      ).toBigInt();
+      const calculatedAmount = BigInt(amount) * BigInt(10) ** BigInt(decimals);
 
       const response = await erc20contract.scSet(
         {

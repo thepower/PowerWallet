@@ -10,7 +10,7 @@ import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 type Args = {
   wif: string;
   to: string;
-  amount: number;
+  amount: string;
   comment: Maybe<string>;
 };
 
@@ -40,7 +40,7 @@ export const useSendTx = ({
         from: activeWallet.address,
         to,
         token: 'SK',
-        inputAmount: amount,
+        inputAmount: BigInt(amount) * BigInt(10) ** BigInt(9),
         message: comment ?? ''
       });
 
