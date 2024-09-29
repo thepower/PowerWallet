@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 
 import { lighten } from '@mui/material/styles';
 import { useWallets, Wallet } from 'application/utils/localStorageUtils';
@@ -65,25 +65,31 @@ type WalletCardProps = {
 
 const WalletCard: FC<WalletCardProps> = ({ index, wallet }) => {
   const { walletData } = useWalletData(wallet);
-  const { setActiveWalletByAddress } = useWallets();
+  const { activeWallet, setActiveWalletByAddress } = useWallets();
 
   const onClick = () => {
     setActiveWalletByAddress(wallet.address);
   };
 
+  const isActive = useMemo(
+    () => activeWallet?.address === wallet.address,
+    [activeWallet?.address, wallet.address]
+  );
+
   return (
     <div
       style={{
         backgroundColor: colors[index],
-        borderColor: lighten(colors[index], 0.2)
+        borderColor: lighten(colors[index], 0.2),
+        opacity: isActive ? 1 : 0.4
       }}
       onClick={onClick}
       className={styles.walletCard}
     >
       <div className={styles.chainId}>{wallet.chainId}</div>
-      <div className={styles.balance}>{`${
-        walletData?.amount?.SK || 0
-      } SK`}</div>
+      <div className={styles.balance}>
+        {`${walletData?.amount?.SK || 0} SK`}
+      </div>
       <div className={styles.address}>{wallet.address}</div>
     </div>
   );

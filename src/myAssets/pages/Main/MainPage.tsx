@@ -109,6 +109,7 @@ const MainPageComponent: FC = () => {
   return (
     <PageTemplate>
       <div className={styles.wrapper}>
+        {wallets.length > 1 && renderWallets()}
         <div className={styles.account}>
           <div className={styles.title}>{t('accountNumber')}</div>
           <CopyButton
@@ -160,7 +161,6 @@ const MainPageComponent: FC = () => {
             </CardLink>
           </div>
         </div>
-        {wallets.length > 1 && renderWallets()}
         <div className={styles.btnWrapper}>
           <Button
             to={WalletRoutesEnum.referralProgram}
