@@ -37,6 +37,20 @@
   }
 }
 
+.wallets {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+
+  margin-bottom: 40px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 .info {
   display: flex;
   flex-direction: column;

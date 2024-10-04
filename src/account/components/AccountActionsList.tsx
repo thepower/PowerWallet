@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import styles from './Account.module.scss';
 import { AccountActionType } from '../typings/accountTypings';
 
@@ -6,11 +6,10 @@ interface AccountActionsListProps {
   actions: AccountActionType[];
 }
 
-class AccountActionsListComponent extends React.PureComponent<
-  AccountActionsListProps,
-  {}
-> {
-  renderActionItem = (item: AccountActionType) => {
+const AccountActionsListComponent: FC<AccountActionsListProps> = ({
+  actions
+}) => {
+  const renderActionItem = (item: AccountActionType) => {
     const { Icon, title, action } = item;
 
     return (
@@ -21,13 +20,11 @@ class AccountActionsListComponent extends React.PureComponent<
     );
   };
 
-  render() {
-    return (
-      <div className={styles.accountActionsHolder}>
-        {this.props.actions.map(this.renderActionItem)}
-      </div>
-    );
-  }
-}
+  return (
+    <div className={styles.accountActionsHolder}>
+      {actions.map(renderActionItem)}
+    </div>
+  );
+};
 
 export const AccountActionsList = AccountActionsListComponent;

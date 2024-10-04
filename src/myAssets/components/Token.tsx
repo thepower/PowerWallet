@@ -1,12 +1,14 @@
-import React, { FC, memo } from 'react';
-import { BigNumber, formatFixed } from '@ethersproject/bignumber';
+import React, { FC, memo, useMemo } from 'react';
 import cn from 'classnames';
 
 import { Link } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { LogoIcon } from 'assets/icons';
 import { Checkbox, Divider, Switch } from 'common';
-import { TToken, TokenKind } from 'myAssets/types';
+import { useTokenBalance } from 'myAssets/hooks/useTokenBalance';
+import { useWalletData } from 'myAssets/hooks/useWalletData';
+import { TokenKind, TToken } from 'myAssets/types';
 import styles from './Token.module.scss';
 
 type OwnProps = {
@@ -26,11 +28,21 @@ const TokenComponent: FC<TokenProps> = ({
   onClickSwitch,
   onClickCheckBox
 }) => {
-  const { amount, decimals, type } = token;
-  const formattedAmount =
-    type === TokenKind.Erc20
-      ? formatFixed(BigNumber.from(amount), decimals)
-      : amount;
+  const { type, address } = token;
+  const { activeWallet } = useWalletsStore();
+
+  const { tokenBalance } = useTokenBalance({
+    tokenAddress: address,
+    type
+  });
+
+  const { walletData } = useWalletData(activeWallet);
+
+  const balance = useMemo(
+    () =>
+      type === TokenKind.Native ? walletData?.amount[address] : tokenBalance,
+    [type, walletData?.amount, address, tokenBalance]
+  );
 
   const onClickToken = () => {
     if (onClickSwitch) {
@@ -63,7 +75,7 @@ const TokenComponent: FC<TokenProps> = ({
 
   const renderSymbol = () => {
     const { symbol } = token;
-    return onClickCheckBox ? `${symbol} ${formattedAmount}` : symbol;
+    return onClickCheckBox ? `${symbol} ${balance}` : symbol;
   };
 
   const renderIcon = () => {
@@ -91,7 +103,7 @@ const TokenComponent: FC<TokenProps> = ({
         />
       );
     }
-    return <span className={styles.amount}>{formattedAmount}</span>;
+    return <span className={styles.amount}>{balance}</span>;
   };
 
   return (

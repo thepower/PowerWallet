@@ -1,32 +1,16 @@
-import React, { FC, useCallback, useEffect, useMemo } from 'react';
+import { FC, useCallback, useEffect, useMemo } from 'react';
 import { FormControlLabel } from '@mui/material';
 import { AddressApi } from '@thepowereco/tssdk';
-import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { RootState } from 'application/store';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+
+import { useStore } from 'application/store';
+import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { BreadcrumbsTypeEnum, Checkbox, LangMenu, Wizard } from 'common';
-import {
-  getCurrentCreatingStep,
-  getIsRandomChain,
-  getIsWithoutPassword,
-  getCurrentBackupStep
-} from 'registration/selectors/registrationSelectors';
-import {
-  setCreatingStep,
-  setSelectedNetwork,
-  setIsRandomChain,
-  setIsWithoutPassword,
-  setSelectedChain
-} from 'registration/slice/registrationSlice';
+
 import { stringToObject } from 'sso/utils';
 import styles from './RegistrationPage.module.scss';
-import {
-  AppQueryParams,
-  WalletRoutesEnum
-} from '../../../../application/typings/routes';
 import {
   BackupAccountStepsEnum,
   CreateAccountStepsEnum,
@@ -36,75 +20,54 @@ import { Backup } from '../../scenes/backup/Backup';
 import { LoginToDapp } from '../../scenes/loginToDapp/LoginToDapp';
 import { SelectNetwork } from '../../scenes/selectNetwork/SelectNetwork';
 
-type OwnProps = RouteComponentProps<{ dataOrReferrer?: string }>;
-
-const mapStateToProps = (state: RootState, props: OwnProps) => ({
-  walletAddress: getWalletAddress(state),
-  dataOrReferrer: props?.match?.params?.dataOrReferrer,
-  creatingStep: getCurrentCreatingStep(state),
-  backupStep: getCurrentBackupStep(state),
-  isRandomChain: getIsRandomChain(state),
-  isWithoutPassword: getIsWithoutPassword(state)
-});
-
-const mapDispatchToProps = {
-  routeTo: push,
-  setIsRandomChain,
-  setSelectedNetwork,
-  setCreatingStep,
-  setIsWithoutPassword,
-  setSelectedChain
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type RegistrationPageProps = ConnectedProps<typeof connector>;
-
-const RegistrationPageComponent: FC<RegistrationPageProps> = ({
-  dataOrReferrer,
-  routeTo,
-  setIsRandomChain,
-  setIsWithoutPassword,
-  isRandomChain,
-  isWithoutPassword,
-  setSelectedNetwork,
-  creatingStep,
-  backupStep,
-  setCreatingStep,
-  walletAddress,
-  setSelectedChain
-}) => {
+const RegistrationPageComponent: FC = () => {
   const { t } = useTranslation();
-
+  const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
   const isAddressInParams = useMemo(
     () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
     [dataOrReferrer]
   );
-
+  const { activeWallet } = useWalletsStore();
+  const {
+    isRandomChain,
+    creatingStep,
+    backupStep,
+    isWithoutPassword,
+    setCreatingStep,
+    setIsRandomChain,
+    setSelectedChain,
+    setIsWithoutPassword,
+    setSelectedNetwork
+  } = useStore();
   const parsedData: AppQueryParams = useMemo(() => {
     if (!isAddressInParams && dataOrReferrer)
       return stringToObject(dataOrReferrer);
     return null;
   }, [dataOrReferrer, isAddressInParams]);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    if (walletAddress) {
-      if (!isAddressInParams) {
-        routeTo(`${WalletRoutesEnum.sso}/${dataOrReferrer}`);
-      } else {
-        routeTo(WalletRoutesEnum.root);
-      }
-    } else if (parsedData?.chainID) {
+    // if (activeWallet?.address) {
+    //   if (!isAddressInParams) {
+    //     navigate(`${WalletRoutesEnum.sso}/${dataOrReferrer}`);
+    //   } else {
+    //     navigate(WalletRoutesEnum.root);
+    //   }
+    // } else
+
+    if (parsedData?.chainID) {
       setCreatingStep(CreateAccountStepsEnum.backup);
       setIsRandomChain(false);
       setSelectedChain(parsedData.chainID);
     }
-  }, [dataOrReferrer]);
+  }, [activeWallet, dataOrReferrer, isAddressInParams, navigate, parsedData]);
 
-  const resetStage = () => {
+  const resetStage = useCallback(() => {
     setCreatingStep(CreateAccountStepsEnum.selectNetwork);
     setIsRandomChain(true);
     setSelectedChain(null);
-  };
+  }, []);
 
   const getRegistrationBreadcrumbs = useMemo(
     () =>
@@ -136,14 +99,14 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
     [parsedData, isAddressInParams, t]
   );
 
-  const onSelectBreadCrumb = (nextStep: number) => {
+  const onSelectBreadCrumb = useCallback((nextStep: number) => {
     setCreatingStep(nextStep);
-  };
+  }, []);
 
   const toggleRandomChainHandler = useCallback(() => {
     if (!isRandomChain) setSelectedNetwork(null);
     setIsRandomChain(!isRandomChain);
-  }, [isRandomChain, setSelectedNetwork, setIsRandomChain]);
+  }, [isRandomChain]);
 
   const renderCheckBox = useCallback(() => {
     if (creatingStep === CreateAccountStepsEnum.selectNetwork) {
@@ -192,7 +155,6 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
     creatingStep,
     isRandomChain,
     isWithoutPassword,
-    setIsWithoutPassword,
     toggleRandomChainHandler
   ]);
 
@@ -235,4 +197,4 @@ const RegistrationPageComponent: FC<RegistrationPageProps> = ({
   return <div className={styles.registrationPage}>{renderRegistration()}</div>;
 };
 
-export const RegistrationPage = connector(RegistrationPageComponent);
+export const RegistrationPage = RegistrationPageComponent;

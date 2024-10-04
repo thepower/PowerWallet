@@ -1,156 +1,118 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@mui/material';
 import classnames from 'classnames';
-import { WithTranslation, withTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
-import { exportAccount } from '../../../account/slice/accountSlice';
+import { useTranslation } from 'react-i18next';
+import { useExportAccount } from 'account/hooks';
 import { Modal, OutlinedInput } from '../../../common';
 import { compareTwoStrings } from '../../utils/registrationUtils';
 import styles from '../pages/registration/RegistrationPage.module.scss';
 
-const mapDispatchToProps = {
-  exportAccount
+type ExportAccountModalProps = {
+  open: boolean;
+  onClose: () => void;
 };
 
-const connector = connect(null, mapDispatchToProps);
-type ExportAccountModalProps = ConnectedProps<typeof connector> &
-  WithTranslation & {
-    open: boolean;
-    onClose: () => void;
+const ExportAccountModalComponent: React.FC<ExportAccountModalProps> = ({
+  open,
+  onClose
+}) => {
+  const [password, setPassword] = useState('');
+  const [confirmedPassword, setConfirmedPassword] = useState('');
+  const [hint, setHint] = useState('');
+  const [passwordsNotEqual, setPasswordsNotEqual] = useState(false);
+  const { t } = useTranslation();
+
+  const { exportAccountMutation } = useExportAccount();
+
+  const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+    setPasswordsNotEqual(false);
   };
 
-interface ExportAccountModalState {
-  password: string;
-  confirmedPassword: string;
-  hint: string;
-  passwordsNotEqual: boolean;
-}
-
-class ExportAccountModalComponent extends React.PureComponent<
-  ExportAccountModalProps,
-  ExportAccountModalState
-> {
-  private initialState = {
-    password: '',
-    confirmedPassword: '',
-    hint: '',
-    passwordsNotEqual: false
+  const handleChangeConfirmedPassword = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setConfirmedPassword(event.target.value);
+    setPasswordsNotEqual(false);
   };
 
-  constructor(props: ExportAccountModalProps) {
-    super(props);
-
-    this.state = this.initialState;
-  }
-
-  onChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      password: event.target.value,
-      passwordsNotEqual: false
-    });
+  const handleChangeHint = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setHint(event.target.value);
   };
 
-  onChangeConfirmedPassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      confirmedPassword: event.target.value,
-      passwordsNotEqual: false
-    });
-  };
-
-  onChangeHint = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      hint: event.target.value
-    });
-  };
-
-  handleSubmitExportModal = () => {
-    const { password, confirmedPassword, hint } = this.state;
-    const { exportAccount, onClose } = this.props;
-
-    const passwordsNotEqual = !compareTwoStrings(password!, confirmedPassword!);
+  const handleSubmitExportModal = async () => {
+    const passwordsNotEqual = !compareTwoStrings(password, confirmedPassword);
 
     if (passwordsNotEqual) {
-      this.setState({ passwordsNotEqual });
+      setPasswordsNotEqual(true);
       return;
     }
 
-    exportAccount({ password, hint });
+    exportAccountMutation({
+      password,
+      hint,
+      additionalActionOnSuccess: () => {
+        setPassword('');
+        setConfirmedPassword('');
+        setHint('');
+        setPasswordsNotEqual(false);
 
-    this.setState({ ...this.initialState });
-
-    onClose();
+        onClose();
+      }
+    });
   };
 
-  render() {
-    const { open, onClose } = this.props;
-
-    const { password, confirmedPassword, hint, passwordsNotEqual } = this.state;
-
-    return (
-      <Modal
-        contentClassName={styles.exportModalContent}
-        onClose={onClose}
-        open={open}
+  return (
+    <Modal
+      contentClassName={styles.exportModalContent}
+      onClose={onClose}
+      open={open}
+    >
+      <div className={styles.exportModalTitleHolder}>
+        <div className={styles.exportModalTitle}>{t('exportWallet')}</div>
+        <div className={styles.exportModalTitle}>{t('exportYourWallet')}</div>
+        <div className={styles.exportModalTitle}>
+          {t('exportFileEncrypted')}
+        </div>
+      </div>
+      <OutlinedInput
+        placeholder={t('password')}
+        className={classnames(styles.passwordInput, styles.passwordInputPadded)}
+        value={password}
+        onChange={handleChangePassword}
+        type='password'
+        autoFocus
+      />
+      <OutlinedInput
+        placeholder={t('repeatedPassword')}
+        className={styles.passwordInput}
+        value={confirmedPassword}
+        onChange={handleChangeConfirmedPassword}
+        error={passwordsNotEqual}
+        errorMessage={t('oopsPasswordsDidntMatch')}
+        type='password'
+      />
+      <div className={styles.exportModalHintDesc}>{t('hintForPassword')}</div>
+      <OutlinedInput
+        placeholder={t('hint')}
+        className={styles.exportModalHintTextArea}
+        value={hint}
+        onChange={handleChangeHint}
+        multiline
+      />
+      <Button
+        className={classnames(
+          styles.registrationNextButton,
+          styles.registrationNextButton_outlined
+        )}
+        variant='outlined'
+        size='large'
+        onClick={handleSubmitExportModal}
       >
-        <div className={styles.exportModalTitleHolder}>
-          <div className={styles.exportModalTitle}>
-            {this.props.t('exportWallet')}
-          </div>
-          <div className={styles.exportModalTitle}>
-            {this.props.t('exportYourWallet')}
-          </div>
-          <div className={styles.exportModalTitle}>
-            {this.props.t('exportFileEncrypted')}
-          </div>
-        </div>
-        <OutlinedInput
-          placeholder={this.props.t('password')!}
-          className={classnames(
-            styles.passwordInput,
-            styles.passwordInputPadded
-          )}
-          value={password}
-          onChange={this.onChangePassword}
-          type={'password'}
-          autoFocus
-        />
-        <OutlinedInput
-          placeholder={this.props.t('repeatedPassword')!}
-          className={styles.passwordInput}
-          value={confirmedPassword}
-          onChange={this.onChangeConfirmedPassword}
-          error={passwordsNotEqual}
-          errorMessage={this.props.t('oopsPasswordsDidntMatch')!}
-          type={'password'}
-        />
-        <div className={styles.exportModalHintDesc}>
-          {this.props.t('hintForPassword')}
-        </div>
-        <OutlinedInput
-          placeholder={this.props.t('hint')!}
-          className={styles.exportModalHintTextArea}
-          value={hint}
-          onChange={this.onChangeHint}
-          multiline
-        />
-        <Button
-          className={classnames(
-            styles.registrationNextButton,
-            styles.registrationNextButton_outlined
-          )}
-          variant='outlined'
-          size='large'
-          onClick={this.handleSubmitExportModal}
-        >
-          <span className={styles.registrationNextButtonText}>
-            {this.props.t('next')}
-          </span>
-        </Button>
-      </Modal>
-    );
-  }
-}
+        <span className={styles.registrationNextButtonText}>{t('next')}</span>
+      </Button>
+    </Modal>
+  );
+};
 
-export const ExportAccountModal = withTranslation()(
-  connector(ExportAccountModalComponent)
-);
+export const ExportAccountModal = ExportAccountModalComponent;

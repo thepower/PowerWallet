@@ -1,58 +1,39 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
 import appEnvs from 'appEnvs';
-import { getNetworkChainID } from 'application/selectors';
-import { setShowUnderConstruction } from 'application/slice/applicationSlice';
-import { RootState } from 'application/store';
+import { useStore } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
+import {
+  useTokensStore,
+  useWalletsStore
+} from 'application/utils/localStorageUtils';
 import { BuySvg, FaucetSvg, LogoIcon, SendSvg } from 'assets/icons';
 import { Button, CardLink, CopyButton, PageTemplate, Tabs } from 'common';
-import { getTokens } from 'myAssets/selectors/tokensSelectors';
-import { updateTokensAmountsTrigger } from 'myAssets/slices/tokensSlice';
+import WalletCard from 'myAssets/components/WalletCard/WalletCard';
+import { useWalletData } from 'myAssets/hooks/useWalletData';
 import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
 import styles from './MainPage.module.scss';
 import AddButton from '../../components/AddButton';
 import { Token } from '../../components/Token';
-import {
-  getWalletNativeTokens,
-  getWalletNativeTokensAmounts
-} from '../../selectors/walletSelectors';
 
-const mapDispatchToProps = {
-  updateTokensAmountsTrigger,
-  setShowUnderConstruction
-};
-
-const mapStateToProps = (state: RootState) => ({
-  amounts: getWalletNativeTokensAmounts(state),
-  nativeTokens: getWalletNativeTokens(state),
-  tokens: getTokens(state),
-  walletAddress: getWalletAddress(state),
-  chainId: getNetworkChainID(state)
-});
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-type MainPageProps = ConnectedProps<typeof connector>;
-
-const MainPageComponent: FC<MainPageProps> = ({
-  amounts,
-  nativeTokens,
-  tokens,
-  chainId,
-  updateTokensAmountsTrigger,
-  setShowUnderConstruction,
-  walletAddress
-}) => {
+const MainPageComponent: FC = () => {
   const { t } = useTranslation();
+  const { setIsShowUnderConstruction } = useStore();
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
+  const { activeWallet, wallets } = useWalletsStore();
+
+  const chainId = activeWallet?.chainId;
+
+  const { walletData, nativeTokens } = useWalletData(activeWallet);
+
+  const { tokens } = useTokensStore();
 
   useEffect(() => {
-    updateTokensAmountsTrigger();
+    // updateTokensAmountsTrigger();
   }, []);
 
   const onChangeTab = (_event: React.SyntheticEvent, value: MyAssetsTabs) => {
@@ -61,7 +42,7 @@ const MainPageComponent: FC<MainPageProps> = ({
 
   const handleShowUnderConstruction = (event: React.MouseEvent) => {
     event.preventDefault();
-    setShowUnderConstruction(true);
+    setIsShowUnderConstruction(true);
   };
 
   const erc20tokens = tokens.filter(
@@ -100,13 +81,44 @@ const MainPageComponent: FC<MainPageProps> = ({
     );
   }, [t, currentTokens]);
 
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY !== 0 && scrollContainerRef.current) {
+        e.preventDefault();
+        scrollContainerRef.current.scrollLeft += e.deltaY;
+      }
+    };
+
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('wheel', handleWheel);
+    }
+
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('wheel', handleWheel);
+      }
+    };
+  }, []);
+
+  const renderWallets = useCallback(() => {
+    return (
+      <div ref={scrollContainerRef} className={styles.wallets}>
+        {wallets.map((wallet, i) => (
+          <WalletCard key={wallet.address} index={i} wallet={wallet} />
+        ))}
+      </div>
+    );
+  }, [wallets]);
+
   return (
     <PageTemplate>
       <div className={styles.wrapper}>
+        {wallets.length > 1 && renderWallets()}
         <div className={styles.account}>
           <div className={styles.title}>{t('accountNumber')}</div>
           <CopyButton
-            textButton={walletAddress}
+            textButton={activeWallet?.address || ''}
             className={styles.addressButton}
             iconClassName={styles.copyIcon}
           />
@@ -117,12 +129,12 @@ const MainPageComponent: FC<MainPageProps> = ({
             <div className={styles.infoTitle}>{t('skBalance')}</div>
             <div className={styles.balance}>
               <LogoIcon className={styles.icon} />
-              {!amounts?.SK || amounts?.SK === '0' ? (
+              {!walletData?.amount?.SK || walletData?.amount?.SK === 0 ? (
                 <span className={styles.emptyTitle}>
                   {t('yourTokensWillBeHere')}
                 </span>
               ) : (
-                amounts?.SK
+                walletData?.amount?.SK
               )}
             </div>
           </div>
@@ -182,4 +194,4 @@ const MainPageComponent: FC<MainPageProps> = ({
   );
 };
 
-export const MainPage = connector(MainPageComponent);
+export const MainPage = MainPageComponent;

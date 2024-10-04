@@ -1,8 +1,7 @@
 import React, { useCallback } from 'react';
 import cn from 'classnames';
-import { toggleOpenedAccountMenu } from 'account/slice/accountSlice';
-import { setShowUnderConstruction } from 'application/slice/applicationSlice';
-import { useAppDispatch } from 'application/store';
+
+import { useStore } from 'application/store';
 import { BellIcon, MenuIcon } from 'assets/icons';
 import i18n from 'locales/initTranslation';
 import styles from './TopBar.module.scss';
@@ -23,14 +22,18 @@ const TopBar: React.FC<TopBarProps> = ({
   backUrlText = i18n.t('back')!,
   className
 }) => {
-  const dispatch = useAppDispatch();
+  const {
+    isAccountMenuOpened,
+    setIsShowUnderConstruction,
+    setIsAccountMenuOpened
+  } = useStore();
   const handleShowUnderConstruction = useCallback(() => {
-    dispatch(setShowUnderConstruction(true));
-  }, [dispatch]);
+    setIsShowUnderConstruction(true);
+  }, []);
 
   const toggleAccountMenu = useCallback(() => {
-    dispatch(toggleOpenedAccountMenu());
-  }, [dispatch]);
+    setIsAccountMenuOpened(!isAccountMenuOpened);
+  }, [isAccountMenuOpened]);
 
   const renderLeft = useCallback(() => {
     if (backUrl) {

@@ -1,57 +1,102 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { connectRouter, routerMiddleware } from 'connected-react-router';
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
-import createSagaMiddleware from 'redux-saga';
-import { tokensReducer } from 'myAssets/slices/tokensSlice';
-import rootSaga from './sagas/rootSaga';
-import { applicationDataReducer } from './slice/applicationSlice';
-import history from './utils/history';
-import { accountReducer } from '../account/slice/accountSlice';
-import { transactionsReducer } from '../myAssets/slices/transactionsSlice';
-import { walletReducer } from '../myAssets/slices/walletSlice';
-import { networkReducer } from '../network/slice';
-import { registrationReducer } from '../registration/slice/registrationSlice';
-import { sendReducer } from '../send/slices/sendSlice';
+import { NetworkEnum } from '@thepowereco/tssdk';
+import { create } from 'zustand';
+import {
+  BackupAccountStepsEnum,
+  CreateAccountStepsEnum
+} from 'registration/typings/registrationTypes';
+import { Maybe } from 'typings/common';
 
-const routeMiddleware = routerMiddleware(history);
-const sagaMiddleware = createSagaMiddleware();
-
-const tokensPersistConfig = {
-  key: 'PowerWallet/tokens',
-  storage
+export type SentData = {
+  from: string;
+  to: string;
+  amount: number | string;
+  comment: Maybe<string>;
+  txId: string;
+  returnURL?: string;
 };
 
-const reducer = {
-  router: connectRouter(history),
-  account: accountReducer,
-  applicationData: applicationDataReducer,
-  registration: registrationReducer,
-  wallet: walletReducer,
-  network: networkReducer,
-  tokens: persistReducer(tokensPersistConfig, tokensReducer),
-  transactions: transactionsReducer,
-  send: sendReducer
-};
+interface State {
+  selectedNetwork: Maybe<NetworkEnum>;
+  selectedChain: Maybe<number>;
+  seedPhrase: Maybe<string>;
+  creatingStep: CreateAccountStepsEnum;
+  backupStep: BackupAccountStepsEnum;
+  isWithoutPassword: boolean;
+  isRandomChain: boolean;
 
-const store = configureStore({
-  reducer,
-  devTools: import.meta.env.VITE_NODE_ENV !== 'production',
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false
-    }).concat([routeMiddleware, sagaMiddleware])
-});
+  isAccountMenuOpened: boolean;
+  isShowUnderConstruction: boolean;
 
-sagaMiddleware.run(rootSaga);
+  sentData: Maybe<SentData>;
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+  setSelectedNetwork: (network: Maybe<NetworkEnum>) => void;
+  setSelectedChain: (chainId: Maybe<number>) => void;
+  setSeedPhrase: (seedPhrase: string) => void;
+  setCreatingStep: (step: CreateAccountStepsEnum) => void;
+  setBackupStep: (step: BackupAccountStepsEnum) => void;
+  setIsRandomChain: (isRandomChain: boolean) => void;
+  setIsWithoutPassword: (isWithoutPassword: boolean) => void;
+  setIsAccountMenuOpened: (isAccountMenuOpened: boolean) => void;
+  setIsShowUnderConstruction: (isShowUnderConstruction: boolean) => void;
+  setSentData: (sentData: Maybe<SentData>) => void;
+  resetStore: () => void;
+}
 
-export const useAppDispatch: () => AppDispatch = useDispatch;
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+export const useStore = create<State>((set) => ({
+  selectedNetwork: null,
+  selectedChain: null,
+  seedPhrase: null,
+  creatingStep: CreateAccountStepsEnum.selectNetwork,
+  backupStep: BackupAccountStepsEnum.generateSeedPhrase,
+  isWithoutPassword: false,
+  isRandomChain: true,
 
-const persistor = persistStore(store);
+  isAccountMenuOpened: false,
+  isShowUnderConstruction: false,
 
-export { store, persistor };
+  sentData: null,
+
+  setSelectedNetwork: (network: Maybe<NetworkEnum>) =>
+    set((state) => ({ ...state, selectedNetwork: network })),
+
+  setSelectedChain: (chainId: Maybe<number>) =>
+    set((state) => ({ ...state, selectedChain: chainId })),
+
+  setSeedPhrase: (seedPhrase: string) =>
+    set((state) => ({ ...state, seedPhrase })),
+
+  setCreatingStep: (step: CreateAccountStepsEnum) =>
+    set((state) => ({ ...state, creatingStep: step })),
+
+  setBackupStep: (step: BackupAccountStepsEnum) =>
+    set((state) => ({ ...state, backupStep: step })),
+
+  setIsRandomChain: (isRandomChain: boolean) =>
+    set((state) => ({ ...state, isRandomChain })),
+
+  setIsWithoutPassword: (isWithoutPassword: boolean) =>
+    set((state) => ({ ...state, isWithoutPassword })),
+
+  setIsAccountMenuOpened: (isAccountMenuOpened: boolean) =>
+    set((state) => ({ ...state, isAccountMenuOpened })),
+
+  setIsShowUnderConstruction: (isShowUnderConstruction: boolean) =>
+    set((state) => ({ ...state, isShowUnderConstruction })),
+
+  setSentData: (sentData: Maybe<SentData>) =>
+    set((state) => ({ ...state, sentData })),
+
+  resetStore: () =>
+    set(() => ({
+      selectedNetwork: null,
+      selectedChain: null,
+      seedPhrase: null,
+      creatingStep: CreateAccountStepsEnum.selectNetwork,
+      backupStep: BackupAccountStepsEnum.generateSeedPhrase,
+      isWithoutPassword: false,
+      isRandomChain: true,
+      isAccountMenuOpened: false,
+      isShowUnderConstruction: false,
+      sentData: null
+    }))
+}));

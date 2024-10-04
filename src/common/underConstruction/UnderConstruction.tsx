@@ -1,46 +1,31 @@
 import React from 'react';
 import { Button } from '@mui/material';
-import { push } from 'connected-react-router';
 import { useTranslation } from 'react-i18next';
-import { connect, ConnectedProps } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useStore } from 'application/store';
 import styles from './underConstruction.module.scss';
-import { setShowUnderConstruction } from '../../application/slice/applicationSlice';
-import { RootState } from '../../application/store';
 import { WalletRoutesEnum } from '../../application/typings/routes';
 import { Modal } from '../modal/Modal';
 
-const mapStateToProps = (state: RootState) => ({
-  showUnderConstruction: state.applicationData.showUnderConstruction
-});
-
-const mapDispatchToProps = {
-  setShowUnderConstruction,
-  routeTo: push
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type UnderConstructionProps = ConnectedProps<typeof connector>;
-
-const UnderConstructionComponent: React.FC<UnderConstructionProps> = (
-  props: UnderConstructionProps
-) => {
+const UnderConstructionComponent: React.FC = () => {
   const { t } = useTranslation();
-  const { setShowUnderConstruction, showUnderConstruction, routeTo } = props;
+  const navigate = useNavigate();
+  const { isShowUnderConstruction, setIsShowUnderConstruction } = useStore();
 
   const handleCloseModal = React.useCallback(() => {
-    setShowUnderConstruction(false);
-  }, [setShowUnderConstruction]);
+    setIsShowUnderConstruction(false);
+  }, []);
 
   const handleProceedToHome = React.useCallback(() => {
-    routeTo(WalletRoutesEnum.root);
+    navigate(WalletRoutesEnum.root);
     handleCloseModal();
-  }, [handleCloseModal, routeTo]);
+  }, [handleCloseModal, navigate]);
 
   return (
     <Modal
       contentClassName={styles.underConstructionContent}
       onClose={handleCloseModal}
-      open={showUnderConstruction}
+      open={isShowUnderConstruction}
       className={styles.underConstruction}
       alwaysShowCloseIcon
     >
@@ -65,4 +50,4 @@ const UnderConstructionComponent: React.FC<UnderConstructionProps> = (
   );
 };
 
-export const UnderConstruction = connector(UnderConstructionComponent);
+export const UnderConstruction = UnderConstructionComponent;

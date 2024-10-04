@@ -1,45 +1,20 @@
-import React, { FC, useEffect } from 'react';
-import { push } from 'connected-react-router';
+import { FC, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { RootState } from 'application/store';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { Button, LangMenu } from 'common';
-import {
-  getCurrentBackupStep,
-  getCurrentCreatingStep,
-  getIsWithoutPassword
-} from 'registration/selectors/registrationSelectors';
 
 import styles from './WelcomePage.module.scss';
 
-type OwnProps = RouteComponentProps<{ referrer?: string }>;
-
-const mapStateToProps = (state: RootState, props: OwnProps) => ({
-  referrer: props?.match?.params?.referrer,
-  walletAddress: getWalletAddress(state),
-  creatingStep: getCurrentCreatingStep(state),
-  backupStep: getCurrentBackupStep(state),
-  isWithoutPassword: getIsWithoutPassword(state)
-});
-
-const mapDispatchToProps = {
-  routeTo: push
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type WelcomePageProps = ConnectedProps<typeof connector>;
-
-const WelcomePageComponent: FC<WelcomePageProps> = ({ routeTo, referrer }) => {
+const WelcomePageComponent: FC = () => {
   const { t } = useTranslation();
-
+  const { referrer } = useParams<{ referrer: string }>();
+  const navigate = useNavigate();
   useEffect(() => {
     if (referrer) {
-      routeTo(`${WalletRoutesEnum.signup}/${referrer}`);
+      navigate(`${WalletRoutesEnum.signup}/${referrer}`);
     }
-  }, [referrer, routeTo]);
+  }, [navigate, referrer]);
 
   return (
     <div className={styles.registrationPage}>
@@ -70,4 +45,4 @@ const WelcomePageComponent: FC<WelcomePageProps> = ({ routeTo, referrer }) => {
   );
 };
 
-export const WelcomePage = connector(WelcomePageComponent);
+export const WelcomePage = WelcomePageComponent;

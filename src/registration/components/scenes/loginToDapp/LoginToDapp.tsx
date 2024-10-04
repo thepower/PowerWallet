@@ -1,27 +1,18 @@
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
 import { useParams } from 'react-router';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { RootState } from 'application/store';
 import { AppQueryParams } from 'application/typings/routes';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { LogoIcon } from 'assets/icons';
 import { Button, WizardComponentProps } from 'common';
 import { objectToString, stringToObject } from 'sso/utils';
 import styles from './LoginToDapp.module.scss';
 
-const mapStateToProps = (state: RootState) => ({
-  walletAddress: getWalletAddress(state)
-});
+type LoginToDappProps = WizardComponentProps;
 
-const connector = connect(mapStateToProps);
-
-type LoginToDappProps = ConnectedProps<typeof connector> & WizardComponentProps;
-
-const LoginToDappComponent: React.FC<LoginToDappProps> = ({
-  walletAddress
-}) => {
+const LoginToDappComponent: React.FC<LoginToDappProps> = () => {
   const { t } = useTranslation();
+  const { activeWallet } = useWalletsStore();
 
   const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
 
@@ -33,12 +24,12 @@ const LoginToDappComponent: React.FC<LoginToDappProps> = ({
   const onClickLoginHandler = useCallback(() => {
     if (parsedData?.callbackUrl) {
       const stringData = objectToString({
-        address: walletAddress,
+        address: activeWallet?.address,
         returnUrl: parsedData?.returnUrl
       });
       window.location.replace(`${parsedData.callbackUrl}sso/${stringData}`);
     }
-  }, [parsedData?.callbackUrl, parsedData?.returnUrl, walletAddress]);
+  }, [parsedData?.callbackUrl, parsedData?.returnUrl, activeWallet]);
 
   return (
     <div className={styles.content}>
@@ -58,4 +49,4 @@ const LoginToDappComponent: React.FC<LoginToDappProps> = ({
   );
 };
 
-export const LoginToDapp = connector(LoginToDappComponent);
+export const LoginToDapp = LoginToDappComponent;

@@ -2,11 +2,9 @@ import React, { useCallback } from 'react';
 import { CryptoApi } from '@thepowereco/tssdk';
 import { Form, Formik, FormikHelpers } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { connect, ConnectedProps } from 'react-redux';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import styles from './ConfirmModal.module.scss';
 import { Button, Modal, OutlinedInput } from '..';
-import { getWalletData } from '../../account/selectors/accountSelectors';
-import { RootState } from '../../application/store';
 
 interface OwnProps {
   open: boolean;
@@ -17,28 +15,34 @@ interface OwnProps {
 const initialValues = { password: '' };
 type Values = typeof initialValues;
 
-const connector = connect((state: RootState) => ({
-  encryptedWif: getWalletData(state).encryptedWif
-}));
-
-type ConfirmModalProps = ConnectedProps<typeof connector> & OwnProps;
+type ConfirmModalProps = OwnProps;
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onClose,
   open,
-  encryptedWif,
   callback
 }) => {
+  const { activeWallet } = useWalletsStore();
+
   const { t } = useTranslation();
   const handleSubmit = useCallback(
     async (values: Values, formikHelpers: FormikHelpers<Values>) => {
       try {
-        const decryptedWif = await CryptoApi.decryptWif(encryptedWif, '');
+        if (!activeWallet) {
+          throw new Error('Wallet not found');
+        }
+        const decryptedWif = CryptoApi.decryptWif(
+          activeWallet.encryptedWif,
+          ''
+        );
         callback(decryptedWif);
       } catch (e) {
         try {
-          const decryptedWif = await CryptoApi.decryptWif(
-            encryptedWif,
+          if (!activeWallet) {
+            throw new Error('Wallet not found');
+          }
+          const decryptedWif = CryptoApi.decryptWif(
+            activeWallet.encryptedWif,
             values.password
           );
           callback(decryptedWif);
@@ -47,7 +51,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         }
       }
     },
-    [callback, t, encryptedWif]
+    [activeWallet, callback, t]
   );
 
   return (
@@ -91,4 +95,4 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   );
 };
 
-export default connector(ConfirmModal);
+export default ConfirmModal;

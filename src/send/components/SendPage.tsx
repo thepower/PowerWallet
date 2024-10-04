@@ -1,82 +1,38 @@
 import React, { FC, useCallback, useEffect, useMemo } from 'react';
-import { BigNumber, formatFixed } from '@ethersproject/bignumber';
 import { InputAdornment, TextField } from '@mui/material';
 import { AddressApi, CryptoApi } from '@thepowereco/tssdk';
 import cn from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router-dom';
 import * as yup from 'yup';
-import {
-  getWalletAddress,
-  getWalletData
-} from 'account/selectors/accountSelectors';
-import { RootState } from 'application/store';
+import { useStore } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
+import {
+  useTokensStore,
+  useWalletsStore
+} from 'application/utils/localStorageUtils';
 import { LogoIcon, MoneyBugIcon } from 'assets/icons';
 import { Button, PageTemplate, Divider, FullScreenLoader } from 'common';
 import TxResult from 'common/txResult/TxResult';
-import { getTokenByID } from 'myAssets/selectors/tokensSelectors';
-import { getWalletNativeTokensAmountBySymbol } from 'myAssets/selectors/walletSelectors';
-import { addTokenTrigger } from 'myAssets/slices/tokensSlice';
+import { useAddToken } from 'myAssets/hooks/useAddToken';
+import { useTokenBalance } from 'myAssets/hooks/useTokenBalance';
+import { useWalletData } from 'myAssets/hooks/useWalletData';
 import { TokenKind } from 'myAssets/types';
-import { checkIfLoading } from 'network/selectors';
+import { useSendErc721TokenTx } from 'send/hooks/useSendErc721TokenTx';
+import { useSendTokenTx } from 'send/hooks/useSendTokenTx';
+import { useSendTx } from 'send/hooks/useSendTx';
 import ConfirmSendModal from './ConfirmSendModal';
 import styles from './SendPage.module.scss';
-import { getSentData } from '../selectors/sendSelectors';
-import {
-  clearSentData,
-  sendErc721TokenTrxTrigger,
-  sendTokenTrxTrigger,
-  sendTrxTrigger
-} from '../slices/sendSlice';
-
-type OwnProps = RouteComponentProps<{
-  type: TokenKind;
-  address: string;
-  id: string;
-}>;
-
-const mapDispatchToProps = {
-  clearSentData,
-  sendTrxTrigger,
-  sendTokenTrxTrigger,
-  sendErc721TokenTrxTrigger,
-  addTokenTrigger
-};
-
-const mapStateToProps = (state: RootState, props: OwnProps) => ({
-  erc721TokenId: props?.match?.params?.id,
-  address: getWalletAddress(state),
-  sentData: getSentData(state),
-  getTokenByID: (address: string) => getTokenByID(state, address),
-  nativeTokenAmount: getWalletNativeTokensAmountBySymbol(
-    state,
-    props?.match?.params?.address
-  ),
-  tokenType: props?.match?.params?.type,
-  tokenAddress: props?.match?.params?.address,
-  loading:
-    checkIfLoading(state, sendTrxTrigger.type) ||
-    checkIfLoading(state, sendTokenTrxTrigger.type) ||
-    checkIfLoading(state, sendErc721TokenTrxTrigger.type),
-  isAddTokenLoading: checkIfLoading(state, addTokenTrigger.type),
-  encryptedWif: getWalletData(state).encryptedWif
-});
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-type SendProps = ConnectedProps<typeof connector>;
 
 export type FormValues = {
-  amount: number;
+  amount: string;
   comment: string;
   address: string;
 };
 
 const initialValues: FormValues = {
-  amount: 0,
+  amount: '0',
   comment: '',
   address: ''
 };
@@ -85,34 +41,48 @@ const InputLabelProps = {
   className: styles.label
 };
 
-const SendPageComponent: FC<SendProps> = ({
-  address,
-  sentData,
-  tokenType,
-  tokenAddress,
-  loading,
-  isAddTokenLoading,
-  getTokenByID,
-  clearSentData,
-  sendTrxTrigger,
-  sendTokenTrxTrigger,
-  sendErc721TokenTrxTrigger,
-  addTokenTrigger,
-  nativeTokenAmount,
-  encryptedWif,
-  erc721TokenId
-}) => {
+const SendPageComponent: FC = () => {
   const { t } = useTranslation();
+  const { activeWallet } = useWalletsStore();
 
+  const { sentData, setSentData } = useStore();
   const [openModal, setOpenModal] = React.useState(false);
+  const {
+    type: tokenType,
+    address: tokenAddress,
+    id: erc721TokenId
+  } = useParams<{
+    type: TokenKind;
+    address: string;
+    id: string;
+  }>();
+  const { getNativeTokenAmountBySymbol } = useWalletData(activeWallet);
+  const { sendTxMutation, isPending: isSendTxPending } = useSendTx({
+    throwOnError: false
+  });
+  const { sendTokenTxMutation, isPending: isSendTokenTxPending } =
+    useSendTokenTx({ throwOnError: false });
+
+  const { sendErc721TokenTxMutation, isPending: isSendErc721TokenTxPending } =
+    useSendErc721TokenTx({
+      throwOnError: false
+    });
+
+  const { getTokenByAddress } = useTokensStore();
+
+  const { addTokenMutation, isPending: isAddTokenLoading } = useAddToken({
+    throwOnError: false
+  });
 
   const token = useMemo(
-    () => getTokenByID(tokenAddress),
-    [getTokenByID, tokenAddress]
+    () => getTokenByAddress(tokenAddress),
+    [getTokenByAddress, tokenAddress]
   );
 
+  const nativeTokenAmount = getNativeTokenAmountBySymbol(tokenAddress);
+
   useEffect(() => {
-    clearSentData();
+    setSentData(null);
   }, []);
 
   const isNativeToken = useMemo(
@@ -124,26 +94,29 @@ const SendPageComponent: FC<SendProps> = ({
     [tokenType]
   );
 
+  const { tokenBalance } = useTokenBalance({
+    tokenAddress,
+    type: tokenType
+  });
+
   useEffect(() => {
     if (!token && tokenAddress && !isNativeToken) {
-      addTokenTrigger({ address: tokenAddress, withoutRedirect: true });
+      addTokenMutation({ address: tokenAddress, withoutRedirect: true });
     }
-  }, [addTokenTrigger, isNativeToken, token, tokenAddress]);
+  }, [addTokenMutation, isNativeToken, token, tokenAddress]);
 
   const formattedAmount = useMemo(() => {
     switch (tokenType) {
       case TokenKind.Erc20:
-        return (
-          token && formatFixed(BigNumber.from(token.amount), token.decimals)
-        );
+      case TokenKind.Erc721:
+        return tokenBalance;
       case TokenKind.Native:
         return nativeTokenAmount;
-      case TokenKind.Erc721:
-        return token?.amount;
+
       default:
         return '0';
     }
-  }, [tokenType, nativeTokenAmount, token]);
+  }, [tokenType, tokenBalance, nativeTokenAmount]);
 
   const getValidationSchema = useCallback(() => {
     switch (tokenType) {
@@ -194,7 +167,7 @@ const SendPageComponent: FC<SendProps> = ({
   }) => {
     switch (tokenType) {
       case TokenKind.Native:
-        sendTrxTrigger({
+        sendTxMutation({
           to: values.address!,
           comment: values.comment,
           amount: values.amount,
@@ -203,7 +176,7 @@ const SendPageComponent: FC<SendProps> = ({
         break;
       case TokenKind.Erc20:
         if (token) {
-          sendTokenTrxTrigger({
+          sendTokenTxMutation({
             address: token.address,
             amount: values.amount,
             decimals: token.decimals,
@@ -213,7 +186,7 @@ const SendPageComponent: FC<SendProps> = ({
         }
         break;
       case TokenKind.Erc721:
-        sendErc721TokenTrxTrigger({
+        sendErc721TokenTxMutation({
           to: values.address!,
           address: tokenAddress!,
           id: erc721TokenId!,
@@ -232,7 +205,13 @@ const SendPageComponent: FC<SendProps> = ({
       formikHelpers.setFieldError('address', t('invalidAddress')!);
     } else {
       try {
-        const decryptedWif = CryptoApi.decryptWif(encryptedWif, '');
+        if (!activeWallet) {
+          throw new Error('Wallet not found');
+        }
+        const decryptedWif = CryptoApi.decryptWif(
+          activeWallet.encryptedWif,
+          ''
+        );
 
         await send({ values, decryptedWif });
       } catch (error) {
@@ -242,7 +221,13 @@ const SendPageComponent: FC<SendProps> = ({
   };
 
   const onSubmit = async (values: FormValues, password: string) => {
-    const decryptedWif = CryptoApi.decryptWif(encryptedWif, password);
+    if (!activeWallet) {
+      throw new Error('Wallet not found');
+    }
+    const decryptedWif = CryptoApi.decryptWif(
+      activeWallet.encryptedWif,
+      password
+    );
 
     await send({ values, decryptedWif });
   };
@@ -255,20 +240,21 @@ const SendPageComponent: FC<SendProps> = ({
 
   const renderForm = () => (
     <>
-      <ConfirmSendModal
-        open={openModal}
-        trxValues={formik.values}
-        onClose={handleClose}
-        token={token}
-        onSubmit={onSubmit}
-      />
+      {token && (
+        <ConfirmSendModal
+          open={openModal}
+          trxValues={formik.values}
+          onClose={handleClose}
+          token={token}
+          onSubmit={onSubmit}
+        />
+      )}
       <form className={styles.form} onSubmit={formik.handleSubmit}>
         <div className={styles.fields}>
           {!isErc721Token && (
             <TextField
               variant='standard'
               label={t('amount')}
-              type='number'
               placeholder='00.000'
               name='amount'
               value={formik.values.amount}
@@ -332,7 +318,12 @@ const SendPageComponent: FC<SendProps> = ({
   const tokenSymbol = isNativeToken ? tokenAddress : token?.symbol;
   const formattedAmountString = formattedAmount?.toString();
 
-  if (loading || isAddTokenLoading) {
+  if (
+    isSendTxPending ||
+    isSendTokenTxPending ||
+    isSendErc721TokenTxPending ||
+    isAddTokenLoading
+  ) {
     return <FullScreenLoader />;
   }
 
@@ -362,7 +353,9 @@ const SendPageComponent: FC<SendProps> = ({
       <div className={styles.content}>
         <div className={styles.walletInfo}>
           <span className={styles.titleBalance}>{t('totalBalance')}</span>
-          <span className={styles.address}>{address}</span>
+          <span className={styles.address}>{`${activeWallet?.chainId} - ${
+            activeWallet?.address || '-'
+          }`}</span>
           <span className={styles.amount}>
             {isNativeToken && (
               <LogoIcon
@@ -382,4 +375,4 @@ const SendPageComponent: FC<SendProps> = ({
     </PageTemplate>
   );
 };
-export const SendPage = connector(SendPageComponent);
+export const SendPage = SendPageComponent;

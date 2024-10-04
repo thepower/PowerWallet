@@ -1,21 +1,15 @@
-import React from 'react';
-
-// import cn from 'classnames';
+import React, { FC } from 'react';
 import { Button, ButtonProps } from '@mui/material';
-
 import styles from './AddButton.module.scss';
 
 type AddButtonProps = ButtonProps;
 
-class AddButton extends React.PureComponent<AddButtonProps> {
-  render() {
-    const { children, ...props } = this.props;
-    return (
-      <Button {...props} size='small' classes={styles}>
-        {children}
-      </Button>
-    );
-  }
-}
+const AddButton: FC<AddButtonProps> = ({ children, ...props }) => {
+  return (
+    <Button {...props} size='small' classes={{ root: styles.root }}>
+      {children}
+    </Button>
+  );
+};
 
 export default AddButton;
