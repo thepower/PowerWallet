@@ -2,12 +2,12 @@ import { FC, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router';
 
 import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { objectToString, stringToObject } from 'sso/utils';
 
 const WalletSSOPageComponent: FC = () => {
   const { data } = useParams<{ data: string }>();
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
   const navigate = useNavigate();
   const parsedData: AppQueryParams = useMemo(() => {
     if (data) return stringToObject(data);

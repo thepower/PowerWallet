@@ -1,5 +1,4 @@
 import { useState, useEffect, FC } from 'react';
-import { useStore } from '@tanstack/react-store';
 import { AddressApi, CryptoApi, TransactionsApi } from '@thepowereco/tssdk';
 import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
 import cn from 'classnames';
@@ -10,8 +9,8 @@ import { useParams } from 'react-router';
 
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
 
-import { setSentData, store } from 'application/store';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useStore } from 'application/store';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { Button, FullScreenLoader, TxResult } from 'common';
 import CardTable from 'common/cardTable/CardTable';
 import CardTableKeyAccordion from 'common/cardTableKeyAccordion/CardTableKeyAccordion';
@@ -32,13 +31,13 @@ const txKindMap: { [key: number]: string } = Object.entries(
 const SignAndSendPageComponent: FC = () => {
   const { t } = useTranslation();
   const { message } = useParams<{ message: string }>();
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
   const { networkApi } = useNetworkApi({ chainId: activeWallet?.chainId });
 
   const { signAndSendTxMutation, isPending } = useSignAndSendTx({
     throwOnError: true
   });
-  const { sentData } = useStore(store);
+  const { sentData, setSentData } = useStore();
 
   const feeSettings = networkApi?.feeSettings;
   const gasSettings = networkApi?.gasSettings;

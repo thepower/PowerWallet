@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import appEnvs from 'appEnvs';
 import { SentData } from 'application/store';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { Button } from 'common';
 import { SuccessSvg } from './icons';
 import styles from './TxResult.module.scss';
@@ -16,7 +16,8 @@ type TxResultProps = {
 
 const TxResult: React.FC<TxResultProps> = ({ sentData, className }) => {
   const { t } = useTranslation();
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
   const txExplorerLink = `${appEnvs.EXPLORER_THEPOWER_URL}/${activeWallet?.chainId}/transaction/${sentData.txId}`;
 
   const onClickClose = () => {

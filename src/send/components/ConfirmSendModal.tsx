@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { TToken } from 'myAssets/types';
 import styles from './ConfirmSendModal.module.scss';
 import { FormValues } from './SendPage';
@@ -32,7 +32,7 @@ const ConfirmSendModal: React.FC<ConfirmSendModalProps> = ({
   onSubmit
 }) => {
   const { t } = useTranslation();
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
 
   const from = activeWallet?.address;
 

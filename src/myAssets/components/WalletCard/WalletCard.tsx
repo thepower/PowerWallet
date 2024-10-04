@@ -1,7 +1,7 @@
 import { FC, useMemo } from 'react';
 
 import { lighten } from '@mui/material/styles';
-import { useWallets, Wallet } from 'application/utils/localStorageUtils';
+import { useWalletsStore, Wallet } from 'application/utils/localStorageUtils';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
 import styles from './WalletCard.module.scss';
 
@@ -65,7 +65,7 @@ type WalletCardProps = {
 
 const WalletCard: FC<WalletCardProps> = ({ index, wallet }) => {
   const { walletData } = useWalletData(wallet);
-  const { activeWallet, setActiveWalletByAddress } = useWallets();
+  const { activeWallet, setActiveWalletByAddress } = useWalletsStore();
 
   const onClick = () => {
     setActiveWalletByAddress(wallet.address);

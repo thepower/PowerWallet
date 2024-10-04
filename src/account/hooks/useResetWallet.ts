@@ -2,14 +2,15 @@ import { useCallback } from 'react';
 import { CryptoApi } from '@thepowereco/tssdk';
 import { useNavigate } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { AddActionOnSuccessAndDecryptType } from 'typings/common';
 type Args = AddActionOnSuccessAndDecryptType<{
   password: string;
 }>;
 
 export const useResetWallet = () => {
-  const { activeWallet, removeWallet } = useWallets();
+  const { activeWallet, removeWallet } = useWalletsStore();
+
   const navigate = useNavigate();
   const resetWallet = useCallback(
     async ({
@@ -23,7 +24,7 @@ export const useResetWallet = () => {
         }
 
         CryptoApi.decryptWif(activeWallet.encryptedWif, password);
-        await removeWallet(activeWallet.address);
+        removeWallet(activeWallet.address);
         navigate(WalletRoutesEnum.root);
         additionalActionOnSuccess?.();
       } catch (e: any) {

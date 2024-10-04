@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import isArray from 'lodash/isArray';
 
 import { useTranslation } from 'react-i18next';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { Divider } from 'common';
 import { TransactionType } from 'myAssets/types';
 import {
@@ -29,7 +29,8 @@ type TransactionProps = OwnProps;
 
 const Transaction: React.FC<TransactionProps> = ({ trx }) => {
   const [expanded, setExpanded] = useState(false);
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
   const { t } = useTranslation();
   const handleClick = () => {
     setExpanded((prev) => !prev);

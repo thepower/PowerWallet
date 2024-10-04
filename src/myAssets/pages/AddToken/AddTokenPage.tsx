@@ -2,7 +2,10 @@ import React, { FC, useCallback, useState } from 'react';
 import { OutlinedInput } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-import { useTokens, useWallets } from 'application/utils/localStorageUtils';
+import {
+  useTokensStore,
+  useWalletsStore
+} from 'application/utils/localStorageUtils';
 import { Button, PageTemplate, Tabs } from 'common';
 import { Token } from 'myAssets/components/Token';
 import { useAddToken } from 'myAssets/hooks/useAddToken';
@@ -19,9 +22,9 @@ const AddTokenPageComponent: FC = () => {
   const [search, setSearch] = useState<string>('');
   const [address, setAddress] = useState<string>('');
   const [tab, setTab] = useState<AddTokensTabs>(AddTokensTabs.Erc20);
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
 
-  const { tokens, toggleTokenVisibility } = useTokens();
+  const { tokens, toggleTokenVisibility } = useTokensStore();
   const { addTokenMutation } = useAddToken({ throwOnError: false });
 
   const onChangeTab = (_event: React.SyntheticEvent, value: AddTokensTabs) => {

@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { AppQueryParams } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { LogoIcon } from 'assets/icons';
 import { Button, WizardComponentProps } from 'common';
 import { objectToString, stringToObject } from 'sso/utils';
@@ -12,7 +12,8 @@ type LoginToDappProps = WizardComponentProps;
 
 const LoginToDappComponent: React.FC<LoginToDappProps> = () => {
   const { t } = useTranslation();
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
   const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
 
   const parsedData: AppQueryParams = useMemo(() => {

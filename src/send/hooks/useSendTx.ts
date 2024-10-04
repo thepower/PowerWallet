@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { WalletApi } from '@thepowereco/tssdk';
 import { toast } from 'react-toastify';
-import { setSentData } from 'application/store';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useStore } from 'application/store';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { Maybe } from 'typings/common';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
@@ -19,7 +19,10 @@ export const useSendTx = ({
 }: {
   throwOnError?: boolean;
 }) => {
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
+  const { setSentData } = useStore();
+
   const { networkApi, isLoading: isNetworkApiFetching } = useNetworkApi({
     chainId: activeWallet?.chainId
   });

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { AddressApi } from '@thepowereco/tssdk';
 import abis from 'abis';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { TokenKind } from 'myAssets/types';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 
@@ -12,7 +12,7 @@ export const useTokenBalance = ({
   tokenAddress?: string;
   type?: TokenKind;
 }) => {
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
   const { networkApi } = useNetworkApi({ chainId: activeWallet?.chainId });
   const getTokenBalance = async () => {
     if (!tokenAddress) {

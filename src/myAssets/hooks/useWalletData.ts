@@ -1,12 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { WalletApi } from '@thepowereco/tssdk';
-import { useWallets, Wallet } from 'application/utils/localStorageUtils';
+import { Wallet } from 'application/utils/localStorageUtils';
 import { LoadBalanceType, TokenKind, TToken } from 'myAssets/types';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 
 export const useWalletData = (wallet: Wallet | null) => {
   const { networkApi } = useNetworkApi({ chainId: wallet?.chainId });
-  const { activeWallet } = useWallets();
 
   const getBalance = async (address: string | null | undefined) => {
     try {
@@ -48,7 +47,7 @@ export const useWalletData = (wallet: Wallet | null) => {
         decimals: '9',
         amount,
         isShow: true,
-        chainId: activeWallet?.chainId
+        chainId: wallet?.chainId
       }) as TToken
   );
 

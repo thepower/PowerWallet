@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useMediaQuery } from '@mui/material';
-import { useStore } from '@tanstack/react-store';
 import { NetworkEnum } from '@thepowereco/tssdk';
 import { useTranslation } from 'react-i18next';
 import { useNetworkChains } from 'application/hooks/useNetworkChains';
-import { setSelectedChain, setSelectedNetwork, store } from 'application/store';
+import { useStore } from 'application/store';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import { Button, IconButton, WizardComponentProps } from 'common';
 import ChainSelect from 'common/chainSelect/ChainSelect';
@@ -21,7 +20,12 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
   setNextStep
 }) => {
   const { t } = useTranslation();
-  const { selectedNetwork, isRandomChain } = useStore(store);
+  const {
+    selectedNetwork,
+    isRandomChain,
+    setSelectedNetwork,
+    setSelectedChain
+  } = useStore();
   const {
     scrollContainerRef,
     scrollToElementByIndex,

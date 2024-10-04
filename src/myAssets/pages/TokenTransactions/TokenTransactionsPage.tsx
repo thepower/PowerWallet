@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next';
 
 import { InView } from 'react-intersection-observer';
 import { useParams } from 'react-router-dom';
-import { useTokens, useWallets } from 'application/utils/localStorageUtils';
+import {
+  useTokensStore,
+  useWalletsStore
+} from 'application/utils/localStorageUtils';
 import { PageTemplate, FullScreenLoader } from 'common';
 
 import Transaction from 'myAssets/components/Transaction';
@@ -22,10 +25,11 @@ const TokenTransactionsPageComponent: React.FC = () => {
     id: string;
   }>();
 
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
   const { walletData } = useWalletData(activeWallet);
 
-  const { getTokenByAddress } = useTokens();
+  const { getTokenByAddress } = useTokensStore();
 
   const token = useMemo(
     () => getTokenByAddress(address!),

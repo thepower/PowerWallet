@@ -2,9 +2,12 @@ import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import appEnvs from 'appEnvs';
-import { setIsShowUnderConstruction } from 'application/store';
+import { useStore } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useTokens, useWallets } from 'application/utils/localStorageUtils';
+import {
+  useTokensStore,
+  useWalletsStore
+} from 'application/utils/localStorageUtils';
 import { BuySvg, FaucetSvg, LogoIcon, SendSvg } from 'assets/icons';
 import { Button, CardLink, CopyButton, PageTemplate, Tabs } from 'common';
 import WalletCard from 'myAssets/components/WalletCard/WalletCard';
@@ -16,16 +19,18 @@ import { Token } from '../../components/Token';
 
 const MainPageComponent: FC = () => {
   const { t } = useTranslation();
+  const { setIsShowUnderConstruction } = useStore();
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
-  const { activeWallet, wallets } = useWallets();
+  const { activeWallet, wallets } = useWalletsStore();
 
   const chainId = activeWallet?.chainId;
 
   const { walletData, nativeTokens } = useWalletData(activeWallet);
 
-  const { tokens } = useTokens();
+  const { tokens } = useTokensStore();
 
   useEffect(() => {
     // updateTokensAmountsTrigger();

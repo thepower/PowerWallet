@@ -3,8 +3,8 @@ import { AddressApi, TransactionsApi, WalletApi } from '@thepowereco/tssdk';
 import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
 import { toast } from 'react-toastify';
 
-import { setSentData } from 'application/store';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useStore } from 'application/store';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { LoadBalanceType } from 'myAssets/types';
 import { TxBody, TxPurpose } from 'sign-and-send/typing';
@@ -23,7 +23,9 @@ export const useSignAndSendTx = ({
 }: {
   throwOnError?: boolean;
 }) => {
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
+  const { setSentData } = useStore();
   const { networkApi, isLoading: isNetworkApiFetching } = useNetworkApi({
     chainId: activeWallet?.chainId
   });

@@ -3,7 +3,7 @@ import cn from 'classnames';
 
 import { Link } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { LogoIcon } from 'assets/icons';
 import { Checkbox, Divider, Switch } from 'common';
 import { useTokenBalance } from 'myAssets/hooks/useTokenBalance';
@@ -29,7 +29,7 @@ const TokenComponent: FC<TokenProps> = ({
   onClickCheckBox
 }) => {
   const { type, address } = token;
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
 
   const { tokenBalance } = useTokenBalance({
     tokenAddress: address,

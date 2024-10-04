@@ -1,14 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { useStore } from '@tanstack/react-store';
 import { CryptoApi, WalletApi } from '@thepowereco/tssdk';
 import fileSaver from 'file-saver';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { store } from 'application/store';
+import { useStore } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import {
   AddActionOnSuccessType,
@@ -24,8 +23,9 @@ type Args = AddActionOnDecryptErrorType<
 >;
 
 export const useExportAccount = () => {
-  const { activeWallet } = useWallets();
-  const { selectedChain } = useStore(store);
+  const { activeWallet } = useWalletsStore();
+
+  const { selectedChain } = useStore();
   const navigate = useNavigate();
 
   const exportAccount = async ({

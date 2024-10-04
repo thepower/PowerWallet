@@ -1,7 +1,7 @@
 import React, { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { CopyButton, PageTemplate, Tabs } from 'common';
 import {
   ReferralProgramTabs,
@@ -13,7 +13,8 @@ const ReferralProgramPageComponent: FC = () => {
   const { t } = useTranslation();
 
   const [tab, setTab] = useState(ReferralProgramTabs.referralLink);
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
   const onChangeTab = (
     _event: React.SyntheticEvent,
     value: ReferralProgramTabs

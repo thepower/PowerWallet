@@ -3,7 +3,7 @@ import { WalletApi } from '@thepowereco/tssdk';
 import { format } from 'date-fns';
 import { groupBy } from 'lodash';
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { TransactionType } from 'myAssets/types';
 
 export function useTransactionsHistory({
@@ -15,7 +15,8 @@ export function useTransactionsHistory({
   tokenAddress?: string;
   perPage?: number;
 }) {
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
   const { networkApi } = useNetworkApi({ chainId: activeWallet?.chainId });
 
   async function fetchTransactionsHistory({

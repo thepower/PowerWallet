@@ -1,24 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { useStore } from '@tanstack/react-store';
 import { CryptoApi, RegisteredAccount, WalletApi } from '@thepowereco/tssdk';
 import { toast } from 'react-toastify';
-import {
-  setBackupStep,
-  setSeedPhrase,
-  setSelectedChain,
-  store
-} from 'application/store';
-import { useWallets } from 'application/utils/localStorageUtils';
+
+import { useStore } from 'application/store';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { BackupAccountStepsEnum } from 'registration/typings/registrationTypes';
 import { AddActionOnSuccessType } from 'typings/common';
-
-export function generateSeedPhrase() {
-  const phrase: string = CryptoApi.generateSeedPhrase();
-
-  setSeedPhrase(phrase);
-}
 
 type Args = AddActionOnSuccessType<{
   password: string;
@@ -33,8 +22,14 @@ type ReturnParams = {
 };
 
 export const useCreateWallet = () => {
-  const { isRandomChain, selectedNetwork, selectedChain } = useStore(store);
-  const { addWallet } = useWallets();
+  const {
+    isRandomChain,
+    selectedNetwork,
+    selectedChain,
+    setSelectedChain,
+    setBackupStep
+  } = useStore();
+  const { addWallet } = useWalletsStore();
 
   const { mutate: createWalletMutation, isPending } = useMutation<
     ReturnParams | undefined,
@@ -71,9 +66,9 @@ export const useCreateWallet = () => {
       };
     },
 
-    onSuccess: async (params) => {
+    onSuccess: (params) => {
       if (params) {
-        await addWallet({
+        addWallet({
           chainId: params.chainId,
           address: params.address,
           encryptedWif: params.encryptedWif

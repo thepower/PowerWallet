@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import appEnvs from 'appEnvs';
 import { useInitApp } from 'application/hooks';
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { FullScreenLoader } from 'common';
 import { AddTokenPage } from 'myAssets/pages/AddToken/AddTokenPage';
 import { MainPage } from 'myAssets/pages/Main/MainPage';
@@ -20,8 +20,7 @@ import { WalletSSOPage } from 'sso/components/pages/WalletSSOPage';
 import { WalletRoutesEnum } from '../typings/routes';
 
 const AppRoutesComponent: React.FC = () => {
-  const { activeWallet } = useWallets();
-
+  const { activeWallet } = useWalletsStore();
   const { isLoading } = useNetworkApi({
     chainId: activeWallet?.chainId || appEnvs.DEFAULT_CHAIN_ID
   });

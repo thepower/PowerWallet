@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { Drawer, IconButton } from '@mui/material';
-import { useStore } from '@tanstack/react-store';
 import cn from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -9,9 +8,9 @@ import {
   useImportWalletFromFile,
   useResetWallet
 } from 'account/hooks';
-import { setIsAccountMenuOpened, store } from 'application/store';
+import { useStore } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import {
   SupportIcon,
   CreateIcon,
@@ -44,8 +43,8 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   const { exportAccountMutation } = useExportAccount();
   const { importWalletFromFileMutation } = useImportWalletFromFile();
   const { resetWallet } = useResetWallet();
-  const { isAccountMenuOpened } = useStore(store);
-  const { activeWallet } = useWallets();
+  const { isAccountMenuOpened, setIsAccountMenuOpened } = useStore();
+  const { activeWallet } = useWalletsStore();
 
   // const handleReferralProgram = () => {
   //   routeTo(WalletRoutesEnum.referralProgram);

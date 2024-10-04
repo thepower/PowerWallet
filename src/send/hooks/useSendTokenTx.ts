@@ -3,8 +3,8 @@ import { AddressApi, EvmContract } from '@thepowereco/tssdk';
 import { toast } from 'react-toastify';
 import abis from 'abis';
 
-import { setSentData } from 'application/store';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useStore } from 'application/store';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 
@@ -21,7 +21,9 @@ export const useSendTokenTx = ({
 }: {
   throwOnError?: boolean;
 }) => {
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+  const { setSentData } = useStore();
+
   const { networkApi, isLoading: isNetworkApiFetching } = useNetworkApi({
     chainId: activeWallet?.chainId
   });

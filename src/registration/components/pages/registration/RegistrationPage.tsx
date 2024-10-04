@@ -1,19 +1,12 @@
-import React, { FC, useCallback, useEffect, useMemo } from 'react';
+import { FC, useCallback, useEffect, useMemo } from 'react';
 import { FormControlLabel } from '@mui/material';
-import { useStore } from '@tanstack/react-store';
 import { AddressApi } from '@thepowereco/tssdk';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import {
-  setCreatingStep,
-  setIsRandomChain,
-  setIsWithoutPassword,
-  setSelectedChain,
-  setSelectedNetwork,
-  store
-} from 'application/store';
+
+import { useStore } from 'application/store';
 import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { BreadcrumbsTypeEnum, Checkbox, LangMenu, Wizard } from 'common';
 
 import { stringToObject } from 'sso/utils';
@@ -34,9 +27,18 @@ const RegistrationPageComponent: FC = () => {
     () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
     [dataOrReferrer]
   );
-  const { activeWallet } = useWallets();
-  const { isRandomChain, creatingStep, backupStep, isWithoutPassword } =
-    useStore(store);
+  const { activeWallet } = useWalletsStore();
+  const {
+    isRandomChain,
+    creatingStep,
+    backupStep,
+    isWithoutPassword,
+    setCreatingStep,
+    setIsRandomChain,
+    setSelectedChain,
+    setIsWithoutPassword,
+    setSelectedNetwork
+  } = useStore();
   const parsedData: AppQueryParams = useMemo(() => {
     if (!isAddressInParams && dataOrReferrer)
       return stringToObject(dataOrReferrer);

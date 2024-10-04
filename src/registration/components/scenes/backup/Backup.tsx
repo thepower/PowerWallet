@@ -1,13 +1,12 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormControlLabel } from '@mui/material';
-import { useStore } from '@tanstack/react-store';
-import { AddressApi } from '@thepowereco/tssdk';
+import { AddressApi, CryptoApi } from '@thepowereco/tssdk';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useExportAccount } from 'account/hooks';
-import { setBackupStep, store } from 'application/store';
+import { useStore } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import {
   Button,
   Checkbox,
@@ -15,10 +14,7 @@ import {
   OutlinedInput,
   WizardComponentProps
 } from 'common';
-import {
-  generateSeedPhrase,
-  useCreateWallet
-} from 'registration/hooks/useCreateWallet';
+import { useCreateWallet } from 'registration/hooks/useCreateWallet';
 import { BackupAccountStepsEnum } from 'registration/typings/registrationTypes';
 import { compareTwoStrings } from 'registration/utils/registrationUtils';
 import styles from './Backup.module.scss';
@@ -33,10 +29,17 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
 
   const [isSeedPhraseSaved, setIsSeedPhraseSaved] = useState(false);
   const navigate = useNavigate();
-  const { selectedChain, seedPhrase, backupStep, isWithoutPassword } =
-    useStore(store);
+  const {
+    selectedChain,
+    seedPhrase,
+    backupStep,
+    isWithoutPassword,
+    setBackupStep,
+    setSeedPhrase
+  } = useStore();
   const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
   const { exportAccountMutation } = useExportAccount();
   const { createWalletMutation, isLoading: isWalletCreating } =
     useCreateWallet();
@@ -47,7 +50,9 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
 
   useEffect(() => {
     if (!seedPhrase) {
-      generateSeedPhrase();
+      const phrase: string = CryptoApi.generateSeedPhrase();
+
+      setSeedPhrase(phrase);
     }
   }, [seedPhrase]);
 
@@ -71,6 +76,7 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
     }
   }, [
     backupStep,
+    setBackupStep,
     password,
     confirmedPassword,
     isWithoutPassword,
@@ -94,9 +100,9 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
     return null;
   }, [seedPhrase]);
 
-  const onClickCheckbox = () => {
+  const onClickCheckbox = useCallback(() => {
     setIsSeedPhraseSaved(!isSeedPhraseSaved);
-  };
+  }, [isSeedPhraseSaved]);
 
   const renderCheckBox = useCallback(
     () => (

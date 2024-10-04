@@ -1,9 +1,10 @@
 import { useMatch, useNavigate } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 
 export const useInitApp = () => {
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
   const isSignupPage = useMatch(`${WalletRoutesEnum.signup}/:dataOrReferrer?`);
   const isSSOPage = useMatch(`${WalletRoutesEnum.sso}/:data?`);
 

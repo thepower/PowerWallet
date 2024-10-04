@@ -1,5 +1,5 @@
-import { Store } from '@tanstack/react-store';
 import { NetworkEnum } from '@thepowereco/tssdk';
+import { create } from 'zustand';
 import {
   BackupAccountStepsEnum,
   CreateAccountStepsEnum
@@ -28,9 +28,21 @@ interface State {
   isShowUnderConstruction: boolean;
 
   sentData: Maybe<SentData>;
+
+  setSelectedNetwork: (network: Maybe<NetworkEnum>) => void;
+  setSelectedChain: (chainId: Maybe<number>) => void;
+  setSeedPhrase: (seedPhrase: string) => void;
+  setCreatingStep: (step: CreateAccountStepsEnum) => void;
+  setBackupStep: (step: BackupAccountStepsEnum) => void;
+  setIsRandomChain: (isRandomChain: boolean) => void;
+  setIsWithoutPassword: (isWithoutPassword: boolean) => void;
+  setIsAccountMenuOpened: (isAccountMenuOpened: boolean) => void;
+  setIsShowUnderConstruction: (isShowUnderConstruction: boolean) => void;
+  setSentData: (sentData: Maybe<SentData>) => void;
+  resetStore: () => void;
 }
 
-const initialState: State = {
+export const useStore = create<State>((set) => ({
   selectedNetwork: null,
   selectedChain: null,
   seedPhrase: null,
@@ -42,83 +54,49 @@ const initialState: State = {
   isAccountMenuOpened: false,
   isShowUnderConstruction: false,
 
-  sentData: null
-};
+  sentData: null,
 
-export const store = new Store<State>(initialState);
+  setSelectedNetwork: (network: Maybe<NetworkEnum>) =>
+    set((state) => ({ ...state, selectedNetwork: network })),
 
-export const { setState } = store;
+  setSelectedChain: (chainId: Maybe<number>) =>
+    set((state) => ({ ...state, selectedChain: chainId })),
 
-export const setSelectedNetwork = (network: Maybe<NetworkEnum>) => {
-  setState((prevState) => ({
-    ...prevState,
-    selectedNetwork: network
-  }));
-};
+  setSeedPhrase: (seedPhrase: string) =>
+    set((state) => ({ ...state, seedPhrase })),
 
-export const setSelectedChain = (chainId: Maybe<number>) => {
-  setState((prevState) => ({
-    ...prevState,
-    selectedChain: chainId
-  }));
-};
+  setCreatingStep: (step: CreateAccountStepsEnum) =>
+    set((state) => ({ ...state, creatingStep: step })),
 
-export const setSeedPhrase = (seedPhrase: string) => {
-  setState((prevState) => ({
-    ...prevState,
-    seedPhrase: seedPhrase
-  }));
-};
+  setBackupStep: (step: BackupAccountStepsEnum) =>
+    set((state) => ({ ...state, backupStep: step })),
 
-export const setCreatingStep = (step: CreateAccountStepsEnum) => {
-  setState((prevState) => ({
-    ...prevState,
-    creatingStep: step
-  }));
-};
+  setIsRandomChain: (isRandomChain: boolean) =>
+    set((state) => ({ ...state, isRandomChain })),
 
-export const setBackupStep = (step: BackupAccountStepsEnum) => {
-  setState((prevState) => ({
-    ...prevState,
-    backupStep: step
-  }));
-};
+  setIsWithoutPassword: (isWithoutPassword: boolean) =>
+    set((state) => ({ ...state, isWithoutPassword })),
 
-export const setIsRandomChain = (isRandomChain: boolean) => {
-  setState((prevState) => ({
-    ...prevState,
-    isRandomChain
-  }));
-};
+  setIsAccountMenuOpened: (isAccountMenuOpened: boolean) =>
+    set((state) => ({ ...state, isAccountMenuOpened })),
 
-export const setIsWithoutPassword = (isWithoutPassword: boolean) => {
-  setState((prevState) => ({
-    ...prevState,
-    isWithoutPassword
-  }));
-};
+  setIsShowUnderConstruction: (isShowUnderConstruction: boolean) =>
+    set((state) => ({ ...state, isShowUnderConstruction })),
 
-export const setIsAccountMenuOpened = (isAccountMenuOpened: boolean) => {
-  setState((prevState) => ({
-    ...prevState,
-    isAccountMenuOpened
-  }));
-};
+  setSentData: (sentData: Maybe<SentData>) =>
+    set((state) => ({ ...state, sentData })),
 
-export const setIsShowUnderConstruction = (
-  isShowUnderConstruction: boolean
-) => {
-  setState((prevState) => ({
-    ...prevState,
-    isShowUnderConstruction
-  }));
-};
-
-export const setSentData = (sentData: Maybe<SentData>) => {
-  setState((prevState) => ({
-    ...prevState,
-    sentData
-  }));
-};
-
-export const resetStore = () => setState(() => initialState);
+  resetStore: () =>
+    set(() => ({
+      selectedNetwork: null,
+      selectedChain: null,
+      seedPhrase: null,
+      creatingStep: CreateAccountStepsEnum.selectNetwork,
+      backupStep: BackupAccountStepsEnum.generateSeedPhrase,
+      isWithoutPassword: false,
+      isRandomChain: true,
+      isAccountMenuOpened: false,
+      isShowUnderConstruction: false,
+      sentData: null
+    }))
+}));

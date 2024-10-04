@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { GetChainResultType } from 'account/typings/accountTypings';
 import appEnvs from 'appEnvs';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 
@@ -27,7 +27,7 @@ export const useAccountLoginToWallet = ({
   const { networkApi } = useNetworkApi({
     chainId: appEnvs.DEFAULT_CHAIN_ID
   });
-  const { addWallet } = useWallets();
+  const { addWallet } = useWalletsStore();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const loginToWallet = async ({ address, encryptedWif }: Args) => {
@@ -55,9 +55,9 @@ export const useAccountLoginToWallet = ({
     Args
   >({
     mutationFn: loginToWallet,
-    onSuccess: async (params) => {
+    onSuccess: (params) => {
       if (params) {
-        await addWallet({
+        addWallet({
           chainId: params.chainId,
           address: params.address,
           encryptedWif: params.encryptedWif

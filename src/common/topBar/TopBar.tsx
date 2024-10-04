@@ -1,11 +1,7 @@
 import React, { useCallback } from 'react';
-import { useStore } from '@tanstack/react-store';
 import cn from 'classnames';
-import {
-  setIsAccountMenuOpened,
-  setIsShowUnderConstruction,
-  store
-} from 'application/store';
+
+import { useStore } from 'application/store';
 import { BellIcon, MenuIcon } from 'assets/icons';
 import i18n from 'locales/initTranslation';
 import styles from './TopBar.module.scss';
@@ -26,7 +22,11 @@ const TopBar: React.FC<TopBarProps> = ({
   backUrlText = i18n.t('back')!,
   className
 }) => {
-  const { isAccountMenuOpened } = useStore(store);
+  const {
+    isAccountMenuOpened,
+    setIsShowUnderConstruction,
+    setIsAccountMenuOpened
+  } = useStore();
   const handleShowUnderConstruction = useCallback(() => {
     setIsShowUnderConstruction(true);
   }, []);

@@ -1,15 +1,17 @@
 import React, { FC, useCallback, useEffect, useMemo } from 'react';
 import { InputAdornment, TextField } from '@mui/material';
-import { useStore } from '@tanstack/react-store';
 import { AddressApi, CryptoApi } from '@thepowereco/tssdk';
 import cn from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as yup from 'yup';
-import { setSentData, store } from 'application/store';
+import { useStore } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useTokens, useWallets } from 'application/utils/localStorageUtils';
+import {
+  useTokensStore,
+  useWalletsStore
+} from 'application/utils/localStorageUtils';
 import { LogoIcon, MoneyBugIcon } from 'assets/icons';
 import { Button, PageTemplate, Divider, FullScreenLoader } from 'common';
 import TxResult from 'common/txResult/TxResult';
@@ -41,8 +43,9 @@ const InputLabelProps = {
 
 const SendPageComponent: FC = () => {
   const { t } = useTranslation();
-  const { activeWallet } = useWallets();
-  const { sentData } = useStore(store);
+  const { activeWallet } = useWalletsStore();
+
+  const { sentData, setSentData } = useStore();
   const [openModal, setOpenModal] = React.useState(false);
   const {
     type: tokenType,
@@ -65,7 +68,7 @@ const SendPageComponent: FC = () => {
       throwOnError: false
     });
 
-  const { getTokenByAddress } = useTokens();
+  const { getTokenByAddress } = useTokensStore();
 
   const { addTokenMutation, isPending: isAddTokenLoading } = useAddToken({
     throwOnError: false

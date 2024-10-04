@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { CryptoApi } from '@thepowereco/tssdk';
 import { Form, Formik, FormikHelpers } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import styles from './ConfirmModal.module.scss';
 import { Button, Modal, OutlinedInput } from '..';
 
@@ -22,7 +22,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   open,
   callback
 }) => {
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
   const { t } = useTranslation();
   const handleSubmit = useCallback(
     async (values: Values, formikHelpers: FormikHelpers<Values>) => {

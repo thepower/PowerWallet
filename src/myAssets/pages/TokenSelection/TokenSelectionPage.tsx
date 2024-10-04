@@ -4,7 +4,10 @@ import range from 'lodash/range';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useTokens, useWallets } from 'application/utils/localStorageUtils';
+import {
+  useTokensStore,
+  useWalletsStore
+} from 'application/utils/localStorageUtils';
 import { Button, Divider, PageTemplate, Tabs } from 'common';
 import { Erc721Token } from 'myAssets/components/Erc721Token';
 import { Token } from 'myAssets/components/Token';
@@ -20,7 +23,8 @@ const TokenSelectionPageComponent: React.FC = () => {
   const { t } = useTranslation();
   const { address: collectionAddress } = useParams<{ address: string }>();
 
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
   const { nativeTokens, getNativeTokenAmountBySymbol } =
     useWalletData(activeWallet);
 
@@ -28,7 +32,7 @@ const TokenSelectionPageComponent: React.FC = () => {
     { tokenAddress: collectionAddress, enabled: !!collectionAddress }
   );
 
-  const { tokens, getTokenByAddress } = useTokens();
+  const { tokens, getTokenByAddress } = useTokensStore();
 
   const collection = useMemo(() => {
     if (collectionAddress) {

@@ -5,7 +5,10 @@ import { toast } from 'react-toastify';
 import abis from 'abis';
 
 import { WalletRoutesEnum } from 'application/typings/routes';
-import { useTokens, useWallets } from 'application/utils/localStorageUtils';
+import {
+  useTokensStore,
+  useWalletsStore
+} from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { TokenKind } from 'myAssets/types';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
@@ -13,12 +16,13 @@ import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 type Args = { address: string; withoutRedirect?: boolean };
 
 export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
   const { networkApi, isLoading: isNetworkApiFetching } = useNetworkApi({
     chainId: activeWallet?.chainId
   });
   const navigate = useNavigate();
-  const { addToken, tokens } = useTokens();
+  const { addToken, tokens } = useTokensStore();
   const getIsErc721 = async (network: NetworkApi, address: string) => {
     try {
       const isErc721: boolean = await network.executeCall(

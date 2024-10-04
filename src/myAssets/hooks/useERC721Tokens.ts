@@ -3,7 +3,7 @@ import { AddressApi } from '@thepowereco/tssdk';
 import axios, { AxiosResponse } from 'axios';
 import range from 'lodash/range';
 import abis from 'abis';
-import { useWallets } from 'application/utils/localStorageUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 
 async function getMetaData(uri: string) {
@@ -27,7 +27,8 @@ export const useERC721Tokens = ({
   tokenAddress?: string;
   enabled?: boolean;
 }) => {
-  const { activeWallet } = useWallets();
+  const { activeWallet } = useWalletsStore();
+
   const { networkApi } = useNetworkApi({ chainId: activeWallet?.chainId });
 
   const getErc721Token = async (id: number) => {
