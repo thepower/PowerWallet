@@ -105,6 +105,10 @@ export const useSignAndSendTx = ({
 
       newDecodedTxBody.s = newSequence;
 
+      newDecodedTxBody.f = Buffer.from(
+        AddressApi.parseTextAddress(activeWallet.address)
+      );
+
       const response = await networkApi.sendTxAndWaitForResponse(
         packAndSignTX(newDecodedTxBody, wif)
       );

@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, useEffect, FC, useMemo } from 'react';
 import { AddressApi, CryptoApi, TransactionsApi } from '@thepowereco/tssdk';
 import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
 import cn from 'classnames';
@@ -7,6 +7,7 @@ import isObject from 'lodash/isObject';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
+import { toast } from 'react-toastify';
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
 
 import { useStore } from 'application/store';
@@ -31,7 +32,7 @@ const txKindMap: { [key: number]: string } = Object.entries(
 const SignAndSendPageComponent: FC = () => {
   const { t } = useTranslation();
   const { message } = useParams<{ message: string }>();
-  const { activeWallet } = useWalletsStore();
+  const { activeWallet, wallets, setActiveWalletByAddress } = useWalletsStore();
   const { networkApi } = useNetworkApi({ chainId: activeWallet?.chainId });
 
   const { signAndSendTxMutation, isPending } = useSignAndSendTx({
@@ -46,17 +47,57 @@ const SignAndSendPageComponent: FC = () => {
   const [returnURL, setReturnURL] = useState<string | undefined>();
   const [decodedTxBody, setDecodedTxBody] = useState<TxBody | undefined>();
 
+  const decodedMessage = useMemo<{
+    sponsor: string;
+    returnUrl: string;
+    body: TxBody;
+  }>(() => {
+    try {
+      return message ? stringToObject(message) : null;
+    } catch (error) {
+      return null;
+    }
+  }, [message]);
+
+  const fromAddress = useMemo(() => {
+    try {
+      return AddressApi.encodeAddress(decodedMessage.body.f)?.txt;
+    } catch (error) {
+      return;
+    }
+  }, [decodedMessage?.body?.f]);
+
+  const isWalletExists = useMemo<boolean>(() => {
+    return wallets.some((wallet) => wallet.address === fromAddress);
+  }, [fromAddress, wallets]);
+
+  const isCurrentActiveWallet = useMemo<boolean>(() => {
+    return activeWallet?.address === fromAddress;
+  }, [activeWallet?.address, fromAddress]);
+
+  useEffect(() => {
+    if (isWalletExists && !isCurrentActiveWallet) {
+      fromAddress && setActiveWalletByAddress(fromAddress);
+    } else if (!isWalletExists) {
+      toast.error('Wallet not found');
+    }
+  }, [
+    fromAddress,
+    isCurrentActiveWallet,
+    isWalletExists,
+    setActiveWalletByAddress
+  ]);
+
   useEffect(() => {
     try {
-      if (!message) {
+      if (!decodedMessage) {
         throw new Error('Message not found');
       }
       if (!activeWallet) {
         throw new Error('Wallet not found');
       }
 
-      const decodedMessage = stringToObject(message);
-      let txBody: TxBody = decodedMessage?.body;
+      let txBody = decodedMessage?.body;
       setReturnURL(decodedMessage?.returnUrl);
       const sponsor = decodedMessage?.sponsor;
 
@@ -69,7 +110,6 @@ const SignAndSendPageComponent: FC = () => {
         txBody.e = {};
       }
 
-      txBody.f = Buffer.from(AddressApi.parseTextAddress(activeWallet.address));
       txBody.t = BigInt(Date.now());
 
       if (sponsor) {
@@ -99,9 +139,9 @@ const SignAndSendPageComponent: FC = () => {
         setDecodedTxBody(txBody);
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
-  }, [message, activeWallet, gasSettings, feeSettings]);
+  }, [message, activeWallet, gasSettings, feeSettings, decodedMessage]);
 
   useEffect(() => {
     return () => {
@@ -259,6 +299,7 @@ const SignAndSendPageComponent: FC = () => {
             onClick={handleClickSignAndSend}
             fullWidth
             variant='contained'
+            disabled={!isWalletExists || !isCurrentActiveWallet}
           >
             {t('signAndSend')}
           </Button>

@@ -161,9 +161,7 @@ export const useWalletsStore = create<WalletStore>()(
           );
           return {
             wallets: updatedWallets,
-            activeWallet:
-              updatedWallets.find((wallet) => wallet.address === address) ||
-              null
+            activeWallet: updatedWallets.length > 0 ? updatedWallets[0] : null
           };
         });
       },

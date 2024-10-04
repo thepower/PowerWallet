@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { FileReaderType, getFileData } from 'common';
 import i18n from 'locales/initTranslation';
-import { AddActionOnDecryptErrorType } from 'typings/common';
+import { AddActionOnSuccessAndDecryptType } from 'typings/common';
 import { useAccountLoginToWallet } from './useAccountLoginToWallet';
 
 type Args = {
@@ -22,11 +22,15 @@ export const useImportWalletFromFile = () => {
   const { mutate: importWalletFromFileMutation, isPending } = useMutation<
     void,
     Error,
-    AddActionOnDecryptErrorType<Args>
+    AddActionOnSuccessAndDecryptType<
+      Args,
+      { address?: string; chainId?: number }
+    >
   >({
     mutationFn: async ({
       accountFile,
       password,
+      additionalActionOnSuccess,
       additionalActionOnDecryptError
     }) => {
       try {
@@ -34,7 +38,16 @@ export const useImportWalletFromFile = () => {
         const walletData = WalletApi.parseExportData(data!, password);
         const encryptedWif = CryptoApi.encryptWif(walletData.wif!, password);
 
-        await loginMutation({ address: walletData.address, encryptedWif });
+        const loginResult = await loginMutation({
+          address: walletData.address,
+          encryptedWif
+        });
+
+        additionalActionOnSuccess?.({
+          address: walletData.address,
+          chainId: loginResult?.chainId
+        });
+
         navigate(WalletRoutesEnum.root);
       } catch (e: any) {
         if (

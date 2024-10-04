@@ -13,6 +13,7 @@ interface RegistrationCardProps {
   buttonLabel: string;
   isWithBorder?: boolean;
   disabled?: boolean;
+  loading?: boolean;
   onSelect?: () => void;
 }
 
@@ -24,6 +25,7 @@ const RegistrationCardComponent: FC<RegistrationCardProps> = ({
   buttonVariant,
   isWithBorder,
   disabled,
+  loading,
   buttonLabel,
   onSelect,
   ...props
@@ -58,6 +60,7 @@ const RegistrationCardComponent: FC<RegistrationCardProps> = ({
         variant={buttonVariant}
         size='large'
         onClick={onSelect}
+        loading={loading}
       >
         {buttonLabel}
       </Button>

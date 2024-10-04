@@ -3,15 +3,16 @@ import React, {
   FC,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState
 } from 'react';
 import { FormControlLabel, useMediaQuery } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useImportWalletFromFile } from 'account/hooks';
-// import { importAccountFromFile } from 'account/slice/accountSlice';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import {
   Button,
@@ -25,6 +26,7 @@ import hooks from 'hooks';
 import { RegistrationCard } from 'registration/components/common/registrationCard/RegistrationCard';
 import { useRegistrationLoginToWallet } from 'registration/hooks/useRegistrationLoginToWallet';
 import { compareTwoStrings } from 'registration/utils/registrationUtils';
+import { stringToObject, objectToString } from 'sso/utils';
 import { Maybe } from 'typings/common';
 import styles from './LoginPage.module.scss';
 import { ImportAccountModal } from '../../modals/ImportAccountModal';
@@ -32,6 +34,13 @@ import registrationStyles from '../registration/RegistrationPage.module.scss';
 
 const LoginPageComponent: FC = ({}) => {
   const { t } = useTranslation();
+
+  const { data } = useParams<{ data?: string }>();
+  const navigate = useNavigate();
+  const parsedData: AppQueryParams = useMemo(() => {
+    if (data) return stringToObject(data);
+    return null;
+  }, [data]);
 
   const [openedPasswordModal, setOpenedPasswordModal] = useState(false);
   const [accountFile, setAccountFile] = useState<Maybe<File>>(null);
@@ -55,7 +64,8 @@ const LoginPageComponent: FC = ({}) => {
     scrollToPrevious
   } = hooks.useSmoothHorizontalScroll();
 
-  const { importWalletFromFileMutation } = useImportWalletFromFile();
+  const { importWalletFromFileMutation, isLoading: isImportWalletLoading } =
+    useImportWalletFromFile();
 
   const resetStage = () => {
     setAccountFile(null);
@@ -72,7 +82,7 @@ const LoginPageComponent: FC = ({}) => {
 
   useEffect(() => {
     if (isMobile) {
-      scrollToElementByIndex(0);
+      scrollToElementByIndex(1);
     }
   }, []);
 
@@ -89,6 +99,23 @@ const LoginPageComponent: FC = ({}) => {
       importWalletFromFileMutation({
         password: '',
         accountFile: accountFile!,
+        additionalActionOnSuccess: (result) => {
+          if (parsedData?.callbackUrl) {
+            if (parsedData?.chainID === result?.chainId) {
+              const stringData = objectToString({
+                address: result?.address,
+                returnUrl: parsedData?.returnUrl
+              });
+
+              window.location.replace(
+                `${parsedData.callbackUrl}sso/${stringData}`
+              );
+            } else {
+              toast.error(t('wrongChainLogin'));
+              navigate(`${WalletRoutesEnum.login}/${data}`);
+            }
+          }
+        },
         additionalActionOnDecryptError: () => {
           if (accountFile) {
             setAccountFile(accountFile);
@@ -97,7 +124,15 @@ const LoginPageComponent: FC = ({}) => {
         }
       });
     },
-    [importWalletFromFileMutation]
+    [
+      data,
+      importWalletFromFileMutation,
+      navigate,
+      parsedData?.callbackUrl,
+      parsedData?.chainID,
+      parsedData?.returnUrl,
+      t
+    ]
   );
   const closePasswordModal = () => {
     setOpenedPasswordModal(false);
@@ -158,7 +193,24 @@ const LoginPageComponent: FC = ({}) => {
   const handleImportAccount = (password: string) => {
     importWalletFromFileMutation({
       password,
-      accountFile: accountFile!
+      accountFile: accountFile!,
+      additionalActionOnSuccess: (result) => {
+        if (parsedData?.callbackUrl) {
+          if (parsedData?.chainID === result?.chainId) {
+            const stringData = objectToString({
+              address: result?.address,
+              returnUrl: parsedData?.returnUrl
+            });
+
+            window.location.replace(
+              `${parsedData.callbackUrl}sso/${stringData}`
+            );
+          } else {
+            toast.error(t('wrongChainLogin'));
+            navigate(`${WalletRoutesEnum.login}/${data}`);
+          }
+        }
+      }
     });
 
     closePasswordModal();
@@ -269,6 +321,7 @@ const LoginPageComponent: FC = ({}) => {
             buttonVariant='contained'
             buttonLabel={t('selectFile')}
             isWithBorder
+            loading={isImportWalletLoading}
             onSelect={handleOpenImportFile}
           />
         </div>

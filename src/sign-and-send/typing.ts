@@ -44,6 +44,4 @@ export interface TxBody {
   };
   c?: [string, Buffer];
   pa?: Buffer;
-  // return url
-  ru?: string;
 }

@@ -157,6 +157,7 @@
     "skBalance": "SK สมดุล",
     "tokens": "โทเค็น",
     "wrongChain": "ห่วงโซ่ที่อยู่ของคุณไม่ตรงกับห่วงโซ่ของสัญญาโทเค็น",
+    "wrongChainLogin": "ห่วงโซ่ที่อยู่ของคุณไม่ตรงกับห่วงโซ่แอ็พพลิเคชัน",
     "tokenHasAlreadyBeenAdded": "เพิ่มโทเค็นแล้ว",
     "chooseDeInfraNetwork": "เลือกเครือข่าย DeInfra",
     "enterAccountNumberAndSeedPhrase": "กรอกหมายเลขบัญชีและคำศัพท์เมล็ดพันธุ์",

@@ -134,7 +134,7 @@ const MainPageComponent: FC = () => {
                   {t('yourTokensWillBeHere')}
                 </span>
               ) : (
-                walletData?.amount?.SK
+                walletData?.amount?.SK.toFixed(2)
               )}
             </div>
           </div>

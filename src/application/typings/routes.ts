@@ -16,6 +16,4 @@ export type AppQueryParams = {
   callbackUrl?: string;
   returnUrl?: string;
   chainID?: number;
-  isShowSeedAfterRegistration?: boolean;
-  isAutoDownloadSeed?: boolean;
 };

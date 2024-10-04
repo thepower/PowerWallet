@@ -157,6 +157,7 @@
     "skBalance": "SK баланс",
     "tokens": "Токены",
     "wrongChain": "Цепочка вашего адреса не совпадает с цепочкой контракта токена",
+    "wrongChainLogin": "Цепочка вашего адреса не совпадает с цепочкой приложения",
     "tokenHasAlreadyBeenAdded": "Токен уже был добавлен",
     "chooseDeInfraNetwork": "Выбертите DeInfra сеть",
     "enterAccountNumberAndSeedPhrase": "Введите номер аккаунта и seed фразу",

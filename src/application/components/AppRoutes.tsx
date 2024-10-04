@@ -15,7 +15,7 @@ import { RegistrationPage } from 'registration/components/pages/registration/Reg
 import { WelcomePage } from 'registration/components/pages/welcome/WelcomePage';
 import { SendPage } from 'send/components/SendPage';
 import { SignAndSendPage } from 'sign-and-send/components/SingAndSendPage';
-import { WalletSSOPage } from 'sso/components/pages/WalletSSOPage';
+import { WalletSSOPage } from 'sso/pages/WalletSSO/WalletSSOPage';
 
 import { WalletRoutesEnum } from '../typings/routes';
 

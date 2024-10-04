@@ -157,6 +157,7 @@
     "skBalance": "SK balance",
     "tokens": "Tokens",
     "wrongChain": "The chain of your address does not match the chain of the token contract",
+    "wrongChainLogin": "Your address chain does not match the application chain",
     "tokenHasAlreadyBeenAdded": "the token has already been added",
     "chooseDeInfraNetwork": "Choose DeInfra network",
     "enterAccountNumberAndSeedPhrase": "Enter account number and seed phrase",
