@@ -1,62 +1,67 @@
 import React, {
-  ChangeEvent,
   FC,
+  useState,
   useCallback,
-  useEffect,
   useMemo,
   useRef,
-  useState
+  useEffect
 } from 'react';
 import { FormControlLabel, useMediaQuery } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+
 import { useImportWalletFromFile } from 'account/hooks';
 import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
-import {
-  Button,
-  Checkbox,
-  LangMenu,
-  OutlinedInput,
-  IconButton
-  // FullScreenLoader
-} from 'common';
+import { Button, Checkbox, LangMenu, OutlinedInput, IconButton } from 'common';
 import hooks from 'hooks';
 import { RegistrationCard } from 'registration/components/common/registrationCard/RegistrationCard';
 import { useRegistrationLoginToWallet } from 'registration/hooks/useRegistrationLoginToWallet';
 import { compareTwoStrings } from 'registration/utils/registrationUtils';
 import { stringToObject, objectToString } from 'sso/utils';
-import { Maybe } from 'typings/common';
 import styles from './LoginPage.module.scss';
 import { ImportAccountModal } from '../../modals/ImportAccountModal';
 import registrationStyles from '../registration/RegistrationPage.module.scss';
 
-const LoginPageComponent: FC = ({}) => {
+const LoginPageComponent: FC = () => {
   const { t } = useTranslation();
-
   const { data } = useParams<{ data?: string }>();
-  const navigate = useNavigate();
-  const parsedData: AppQueryParams = useMemo(() => {
-    if (data) return stringToObject(data);
-    return null;
-  }, [data]);
+  const isMobile = useMediaQuery('(max-width:768px)');
 
-  const [openedPasswordModal, setOpenedPasswordModal] = useState(false);
-  const [accountFile, setAccountFile] = useState<Maybe<File>>(null);
-  const [address, setAddress] = useState('');
-  const [seedOrPrivateKey, setSeedOrPrivateKey] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmedPassword, setConfirmedPassword] = useState('');
-  const [passwordsNotEqual, setPasswordsNotEqual] = useState(false);
+  const [state, setState] = useState<{
+    openedPasswordModal: boolean;
+    accountFile: File | null;
+    address: string;
+    seedOrPrivateKey: string;
+    password: string;
+    confirmedPassword: string;
+    passwordsNotEqual: boolean;
+    isEnterToAccPressed: boolean;
+    isWithoutPassword: boolean;
+  }>({
+    openedPasswordModal: false,
+    accountFile: null,
+    address: '',
+    seedOrPrivateKey: '',
+    password: '',
+    confirmedPassword: '',
+    passwordsNotEqual: false,
+    isEnterToAccPressed: false,
+    isWithoutPassword: false
+  });
 
-  const [isEnterToAccPressed, setIsEnterToAccPressed] = useState(false);
-  const [isWithoutPassword, setIsWithoutPassword] = useState(false);
-  const importAccountRef = useRef<HTMLInputElement>(null);
+  const parsedData: AppQueryParams = useMemo(
+    () => (data ? stringToObject(data) : null),
+    [data]
+  );
 
   const { loginMutation, isPending } = useRegistrationLoginToWallet({
     throwOnError: false
   });
+  const { importWalletFromFileMutation, isLoading: isImportWalletLoading } =
+    useImportWalletFromFile();
+
   const {
     scrollContainerRef,
     scrollToElementByIndex,
@@ -64,163 +69,101 @@ const LoginPageComponent: FC = ({}) => {
     scrollToPrevious
   } = hooks.useSmoothHorizontalScroll();
 
-  const { importWalletFromFileMutation, isLoading: isImportWalletLoading } =
-    useImportWalletFromFile();
-
-  const resetStage = () => {
-    setAccountFile(null);
-    setAddress('');
-    setSeedOrPrivateKey('');
-    setPassword('');
-    setConfirmedPassword('');
-    setPasswordsNotEqual(false);
-    setIsEnterToAccPressed(false);
-    setIsWithoutPassword(false);
-  };
-
-  const isMobile = useMediaQuery('(max-width:768px)');
-
+  const importAccountRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (isMobile) {
       scrollToElementByIndex(1);
     }
   }, []);
 
-  const handleOpenImportFile = () => {
-    if (importAccountRef) {
-      importAccountRef.current?.click();
-    }
-  };
+  const resetState = () =>
+    setState({
+      openedPasswordModal: false,
+      accountFile: null,
+      address: '',
+      seedOrPrivateKey: '',
+      password: '',
+      confirmedPassword: '',
+      passwordsNotEqual: false,
+      isEnterToAccPressed: false,
+      isWithoutPassword: false
+    });
 
-  const setAccountFileHandler = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const accountFile = event?.target?.files?.[0];
+  const updateState = (newState: Partial<typeof state>) =>
+    setState((prevState) => ({ ...prevState, ...newState }));
 
-      importWalletFromFileMutation({
-        password: '',
-        accountFile: accountFile!,
-        additionalActionOnSuccess: (result) => {
-          if (parsedData?.callbackUrl) {
-            if (parsedData?.chainID === result?.chainId) {
-              const stringData = objectToString({
-                address: result?.address,
-                returnUrl: parsedData?.returnUrl
-              });
+  const handleImportFile = useCallback(() => {
+    importAccountRef.current?.click();
+  }, []);
 
-              window.location.replace(
-                `${parsedData.callbackUrl}sso/${stringData}`
-              );
-            } else {
-              toast.error(t('wrongChainLogin'));
-              navigate(`${WalletRoutesEnum.login}/${data}`);
-            }
-          }
-        },
-        additionalActionOnDecryptError: () => {
-          if (accountFile) {
-            setAccountFile(accountFile);
-            setOpenedPasswordModal(true);
-          }
-        }
-      });
+  const handleFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        importWalletFromFileMutation({
+          password: '',
+          accountFile: file,
+          additionalActionOnSuccess: handleImportSuccess,
+          additionalActionOnDecryptError: () =>
+            updateState({ accountFile: file, openedPasswordModal: true }),
+          isWithoutGoHome: Boolean(parsedData)
+        });
+      }
     },
-    [
-      data,
-      importWalletFromFileMutation,
-      navigate,
-      parsedData?.callbackUrl,
-      parsedData?.chainID,
-      parsedData?.returnUrl,
-      t
-    ]
+    [importWalletFromFileMutation, updateState, parsedData]
   );
-  const closePasswordModal = () => {
-    setOpenedPasswordModal(false);
-  };
 
-  const onChangeAddress = (
-    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    setAddress(event.target.value);
-  };
+  const handleImportSuccess = useCallback(
+    (result: any) => {
+      if (parsedData?.callbackUrl) {
+        if (parsedData.chainID === result?.chainId) {
+          const stringData = objectToString({
+            address: result?.address,
+            returnUrl: parsedData?.returnUrl
+          });
+          window.location.replace(`${parsedData.callbackUrl}sso/${stringData}`);
+        } else {
+          toast.error(t('wrongChainLogin'));
+        }
+      }
+    },
+    [parsedData, t]
+  );
 
-  const onChangeSeedOrPrivateKey = (
-    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    setSeedOrPrivateKey(event.target.value);
-  };
-
-  const onChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-    setPasswordsNotEqual(false);
-  };
-
-  const onChangeConfirmedPassword = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setConfirmedPassword(event.target.value);
-    setPasswordsNotEqual(false);
-  };
-
-  const loginToAccount = useCallback(() => {
+  const handleLogin = useCallback(() => {
+    const {
+      isWithoutPassword,
+      address,
+      seedOrPrivateKey,
+      password,
+      confirmedPassword
+    } = state;
     if (isWithoutPassword) {
-      loginMutation({
-        address,
-        seedOrPrivateKey,
-        password: ''
-      });
+      loginMutation({ address, seedOrPrivateKey, password: '' });
     } else {
-      const passwordsNotEqual = !compareTwoStrings(
-        password!,
-        confirmedPassword!
-      );
-
+      const passwordsNotEqual = !compareTwoStrings(password, confirmedPassword);
       if (passwordsNotEqual) {
-        setPasswordsNotEqual(passwordsNotEqual);
+        updateState({ passwordsNotEqual });
         return;
       }
       loginMutation({ address, seedOrPrivateKey, password });
     }
-  }, [
-    isWithoutPassword,
-    loginMutation,
-    address,
-    seedOrPrivateKey,
-    password,
-    confirmedPassword
-  ]);
+  }, [state, loginMutation]);
 
-  const handleImportAccount = (password: string) => {
-    importWalletFromFileMutation({
+  const renderLoginForm = () => {
+    const {
+      address,
+      seedOrPrivateKey,
       password,
-      accountFile: accountFile!,
-      additionalActionOnSuccess: (result) => {
-        if (parsedData?.callbackUrl) {
-          if (parsedData?.chainID === result?.chainId) {
-            const stringData = objectToString({
-              address: result?.address,
-              returnUrl: parsedData?.returnUrl
-            });
-
-            window.location.replace(
-              `${parsedData.callbackUrl}sso/${stringData}`
-            );
-          } else {
-            toast.error(t('wrongChainLogin'));
-            navigate(`${WalletRoutesEnum.login}/${data}`);
-          }
-        }
-      }
-    });
-
-    closePasswordModal();
-  };
-
-  const renderLoginPart = useCallback(() => {
+      confirmedPassword,
+      passwordsNotEqual,
+      isWithoutPassword
+    } = state;
     const isButtonDisabled =
       !address ||
       !seedOrPrivateKey ||
       (passwordsNotEqual && !password && !isWithoutPassword);
+
     return (
       <>
         <div className={styles.title}>
@@ -231,39 +174,51 @@ const LoginPageComponent: FC = ({}) => {
             placeholder={t('address')!}
             className={registrationStyles.passwordInput}
             value={address}
-            onChange={onChangeAddress}
+            onChange={(e) => updateState({ address: e.target.value })}
           />
           <OutlinedInput
             placeholder={t('seedPhraseOrPrivateKey')!}
             className={registrationStyles.passwordInput}
             value={seedOrPrivateKey}
-            type={'password'}
-            onChange={onChangeSeedOrPrivateKey}
+            type='password'
+            onChange={(e) => updateState({ seedOrPrivateKey: e.target.value })}
           />
           <OutlinedInput
             placeholder={t('password')!}
             className={registrationStyles.passwordInput}
             value={password}
-            type={'password'}
-            onChange={onChangePassword}
+            type='password'
+            onChange={(e) =>
+              updateState({
+                password: e.target.value,
+                passwordsNotEqual: false
+              })
+            }
             disabled={isWithoutPassword}
           />
           <OutlinedInput
             placeholder={t('repeatedPassword')!}
             className={registrationStyles.passwordInput}
             value={confirmedPassword}
-            type={'password'}
+            type='password'
             error={passwordsNotEqual}
             errorMessage={t('oopsPasswordsDidntMatch')!}
-            onChange={onChangeConfirmedPassword}
+            onChange={(e) =>
+              updateState({
+                confirmedPassword: e.target.value,
+                passwordsNotEqual: false
+              })
+            }
             disabled={isWithoutPassword}
           />
           <FormControlLabel
             control={
               <Checkbox
-                size={'medium'}
+                size='medium'
                 checked={isWithoutPassword}
-                onClick={() => setIsWithoutPassword(!isWithoutPassword)}
+                onClick={() =>
+                  updateState({ isWithoutPassword: !isWithoutPassword })
+                }
                 disableRipple
               />
             }
@@ -275,7 +230,7 @@ const LoginPageComponent: FC = ({}) => {
           className={styles.button}
           variant='contained'
           size='large'
-          onClick={loginToAccount}
+          onClick={handleLogin}
           disabled={isButtonDisabled}
           loading={isPending}
         >
@@ -283,75 +238,60 @@ const LoginPageComponent: FC = ({}) => {
         </Button>
       </>
     );
-  }, [
-    address,
-    seedOrPrivateKey,
-    passwordsNotEqual,
-    password,
-    isWithoutPassword,
-    t,
-    confirmedPassword,
-    loginToAccount,
-    isPending
-  ]);
+  };
 
-  const renderInitCards = useCallback(
-    () => (
-      <>
-        <div className={styles.title}>{t('loginImport')}</div>
-        <input
-          ref={importAccountRef}
-          className={registrationStyles.importAccountInput}
-          onChange={setAccountFileHandler}
-          type='file'
+  const renderInitialCards = () => (
+    <>
+      <div className={styles.title}>{t('loginImport')}</div>
+      <input
+        ref={importAccountRef}
+        className={registrationStyles.importAccountInput}
+        onChange={handleFileChange}
+        type='file'
+      />
+      <div ref={scrollContainerRef} className={styles.cards}>
+        <RegistrationCard
+          title={t('loginToAccount')}
+          iconType={2}
+          description={t('enterAddressAndSeedPhrase')}
+          buttonVariant='outlined'
+          buttonLabel={t('enter')}
+          onSelect={() => updateState({ isEnterToAccPressed: true })}
         />
-        <div ref={scrollContainerRef} className={styles.cards}>
-          <RegistrationCard
-            title={t('loginToAccount')}
-            iconType={2}
-            description={t('enterAddressAndSeedPhrase')}
-            buttonVariant='outlined'
-            buttonLabel={t('enter')}
-            onSelect={() => setIsEnterToAccPressed(true)}
-          />
-          <RegistrationCard
-            title={t('importAccount')}
-            iconType={3}
-            description={t('uploadPEMFileToImportAccount')}
-            buttonVariant='contained'
-            buttonLabel={t('selectFile')}
-            isWithBorder
-            loading={isImportWalletLoading}
-            onSelect={handleOpenImportFile}
-          />
-        </div>
-        <IconButton className={styles.leftArrow} onClick={scrollToPrevious}>
-          <ChevronLeftIcon />
-        </IconButton>
-        <IconButton className={styles.rightArrow} onClick={scrollToNext}>
-          <ChevronRightIcon />
-        </IconButton>
-      </>
-    ),
-    [
-      t,
-      scrollContainerRef,
-      scrollToNext,
-      scrollToPrevious,
-      setAccountFileHandler
-    ]
+        <RegistrationCard
+          title={t('importAccount')}
+          iconType={3}
+          description={t('uploadPEMFileToImportAccount')}
+          buttonVariant='contained'
+          buttonLabel={t('selectFile')}
+          isWithBorder
+          loading={isImportWalletLoading}
+          onSelect={handleImportFile}
+        />
+      </div>
+      <IconButton className={styles.leftArrow} onClick={scrollToPrevious}>
+        <ChevronLeftIcon />
+      </IconButton>
+      <IconButton className={styles.rightArrow} onClick={scrollToNext}>
+        <ChevronRightIcon />
+      </IconButton>
+    </>
   );
-
-  // if (isImportAccountFromFileLoading) {
-  //   return <FullScreenLoader />;
-  // }
 
   return (
     <div className={registrationStyles.registrationPage}>
       <ImportAccountModal
-        open={openedPasswordModal}
-        onClose={closePasswordModal}
-        onSubmit={handleImportAccount}
+        open={state.openedPasswordModal}
+        onClose={() => updateState({ openedPasswordModal: false })}
+        onSubmit={(password: string) => {
+          importWalletFromFileMutation({
+            password,
+            accountFile: state.accountFile!,
+            additionalActionOnSuccess: handleImportSuccess,
+            isWithoutGoHome: Boolean(parsedData)
+          });
+          updateState({ openedPasswordModal: false });
+        }}
       />
       <div className={registrationStyles.registrationWizardComponent}>
         <div className={registrationStyles.registrationPageHeader}>
@@ -359,14 +299,14 @@ const LoginPageComponent: FC = ({}) => {
           <Link
             to={WalletRoutesEnum.root}
             className={registrationStyles.registrationPageTitle}
-            onClick={resetStage}
+            onClick={resetState}
           >
             Power Wallet
           </Link>
           <LangMenu className={registrationStyles.registrationPageLangSelect} />
         </div>
         <div className={registrationStyles.registrationWizardHolder}>
-          {isEnterToAccPressed ? renderLoginPart() : renderInitCards()}
+          {state.isEnterToAccPressed ? renderLoginForm() : renderInitialCards()}
         </div>
       </div>
     </div>

@@ -29,7 +29,7 @@ export const useCreateWallet = () => {
     setSelectedChain,
     setBackupStep
   } = useStore();
-  const { addWallet } = useWalletsStore();
+  const { addWallet, wallets } = useWalletsStore();
 
   const { mutate: createWalletMutation, isPending } = useMutation<
     ReturnParams | undefined,
@@ -69,6 +69,7 @@ export const useCreateWallet = () => {
     onSuccess: (params) => {
       if (params) {
         addWallet({
+          name: 'wallet ' + (wallets.length + 1),
           chainId: params.chainId,
           address: params.address,
           encryptedWif: params.encryptedWif

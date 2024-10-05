@@ -27,14 +27,11 @@ const MainPageComponent: FC = () => {
   const { activeWallet, wallets } = useWalletsStore();
 
   const chainId = activeWallet?.chainId;
+  const name = activeWallet?.name;
 
   const { walletData, nativeTokens } = useWalletData(activeWallet);
 
   const { tokens } = useTokensStore();
-
-  useEffect(() => {
-    // updateTokensAmountsTrigger();
-  }, []);
 
   const onChangeTab = (_event: React.SyntheticEvent, value: MyAssetsTabs) => {
     setTab(value);
@@ -117,6 +114,11 @@ const MainPageComponent: FC = () => {
         {wallets.length > 1 && renderWallets()}
         <div className={styles.account}>
           <div className={styles.title}>{t('accountNumber')}</div>
+          {name && (
+            <div title={name} className={styles.accountName}>
+              {name}
+            </div>
+          )}
           <CopyButton
             textButton={activeWallet?.address || ''}
             className={styles.addressButton}

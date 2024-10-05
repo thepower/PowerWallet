@@ -147,7 +147,7 @@ export const useSignAndSendTx = ({
     onError: (e) => {
       console.error('loginToWalletSaga', e);
 
-      toast.error(i18n.t(`loginError${e}`));
+      toast.error(i18n.t('loginError') + ` ${e?.message}`);
     },
     throwOnError
   });

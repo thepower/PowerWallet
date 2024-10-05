@@ -86,6 +86,9 @@ const WalletCard: FC<WalletCardProps> = ({ index, wallet }) => {
       onClick={onClick}
       className={styles.walletCard}
     >
+      <div title={wallet.name} className={styles.name}>
+        {wallet.name}
+      </div>
       <div className={styles.chainId}>{wallet.chainId}</div>
       <div className={styles.balance}>
         {`${walletData?.amount?.SK || 0} SK`}

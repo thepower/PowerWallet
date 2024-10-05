@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { useMediaQuery } from '@mui/material';
 import { NetworkEnum } from '@thepowereco/tssdk';
 import { useTranslation } from 'react-i18next';
-import { useNetworkChains } from 'application/hooks/useNetworkChains';
+import { useNetworkChains } from 'application/hooks';
 import { useStore } from 'application/store';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import { Button, IconButton, WizardComponentProps } from 'common';

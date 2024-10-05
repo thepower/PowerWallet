@@ -13,6 +13,7 @@ import { useAccountLoginToWallet } from './useAccountLoginToWallet';
 type Args = {
   accountFile: File;
   password: string;
+  isWithoutGoHome?: boolean;
 };
 
 export const useImportWalletFromFile = () => {
@@ -31,7 +32,8 @@ export const useImportWalletFromFile = () => {
       accountFile,
       password,
       additionalActionOnSuccess,
-      additionalActionOnDecryptError
+      additionalActionOnDecryptError,
+      isWithoutGoHome
     }) => {
       try {
         const data = await getFileData(accountFile, FileReaderType.binary);
@@ -48,7 +50,7 @@ export const useImportWalletFromFile = () => {
           chainId: loginResult?.chainId
         });
 
-        navigate(WalletRoutesEnum.root);
+        !isWithoutGoHome && navigate(WalletRoutesEnum.root);
       } catch (e: any) {
         if (
           additionalActionOnDecryptError &&

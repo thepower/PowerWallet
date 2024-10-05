@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import appEnvs from 'appEnvs';
-import { useInitApp } from 'application/hooks';
-import { useNetworkApi } from 'application/hooks/useNetworkApi';
+import { useInitApp, useRestoreOldVersionAccount } from 'application/hooks';
+import { useNetworkApi } from 'application/hooks';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { FullScreenLoader } from 'common';
 import { AddTokenPage } from 'myAssets/pages/AddToken/AddTokenPage';
@@ -33,7 +33,9 @@ const AppRoutesComponent: React.FC = () => {
     initApp();
   }, []);
 
-  if (isLoading) {
+  const { isMigrating } = useRestoreOldVersionAccount();
+
+  if (isLoading || isMigrating) {
     return <FullScreenLoader />;
   }
 

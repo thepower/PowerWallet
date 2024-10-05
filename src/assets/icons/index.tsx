@@ -22,6 +22,7 @@ import MenuIcon from './menu.svg?react';
 import MoneyBugIcon from './money-bug.svg?react';
 import OneLayersIcon from './one-layer.svg?react';
 import RefreshIcon from './refresh.svg?react';
+import RenameIcon from './rename.svg?react';
 import ResetIcon from './reset.svg?react';
 import SearchIcon from './searchIcon.svg?react';
 import CheckedIcon from './select.svg?react';
@@ -34,6 +35,7 @@ import UnCheckedIcon from './unSelect.svg?react';
 import WalletsSvg from './wallets.svg?react';
 
 export {
+  RenameIcon,
   ChevronLeftIcon,
   BellIcon,
   LogoIcon,
