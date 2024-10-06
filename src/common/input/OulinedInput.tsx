@@ -53,7 +53,7 @@ export const OutlinedInput: FC<OutlinedInputProps> = memo(
     };
 
     return (
-      <FormControl className={styles.formControl}>
+      <FormControl className={styles.formControl} error={error}>
         <MUIOutlinedInput
           className={className}
           value={value}
@@ -62,11 +62,12 @@ export const OutlinedInput: FC<OutlinedInputProps> = memo(
           classes={{
             notchedOutline: value ? styles.bordered : ''
           }}
+          error={error}
           endAdornment={getEndAdornment()}
           {...otherProps}
         />
         {error && (
-          <FormHelperText className={styles.errorMessage}>
+          <FormHelperText error={error} className={styles.errorMessage}>
             {errorMessage}
           </FormHelperText>
         )}

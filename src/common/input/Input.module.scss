@@ -1,10 +1,13 @@
+@import 'src/styles/variables';
+
 .passwordAdornment {
   margin-bottom: -4px !important;
   cursor: pointer;
 }
 
 .errorMessage {
-  color: #ac2d2d;
+  position: absolute;
+  bottom: -50%;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
@@ -13,7 +16,6 @@
 .formControl {
   display: flex;
   width: 100%;
-  align-items: center;
 }
 
 .bordered {

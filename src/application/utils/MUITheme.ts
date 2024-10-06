@@ -52,7 +52,6 @@ const MUITheme = createTheme({
       styleOverrides: {
         root: {
           color: '#F5F5F7',
-          padding: '8px 16px',
           borderRadius: 5,
           background: '#252B35',
           '&:hover': {
@@ -81,6 +80,9 @@ const MUITheme = createTheme({
         },
         notchedOutline: {
           border: '1px solid #252B35'
+        },
+        sizeSmall: {
+          height: '48px'
         }
       }
     },

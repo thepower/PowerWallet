@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { CryptoApi } from '@thepowereco/tssdk';
-import { Form, Formik, FormikHelpers } from 'formik';
+import { FormikHelpers, useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import styles from './ConfirmModal.module.scss';
@@ -54,43 +54,37 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     [activeWallet, callback, t]
   );
 
+  const formik = useFormik({
+    initialValues,
+    onSubmit: handleSubmit
+  });
+
   return (
     <Modal open={open} onClose={onClose} contentClassName={styles.modalContent}>
-      <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-        {(formikProps) => (
-          <Form className={styles.form}>
-            <p className={styles.title}>{t('confirmAction')}</p>
-            <p className={styles.subTitle}>
-              {t('enterYourPasswordCompleteTransaction')}
-            </p>
-            <OutlinedInput
-              inputRef={(input) => input && input.focus()}
-              placeholder={t('password')!}
-              className={styles.passwordInput}
-              name='password'
-              value={formikProps.values.password}
-              onChange={formikProps.handleChange}
-              onBlur={formikProps.handleBlur}
-              type={'password'}
-              autoComplete='new-password'
-              autoFocus
-              errorMessage={formikProps.errors.password}
-              error={
-                formikProps.touched.password &&
-                Boolean(formikProps.errors.password)
-              }
-            />
-            <Button
-              variant='outlined'
-              type='submit'
-              disabled={!formikProps.dirty}
-              className={styles.button}
-            >
-              {t('confirm')}
-            </Button>
-          </Form>
-        )}
-      </Formik>
+      <form className={styles.form} onSubmit={formik.handleSubmit}>
+        <p className={styles.title}>{t('confirmAction')}</p>
+        <p className={styles.subTitle}>
+          {t('enterYourPasswordCompleteTransaction')}
+        </p>
+        <OutlinedInput
+          inputRef={(input) => input && input.focus()}
+          placeholder={t('password')!}
+          type={'password'}
+          autoComplete='new-password'
+          autoFocus
+          errorMessage={formik.errors.password}
+          error={formik.touched.password && Boolean(formik.errors.password)}
+          {...formik.getFieldProps('password')}
+        />
+        <Button
+          variant='outlined'
+          type='submit'
+          className={styles.button}
+          disabled={!formik.isValid || formik.isSubmitting}
+        >
+          {t('confirm')}
+        </Button>
+      </form>
     </Modal>
   );
 };

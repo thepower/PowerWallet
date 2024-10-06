@@ -112,7 +112,6 @@ const SendPageComponent: FC = () => {
         return tokenBalance;
       case TokenKind.Native:
         return nativeTokenAmount;
-
       default:
         return '0';
     }
@@ -256,10 +255,6 @@ const SendPageComponent: FC = () => {
               variant='standard'
               label={t('amount')}
               placeholder='00.000'
-              name='amount'
-              value={formik.values.amount}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
               error={formik.touched.amount && Boolean(formik.errors.amount)}
               helperText={formik.touched.amount && formik.errors.amount}
               InputLabelProps={InputLabelProps}
@@ -274,18 +269,16 @@ const SendPageComponent: FC = () => {
                   </InputAdornment>
                 )
               }}
+              {...formik.getFieldProps('amount')}
             />
           )}
           <TextField
             variant='standard'
             label={t('addressOfTheRecipient')}
             placeholder='AA000000000000000000'
-            name='address'
-            value={formik.values.address}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
             error={formik.touched.address && Boolean(formik.errors.address)}
             helperText={formik.touched.address && formik.errors.address}
+            {...formik.getFieldProps('address')}
           />
           {isNativeToken && (
             <TextField
@@ -293,12 +286,9 @@ const SendPageComponent: FC = () => {
               placeholder={t('addComment')!}
               multiline
               minRows={2}
-              name='comment'
-              value={formik.values.comment}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
               error={formik.touched.comment && Boolean(formik.errors.comment)}
               helperText={formik.touched.comment && formik.errors.comment}
+              {...formik.getFieldProps('comment')}
             />
           )}
         </div>
@@ -307,7 +297,12 @@ const SendPageComponent: FC = () => {
           variant='contained'
           className={styles.button}
           type='submit'
-          disabled={!formik.dirty}
+          loading={
+            isSendTxPending ||
+            isSendTokenTxPending ||
+            isSendErc721TokenTxPending
+          }
+          disabled={!formik.isValid || formik.isSubmitting}
         >
           {t('send')}
         </Button>
@@ -318,12 +313,7 @@ const SendPageComponent: FC = () => {
   const tokenSymbol = isNativeToken ? tokenAddress : token?.symbol;
   const formattedAmountString = formattedAmount?.toString();
 
-  if (
-    isSendTxPending ||
-    isSendTokenTxPending ||
-    isSendErc721TokenTxPending ||
-    isAddTokenLoading
-  ) {
+  if (isAddTokenLoading) {
     return <FullScreenLoader />;
   }
 
@@ -353,17 +343,11 @@ const SendPageComponent: FC = () => {
       <div className={styles.content}>
         <div className={styles.walletInfo}>
           <span className={styles.titleBalance}>{t('totalBalance')}</span>
-          <span className={styles.address}>{`${activeWallet?.chainId} - ${
-            activeWallet?.address || '-'
-          }`}</span>
+          <span className={styles.address}>
+            {`${activeWallet?.chainId} - ${activeWallet?.address || '-'}`}
+          </span>
           <span className={styles.amount}>
-            {isNativeToken && (
-              <LogoIcon
-                width={20}
-                height={20}
-                className={styles.totalBalanceIcon}
-              />
-            )}
+            {isNativeToken && <LogoIcon className={styles.totalBalanceIcon} />}
             {formattedAmountString === '0'
               ? t('yourTokensWillBeHere')
               : `${formattedAmountString} ${tokenSymbol}`}

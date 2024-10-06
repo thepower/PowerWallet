@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { Button } from '@mui/material';
 import classnames from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
@@ -44,27 +44,29 @@ const RenameAccountModalComponent: FC<RenameAccountModalProps> = ({
     onSubmit: handleSubmitImportModal
   });
 
+  useEffect(() => {
+    if (activeWallet?.name) formik.setFieldValue('name', activeWallet.name);
+  }, [activeWallet]);
+
   return (
     <Modal
       contentClassName={styles.importModalContent}
       onClose={onClose}
       open={open}
     >
+      <div className={styles.exportModalTitleHolder}>
+        <div className={styles.exportModalTitle}>{t('enterNewName')}</div>
+      </div>
       <form className={styles.resetModalForm} onSubmit={formik.handleSubmit}>
-        <div className={styles.exportModalTitleHolder}>
-          <div className={styles.exportModalTitle}>{t('enterNewName')}</div>
-        </div>
         <OutlinedInput
           inputRef={(input) => input && input.focus()}
           placeholder={t('name')!}
-          name='name'
           size='small'
-          value={formik.values.name}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
           autoFocus
+          fullWidth
           errorMessage={formik.errors.name}
           error={formik.touched.name && Boolean(formik.errors.name)}
+          {...formik.getFieldProps('name')}
         />
         <Button
           className={classnames(
@@ -74,7 +76,7 @@ const RenameAccountModalComponent: FC<RenameAccountModalProps> = ({
           variant='outlined'
           size='large'
           type='submit'
-          disabled={!formik.values.name}
+          disabled={!formik.isValid || formik.isSubmitting}
         >
           <span className={styles.registrationNextButtonText}>
             {t('confirm')}

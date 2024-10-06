@@ -74,7 +74,6 @@ export const useExportAccount = () => {
 
       additionalActionOnSuccess?.();
     } catch (e: any) {
-      console.error('exportAccountSaga', e);
       if (
         additionalActionOnDecryptError &&
         e.message === 'unable to decrypt data'

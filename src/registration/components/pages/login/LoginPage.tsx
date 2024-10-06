@@ -7,49 +7,57 @@ import React, {
   useEffect
 } from 'react';
 import { FormControlLabel, useMediaQuery } from '@mui/material';
+import { Maybe } from '@thepowereco/tssdk';
+import { useFormik } from 'formik';
+import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import * as yup from 'yup';
 import { useImportWalletFromFile } from 'account/hooks';
 import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
-import { Button, Checkbox, LangMenu, OutlinedInput, IconButton } from 'common';
+import { Button, LangMenu, OutlinedInput, IconButton, Checkbox } from 'common';
 import hooks from 'hooks';
 import { RegistrationCard } from 'registration/components/common/registrationCard/RegistrationCard';
 import { useRegistrationLoginToWallet } from 'registration/hooks/useRegistrationLoginToWallet';
-import { compareTwoStrings } from 'registration/utils/registrationUtils';
 import { stringToObject, objectToString } from 'sso/utils';
 import styles from './LoginPage.module.scss';
 import { ImportAccountModal } from '../../modals/ImportAccountModal';
 import registrationStyles from '../registration/RegistrationPage.module.scss';
 
+const initialValues = {
+  address: '',
+  seedOrPrivateKey: '',
+  password: '',
+  confirmedPassword: '',
+  isWithoutPassword: false,
+  isEnterToAccPressed: false
+};
+
+const validationSchema = (t: TFunction) =>
+  yup.object().shape({
+    address: yup.string().required(t('required')),
+    seedOrPrivateKey: yup.string().required(t('required')),
+    password: yup.string().when('isWithoutPassword', {
+      is: false,
+      then: yup.string().required(t('required'))
+    }),
+    confirmedPassword: yup.string().when('isWithoutPassword', {
+      is: false,
+      then: yup
+        .string()
+        .oneOf([yup.ref('password')], t('oopsPasswordsDidntMatch'))
+        .required(t('required'))
+    })
+  });
+
 const LoginPageComponent: FC = () => {
   const { t } = useTranslation();
   const { data } = useParams<{ data?: string }>();
   const isMobile = useMediaQuery('(max-width:768px)');
-
-  const [state, setState] = useState<{
-    openedPasswordModal: boolean;
-    accountFile: File | null;
-    address: string;
-    seedOrPrivateKey: string;
-    password: string;
-    confirmedPassword: string;
-    passwordsNotEqual: boolean;
-    isEnterToAccPressed: boolean;
-    isWithoutPassword: boolean;
-  }>({
-    openedPasswordModal: false,
-    accountFile: null,
-    address: '',
-    seedOrPrivateKey: '',
-    password: '',
-    confirmedPassword: '',
-    passwordsNotEqual: false,
-    isEnterToAccPressed: false,
-    isWithoutPassword: false
-  });
+  const [accountFile, setAccountFile] = useState<Maybe<File>>(null);
+  const [openedPasswordModal, setOpenedPasswordModal] = useState(false);
 
   const parsedData: AppQueryParams = useMemo(
     () => (data ? stringToObject(data) : null),
@@ -70,48 +78,29 @@ const LoginPageComponent: FC = () => {
   } = hooks.useSmoothHorizontalScroll();
 
   const importAccountRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (isMobile) {
       scrollToElementByIndex(1);
     }
-  }, []);
+  }, [isMobile, scrollToElementByIndex]);
 
-  const resetState = () =>
-    setState({
-      openedPasswordModal: false,
-      accountFile: null,
-      address: '',
-      seedOrPrivateKey: '',
-      password: '',
-      confirmedPassword: '',
-      passwordsNotEqual: false,
-      isEnterToAccPressed: false,
-      isWithoutPassword: false
-    });
-
-  const updateState = (newState: Partial<typeof state>) =>
-    setState((prevState) => ({ ...prevState, ...newState }));
+  const formik = useFormik({
+    initialValues,
+    validationSchema: validationSchema(t),
+    onSubmit: (values) => {
+      const { address, seedOrPrivateKey, password, isWithoutPassword } = values;
+      if (isWithoutPassword) {
+        loginMutation({ address, seedOrPrivateKey, password: '' });
+      } else {
+        loginMutation({ address, seedOrPrivateKey, password });
+      }
+    }
+  });
 
   const handleImportFile = useCallback(() => {
     importAccountRef.current?.click();
   }, []);
-
-  const handleFileChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (file) {
-        importWalletFromFileMutation({
-          password: '',
-          accountFile: file,
-          additionalActionOnSuccess: handleImportSuccess,
-          additionalActionOnDecryptError: () =>
-            updateState({ accountFile: file, openedPasswordModal: true }),
-          isWithoutGoHome: Boolean(parsedData)
-        });
-      }
-    },
-    [importWalletFromFileMutation, updateState, parsedData]
-  );
 
   const handleImportSuccess = useCallback(
     (result: any) => {
@@ -130,94 +119,87 @@ const LoginPageComponent: FC = () => {
     [parsedData, t]
   );
 
-  const handleLogin = useCallback(() => {
-    const {
-      isWithoutPassword,
-      address,
-      seedOrPrivateKey,
-      password,
-      confirmedPassword
-    } = state;
-    if (isWithoutPassword) {
-      loginMutation({ address, seedOrPrivateKey, password: '' });
-    } else {
-      const passwordsNotEqual = !compareTwoStrings(password, confirmedPassword);
-      if (passwordsNotEqual) {
-        updateState({ passwordsNotEqual });
-        return;
+  const handleFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      console.log('event.target.files', event.target.files);
+      const file = event.target.files?.[0];
+      if (file) {
+        importWalletFromFileMutation({
+          password: '',
+          accountFile: file,
+          additionalActionOnSuccess: handleImportSuccess,
+          additionalActionOnDecryptError: () => {
+            setAccountFile(file);
+            setOpenedPasswordModal(true);
+          },
+          isWithoutGoHome: Boolean(parsedData)
+        });
       }
-      loginMutation({ address, seedOrPrivateKey, password });
-    }
-  }, [state, loginMutation]);
+    },
+    [importWalletFromFileMutation, handleImportSuccess, parsedData]
+  );
 
   const renderLoginForm = () => {
-    const {
-      address,
-      seedOrPrivateKey,
-      password,
-      confirmedPassword,
-      passwordsNotEqual,
-      isWithoutPassword
-    } = state;
-    const isButtonDisabled =
-      !address ||
-      !seedOrPrivateKey ||
-      (passwordsNotEqual && !password && !isWithoutPassword);
+    const { isWithoutPassword } = formik.values;
 
     return (
       <>
         <div className={styles.title}>
           {t('enterAccountNumberAndSeedPhrase')}
         </div>
-        <div className={styles.fields}>
+        <form onSubmit={formik.handleSubmit} className={styles.fields}>
           <OutlinedInput
             placeholder={t('address')!}
-            className={registrationStyles.passwordInput}
-            value={address}
-            onChange={(e) => updateState({ address: e.target.value })}
+            size='small'
+            fullWidth
+            error={Boolean(formik.touched.address && formik.errors.address)}
+            errorMessage={formik.errors.address}
+            {...formik.getFieldProps('address')}
           />
           <OutlinedInput
             placeholder={t('seedPhraseOrPrivateKey')!}
-            className={registrationStyles.passwordInput}
-            value={seedOrPrivateKey}
+            size='small'
+            fullWidth
+            error={Boolean(
+              formik.touched.seedOrPrivateKey && formik.errors.seedOrPrivateKey
+            )}
             type='password'
-            onChange={(e) => updateState({ seedOrPrivateKey: e.target.value })}
+            errorMessage={formik.errors.seedOrPrivateKey}
+            {...formik.getFieldProps('seedOrPrivateKey')}
           />
           <OutlinedInput
+            size='small'
+            fullWidth
             placeholder={t('password')!}
-            className={registrationStyles.passwordInput}
-            value={password}
-            type='password'
-            onChange={(e) =>
-              updateState({
-                password: e.target.value,
-                passwordsNotEqual: false
-              })
-            }
             disabled={isWithoutPassword}
+            error={Boolean(formik.touched.password && formik.errors.password)}
+            type='password'
+            errorMessage={formik.errors.password}
+            {...formik.getFieldProps('password')}
           />
           <OutlinedInput
+            size='small'
+            fullWidth
             placeholder={t('repeatedPassword')!}
-            className={registrationStyles.passwordInput}
-            value={confirmedPassword}
-            type='password'
-            error={passwordsNotEqual}
-            errorMessage={t('oopsPasswordsDidntMatch')!}
-            onChange={(e) =>
-              updateState({
-                confirmedPassword: e.target.value,
-                passwordsNotEqual: false
-              })
-            }
             disabled={isWithoutPassword}
+            error={Boolean(
+              formik.touched.confirmedPassword &&
+                formik.errors.confirmedPassword
+            )}
+            errorMessage={formik.errors.confirmedPassword}
+            type='password'
+            {...formik.getFieldProps('confirmedPassword')}
           />
           <FormControlLabel
             control={
               <Checkbox
                 size='medium'
-                checked={isWithoutPassword}
-                onClick={() =>
-                  updateState({ isWithoutPassword: !isWithoutPassword })
+                checked={formik.values.isWithoutPassword}
+                onChange={() =>
+                  formik.setFieldValue(
+                    'isWithoutPassword',
+                    !formik.values.isWithoutPassword
+                  )
                 }
                 disableRipple
               />
@@ -225,17 +207,17 @@ const LoginPageComponent: FC = () => {
             label={t('IDontWantUsePassword')}
             className={styles.checkBoxLabel}
           />
-        </div>
-        <Button
-          className={styles.button}
-          variant='contained'
-          size='large'
-          onClick={handleLogin}
-          disabled={isButtonDisabled}
-          loading={isPending}
-        >
-          {t('login')}
-        </Button>
+          <Button
+            className={styles.button}
+            variant='contained'
+            size='large'
+            type='submit'
+            loading={isPending}
+            disabled={!formik.isValid || formik.isSubmitting}
+          >
+            {t('login')}
+          </Button>
+        </form>
       </>
     );
   };
@@ -256,7 +238,7 @@ const LoginPageComponent: FC = () => {
           description={t('enterAddressAndSeedPhrase')}
           buttonVariant='outlined'
           buttonLabel={t('enter')}
-          onSelect={() => updateState({ isEnterToAccPressed: true })}
+          onSelect={() => formik.setFieldValue('isEnterToAccPressed', true)}
         />
         <RegistrationCard
           title={t('importAccount')}
@@ -281,16 +263,16 @@ const LoginPageComponent: FC = () => {
   return (
     <div className={registrationStyles.registrationPage}>
       <ImportAccountModal
-        open={state.openedPasswordModal}
-        onClose={() => updateState({ openedPasswordModal: false })}
+        open={openedPasswordModal}
+        onClose={() => setOpenedPasswordModal(false)}
         onSubmit={(password: string) => {
           importWalletFromFileMutation({
             password,
-            accountFile: state.accountFile!,
+            accountFile: accountFile!,
             additionalActionOnSuccess: handleImportSuccess,
             isWithoutGoHome: Boolean(parsedData)
           });
-          updateState({ openedPasswordModal: false });
+          setOpenedPasswordModal(false);
         }}
       />
       <div className={registrationStyles.registrationWizardComponent}>
@@ -299,14 +281,16 @@ const LoginPageComponent: FC = () => {
           <Link
             to={WalletRoutesEnum.root}
             className={registrationStyles.registrationPageTitle}
-            onClick={resetState}
+            onClick={() => formik.resetForm()}
           >
             Power Wallet
           </Link>
           <LangMenu className={registrationStyles.registrationPageLangSelect} />
         </div>
         <div className={registrationStyles.registrationWizardHolder}>
-          {state.isEnterToAccPressed ? renderLoginForm() : renderInitialCards()}
+          {formik.values.isEnterToAccPressed
+            ? renderLoginForm()
+            : renderInitialCards()}
         </div>
       </div>
     </div>

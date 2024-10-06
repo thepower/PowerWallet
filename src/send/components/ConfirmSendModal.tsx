@@ -80,11 +80,6 @@ const ConfirmSendModal: React.FC<ConfirmSendModalProps> = ({
             <OutlinedInput
               inputRef={(input) => input && input.focus()}
               placeholder={t('password')!}
-              className={styles.passwordInput}
-              name='password'
-              value={formikProps.values.password}
-              onChange={formikProps.handleChange}
-              onBlur={formikProps.handleBlur}
               type={'password'}
               autoFocus
               errorMessage={formikProps.errors.password}
@@ -92,6 +87,7 @@ const ConfirmSendModal: React.FC<ConfirmSendModalProps> = ({
                 formikProps.touched.password &&
                 Boolean(formikProps.errors.password)
               }
+              {...formikProps.getFieldProps('password')}
             />
             <Button variant='outlined' type='submit' className={styles.button}>
               {t('next')}
