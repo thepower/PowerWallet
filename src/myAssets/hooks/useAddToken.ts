@@ -96,7 +96,7 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
           name,
           symbol,
           address,
-          decimals: '1',
+          decimals: 1,
           type: TokenKind.Erc721,
           chainId: chain!,
           isShow: true
@@ -124,7 +124,7 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
           }
         );
 
-        const decimalsNumber = await contractNetworkApi.executeCall(
+        const decimals = await contractNetworkApi.executeCall(
           {
             abi: abis.erc20.abi,
             functionName: 'decimals',
@@ -134,8 +134,6 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
             address
           }
         );
-
-        const decimals = decimalsNumber.toString();
 
         addToken({
           name,

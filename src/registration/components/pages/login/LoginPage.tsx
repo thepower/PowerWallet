@@ -83,7 +83,7 @@ const LoginPageComponent: FC = () => {
     if (isMobile) {
       scrollToElementByIndex(1);
     }
-  }, [isMobile, scrollToElementByIndex]);
+  }, []);
 
   const formik = useFormik({
     initialValues,

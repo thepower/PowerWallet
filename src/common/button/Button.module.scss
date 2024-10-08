@@ -51,15 +51,6 @@
   &:active {
     background: $active-gradient;
   }
-
-  &:disabled {
-    background: #26354d;
-
-    background-color: #26354d !important;
-
-    color: #79789d;
-    pointer-events: none;
-  }
 }
 
 .outlined {
@@ -86,17 +77,17 @@
       @include text-gradient($active-gradient);
     }
   }
+}
 
-  &:disabled {
-    background: #26354d;
-    background-color: #26354d !important;
-    pointer-events: none;
+.disabled {
+  background: #26354d !important;
+  background-color: #26354d !important;
+  pointer-events: none;
 
-    @include border-gradient(#26354d);
+  @include border-gradient(#26354d);
 
 
-    span {
-      @include text-gradient(#79789d);
-    }
+  span {
+    @include text-gradient(#79789d);
   }
 }

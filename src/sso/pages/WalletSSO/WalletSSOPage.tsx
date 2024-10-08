@@ -63,7 +63,7 @@ const WalletSSOPageComponent: FC = () => {
             variant='contained'
             onClick={() => onClickLoginHandler(wallet.address)}
           >
-            {wallet.address}
+            {wallet.name} - {wallet.address}
           </Button>
         ))}
       </>

@@ -76,7 +76,7 @@ const RenameAccountModalComponent: FC<RenameAccountModalProps> = ({
           variant='outlined'
           size='large'
           type='submit'
-          disabled={!formik.isValid || formik.isSubmitting}
+          disabled={!formik.isValid || formik.isSubmitting || !formik.dirty}
         >
           <span className={styles.registrationNextButtonText}>
             {t('confirm')}

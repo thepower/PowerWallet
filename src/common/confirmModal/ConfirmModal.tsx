@@ -80,7 +80,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           variant='outlined'
           type='submit'
           className={styles.button}
-          disabled={!formik.isValid || formik.isSubmitting}
+          disabled={!formik.isValid || formik.isSubmitting || !formik.dirty}
         >
           {t('confirm')}
         </Button>

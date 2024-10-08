@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { WalletApi } from '@thepowereco/tssdk';
 import { toast } from 'react-toastify';
+import { parseUnits } from 'viem/utils';
 import { useStore } from 'application/store';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
@@ -43,7 +44,7 @@ export const useSendTx = ({
         from: activeWallet.address,
         to,
         token: 'SK',
-        inputAmount: BigInt(amount) * BigInt(10) ** BigInt(9),
+        inputAmount: parseUnits(amount, 9),
         message: comment ?? ''
       });
 

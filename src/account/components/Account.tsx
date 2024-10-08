@@ -69,11 +69,12 @@ const Account: React.FC<AccountProps> = ({ className }) => {
 
   const closeImportAccountModal = () => {
     setOpenedImportAccountModal(false);
+    setIsAccountMenuOpened(false);
   };
 
   const handleOpenImportFile = () => {
     navigate(WalletRoutesEnum.login);
-    setIsAccountMenuOpened(!isAccountMenuOpened);
+    setIsAccountMenuOpened(false);
   };
 
   const handleImportAccount = (password: string) => {
@@ -102,12 +103,11 @@ const Account: React.FC<AccountProps> = ({ className }) => {
         setOpenedImportAccountModal(true);
       }
     });
-
-    setIsAccountMenuOpened(!isAccountMenuOpened);
   };
 
   const closeExportAccountModal = () => {
     setOpenedExportAccountModal(false);
+    setIsAccountMenuOpened(false);
   };
 
   const handleResetAccount = () => {
@@ -122,10 +122,12 @@ const Account: React.FC<AccountProps> = ({ className }) => {
 
   const closeResetAccountModal = () => {
     setOpenedResetAccountModal(false);
+    setIsAccountMenuOpened(false);
   };
 
   const closeRenameAccountModal = () => {
     setOpenedRenameAccountModal(false);
+    setIsAccountMenuOpened(false);
   };
 
   const getAccountActionsData = () => [

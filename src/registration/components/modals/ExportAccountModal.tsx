@@ -61,8 +61,7 @@ const ExportAccountModalComponent: React.FC<ExportAccountModalProps> = ({
       hint: ''
     },
     onSubmit: handleSubmitExportModal,
-    validationSchema: validationSchema(t),
-    validateOnBlur: false
+    validationSchema: validationSchema(t)
   });
 
   useEffect(() => {
@@ -119,7 +118,7 @@ const ExportAccountModalComponent: React.FC<ExportAccountModalProps> = ({
           variant='outlined'
           size='large'
           type='submit'
-          disabled={!formik.isValid || formik.isSubmitting}
+          disabled={!formik.isValid || formik.isSubmitting || !formik.dirty}
         >
           <span className={styles.registrationNextButtonText}>
             {t('confirm')}

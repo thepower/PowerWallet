@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { AddressApi } from '@thepowereco/tssdk';
+import { formatUnits } from 'viem/utils';
 import abis from 'abis';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { TokenKind } from 'myAssets/types';
@@ -63,7 +64,7 @@ export const useTokenBalance = ({
         }
       );
 
-      return (balanceBigint / BigInt(10) ** BigInt(decimals)).toString(10);
+      return formatUnits(balanceBigint, decimals);
     }
   };
 

@@ -7,6 +7,7 @@ import {
   useWalletsStore
 } from 'application/utils/localStorageUtils';
 import { Button, PageTemplate, Tabs } from 'common';
+import SearchInput from 'common/searchInput/SearchInput';
 import { Token } from 'myAssets/components/Token';
 import { useAddToken } from 'myAssets/hooks/useAddToken';
 import {
@@ -15,7 +16,6 @@ import {
   getAddTokenTabsLabels
 } from 'myAssets/types';
 import styles from './AddTokenPage.module.scss';
-import SearchInput from '../../../common/searchInput/SearchInput';
 
 const AddTokenPageComponent: FC = () => {
   const { t } = useTranslation();

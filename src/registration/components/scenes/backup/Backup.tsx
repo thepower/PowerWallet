@@ -43,6 +43,7 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
   const { t } = useTranslation();
 
   const [isSeedPhraseSaved, setIsSeedPhraseSaved] = useState(false);
+  const [usedPassword, setUsedPassword] = useState('');
   const navigate = useNavigate();
   const {
     selectedChain,
@@ -50,7 +51,8 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
     backupStep,
     isWithoutPassword,
     setBackupStep,
-    setSeedPhrase
+    setSeedPhrase,
+    resetStore
   } = useStore();
   const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
   const { activeWallet } = useWalletsStore();
@@ -102,7 +104,10 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
           createWalletMutation({
             seedPhrase,
             password: isWithoutPassword ? '' : password,
-            referrer: isAddressInParams ? dataOrReferrer : ''
+            referrer: isAddressInParams ? dataOrReferrer : '',
+            additionalActionOnSuccess: (password) => {
+              if (password) setUsedPassword(password);
+            }
           });
         }
       }
@@ -120,9 +125,14 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
   const formik = useFormik({
     initialValues,
     onSubmit: handleCreateWallet,
-    validationSchema: validationSchema(t),
-    validateOnBlur: false
+    validationSchema: !isWithoutPassword ? validationSchema(t) : null
   });
+
+  useEffect(() => {
+    if (isWithoutPassword) {
+      formik.resetForm();
+    }
+  }, [isWithoutPassword]);
 
   const renderCheckBox = useCallback(
     () => (
@@ -164,12 +174,20 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
           variant='contained'
           size='large'
           onClick={onClickNext}
+          disabled={!isSeedPhraseSaved}
         >
           {t('next')}
         </Button>
       </>
     ),
-    [t, renderSeedPhrase, seedPhrase, renderCheckBox, onClickNext]
+    [
+      t,
+      renderSeedPhrase,
+      seedPhrase,
+      renderCheckBox,
+      onClickNext,
+      isSeedPhraseSaved
+    ]
   );
 
   const renderEncryptPrivateKey = useCallback(
@@ -182,6 +200,8 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
             autoComplete='new-password'
             size='small'
             type={'password'}
+            error={Boolean(formik.touched.password && formik.errors.password)}
+            errorMessage={formik.errors.password}
             disabled={isWalletCreating || isWithoutPassword}
             {...formik.getFieldProps('password')}
           />
@@ -190,7 +210,11 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
             type={'password'}
             autoComplete='new-password'
             size='small'
-            errorMessage={t('oopsPasswordsDidntMatch')!}
+            error={Boolean(
+              formik.touched.confirmedPassword &&
+                formik.errors.confirmedPassword
+            )}
+            errorMessage={formik.errors.confirmedPassword}
             disabled={isWalletCreating || isWithoutPassword}
             {...formik.getFieldProps('confirmedPassword')}
           />
@@ -212,23 +236,25 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
 
   const onClickExportAccount = useCallback(() => {
     exportAccountMutation({
-      password: formik.values.password,
+      password: usedPassword,
       isWithoutGoHome: true,
       additionalActionOnSuccess: () => {
         if (dataOrReferrer && !isAddressInParams) {
           setNextStep();
         } else {
           navigate(WalletRoutesEnum.root);
+          resetStore();
         }
       }
     });
   }, [
-    dataOrReferrer,
     exportAccountMutation,
+    usedPassword,
+    dataOrReferrer,
     isAddressInParams,
+    setNextStep,
     navigate,
-    formik.values.password,
-    setNextStep
+    resetStore
   ]);
 
   const renderRegistrationCompleted = useCallback(() => {

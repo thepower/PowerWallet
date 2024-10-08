@@ -9,11 +9,14 @@ import i18n from 'locales/initTranslation';
 import { BackupAccountStepsEnum } from 'registration/typings/registrationTypes';
 import { AddActionOnSuccessType } from 'typings/common';
 
-type Args = AddActionOnSuccessType<{
-  password: string;
-  seedPhrase: string;
-  referrer?: string;
-}>;
+type Args = AddActionOnSuccessType<
+  {
+    password: string;
+    seedPhrase: string;
+    referrer?: string;
+  },
+  string
+>;
 
 type ReturnParams = {
   chainId: number;
@@ -36,7 +39,12 @@ export const useCreateWallet = () => {
     Error,
     Args
   >({
-    mutationFn: async ({ password, seedPhrase, referrer }) => {
+    mutationFn: async ({
+      password,
+      seedPhrase,
+      referrer,
+      additionalActionOnSuccess
+    }) => {
       let account: RegisteredAccount;
       if (!isRandomChain && !selectedChain) return;
       if (isRandomChain) {
@@ -58,6 +66,8 @@ export const useCreateWallet = () => {
         });
       }
       const encryptedWif = CryptoApi.encryptWif(account.wif, password);
+
+      additionalActionOnSuccess?.(password);
 
       return {
         chainId: account.chain,

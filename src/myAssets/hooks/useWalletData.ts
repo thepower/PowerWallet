@@ -44,7 +44,7 @@ export const useWalletData = (wallet: Wallet | null) => {
         name: symbol,
         address: symbol,
         symbol,
-        decimals: '9',
+        decimals: 9,
         amount,
         isShow: true,
         chainId: wallet?.chainId

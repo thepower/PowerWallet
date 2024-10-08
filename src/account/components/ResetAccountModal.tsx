@@ -27,7 +27,7 @@ const ResetAccountModalComponent: FC<ResetAccountModalProps> = ({
   ) => {
     const { password } = values;
 
-    resetWallet({ password });
+    resetWallet({ password, additionalActionOnSuccess: onClose });
 
     formikHelpers.setFieldValue('password', '');
     onClose();
@@ -73,7 +73,7 @@ const ResetAccountModalComponent: FC<ResetAccountModalProps> = ({
           variant='outlined'
           size='large'
           type='submit'
-          disabled={!formik.isValid || formik.isSubmitting}
+          disabled={!formik.isValid || formik.isSubmitting || !formik.dirty}
         >
           <span className={styles.registrationNextButtonText}>
             {t('confirm')}

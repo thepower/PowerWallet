@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AddressApi, EvmContract } from '@thepowereco/tssdk';
 import { toast } from 'react-toastify';
+import { parseUnits } from 'viem/utils';
 import abis from 'abis';
-
 import { useStore } from 'application/store';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
@@ -12,7 +12,7 @@ type Args = {
   wif: string;
   to: string;
   address: string;
-  decimals: string;
+  decimals: number;
   amount: string;
 };
 
@@ -40,7 +40,7 @@ export const useSendTokenTx = ({
 
       const erc20contract: EvmContract = new EvmContract(networkApi, address);
 
-      const calculatedAmount = BigInt(amount) * BigInt(10) ** BigInt(decimals);
+      const calculatedAmount = parseUnits(amount, +decimals);
 
       const response = await erc20contract.scSet(
         {

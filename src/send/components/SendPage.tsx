@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { InputAdornment, TextField } from '@mui/material';
 import { AddressApi, CryptoApi } from '@thepowereco/tssdk';
 import cn from 'classnames';
@@ -19,9 +19,7 @@ import { useAddToken } from 'myAssets/hooks/useAddToken';
 import { useTokenBalance } from 'myAssets/hooks/useTokenBalance';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
 import { TokenKind } from 'myAssets/types';
-import { useSendErc721TokenTx } from 'send/hooks/useSendErc721TokenTx';
-import { useSendTokenTx } from 'send/hooks/useSendTokenTx';
-import { useSendTx } from 'send/hooks/useSendTx';
+import { useSendErc721TokenTx, useSendTokenTx, useSendTx } from 'send/hooks';
 import ConfirmSendModal from './ConfirmSendModal';
 import styles from './SendPage.module.scss';
 
@@ -44,41 +42,30 @@ const InputLabelProps = {
 const SendPageComponent: FC = () => {
   const { t } = useTranslation();
   const { activeWallet } = useWalletsStore();
-
   const { sentData, setSentData } = useStore();
-  const [openModal, setOpenModal] = React.useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const {
     type: tokenType,
     address: tokenAddress,
     id: erc721TokenId
-  } = useParams<{
-    type: TokenKind;
-    address: string;
-    id: string;
-  }>();
+  } = useParams<{ type: TokenKind; address: string; id: string }>();
+
   const { getNativeTokenAmountBySymbol } = useWalletData(activeWallet);
   const { sendTxMutation, isPending: isSendTxPending } = useSendTx({
     throwOnError: false
   });
   const { sendTokenTxMutation, isPending: isSendTokenTxPending } =
     useSendTokenTx({ throwOnError: false });
-
   const { sendErc721TokenTxMutation, isPending: isSendErc721TokenTxPending } =
-    useSendErc721TokenTx({
-      throwOnError: false
-    });
-
+    useSendErc721TokenTx({ throwOnError: false });
   const { getTokenByAddress } = useTokensStore();
-
   const { addTokenMutation, isPending: isAddTokenLoading } = useAddToken({
     throwOnError: false
   });
-
   const token = useMemo(
     () => getTokenByAddress(tokenAddress),
     [getTokenByAddress, tokenAddress]
   );
-
   const nativeTokenAmount = getNativeTokenAmountBySymbol(tokenAddress);
 
   useEffect(() => {
@@ -94,10 +81,7 @@ const SendPageComponent: FC = () => {
     [tokenType]
   );
 
-  const { tokenBalance } = useTokenBalance({
-    tokenAddress,
-    type: tokenType
-  });
+  const { tokenBalance } = useTokenBalance({ tokenAddress, type: tokenType });
 
   useEffect(() => {
     if (!token && tokenAddress && !isNativeToken) {
@@ -118,32 +102,23 @@ const SendPageComponent: FC = () => {
   }, [tokenType, tokenBalance, nativeTokenAmount]);
 
   const getValidationSchema = useCallback(() => {
+    const amountValidation = yup
+      .number()
+      .required()
+      .moreThan(0)
+      .lessThan(Number(formattedAmount), t('balanceExceededReduceAmount')!)
+      .nullable();
+
     switch (tokenType) {
       case TokenKind.Native:
         return yup.object().shape({
-          amount: yup
-            .number()
-            .required()
-            .moreThan(0)
-            .lessThan(
-              Number(formattedAmount?.toString()),
-              t('balanceExceededReduceAmount')!
-            )
-            .nullable(),
+          amount: amountValidation,
           address: yup.string().required().length(20),
           comment: yup.string().max(1024)
         });
       case TokenKind.Erc20:
         return yup.object().shape({
-          amount: yup
-            .number()
-            .required()
-            .moreThan(0)
-            .lessThan(
-              Number(formattedAmount?.toString()),
-              t('balanceExceededReduceAmount')!
-            )
-            .nullable(),
+          amount: amountValidation,
           address: yup.string().required().length(20)
         });
       case TokenKind.Erc721:
@@ -186,13 +161,14 @@ const SendPageComponent: FC = () => {
         break;
       case TokenKind.Erc721:
         sendErc721TokenTxMutation({
-          to: values.address!,
+          to: values.address,
           address: tokenAddress!,
           id: erc721TokenId!,
           wif: decryptedWif
         });
         break;
       default:
+        break;
     }
   };
 
@@ -200,35 +176,39 @@ const SendPageComponent: FC = () => {
     values: FormValues,
     formikHelpers: FormikHelpers<FormValues>
   ) => {
-    if (!AddressApi.isTextAddressValid(values.address!)) {
+    if (!AddressApi.isTextAddressValid(values.address)) {
       formikHelpers.setFieldError('address', t('invalidAddress')!);
     } else {
       try {
         if (!activeWallet) {
           throw new Error('Wallet not found');
         }
+        formikHelpers.setSubmitting(true);
         const decryptedWif = CryptoApi.decryptWif(
           activeWallet.encryptedWif,
           ''
         );
-
         await send({ values, decryptedWif });
+        formikHelpers.setSubmitting(false);
       } catch (error) {
+        formik.setSubmitting(false);
         setOpenModal(true);
       }
     }
   };
-
   const onSubmit = async (values: FormValues, password: string) => {
     if (!activeWallet) {
       throw new Error('Wallet not found');
     }
+    formik.setSubmitting(true);
+
     const decryptedWif = CryptoApi.decryptWif(
       activeWallet.encryptedWif,
       password
     );
 
     await send({ values, decryptedWif });
+    formik.setSubmitting(false);
   };
 
   const formik = useFormik({
@@ -302,7 +282,7 @@ const SendPageComponent: FC = () => {
             isSendTokenTxPending ||
             isSendErc721TokenTxPending
           }
-          disabled={!formik.isValid || formik.isSubmitting}
+          disabled={!formik.isValid || formik.isSubmitting || !formik.dirty}
         >
           {t('send')}
         </Button>
@@ -343,9 +323,9 @@ const SendPageComponent: FC = () => {
       <div className={styles.content}>
         <div className={styles.walletInfo}>
           <span className={styles.titleBalance}>{t('totalBalance')}</span>
-          <span className={styles.address}>
-            {`${activeWallet?.chainId} - ${activeWallet?.address || '-'}`}
-          </span>
+          <span className={styles.address}>{`${activeWallet?.chainId} - ${
+            activeWallet?.address || '-'
+          }`}</span>
           <span className={styles.amount}>
             {isNativeToken && <LogoIcon className={styles.totalBalanceIcon} />}
             {formattedAmountString === '0'
@@ -359,4 +339,5 @@ const SendPageComponent: FC = () => {
     </PageTemplate>
   );
 };
+
 export const SendPage = SendPageComponent;

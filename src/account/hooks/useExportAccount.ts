@@ -37,7 +37,6 @@ export const useExportAccount = () => {
   }: Args) => {
     const currentNetworkChain = activeWallet?.chainId;
     const currentRegistrationChain = selectedChain;
-
     try {
       if (!activeWallet) {
         throw new Error('Wallet not found');
