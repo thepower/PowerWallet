@@ -8,7 +8,7 @@ import {
   useTokensStore,
   useWalletsStore
 } from 'application/utils/localStorageUtils';
-import { Button, Divider, PageTemplate, Tabs } from 'common';
+import { Button, CopyButton, Divider, PageTemplate, Tabs } from 'common';
 import { Erc721Token } from 'myAssets/components/Erc721Token';
 import { Token } from 'myAssets/components/Token';
 import { useERC721Tokens } from 'myAssets/hooks/useERC721Tokens';
@@ -176,6 +176,11 @@ const TokenSelectionPageComponent: React.FC = () => {
       backUrl='/'
       backUrlText={t('home')!}
     >
+      <CopyButton
+        textButton={activeWallet?.address || ''}
+        className={styles.addressButton}
+        iconClassName={styles.copyIcon}
+      />
       <div className={styles.tokenSelection}>
         {!collectionAddress && (
           <Tabs

@@ -190,6 +190,10 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
     ]
   );
 
+  useEffect(() => {
+    formik.setSubmitting(isWalletCreating);
+  }, [isWalletCreating]);
+
   const renderEncryptPrivateKey = useCallback(
     () => (
       <>
@@ -202,7 +206,7 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
             type={'password'}
             error={Boolean(formik.touched.password && formik.errors.password)}
             errorMessage={formik.errors.password}
-            disabled={isWalletCreating || isWithoutPassword}
+            disabled={isWithoutPassword}
             {...formik.getFieldProps('password')}
           />
           <OutlinedInput
@@ -215,7 +219,7 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
                 formik.errors.confirmedPassword
             )}
             errorMessage={formik.errors.confirmedPassword}
-            disabled={isWalletCreating || isWithoutPassword}
+            disabled={isWithoutPassword}
             {...formik.getFieldProps('confirmedPassword')}
           />
           <Button

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { LogoIcon } from 'assets/icons';
-import { Checkbox, Divider, Switch } from 'common';
+import { Checkbox, Switch } from 'common';
 import { useTokenBalance } from 'myAssets/hooks/useTokenBalance';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
 import { TokenKind, TToken } from 'myAssets/types';
@@ -118,7 +118,6 @@ const TokenComponent: FC<TokenProps> = ({
           {renderRightCol()}
         </div>
       )}
-      <Divider className={styles.divider} />
     </>
   );
 };

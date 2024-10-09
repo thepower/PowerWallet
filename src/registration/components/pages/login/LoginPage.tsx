@@ -67,7 +67,7 @@ const LoginPageComponent: FC = () => {
   const { loginMutation, isPending } = useRegistrationLoginToWallet({
     throwOnError: false
   });
-  const { importWalletFromFileMutation, isLoading: isImportWalletLoading } =
+  const { importWalletFromFileMutation, isPending: isImportWalletPending } =
     useImportWalletFromFile();
 
   const {
@@ -98,6 +98,10 @@ const LoginPageComponent: FC = () => {
     }
   });
 
+  useEffect(() => {
+    formik.setSubmitting(isImportWalletPending);
+  }, [isImportWalletPending]);
+
   const handleImportFile = useCallback(() => {
     importAccountRef.current?.click();
   }, []);
@@ -121,7 +125,6 @@ const LoginPageComponent: FC = () => {
 
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      console.log('event.target.files', event.target.files);
       const file = event.target.files?.[0];
       if (file) {
         importWalletFromFileMutation({
@@ -247,7 +250,7 @@ const LoginPageComponent: FC = () => {
           buttonVariant='contained'
           buttonLabel={t('selectFile')}
           isWithBorder
-          loading={isImportWalletLoading}
+          loading={isImportWalletPending}
           onSelect={handleImportFile}
         />
       </div>

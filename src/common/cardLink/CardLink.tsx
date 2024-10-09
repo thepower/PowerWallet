@@ -21,7 +21,7 @@ const CardLink: React.FC<PropsWithChildren<CardLinkProps>> = ({
     return (
       <a
         {...linkProps}
-        href={linkProps.to as string}
+        href={linkProps.to.toString()}
         aria-disabled={disabled}
         className={cn(styles.card, className)}
       >

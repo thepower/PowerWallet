@@ -4,7 +4,8 @@
   display: block;
   padding: 12px 16px;
   border-radius: 5px;
-  margin-top: 40px;
+  border: 1px solid rgba(176, 178, 183, 0.20);
+  margin-top: 20px;
 
   &:hover {
     background: #252b35;
@@ -86,10 +87,6 @@
     font-weight: 500;
     line-height: 20px;
   }
-}
-
-.divider {
-  margin-top: 20px;
 }
 
 .assetSwitch {

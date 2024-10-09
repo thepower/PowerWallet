@@ -1,58 +1,71 @@
-.walletCard {
-  width: 280px;
-  height: 156px;
+@import 'src/styles/mixins';
 
-  padding: 20px 24px;
+
+.walletCard {
+  width: 248px;
+  height: 130px;
+
+  padding: 16px 24px;
 
   border-radius: 5px;
-  border: 1px solid;
 
-  box-shadow: 20px 30px 110px 0px rgba(0, 0, 0, 0.12), 5px 5px 10px 0px rgba(229, 23, 208, 0.10), -5px -5px 10px 0px rgba(229, 23, 208, 0.10);
-  backdrop-filter: blur(65px);
   cursor: pointer;
+
+  border: 1px solid rgba(176, 178, 183, 0.20);
+}
+
+.walletCardActive {
+  @include border-gradient-background(#020409);
+
+  & .name {
+    @include text-gradient;
+  }
+
+  & .balance {
+    color: #F5F5F7;
+  }
+
+  & .addressButton {
+    color: #F5F5F7;
+  }
 }
 
 .name {
-  color: #F5F5F7;
-
   font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 20px;
+  color: #B0B2B7;
 
-  max-width: 232px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .chainId {
-  color: #F5F5F7;
-
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
+  color: rgba(245, 245, 247, 0.40);
+  font-size: 12px;
+  font-weight: 500;
   line-height: 20px;
 
-  margin-bottom: 8px;
+  margin-bottom: 3px;
 }
 
 .balance {
-  color: #F5F5F7;
-  font-size: 18px;
-  font-style: normal;
+
+  font-size: 16px;
   font-weight: 500;
-  line-height: 24px;
+  line-height: 20px;
+
+  color: #F5F5F766;
 
   margin-bottom: 18px;
 }
 
-.address {
-  color: #F5F5F7;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
+
+
+.addressButton {
+  color: #F5F5F766;
+  font-size: 14px;
+  font-weight: 500;
   line-height: 20px;
 }
+
+@include icon-colors('.copyIcon', #B0B2B7);

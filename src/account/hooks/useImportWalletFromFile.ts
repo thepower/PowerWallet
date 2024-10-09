@@ -69,6 +69,6 @@ export const useImportWalletFromFile = () => {
 
   return {
     importWalletFromFileMutation,
-    isLoading: isPending
+    isPending
   };
 };

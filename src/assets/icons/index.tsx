@@ -28,6 +28,7 @@ import SearchIcon from './searchIcon.svg?react';
 import CheckedIcon from './select.svg?react';
 import SendSvg from './send.svg?react';
 import ShareIcon from './share.svg?react';
+import SponsorSvg from './sponsor.svg?react';
 import SupportIcon from './support.svg?react';
 import ThreeLayersIcon from './three-layers.svg?react';
 import TwoLayersIcon from './two-layers.svg?react';
@@ -35,6 +36,7 @@ import UnCheckedIcon from './unSelect.svg?react';
 import WalletsSvg from './wallets.svg?react';
 
 export {
+  SponsorSvg,
   RenameIcon,
   ChevronLeftIcon,
   BellIcon,

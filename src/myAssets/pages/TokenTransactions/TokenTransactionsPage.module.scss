@@ -9,8 +9,6 @@
 }
 
 .groupByDates {
-  margin-top: 40px;
-
   > :not(:first-child) {
     margin-top: 40px;
   }
@@ -29,4 +27,9 @@
   > :not(:first-child) {
     margin-top: 40px;
   }
+}
+
+
+.addressButton {
+  margin: 16px auto 0 auto;
 }

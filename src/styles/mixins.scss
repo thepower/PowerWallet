@@ -22,9 +22,9 @@
   }
 }
 
-@mixin border-gradient-background($background, $gradient: $the-power-gradient) {
+@mixin border-gradient-background($background, $gradient: $the-power-gradient, $radius: 5px) {
   border: 1px solid #0000;
-  border-radius: 5px;
+  border-radius: $radius;
   background: linear-gradient($background, $background) padding-box, $gradient border-box;
 }
 
@@ -50,7 +50,7 @@
 }
 
 @mixin icon-colors($class,
-$defaultColor: #6b798f,
+  $defaultColor: #6b798f,
   $hoverColor: url('#hover'),
   $activeColor: url('#pressed'),
   $disabledColor: #79789d) {

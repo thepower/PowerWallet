@@ -3,8 +3,8 @@
 .transaction {
   padding: 12px 16px;
   border-radius: 5px;
+  border: 1px solid rgba(176, 178, 183, 0.20);
   margin-top: 40px;
-  background: #1b222c;
 
   &:hover {
     background: #252b35;
@@ -21,8 +21,6 @@
   }
 
   &[aria-expanded='true'] {
-    background: rgba(37, 43, 53, 0.7);
-
     .icon {
       background: rgba(46, 53, 61, 0.7);
     }
@@ -31,10 +29,6 @@
       -webkit-line-clamp: unset;
     }
   }
-}
-
-.divider {
-  margin-top: 20px;
 }
 
 .shortInfoButton {
@@ -206,7 +200,7 @@
   grid-template-columns: auto auto 1fr;
   line-height: 16px;
 
-  > * {
+  >* {
     grid-column: 1 span;
   }
 }

@@ -183,15 +183,12 @@ const SendPageComponent: FC = () => {
         if (!activeWallet) {
           throw new Error('Wallet not found');
         }
-        formikHelpers.setSubmitting(true);
         const decryptedWif = CryptoApi.decryptWif(
           activeWallet.encryptedWif,
           ''
         );
         await send({ values, decryptedWif });
-        formikHelpers.setSubmitting(false);
       } catch (error) {
-        formik.setSubmitting(false);
         setOpenModal(true);
       }
     }
@@ -200,7 +197,6 @@ const SendPageComponent: FC = () => {
     if (!activeWallet) {
       throw new Error('Wallet not found');
     }
-    formik.setSubmitting(true);
 
     const decryptedWif = CryptoApi.decryptWif(
       activeWallet.encryptedWif,
@@ -208,7 +204,6 @@ const SendPageComponent: FC = () => {
     );
 
     await send({ values, decryptedWif });
-    formik.setSubmitting(false);
   };
 
   const formik = useFormik({
@@ -216,6 +211,11 @@ const SendPageComponent: FC = () => {
     onSubmit: handleSubmit,
     validationSchema: getValidationSchema()
   });
+
+  const isPending = useMemo(
+    () => isSendTxPending || isSendTokenTxPending || isSendErc721TokenTxPending,
+    [isSendTxPending, isSendTokenTxPending, isSendErc721TokenTxPending]
+  );
 
   const renderForm = () => (
     <>
@@ -238,6 +238,7 @@ const SendPageComponent: FC = () => {
               error={formik.touched.amount && Boolean(formik.errors.amount)}
               helperText={formik.touched.amount && formik.errors.amount}
               InputLabelProps={InputLabelProps}
+              disabled={isPending}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position='start'>
@@ -258,6 +259,7 @@ const SendPageComponent: FC = () => {
             placeholder='AA000000000000000000'
             error={formik.touched.address && Boolean(formik.errors.address)}
             helperText={formik.touched.address && formik.errors.address}
+            disabled={isPending}
             {...formik.getFieldProps('address')}
           />
           {isNativeToken && (
@@ -268,6 +270,7 @@ const SendPageComponent: FC = () => {
               minRows={2}
               error={formik.touched.comment && Boolean(formik.errors.comment)}
               helperText={formik.touched.comment && formik.errors.comment}
+              disabled={isPending}
               {...formik.getFieldProps('comment')}
             />
           )}
@@ -277,11 +280,7 @@ const SendPageComponent: FC = () => {
           variant='contained'
           className={styles.button}
           type='submit'
-          loading={
-            isSendTxPending ||
-            isSendTokenTxPending ||
-            isSendErc721TokenTxPending
-          }
+          loading={isPending}
           disabled={!formik.isValid || formik.isSubmitting || !formik.dirty}
         >
           {t('send')}

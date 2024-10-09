@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import appEnvs from 'appEnvs';
@@ -8,8 +8,9 @@ import {
   useTokensStore,
   useWalletsStore
 } from 'application/utils/localStorageUtils';
-import { BuySvg, FaucetSvg, LogoIcon, SendSvg } from 'assets/icons';
-import { Button, CardLink, CopyButton, PageTemplate, Tabs } from 'common';
+import { BuySvg, FaucetSvg, SendSvg } from 'assets/icons';
+import { Button, CardLink, PageTemplate, Tabs } from 'common';
+import hooks from 'hooks';
 import WalletCard from 'myAssets/components/WalletCard/WalletCard';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
 import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
@@ -21,15 +22,25 @@ const MainPageComponent: FC = () => {
   const { t } = useTranslation();
   const { setIsShowUnderConstruction } = useStore();
 
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { scrollContainerRef, scrollToElementByIndex } =
+    hooks.useSmoothHorizontalScroll();
 
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
   const { activeWallet, wallets } = useWalletsStore();
 
-  const chainId = activeWallet?.chainId;
-  const name = activeWallet?.name;
+  const walletsWithActiveWalletAtFirst = useMemo(() => {
+    if (activeWallet) {
+      return [
+        activeWallet,
+        ...wallets.filter((wallet) => wallet.address !== activeWallet.address)
+      ];
+    }
+    return wallets;
+  }, [activeWallet, wallets]);
 
-  const { walletData, nativeTokens } = useWalletData(activeWallet);
+  const chainId = activeWallet?.chainId;
+
+  const { nativeTokens } = useWalletData(activeWallet);
 
   const { tokens } = useTokensStore();
 
@@ -68,7 +79,7 @@ const MainPageComponent: FC = () => {
     }
 
     return (
-      <ul className={styles.tokensList}>
+      <ul>
         {currentTokens.map((token) => (
           <li key={token.address}>
             <Token token={token} />
@@ -101,72 +112,51 @@ const MainPageComponent: FC = () => {
   const renderWallets = useCallback(() => {
     return (
       <div ref={scrollContainerRef} className={styles.wallets}>
-        {wallets.map((wallet, i) => (
-          <WalletCard key={wallet.address} index={i} wallet={wallet} />
+        {walletsWithActiveWalletAtFirst.map((wallet) => (
+          <WalletCard
+            key={wallet.address}
+            wallet={wallet}
+            onSelectWallet={() => scrollToElementByIndex(0)}
+          />
         ))}
       </div>
     );
-  }, [wallets]);
+  }, [
+    scrollContainerRef,
+    scrollToElementByIndex,
+    walletsWithActiveWalletAtFirst
+  ]);
 
   return (
     <PageTemplate>
       <div className={styles.wrapper}>
-        {wallets.length > 1 && renderWallets()}
-        <div className={styles.account}>
-          <div className={styles.title}>{t('accountNumber')}</div>
-          {name && (
-            <div title={name} className={styles.accountName}>
-              {name}
-            </div>
-          )}
-          <CopyButton
-            textButton={activeWallet?.address || ''}
-            className={styles.addressButton}
-            iconClassName={styles.copyIcon}
-          />
-          <div className={styles.accountChain}>{`Chain: ${chainId}`}</div>
-        </div>
-        <div className={styles.panel}>
-          <div className={styles.info}>
-            <div className={styles.infoTitle}>{t('skBalance')}</div>
-            <div className={styles.balance}>
-              <LogoIcon className={styles.icon} />
-              {!walletData?.amount?.SK || walletData?.amount?.SK === 0 ? (
-                <span className={styles.emptyTitle}>
-                  {t('yourTokensWillBeHere')}
-                </span>
-              ) : (
-                walletData?.amount?.SK.toFixed(2)
-              )}
-            </div>
-          </div>
-          <div className={styles.linksGroup}>
-            <CardLink
-              label={t('faucet')}
-              isAnchor
-              to={appEnvs.FAUCET_THEPOWER_URL}
-              target='_blank'
-              rel='noreferrer'
-            >
-              <FaucetSvg />
-            </CardLink>
-            <CardLink
-              to={WalletRoutesEnum.tokenSelection}
-              label={t('send')}
-              target={'_self'}
-              rel='noreferrer'
-            >
-              <SendSvg />
-            </CardLink>
-            <CardLink
-              onClick={handleShowUnderConstruction}
-              to={WalletRoutesEnum.buy}
-              label={t('buy')}
-              target={'_self'}
-            >
-              <BuySvg />
-            </CardLink>
-          </div>
+        {renderWallets()}
+        <div className={styles.linksGroup}>
+          <CardLink
+            label={t('faucet')}
+            isAnchor
+            to={appEnvs.FAUCET_THEPOWER_URL}
+            target='_blank'
+            rel='noreferrer'
+          >
+            <FaucetSvg />
+          </CardLink>
+          <CardLink
+            to={WalletRoutesEnum.tokenSelection}
+            label={t('send')}
+            target={'_self'}
+            rel='noreferrer'
+          >
+            <SendSvg />
+          </CardLink>
+          <CardLink
+            onClick={handleShowUnderConstruction}
+            to={WalletRoutesEnum.buy}
+            label={t('buy')}
+            target={'_self'}
+          >
+            <BuySvg />
+          </CardLink>
         </div>
         <div className={styles.btnWrapper}>
           <Button
@@ -183,15 +173,15 @@ const MainPageComponent: FC = () => {
             <AddButton>{t('addToken')}</AddButton>
           </Link>
         </div>
+        <Tabs
+          tabs={MyAssetsTabs}
+          tabsLabels={getMyAssetsTabsLabels()}
+          value={tab}
+          onChange={onChangeTab}
+          tabsRootClassName={styles.myAssetsTabsRoot}
+        />
+        {renderAssetsList()}
       </div>
-      <Tabs
-        tabs={MyAssetsTabs}
-        tabsLabels={getMyAssetsTabsLabels()}
-        value={tab}
-        onChange={onChangeTab}
-        tabsRootClassName={styles.myAssetsTabsRoot}
-      />
-      <div className={styles.tokens}>{renderAssetsList()}</div>
     </PageTemplate>
   );
 };

@@ -27,7 +27,6 @@ type StoreWithPersist<T> = Mutate<StoreApi<T>, [['zustand/persist', unknown]]>;
 export const withStorageDOMEvents = <T>(store: StoreWithPersist<T>) => {
   const storageEventCallback = (e: StorageEvent) => {
     if (e.key === store.persist.getOptions().name && e.newValue) {
-      console.log(1);
       store.persist.rehydrate();
     }
   };

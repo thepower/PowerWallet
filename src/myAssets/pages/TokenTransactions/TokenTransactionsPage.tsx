@@ -8,7 +8,7 @@ import {
   useTokensStore,
   useWalletsStore
 } from 'application/utils/localStorageUtils';
-import { PageTemplate, FullScreenLoader } from 'common';
+import { PageTemplate, FullScreenLoader, CopyButton } from 'common';
 
 import Transaction from 'myAssets/components/Transaction';
 import { useTransactionsHistory } from 'myAssets/hooks/useLoadTransactions';
@@ -83,14 +83,17 @@ const TokenTransactionsPageComponent: React.FC = () => {
       backUrl='/'
       backUrlText={t('home')!}
     >
-      <div className={styles.TokenTransactionsPage}>
-        <div className={styles.transactions}>
-          <ul className={styles.groupByDates}>{renderTransactionsList()}</ul>
-        </div>
-        <InView onChange={handleChangeView}>
-          <div />
-        </InView>
+      <CopyButton
+        textButton={activeWallet?.address || ''}
+        className={styles.addressButton}
+        iconClassName={styles.copyIcon}
+      />
+      <div className={styles.transactions}>
+        <ul className={styles.groupByDates}>{renderTransactionsList()}</ul>
       </div>
+      <InView onChange={handleChangeView}>
+        <div />
+      </InView>
     </PageTemplate>
   );
 };

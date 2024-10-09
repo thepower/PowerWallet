@@ -31,7 +31,7 @@ export type TransactionType = {
   };
   t: number;
   to: string;
-  txext: { msg: string } | never[];
+  txext: { msg?: string; sponsor?: string[] } | never[];
   ver: number;
   timestamp: number;
   cur: string;
