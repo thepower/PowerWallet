@@ -64,6 +64,9 @@ export const useSendTokenTx = ({
       queryClient.invalidateQueries({
         queryKey: ['tokenBalance', activeWallet?.address, address]
       });
+      queryClient.invalidateQueries({
+        queryKey: ['tokenBalance', to, address]
+      });
     } catch (error: any) {
       console.error(error);
       toast.error(`${i18n.t('anErrorOccurredToken')} ${error}`);

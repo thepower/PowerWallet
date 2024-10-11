@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { ClosedEyeIcon } from 'assets/icons/ClosedEyeIcon';
 import { EyeIcon } from 'assets/icons/EyeIcon';
-import styles from './Input.module.scss';
+import styles from './OutlinedInput.module.scss';
 
 interface OutlinedInputProps extends MUIOutlinedInputProps {
   errorMessage?: string;

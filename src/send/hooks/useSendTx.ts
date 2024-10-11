@@ -61,6 +61,9 @@ export const useSendTx = ({
       queryClient.invalidateQueries({
         queryKey: ['walletData', activeWallet.address]
       });
+      queryClient.invalidateQueries({
+        queryKey: ['walletData', to]
+      });
     } catch (error: any) {
       toast.error(`${i18n.t('anErrorOccurredToken')} ${error}`);
     }

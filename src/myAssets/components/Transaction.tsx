@@ -22,7 +22,7 @@ import {
   WatchIcon
 } from './icons';
 import styles from './Transaction.module.scss';
-import { FaucetSvg, SendSvg, SponsorSvg } from '../../assets/icons';
+import { FaucetSvg, SendSvg } from '../../assets/icons';
 
 type OwnProps = { trx: TransactionType };
 type TransactionProps = OwnProps;
@@ -40,7 +40,6 @@ const Transaction: React.FC<TransactionProps> = ({ trx }) => {
       setExpanded((prev) => !prev);
     }
   };
-  console.log(trx);
   const renderGrid = useCallback(() => {
     const sponsor =
       !isArray(trx.txext) &&

@@ -18,19 +18,14 @@ const CopyButton: React.FC<CopyButtonProps> = ({
   iconClassName
 }) => {
   const ref = useRef<HTMLButtonElement>(null);
-  const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
-    (e) => {
-      e.stopPropagation();
-
-      if (ref.current) {
-        navigator.clipboard.writeText(
-          copyInfo || ref.current.textContent || ''
-        );
-        toast.success('Copied to clipboard');
-      }
-    },
-    [copyInfo]
-  );
+  const handleClick = useCallback<
+    React.MouseEventHandler<HTMLButtonElement>
+  >(() => {
+    if (ref.current) {
+      navigator.clipboard.writeText(copyInfo || ref.current.textContent || '');
+      toast.success('Copied to clipboard');
+    }
+  }, [copyInfo]);
 
   return (
     <button

@@ -14,10 +14,10 @@
 
   text-decoration: none;
 
-  @include border-gradient-background(#020409, $card-gradient, 5px);
+  @include border-gradient-background(#020409, $card-gradient);
 
   @include mobile {
-    @include border-gradient-background(#020409, $card-hover-gradient, 5px);
+    @include border-gradient-background(#020409, $card-hover-gradient);
 
     :global(.fill) {
       fill: url('#hover');
@@ -33,7 +33,7 @@
   }
 
   &:hover {
-    @include border-gradient-background(#020409, $card-hover-gradient, 5px);
+    @include border-gradient-background(#020409, $card-hover-gradient);
 
     .text {
       @include text-gradient($card-hover-gradient);
@@ -41,7 +41,7 @@
   }
 
   &:active {
-    @include border-gradient-background(#020409, $card-active-gradient, 5px);
+    @include border-gradient-background(#020409, $card-active-gradient);
 
     .text {
       @include text-gradient($card-active-gradient);

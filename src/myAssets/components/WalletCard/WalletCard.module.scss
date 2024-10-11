@@ -25,7 +25,7 @@
     color: #F5F5F7;
   }
 
-  & .addressButton {
+  & .copyAddressButton {
     color: #F5F5F7;
   }
 }
@@ -60,12 +60,23 @@
 }
 
 
+@include icon-colors('.copyIcon', #B0B2B7);
 
-.addressButton {
+
+.copyAddressButton {
   color: #F5F5F766;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
+
+  display: flex;
+  align-items: center;
+  background: none;
+  cursor: pointer;
 }
 
-@include icon-colors('.copyIcon', #B0B2B7);
+.copyAddressIcon {
+  margin-left: 8px;
+}
+
+@include icon-colors('.copyAddressIcon');

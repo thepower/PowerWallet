@@ -4,7 +4,7 @@
   background: $the-power-gradient;
 }
 
-@mixin border-gradient($gradient: $the-power-gradient, $radios: 10px) {
+@mixin border-gradient($gradient: $the-power-gradient, $radios: 5px) {
   position: relative;
 
   &::before {

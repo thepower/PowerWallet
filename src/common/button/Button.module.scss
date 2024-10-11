@@ -59,14 +59,14 @@
 
 
   span {
-    @include text-gradient();
+    @include text-gradient($the-power-gradient, 5px);
   }
 
   &:hover {
     @include border-gradient($hover-gradient);
 
     span {
-      @include text-gradient($hover-gradient);
+      @include text-gradient($hover-gradient, 5px);
     }
   }
 
@@ -74,7 +74,7 @@
     @include border-gradient($active-gradient);
 
     span {
-      @include text-gradient($active-gradient);
+      @include text-gradient($active-gradient, 5px);
     }
   }
 }
@@ -88,6 +88,6 @@
 
 
   span {
-    @include text-gradient(#79789d);
+    @include text-gradient(#79789d, 5px);
   }
 }

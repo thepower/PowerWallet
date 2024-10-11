@@ -8,23 +8,19 @@ export const useWalletData = (wallet: Wallet | null) => {
   const { networkApi } = useNetworkApi({ chainId: wallet?.chainId });
 
   const getBalance = async (address: string | null | undefined) => {
-    try {
-      if (!address) {
-        throw new Error('Address not found');
-      }
-
-      if (!networkApi) {
-        throw new Error('Network API not available');
-      }
-
-      const walletApi = new WalletApi(networkApi);
-
-      const walletData = await walletApi?.loadBalance(address);
-
-      return walletData;
-    } catch (error) {
-      console.log(error);
+    if (!address) {
+      throw new Error('Address not found');
     }
+
+    if (!networkApi) {
+      throw new Error('Network API not available');
+    }
+
+    const walletApi = new WalletApi(networkApi);
+
+    const walletData = await walletApi?.loadBalance(address);
+
+    return walletData;
   };
 
   const {
@@ -52,7 +48,7 @@ export const useWalletData = (wallet: Wallet | null) => {
   );
 
   const getNativeTokenAmountBySymbol = (symbol?: string) => {
-    return symbol && walletData?.amount?.[symbol];
+    return (symbol && walletData?.amount?.[symbol]) || 0;
   };
 
   return {
