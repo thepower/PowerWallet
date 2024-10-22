@@ -2,7 +2,6 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import appEnvs from 'appEnvs';
-import { useStore } from 'application/store';
 import { WalletRoutesEnum } from 'application/typings/routes';
 import {
   useTokensStore,
@@ -20,7 +19,6 @@ import { Token } from '../../components/Token';
 
 const MainPageComponent: FC = () => {
   const { t } = useTranslation();
-  const { setIsShowUnderConstruction } = useStore();
 
   const { scrollContainerRef, scrollToElementByIndex } =
     hooks.useSmoothHorizontalScroll();
@@ -46,11 +44,6 @@ const MainPageComponent: FC = () => {
 
   const onChangeTab = (_event: React.SyntheticEvent, value: MyAssetsTabs) => {
     setTab(value);
-  };
-
-  const handleShowUnderConstruction = (event: React.MouseEvent) => {
-    event.preventDefault();
-    setIsShowUnderConstruction(true);
   };
 
   const erc20tokens = tokens.filter(
@@ -149,12 +142,7 @@ const MainPageComponent: FC = () => {
           >
             <SendSvg />
           </CardLink>
-          <CardLink
-            onClick={handleShowUnderConstruction}
-            to={WalletRoutesEnum.buy}
-            label={t('buy')}
-            target={'_self'}
-          >
+          <CardLink to={WalletRoutesEnum.buy} label={t('buy')} target={'_self'}>
             <BuySvg />
           </CardLink>
         </div>

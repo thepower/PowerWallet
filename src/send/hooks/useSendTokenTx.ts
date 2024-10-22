@@ -51,22 +51,22 @@ export const useSendTokenTx = ({
         { key: { wif, address: activeWallet.address } }
       );
 
-      const { txId } = response;
+      if (response?.txId) {
+        setSentData({
+          txId: response.txId,
+          comment: '',
+          amount,
+          from: activeWallet.address,
+          to
+        });
 
-      setSentData({
-        txId,
-        comment: '',
-        amount,
-        from: activeWallet.address,
-        to
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['tokenBalance', activeWallet?.address, address]
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['tokenBalance', to, address]
-      });
+        queryClient.invalidateQueries({
+          queryKey: ['tokenBalance', activeWallet?.address, address]
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['tokenBalance', to, address]
+        });
+      }
     } catch (error: any) {
       console.error(error);
       toast.error(`${i18n.t('anErrorOccurredToken')} ${error}`);

@@ -48,7 +48,7 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   const { importWalletFromFileMutation } = useImportWalletFromFile();
   const { resetWallet } = useResetWallet();
   const { isAccountMenuOpened, setIsAccountMenuOpened } = useStore();
-  const { activeWallet } = useWalletsStore();
+  const { activeWallet, setActiveWalletByAddress } = useWalletsStore();
 
   const handleCreateAccount = () => {
     navigate(WalletRoutesEnum.signup);
@@ -80,10 +80,14 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   const handleImportAccount = (password: string) => {
     importWalletFromFileMutation({
       password,
-      accountFile: accountFile!
+      accountFile: accountFile!,
+      additionalActionOnSuccess: (params) => {
+        if (params && params.address) {
+          setActiveWalletByAddress(params.address);
+          setOpenedImportAccountModal(false);
+        }
+      }
     });
-
-    setOpenedImportAccountModal(false);
   };
 
   const setAccountFileOnChange = (
@@ -98,6 +102,12 @@ const Account: React.FC<AccountProps> = ({ className }) => {
     importWalletFromFileMutation({
       password: '',
       accountFile,
+      additionalActionOnSuccess: (params) => {
+        if (params && params.address) {
+          setActiveWalletByAddress(params.address);
+          setOpenedImportAccountModal(false);
+        }
+      },
       additionalActionOnDecryptError: () => {
         setAccountFile(accountFile);
         setOpenedImportAccountModal(true);

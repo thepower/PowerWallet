@@ -4,6 +4,7 @@ import appEnvs from 'appEnvs';
 import { useInitApp, useRestoreOldVersionAccount } from 'application/hooks';
 import { useNetworkApi } from 'application/hooks';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
+import { BuyPage } from 'buy/pages/BuyPage/BuyPage';
 import { FullScreenLoader } from 'common';
 import { AddTokenPage } from 'myAssets/pages/AddToken/AddTokenPage';
 import { MainPage } from 'myAssets/pages/Main/MainPage';
@@ -62,6 +63,7 @@ const AppRoutesComponent: React.FC = () => {
         path={`${WalletRoutesEnum.sso}/:data`}
         element={<WalletSSOPage />}
       />
+      <Route path={`${WalletRoutesEnum.buy}`} element={<BuyPage />} />
       <Route
         path={`${WalletRoutesEnum.signup}/:dataOrReferrer?`}
         element={<RegistrationPage />}

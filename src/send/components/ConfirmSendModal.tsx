@@ -11,7 +11,7 @@ interface OwnProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (values: FormValues, password: string) => Promise<void>;
-  token?: TToken;
+  token: TToken | null;
   trxValues: {
     amount: string;
     comment: string;

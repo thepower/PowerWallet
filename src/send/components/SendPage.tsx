@@ -219,15 +219,13 @@ const SendPageComponent: FC = () => {
 
   const renderForm = () => (
     <>
-      {token && (
-        <ConfirmSendModal
-          open={openModal}
-          trxValues={formik.values}
-          onClose={handleClose}
-          token={token}
-          onSubmit={onSubmit}
-        />
-      )}
+      <ConfirmSendModal
+        open={openModal}
+        trxValues={formik.values}
+        onClose={handleClose}
+        token={token}
+        onSubmit={onSubmit}
+      />
       <form className={styles.form} onSubmit={formik.handleSubmit}>
         <div className={styles.fields}>
           {!isErc721Token && (
