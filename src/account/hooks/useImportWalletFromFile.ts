@@ -4,7 +4,7 @@ import { CryptoApi, WalletApi } from '@thepowereco/tssdk';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import { FileReaderType, getFileData } from 'common';
 import i18n from 'locales/initTranslation';
 import { AddActionOnSuccessAndDecryptType } from 'typings/common';
@@ -50,7 +50,7 @@ export const useImportWalletFromFile = () => {
           chainId: loginResult?.chainId
         });
 
-        !isWithoutGoHome && navigate(WalletRoutesEnum.root);
+        !isWithoutGoHome && navigate(RoutesEnum.root);
       } catch (e: any) {
         if (
           additionalActionOnDecryptError &&

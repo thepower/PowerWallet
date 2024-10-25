@@ -3,7 +3,7 @@ import { Skeleton } from '@mui/material';
 import range from 'lodash/range';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import {
   useTokensStore,
   useWalletsStore
@@ -167,8 +167,8 @@ const TokenSelectionPageComponent: React.FC = () => {
 
   const nextLink =
     tokenType === TokenKind.Erc721
-      ? `/${tokenType}/${assetIdentifier}/${selectedToken}${WalletRoutesEnum.send}`
-      : `/${tokenType}/${assetIdentifier}${WalletRoutesEnum.send}`;
+      ? `/${tokenType}/${assetIdentifier}/${selectedToken}${RoutesEnum.send}`
+      : `/${tokenType}/${assetIdentifier}${RoutesEnum.send}`;
 
   return (
     <PageTemplate

@@ -1,0 +1,95 @@
+@import 'src/styles/mixins';
+@import 'src/styles/variables';
+
+
+.walletSSOPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 40px 32px;
+
+  min-height: 100vh;
+}
+
+.title {
+  @include text-gradient();
+
+  text-align: center;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 32px;
+
+
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  color: #F5F5F7;
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+
+  margin-bottom: 18px;
+}
+
+.walletList {
+  display: flex;
+  flex-direction: column;
+
+  gap: 24px;
+}
+
+.walletCard {
+  @include border-gradient($the-power-gradient, 10px);
+
+  display: flex;
+  height: 83px;
+  padding: 20px 40px;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  flex-direction: column;
+  cursor: pointer;
+
+  & .name {
+    @include text-gradient();
+
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+
+    max-width: 200px;
+
+  }
+
+  & .address {
+    color: #F2F2F2;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+  }
+
+  & .chain {
+    color: #AAABAC;
+
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+  }
+
+}
+
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
+}

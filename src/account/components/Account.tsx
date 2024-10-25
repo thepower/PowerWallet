@@ -9,7 +9,7 @@ import {
   useResetWallet
 } from 'account/hooks';
 import { useStore } from 'application/store';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import {
   SupportIcon,
@@ -51,7 +51,7 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   const { activeWallet, setActiveWalletByAddress } = useWalletsStore();
 
   const handleCreateAccount = () => {
-    navigate(WalletRoutesEnum.signup);
+    navigate(RoutesEnum.signup);
   };
 
   const handleExportAccount = () => {
@@ -73,7 +73,7 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   };
 
   const handleOpenImportFile = () => {
-    navigate(WalletRoutesEnum.login);
+    navigate(RoutesEnum.login);
     setIsAccountMenuOpened(false);
   };
 

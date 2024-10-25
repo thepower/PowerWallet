@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { AddressApi, TransactionsApi, WalletApi } from '@thepowereco/tssdk';
-import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
 import { toast } from 'react-toastify';
+import { formatUnits } from 'viem/utils';
 
 import { useStore } from 'application/store';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
@@ -67,24 +67,22 @@ export const useSignAndSendTx = ({
       const fee = newDecodedTxBody?.p?.find(
         (purpose) => purpose?.[0] === TxPurpose.SRCFEE
       );
-      const feeAmount = fee?.[2] || 0;
+      const feeAmount = fee?.[2] || 0n;
 
       const gas = newDecodedTxBody?.p?.find(
         (purpose) => purpose?.[0] === TxPurpose.GAS
       );
-      const gasAmount = gas?.[2] || 0;
+      const gasAmount = gas?.[2] || 0n;
 
       const transfer = newDecodedTxBody?.p?.find(
         (purpose) => purpose?.[0] === TxPurpose.TRANSFER
       );
-      const transferAmount = transfer?.[2] || 0;
+      const transferAmount = transfer?.[2] || 0n;
       const transferToken = transfer?.[1];
 
       const totalAmount = feeAmount + gasAmount + transferAmount;
-      const correctedTotalCommissionAmount =
-        totalAmount && correctAmount(totalAmount, 'SK');
 
-      if (balance?.amount?.SK < correctedTotalCommissionAmount) {
+      if (balance?.amount?.SK < totalAmount) {
         toast.error(i18n.t('insufficientFunds'));
         return;
       }
@@ -92,7 +90,7 @@ export const useSignAndSendTx = ({
       const amount =
         transferAmount &&
         transferToken &&
-        correctAmount(transferAmount, transferToken);
+        formatUnits(transferAmount, networkApi.decimals[transferToken]);
 
       const to =
         newDecodedTxBody?.to &&

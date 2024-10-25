@@ -37,7 +37,7 @@ export interface TxBody {
   f: Buffer;
   to: Buffer;
   s: bigint;
-  p: Array<[TxPurpose, string, number]>;
+  p: Array<[TxPurpose, string, bigint]>;
   e?: {
     sponsor?: Buffer[];
     msg?: string;

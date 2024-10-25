@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import appEnvs from 'appEnvs';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import {
   useTokensStore,
   useWalletsStore
@@ -135,20 +135,20 @@ const MainPageComponent: FC = () => {
             <FaucetSvg />
           </CardLink>
           <CardLink
-            to={WalletRoutesEnum.tokenSelection}
+            to={RoutesEnum.tokenSelection}
             label={t('send')}
             target={'_self'}
             rel='noreferrer'
           >
             <SendSvg />
           </CardLink>
-          <CardLink to={WalletRoutesEnum.buy} label={t('buy')} target={'_self'}>
+          <CardLink to={RoutesEnum.buy} label={t('buy')} target={'_self'}>
             <BuySvg />
           </CardLink>
         </div>
         <div className={styles.btnWrapper}>
           <Button
-            to={WalletRoutesEnum.referralProgram}
+            to={RoutesEnum.referralProgram}
             className={styles.referralBtn}
             variant='contained'
           >
@@ -157,7 +157,7 @@ const MainPageComponent: FC = () => {
         </div>
         <div className={styles.tokensHeadRow}>
           <div className={styles.title}>{t('tokens')}</div>
-          <Link to={`${WalletRoutesEnum.add}`}>
+          <Link to={`${RoutesEnum.add}`}>
             <AddButton>{t('addToken')}</AddButton>
           </Link>
         </div>

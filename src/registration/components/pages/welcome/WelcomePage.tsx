@@ -1,7 +1,7 @@
 import { FC, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import { Button, LangMenu } from 'common';
 
 import styles from './WelcomePage.module.scss';
@@ -12,14 +12,14 @@ const WelcomePageComponent: FC = () => {
   const navigate = useNavigate();
   useEffect(() => {
     if (referrer) {
-      navigate(`${WalletRoutesEnum.signup}/${referrer}`);
+      navigate(`${RoutesEnum.signup}/${referrer}`);
     }
   }, [navigate, referrer]);
 
   return (
     <div className={styles.registrationPage}>
       <LangMenu className={styles.langSelect} />
-      <Link to={WalletRoutesEnum.root} className={styles.registrationTitle}>
+      <Link to={RoutesEnum.root} className={styles.registrationTitle}>
         Power Wallet
       </Link>
       <div className={styles.registrationDesc}>{t('registrationPageDesc')}</div>
@@ -28,7 +28,7 @@ const WelcomePageComponent: FC = () => {
           size='large'
           variant='contained'
           type='button'
-          to={WalletRoutesEnum.signup}
+          to={RoutesEnum.signup}
         >
           {t('registrationPageJoinButton')}
         </Button>
@@ -36,7 +36,7 @@ const WelcomePageComponent: FC = () => {
           size='large'
           variant='outlined'
           type='button'
-          to={WalletRoutesEnum.login}
+          to={RoutesEnum.login}
         >
           {t('registrationPageImportAccountButton')}
         </Button>

@@ -75,7 +75,7 @@ export type TToken = {
   name: string;
   address: string;
   symbol: string;
-  chainId: number;
+  chainId: number | null;
   decimals: number;
   isShow?: boolean;
 };

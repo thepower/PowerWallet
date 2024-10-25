@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
 import { useStore } from 'application/store';
-import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
+import { AppQueryParams, RoutesEnum } from 'application/typings/routes';
 import { BreadcrumbsTypeEnum, Checkbox, LangMenu, Wizard } from 'common';
 
 import { stringToObject } from 'sso/utils';
@@ -153,7 +153,7 @@ const RegistrationPageComponent: FC = () => {
         <div className={styles.registrationPageHeader}>
           <div style={{ width: '48px' }} />
           <Link
-            to={WalletRoutesEnum.root}
+            to={RoutesEnum.root}
             className={styles.registrationPageTitle}
             onClick={resetStage}
           >

@@ -15,7 +15,7 @@ type WalletCardProps = {
 
 const WalletCard: FC<WalletCardProps> = ({ wallet, onSelectWallet }) => {
   const { t } = useTranslation();
-  const { walletData } = useWalletData(wallet);
+  const { getNativeTokenAmountBySymbol } = useWalletData(wallet);
   const { activeWallet, setActiveWalletByAddress } = useWalletsStore();
 
   const onClick = () => {
@@ -37,12 +37,19 @@ const WalletCard: FC<WalletCardProps> = ({ wallet, onSelectWallet }) => {
     [wallet?.address]
   );
 
+  const SK = getNativeTokenAmountBySymbol('SK');
+  const fixedSK = parseFloat(SK.formattedAmount).toFixed(3);
+
   return (
     <div
       onClick={onClick}
       className={cn(styles.walletCard, isActive && styles.walletCardActive)}
     >
-      <div className={styles.name}>{wallet?.name || ''}</div>
+      <div title={wallet.name} className={styles.name}>
+        {wallet.name.length > 20
+          ? `${wallet.name.substring(0, 20)}...`
+          : wallet.name}
+      </div>
       <button type='button' className={cn(styles.copyAddressButton)}>
         {wallet?.address}
         <CopySvg onClick={handleClick} className={styles.copyAddressIcon} />
@@ -50,11 +57,8 @@ const WalletCard: FC<WalletCardProps> = ({ wallet, onSelectWallet }) => {
       <div className={styles.chainId}>
         {t('chain')}: {wallet.chainId}
       </div>
-      <div
-        title={walletData?.amount?.SK?.toString() || '0'}
-        className={styles.balance}
-      >
-        {`${walletData?.amount?.SK?.toFixed(2) || 0} SK`}
+      <div title={fixedSK || '0'} className={styles.balance}>
+        {`${fixedSK} SK`}
       </div>
     </div>
   );

@@ -1,13 +1,13 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { InputAdornment, TextField } from '@mui/material';
-import { AddressApi, CryptoApi } from '@thepowereco/tssdk';
+import { CryptoApi } from '@thepowereco/tssdk';
 import cn from 'classnames';
-import { FormikHelpers, useFormik } from 'formik';
+import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import * as yup from 'yup';
 import { useStore } from 'application/store';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import {
   useTokensStore,
   useWalletsStore
@@ -66,6 +66,7 @@ const SendPageComponent: FC = () => {
     () => getTokenByAddress(tokenAddress),
     [getTokenByAddress, tokenAddress]
   );
+
   const nativeTokenAmount = getNativeTokenAmountBySymbol(tokenAddress);
 
   useEffect(() => {
@@ -95,7 +96,7 @@ const SendPageComponent: FC = () => {
       case TokenKind.Erc721:
         return tokenBalance;
       case TokenKind.Native:
-        return nativeTokenAmount;
+        return nativeTokenAmount.formattedAmount;
       default:
         return '0';
     }
@@ -113,17 +114,20 @@ const SendPageComponent: FC = () => {
       case TokenKind.Native:
         return yup.object().shape({
           amount: amountValidation,
-          address: yup.string().required().length(20),
+          address: yup.string().required(),
+          // .length(20),
           comment: yup.string().max(1024)
         });
       case TokenKind.Erc20:
         return yup.object().shape({
           amount: amountValidation,
-          address: yup.string().required().length(20)
+          address: yup.string().required()
+          // .length(20)
         });
       case TokenKind.Erc721:
         return yup.object().shape({
-          address: yup.string().required().length(20)
+          address: yup.string().required()
+          // .length(20)
         });
       default:
         return undefined;
@@ -173,25 +177,22 @@ const SendPageComponent: FC = () => {
   };
 
   const handleSubmit = async (
-    values: FormValues,
-    formikHelpers: FormikHelpers<FormValues>
+    values: FormValues
+    // formikHelpers: FormikHelpers<FormValues>
   ) => {
-    if (!AddressApi.isTextAddressValid(values.address)) {
-      formikHelpers.setFieldError('address', t('invalidAddress')!);
-    } else {
-      try {
-        if (!activeWallet) {
-          throw new Error('Wallet not found');
-        }
-        const decryptedWif = CryptoApi.decryptWif(
-          activeWallet.encryptedWif,
-          ''
-        );
-        await send({ values, decryptedWif });
-      } catch (error) {
-        setOpenModal(true);
+    // if (!AddressApi.isTextAddressValid(values.address) && !isAddre) {
+    //   formikHelpers.setFieldError('address', t('invalidAddress')!);
+    // } else {
+    try {
+      if (!activeWallet) {
+        throw new Error('Wallet not found');
       }
+      const decryptedWif = CryptoApi.decryptWif(activeWallet.encryptedWif, '');
+      await send({ values, decryptedWif });
+    } catch (error) {
+      setOpenModal(true);
     }
+    // }
   };
   const onSubmit = async (values: FormValues, password: string) => {
     if (!activeWallet) {
@@ -298,7 +299,7 @@ const SendPageComponent: FC = () => {
     return (
       <PageTemplate
         topBarChild={t('send')}
-        backUrl={WalletRoutesEnum.root}
+        backUrl={RoutesEnum.root}
         backUrlText={t('home')!}
       >
         <TxResult
@@ -314,7 +315,7 @@ const SendPageComponent: FC = () => {
   return (
     <PageTemplate
       topBarChild={t('send')}
-      backUrl={WalletRoutesEnum.root}
+      backUrl={RoutesEnum.root}
       backUrlText={t('home')!}
     >
       <div className={styles.content}>

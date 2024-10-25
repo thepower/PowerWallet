@@ -16,9 +16,9 @@ import { RegistrationPage } from 'registration/components/pages/registration/Reg
 import { WelcomePage } from 'registration/components/pages/welcome/WelcomePage';
 import { SendPage } from 'send/components/SendPage';
 import { SignAndSendPage } from 'sign-and-send/components/SingAndSendPage';
-import { WalletSSOPage } from 'sso/pages/WalletSSO/WalletSSOPage';
+import { SSOPage } from 'sso/pages/sso/SSOPage';
 
-import { WalletRoutesEnum } from '../typings/routes';
+import { RoutesEnum } from '../typings/routes';
 
 const AppRoutesComponent: React.FC = () => {
   const { activeWallet } = useWalletsStore();
@@ -47,39 +47,33 @@ const AppRoutesComponent: React.FC = () => {
         element={walletAddress ? <MainPage /> : <WelcomePage />}
       />
       <Route
-        path={WalletRoutesEnum.referralProgram}
+        path={RoutesEnum.referralProgram}
         element={<ReferralProgramPage />}
       />
-      <Route path={WalletRoutesEnum.add} element={<AddTokenPage />} />
+      <Route path={RoutesEnum.add} element={<AddTokenPage />} />
       <Route
-        path={`${WalletRoutesEnum.signAndSend}/:message`}
+        path={`${RoutesEnum.signAndSend}/:message`}
         element={<SignAndSendPage />}
       />
       <Route
-        path={`${WalletRoutesEnum.tokenSelection}/:address?`}
+        path={`${RoutesEnum.tokenSelection}/:address?`}
         element={<TokenSelectionPage />}
       />
+      <Route path={`${RoutesEnum.sso}/:data`} element={<SSOPage />} />
+      <Route path={`${RoutesEnum.buy}`} element={<BuyPage />} />
       <Route
-        path={`${WalletRoutesEnum.sso}/:data`}
-        element={<WalletSSOPage />}
-      />
-      <Route path={`${WalletRoutesEnum.buy}`} element={<BuyPage />} />
-      <Route
-        path={`${WalletRoutesEnum.signup}/:dataOrReferrer?`}
+        path={`${RoutesEnum.signup}/:dataOrReferrer?`}
         element={<RegistrationPage />}
       />
 
+      <Route path={`${RoutesEnum.login}/:data?`} element={<LoginPage />} />
       <Route
-        path={`${WalletRoutesEnum.login}/:data?`}
-        element={<LoginPage />}
-      />
-      <Route
-        path={`/:type/:address/:id?${WalletRoutesEnum.send}`}
+        path={`/:type/:address/:id?${RoutesEnum.send}`}
         element={<SendPage />}
       />
 
       <Route
-        path={`/:type/:address${WalletRoutesEnum.transactions}`}
+        path={`/:type/:address${RoutesEnum.transactions}`}
         element={<TokenTransactionsPage />}
       />
     </Routes>

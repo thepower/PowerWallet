@@ -8,7 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import * as yup from 'yup';
 import { useExportAccount } from 'account/hooks';
 import { useStore } from 'application/store';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import {
   Button,
@@ -246,7 +246,7 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
         if (dataOrReferrer && !isAddressInParams) {
           setNextStep();
         } else {
-          navigate(WalletRoutesEnum.root);
+          navigate(RoutesEnum.root);
           resetStore();
         }
       }

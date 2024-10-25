@@ -46,7 +46,12 @@ export const useSendTokenTx = ({
         {
           abi: abis.erc20.abi,
           functionName: 'transfer',
-          args: [AddressApi.textAddressToEvmAddress(to), calculatedAmount]
+          args: [
+            AddressApi.isTextAddressValid(to)
+              ? AddressApi.textAddressToEvmAddress(to)
+              : (to as `0x${string}`),
+            calculatedAmount
+          ]
         },
         { key: { wif, address: activeWallet.address } }
       );

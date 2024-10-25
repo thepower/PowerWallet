@@ -16,6 +16,7 @@ const bootstrap = async (chainId?: number) => {
     }
     const networkApi = new NetworkApi(chainId);
     await networkApi.bootstrap();
+
     return networkApi.upload();
   } catch (error) {
     console.error(error);

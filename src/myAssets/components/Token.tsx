@@ -2,7 +2,7 @@ import React, { FC, memo, useMemo } from 'react';
 import cn from 'classnames';
 
 import { Link } from 'react-router-dom';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { LogoIcon } from 'assets/icons';
 import { Checkbox, Switch } from 'common';
@@ -36,12 +36,14 @@ const TokenComponent: FC<TokenProps> = ({
     type
   });
 
-  const { walletData } = useWalletData(activeWallet);
+  const { getNativeTokenAmountBySymbol } = useWalletData(activeWallet);
 
   const balance = useMemo(
     () =>
-      type === TokenKind.Native ? walletData?.amount[address] : tokenBalance,
-    [type, walletData?.amount, address, tokenBalance]
+      type === TokenKind.Native
+        ? getNativeTokenAmountBySymbol(address).formattedAmount
+        : tokenBalance,
+    [type, getNativeTokenAmountBySymbol, address, tokenBalance]
   );
 
   const onClickToken = () => {
@@ -64,8 +66,8 @@ const TokenComponent: FC<TokenProps> = ({
       );
     }
     const link = isErc721Collection
-      ? `${WalletRoutesEnum.tokenSelection}/${token.address}`
-      : `/${token.type}/${token.address}${WalletRoutesEnum.transactions}`;
+      ? `${RoutesEnum.tokenSelection}/${token.address}`
+      : `/${token.type}/${token.address}${RoutesEnum.transactions}`;
     return (
       <Link to={link} className={styles.asset}>
         {children}

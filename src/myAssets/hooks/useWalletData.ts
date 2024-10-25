@@ -1,5 +1,7 @@
+import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { WalletApi } from '@thepowereco/tssdk';
+import { formatUnits } from 'viem/utils';
 import { Wallet } from 'application/utils/localStorageUtils';
 import { LoadBalanceType, TokenKind, TToken } from 'myAssets/types';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
@@ -33,23 +35,44 @@ export const useWalletData = (wallet: Wallet | null) => {
     enabled: !!wallet?.address && !!networkApi
   });
 
-  const nativeTokens = Object.entries(walletData?.amount || {}).map(
-    ([symbol, amount]) =>
-      ({
-        type: TokenKind.Native,
-        name: symbol,
-        address: symbol,
-        symbol,
-        decimals: 9,
-        amount,
-        isShow: true,
-        chainId: wallet?.chainId
-      }) as TToken
+  const nativeTokens = useMemo(
+    () =>
+      Object.entries(walletData?.amount || {}).map(
+        ([symbol, amount]) =>
+          ({
+            type: TokenKind.Native,
+            name: symbol,
+            address: symbol,
+            symbol,
+            decimals: networkApi?.decimals.SK,
+            amount,
+            formattedAmount: networkApi?.decimals[symbol]
+              ? formatUnits(BigInt(amount), networkApi?.decimals[symbol])
+              : '0',
+            isShow: true,
+            chainId: wallet?.chainId
+          }) as TToken
+      ),
+    [walletData?.amount, networkApi?.decimals, wallet?.chainId]
   );
 
-  const getNativeTokenAmountBySymbol = (symbol?: string) => {
-    return (symbol && walletData?.amount?.[symbol]) || 0;
-  };
+  const getNativeTokenAmountBySymbol = useCallback(
+    (symbol?: string) => {
+      return {
+        amount: (symbol && walletData?.amount?.[symbol])?.toString() || '0',
+        formattedAmount:
+          (symbol &&
+            networkApi?.decimals[symbol] &&
+            walletData?.amount?.[symbol] &&
+            formatUnits(
+              BigInt(walletData?.amount?.[symbol]),
+              networkApi?.decimals[symbol]
+            )) ||
+          '0'
+      };
+    },
+    [networkApi?.decimals, walletData?.amount]
+  );
 
   return {
     nativeTokens,

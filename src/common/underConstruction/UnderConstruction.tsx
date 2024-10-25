@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from 'application/store';
 import styles from './underConstruction.module.scss';
-import { WalletRoutesEnum } from '../../application/typings/routes';
+import { RoutesEnum } from '../../application/typings/routes';
 import { Modal } from '../modal/Modal';
 
 const UnderConstructionComponent: React.FC = () => {
@@ -17,7 +17,7 @@ const UnderConstructionComponent: React.FC = () => {
   }, []);
 
   const handleProceedToHome = React.useCallback(() => {
-    navigate(WalletRoutesEnum.root);
+    navigate(RoutesEnum.root);
     handleCloseModal();
   }, [handleCloseModal, navigate]);
 

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { useStore } from 'application/store';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import {
@@ -68,7 +68,7 @@ export const useExportAccount = () => {
       fileSaver.saveAs(blob, fileName, { autoBom: true });
 
       if (!isWithoutGoHome) {
-        navigate(WalletRoutesEnum.root);
+        navigate(RoutesEnum.root);
       }
 
       additionalActionOnSuccess?.();

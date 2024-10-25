@@ -1,6 +1,7 @@
 import React, { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import appEnvs from 'appEnvs';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { PageTemplate } from 'common';
 
@@ -15,13 +16,15 @@ const BuyPageComponent: FC = () => {
     if (activeWallet) {
       // Создаем объект для параметров
       const queryParams = {
-        // evmChainId: 'exampleEvmChainId',
-        // powerChainId: 'examplePowerChainId',
-        // evmTokenAddress: '0xExampleTokenAddress',
-        // evmBridgeAddress: '0xExampleBridgeAddress',
-        // powerTokenAddress: 'examplePowerTokenAddress',
-        // powerBridgeAddress: 'examplePowerBridgeAddress',
-        // amount: '1000'
+        // evmChainId: 'evmChainId',
+        // powerChainId: 'powerChainId',
+        // evmTokenAddress: 'evmTokenAddress',
+        // evmBridgeAddress: 'evmBridgeAddress',
+        // powerTokenAddress: 'powerTokenAddress',
+        // powerBridgeAddress: 'powerBridgeAddress',
+        toAddress: activeWallet.address
+        // amount: 'amount',
+        // token: 'token'
       };
 
       // Используем URLSearchParams для конвертации объекта в строку параметров
@@ -34,10 +37,10 @@ const BuyPageComponent: FC = () => {
     <PageTemplate backUrl='/' backUrlText={t('home')!}>
       <div className={styles.wrapper}>
         <iframe
-          src={`https://localhost:3000?${params}`}
+          src={`${appEnvs.BUY_THEPOWER_URL}?${params}`}
           width='100%'
           height='600px'
-          title='Example Iframe'
+          title='Buy Iframe'
         />
       </div>
     </PageTemplate>

@@ -41,7 +41,9 @@
   grid-template-columns: auto 1fr;
   text-align: left;
 
-  > * {
+  margin-bottom: 16px;
+
+  >* {
     grid-column: 1 span;
   }
 }

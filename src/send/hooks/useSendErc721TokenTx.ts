@@ -47,7 +47,9 @@ export const useSendErc721TokenTx = ({
           functionName: 'transferFrom',
           args: [
             AddressApi.textAddressToEvmAddress(activeWallet.address),
-            AddressApi.textAddressToEvmAddress(to),
+            AddressApi.isTextAddressValid(to)
+              ? AddressApi.textAddressToEvmAddress(to)
+              : (to as `0x${string}`),
             BigInt(id)
           ]
         },

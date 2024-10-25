@@ -15,7 +15,7 @@ import { Link, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
 import { useImportWalletFromFile } from 'account/hooks';
-import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
+import { AppQueryParams, RoutesEnum } from 'application/typings/routes';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
 import { Button, LangMenu, OutlinedInput, IconButton, Checkbox } from 'common';
 import hooks from 'hooks';
@@ -114,7 +114,15 @@ const LoginPageComponent: FC = () => {
             address: result?.address,
             returnUrl: parsedData?.returnUrl
           });
-          window.location.replace(`${parsedData.callbackUrl}sso/${stringData}`);
+          window.opener.postMessage?.(
+            objectToString({
+              type: 'authenticateResponse',
+              data: stringData
+            }),
+            parsedData.returnUrl
+          );
+          window.close();
+          // window.location.replace(`${parsedData.callbackUrl}sso/${stringData}`);
         } else {
           toast.error(t('wrongChainLogin'));
         }
@@ -282,7 +290,7 @@ const LoginPageComponent: FC = () => {
         <div className={registrationStyles.registrationPageHeader}>
           <div style={{ width: '48px' }} />
           <Link
-            to={WalletRoutesEnum.root}
+            to={RoutesEnum.root}
             className={registrationStyles.registrationPageTitle}
             onClick={() => formik.resetForm()}
           >

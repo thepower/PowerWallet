@@ -193,6 +193,10 @@
     "copyReferralLink": "Copy Referral Link",
     "rewards": "🎉 Rewards",
     "referralLink": "🔗 Referral Link",
-    "referralProgram": "Referral Program"
+    "referralProgram": "Referral Program",
+    "walletAuthorization": "Wallet Authorization",
+    "pleaseSelectAccount": "Please select account",
+    "youDontHaveWalletForChain": "You don't have a wallet for chain",
+    "createPowerWallet": "Create Power Wallet"
   }
 }

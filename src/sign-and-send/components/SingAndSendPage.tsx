@@ -1,13 +1,13 @@
 import { useState, useEffect, FC, useMemo } from 'react';
 import { AddressApi, CryptoApi, TransactionsApi } from '@thepowereco/tssdk';
-import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
 import cn from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import isObject from 'lodash/isObject';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
-
 import { toast } from 'react-toastify';
+import { formatUnits } from 'viem/utils';
+
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
 
 import { useStore } from 'application/store';
@@ -269,15 +269,19 @@ const SignAndSendPageComponent: FC = () => {
     const transfer = decodedTxBody?.p?.find(
       (item) => item?.[0] === TxPurpose.TRANSFER
     );
-    const transferAmount = transfer?.[2]
-      ? correctAmount(transfer?.[2], transfer?.[1])
-      : null;
+    const transferAmount =
+      transfer?.[2] && networkApi?.decimals[transfer?.[1]]
+        ? formatUnits(transfer?.[2], networkApi?.decimals[transfer?.[1]])
+        : null;
     const transferCur = transfer?.[1];
 
     const fee = decodedTxBody?.p?.find(
       (item) => item?.[0] === TxPurpose.SRCFEE
     );
-    const feeAmount = fee?.[2] ? correctAmount(fee?.[2], fee?.[1]) : null;
+    const feeAmount =
+      fee?.[2] && networkApi?.decimals[fee?.[1]]
+        ? formatUnits(fee?.[2], networkApi?.decimals[fee?.[1]])
+        : null;
     const feeCur = fee?.[1];
 
     const call = decodedTxBody?.c;
