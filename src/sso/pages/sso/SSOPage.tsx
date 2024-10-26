@@ -56,26 +56,30 @@ export const SSOPage: FC = () => {
   const truncate = (str: string, maxLength: number) =>
     str.length > maxLength ? `${str.substring(0, maxLength)}...` : str;
 
+  const buttons = useMemo(() => {
+    return (
+      <div className={styles.buttons}>
+        <Button
+          variant='contained'
+          onClick={handleWindowResize}
+          to={`${RoutesEnum.signup}/${data}`}
+        >
+          {t('createPowerWallet')}
+        </Button>
+        <Button
+          variant='outlined'
+          onClick={handleWindowResize}
+          to={`${RoutesEnum.login}/${data}`}
+        >
+          {t('login')}
+        </Button>
+      </div>
+    );
+  }, [data, handleWindowResize, t]);
+
   const renderContent = useMemo(() => {
     if (!wallets?.length) {
-      return (
-        <div className={styles.buttons}>
-          <Button
-            variant='contained'
-            onClick={handleWindowResize}
-            to={`${RoutesEnum.signup}/${data}`}
-          >
-            {t('createPowerWallet')}
-          </Button>
-          <Button
-            variant='outlined'
-            onClick={handleWindowResize}
-            to={`${RoutesEnum.login}/${data}`}
-          >
-            {t('login')}
-          </Button>
-        </div>
-      );
+      return buttons;
     } else if (isWalletWithRequiredChainExists) {
       return (
         <>
@@ -97,42 +101,28 @@ export const SSOPage: FC = () => {
               </div>
             ))}
           </div>
+          <div className={styles.subtitle}>{t('or')}</div>
+          {buttons}
         </>
       );
     } else {
       return (
         <>
           <div className={styles.subtitle}>
-            {t('youDontHaveWalletForChain', { chainID })}
+            {t('youDontHaveWalletForChain')} {chainID}
           </div>
-          <div className={styles.buttons}>
-            <Button
-              variant='contained'
-              onClick={handleWindowResize}
-              to={`${RoutesEnum.signup}/${data}`}
-            >
-              {t('createPowerWallet')}
-            </Button>
-            <Button
-              variant='outlined'
-              onClick={handleWindowResize}
-              to={`${RoutesEnum.login}/${data}`}
-            >
-              {t('login')}
-            </Button>
-          </div>
+          {buttons}
         </>
       );
     }
   }, [
-    wallets,
-    walletsWithChain,
+    wallets?.length,
     isWalletWithRequiredChainExists,
-    data,
+    buttons,
     t,
-    chainID,
+    walletsWithChain,
     onClickLoginHandler,
-    handleWindowResize
+    chainID
   ]);
 
   return (

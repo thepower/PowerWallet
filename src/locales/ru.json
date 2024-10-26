@@ -54,7 +54,7 @@
     "yourTokensWillBeHere": "Ваши токены будут здесь",
     "faucet": "Кран",
     "send": "Отправить",
-    "buy": "Купить",
+    "deposit": "Пополнить",
     "totalBalance": "Общий баланс",
     "addToken": "Добавить токен",
     "tx": "Tx",
@@ -197,6 +197,7 @@
     "walletAuthorization": "Авторизация кошелька",
     "pleaseSelectAccount": "Пожалуйста, выберите учетную запись",
     "youDontHaveWalletForChain": "У вас нету кошелька для чейна",
-    "createPowerWallet": "Создать Power Wallet"
+    "createPowerWallet": "Создать Power Wallet",
+    "or": "или"
   }
 }

@@ -1,5 +1,5 @@
-@import 'src/styles/mixins';
-@import 'src/styles/variables';
+@use '@/styles/mixins' as *;
+@use '@/styles/variables' as *;
 
 
 .walletSSOPage {
@@ -41,51 +41,53 @@
   flex-direction: column;
 
   gap: 24px;
+
+  margin-bottom: 16px;
 }
 
 .walletCard {
   @include border-gradient($the-power-gradient, 10px);
 
-  display: flex;
-  height: 83px;
-  padding: 20px 40px;
-  justify-content: center;
-  align-items: center;
-  align-content: center;
-  flex-direction: column;
-  cursor: pointer;
-
-  & .name {
-    @include text-gradient();
-
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 20px;
-
-    max-width: 200px;
-
+  & {
+    display: flex;
+    height: 83px;
+    padding: 8px 40px;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    flex-direction: column;
+    cursor: pointer;
   }
+}
 
-  & .address {
-    color: #F2F2F2;
-    font-size: 18px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 24px;
-  }
+.name {
+  @include text-gradient();
 
-  & .chain {
-    color: #AAABAC;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
 
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 20px;
-  }
+  max-width: 200px;
 
 }
 
+.address {
+  color: #F2F2F2;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.chain {
+  color: #AAABAC;
+
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+}
 
 .buttons {
   display: flex;

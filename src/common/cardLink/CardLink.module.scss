@@ -1,4 +1,5 @@
-@import 'src/styles/utils';
+@use '@/styles/mixins' as *;
+@use '@/styles/variables' as *;
 
 @include icon-colors('.card');
 

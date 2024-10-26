@@ -54,7 +54,7 @@
     "yourTokensWillBeHere": "Your tokens will be here",
     "faucet": "Faucet",
     "send": "Send",
-    "buy": "Buy",
+    "deposit": "Deposit",
     "totalBalance": "Total balance",
     "addToken": "Add token",
     "tx": "Tx",
@@ -197,6 +197,7 @@
     "walletAuthorization": "Wallet Authorization",
     "pleaseSelectAccount": "Please select account",
     "youDontHaveWalletForChain": "You don't have a wallet for chain",
-    "createPowerWallet": "Create Power Wallet"
+    "createPowerWallet": "Create Power Wallet",
+    "or": "or"
   }
 }

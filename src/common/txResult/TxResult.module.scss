@@ -1,4 +1,4 @@
-@import '../.././styles/mixins';
+@use '@/styles/mixins' as *;
 
 .txResult {
   padding: 32px;

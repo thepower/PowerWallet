@@ -1,3 +1,4 @@
+import path from 'path';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
@@ -13,11 +14,19 @@ export default defineConfig({
     strictPort: true,
     host: true
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler'
+      }
+    }
+  },
   plugins: [
     react({
       jsxImportSource: '@emotion/react',
       plugins: [['@swc/plugin-emotion', {}]]
     }),
+
     basicSsl(),
     tsconfigPaths(),
     svgrPlugin(),
@@ -72,6 +81,11 @@ export default defineConfig({
           }
         }
       }
+    }
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src')
     }
   },
   preview: {

@@ -142,7 +142,7 @@ const MainPageComponent: FC = () => {
           >
             <SendSvg />
           </CardLink>
-          <CardLink to={RoutesEnum.buy} label={t('buy')} target={'_self'}>
+          <CardLink to={RoutesEnum.buy} label={t('deposit')} target={'_self'}>
             <BuySvg />
           </CardLink>
         </div>

@@ -54,7 +54,7 @@
     "yourTokensWillBeHere": "โทเค็นของคุณจะอยู่ที่นี่",
     "faucet": "น้ำพุ",
     "send": "ส่ง",
-    "buy": "ซื้อ",
+    "deposit": "เงินฝาก",
     "totalBalance": "ยอดรวมคงเหลือ",
     "addToken": "เพิ่มโทเค็น",
     "tx": "รายการ",
@@ -197,6 +197,7 @@
     "walletAuthorization": "การอนุญาตกระเป๋าสตางค์",
     "pleaseSelectAccount": "กรุณาเลือกบัญชี",
     "youDontHaveWalletForChain": "คุณไม่มีกระเป๋าสตางค์สำหรับห่วงโซ่",
-    "createPowerWallet": "สร้างกระเป๋าสตางค์พลังงาน"
+    "createPowerWallet": "สร้างกระเป๋าสตางค์พลังงาน",
+    "or": "หรือ"
   }
 }

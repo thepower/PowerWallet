@@ -1,5 +1,5 @@
-@import '../../styles/mixins';
-@import '../../styles/variables';
+@use '@/styles/mixins' as *;
+@use '@/styles/variables' as *;
 
 .bar {
   position: sticky;

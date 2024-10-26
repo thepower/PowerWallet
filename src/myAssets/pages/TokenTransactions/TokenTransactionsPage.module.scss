@@ -1,4 +1,4 @@
-@import 'src/styles/utils';
+@use '@/styles/mixins' as *;
 
 .transactions {
   padding: 30px 32px;

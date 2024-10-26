@@ -1,5 +1,5 @@
-@import 'src/styles/mixins';
-@import 'src/styles/variables';
+@use '@/styles/mixins' as *;
+@use '@/styles/variables' as *;
 
 .content {
   display: flex;
