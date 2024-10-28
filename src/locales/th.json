@@ -198,6 +198,13 @@
     "pleaseSelectAccount": "กรุณาเลือกบัญชี",
     "youDontHaveWalletForChain": "คุณไม่มีกระเป๋าสตางค์สำหรับห่วงโซ่",
     "createPowerWallet": "สร้างกระเป๋าสตางค์พลังงาน",
-    "or": "หรือ"
+    "or": "หรือ",
+    "selectPaymentMethod": "เลือกวิธีการชำระเงิน",
+    "crypto": "Crypto",
+    "fiat": "Fiat",
+    "pleaseConfirmYourAction": "กรุณายืนยันการกระทำของคุณ",
+    "thisSecureStepIsNecessary": "ขั้นตอนการรักษาความปลอดภัยนี้เป็นสิ่งจำเป็นเพื่ออนุญาตการดำเนินการของคุณภายใน",
+    "yourDigitalSignatureIsASafeguard": "ลายเซ็นดิจิตอลของคุณคือการป้องกันเพื่อให้มั่นใจว่ากิจกรรมทั้งหมดได้รับการยินยอมจากคุณอย่างชัดเจนและทำให้บัญชีบล็อกเชนของคุณปลอดภัย",
+    "importWallet": "นำเข้ากระเป๋าเงิน"
   }
 }

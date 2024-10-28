@@ -6,6 +6,8 @@ export enum RoutesEnum {
   transactions = '/transactions',
   add = '/add',
   buy = '/buy',
+  crypto = '/crypto',
+  fiat = '/fiat',
   signup = '/signup',
   root = '/',
   login = '/login',

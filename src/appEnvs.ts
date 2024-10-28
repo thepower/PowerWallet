@@ -2,8 +2,8 @@ const DEFAULT_CHAIN_ID = +(import.meta.env.VITE_DEFAULT_CHAIN_ID as string);
 
 const BRIDGE_EVM_CONTRACT_ADDRESS = import.meta.env
   .VITE_BRIDGE_EVM_CONTRACT_ADDRESS as `0x${string}`;
-const USDT_EVM_CONTRACT_ADDRESS = import.meta.env
-  .VITE_USDT_EVM_CONTRACT_ADDRESS as `0x${string}`;
+const SWAP_WSK_EVM_CONTRACT_ADDRESS = import.meta.env
+  .VITE_SWAP_WSK_EVM_CONTRACT_ADDRESS as `0x${string}`;
 
 const PUBLIC_PROJECT_ID = import.meta.env.VITE_PUBLIC_PROJECT_ID!;
 
@@ -17,7 +17,7 @@ export default {
   DEFAULT_CHAIN_ID,
 
   BRIDGE_EVM_CONTRACT_ADDRESS,
-  USDT_EVM_CONTRACT_ADDRESS,
+  SWAP_WSK_EVM_CONTRACT_ADDRESS,
 
   PUBLIC_PROJECT_ID,
 

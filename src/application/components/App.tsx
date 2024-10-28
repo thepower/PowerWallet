@@ -7,6 +7,7 @@ import { StylesProvider } from '@mui/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react';
 import { BrowserRouter } from 'react-router-dom';
+import { WagmiConfig } from 'wagmi';
 import { bsc, bscTestnet } from 'wagmi/chains';
 import appEnvs from 'appEnvs';
 import { AppRoutes } from './AppRoutes';
@@ -36,20 +37,22 @@ const wagmiConfig = defaultWagmiConfig({
 createWeb3Modal({ projectId, wagmiConfig });
 
 export const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <StylesProvider injectFirst>
-        <StyledEngineProvider injectFirst>
-          <MuiThemeProvider theme={MUITheme}>
-            <CssBaseline>
-              <InitGradientsSvg className='initSvgClass' />
-              <ToastNotification />
-              <UnderConstruction />
-              <AppRoutes />
-            </CssBaseline>
-          </MuiThemeProvider>
-        </StyledEngineProvider>
-      </StylesProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
+  <WagmiConfig config={wagmiConfig}>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <StylesProvider injectFirst>
+          <StyledEngineProvider injectFirst>
+            <MuiThemeProvider theme={MUITheme}>
+              <CssBaseline>
+                <InitGradientsSvg className='initSvgClass' />
+                <ToastNotification />
+                <UnderConstruction />
+                <AppRoutes />
+              </CssBaseline>
+            </MuiThemeProvider>
+          </StyledEngineProvider>
+        </StylesProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  </WagmiConfig>
 );

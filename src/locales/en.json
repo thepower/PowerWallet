@@ -198,6 +198,13 @@
     "pleaseSelectAccount": "Please select account",
     "youDontHaveWalletForChain": "You don't have a wallet for chain",
     "createPowerWallet": "Create Power Wallet",
-    "or": "or"
+    "or": "or",
+    "selectPaymentMethod": "Select payment method",
+    "crypto": "Crypto",
+    "fiat": "Fiat",
+    "pleaseConfirmYourAction": "Please confirm your action",
+    "thisSecureStepIsNecessary": "This secure  step is necessary to authorize your action within the DApp",
+    "yourDigitalSignatureIsASafeguard": "Your digital signature is a safeguard,  ensuring that all activities are explicitly consented by you and keeping  your blockchain account safe",
+    "importWallet": "Import Wallet"
   }
 }

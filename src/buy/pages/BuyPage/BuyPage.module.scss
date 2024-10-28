@@ -1,5 +1,29 @@
 @use '@/styles/mixins' as *;
 
-.wrapper {
-  padding: 16px 32px;
+.buyPage {}
+
+.addressButton {
+  margin: 0 auto 24px auto;
+}
+
+.title {
+  color: #F5F5F7;
+  text-align: center;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+
+  margin-bottom: 30px;
+}
+
+.cards {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+.cardLink {
+  height: auto;
+  padding: 20px;
 }

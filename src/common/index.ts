@@ -18,6 +18,8 @@ export { default as Divider } from './divider/Divider';
 export { default as PageTemplate } from './pageTemplate/PageTemplate';
 export { default as SearchInput } from './searchInput/SearchInput';
 export { default as TxResult } from './txResult/TxResult';
+export { default as Select } from './select/Select';
+
 export { UnderConstruction } from './underConstruction/UnderConstruction';
 export { Checkbox } from './checkbox/Checkbox';
 export { Switch } from './switch/Switch';

@@ -198,6 +198,13 @@
     "pleaseSelectAccount": "Пожалуйста, выберите учетную запись",
     "youDontHaveWalletForChain": "У вас нету кошелька для чейна",
     "createPowerWallet": "Создать Power Wallet",
-    "or": "или"
+    "or": "или",
+    "selectPaymentMethod": "Выберите способ оплаты",
+    "crypto": "Crypto",
+    "fiat": "Fiat",
+    "pleaseConfirmYourAction": "Пожалуйста, подтвердите свои действия",
+    "thisSecureStepIsNecessary": "Этот безопасный шаг необходим для авторизации ваших действий в DApp",
+    "yourDigitalSignatureIsASafeguard": "Ваша цифровая подпись является защитой, гарантирующей, что все действия явно согласованы с вами, и обеспечивающей безопасность вашей учетной записи в блокчейне.",
+    "importWallet": "Импорт кошелька"
   }
 }

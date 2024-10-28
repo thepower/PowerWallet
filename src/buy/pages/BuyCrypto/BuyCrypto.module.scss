@@ -1,0 +1,14 @@
+@use '@/styles/mixins' as *;
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  row-gap: 40px;
+}
+
+.wallet {
+  position: absolute;
+  z-index: 1;
+  top: 4px;
+  right: 12px;
+}

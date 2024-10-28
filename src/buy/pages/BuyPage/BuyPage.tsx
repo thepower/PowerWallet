@@ -1,9 +1,10 @@
-import React, { FC, useMemo } from 'react';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import appEnvs from 'appEnvs';
+import { RoutesEnum } from 'application/typings/routes';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
-import { PageTemplate } from 'common';
+import { CryptoSvg, FiatSvg } from 'assets/icons';
+import { CardLink, CopyButton, PageTemplate } from 'common';
 
 import styles from './BuyPage.module.scss';
 
@@ -11,37 +12,35 @@ const BuyPageComponent: FC = () => {
   const { t } = useTranslation();
 
   const { activeWallet } = useWalletsStore();
-
-  const params = useMemo(() => {
-    if (activeWallet) {
-      // Создаем объект для параметров
-      const queryParams = {
-        // evmChainId: 'evmChainId',
-        // powerChainId: 'powerChainId',
-        // evmTokenAddress: 'evmTokenAddress',
-        // evmBridgeAddress: 'evmBridgeAddress',
-        // powerTokenAddress: 'powerTokenAddress',
-        // powerBridgeAddress: 'powerBridgeAddress',
-        toAddress: activeWallet.address
-        // amount: 'amount',
-        // token: 'token'
-      };
-
-      // Используем URLSearchParams для конвертации объекта в строку параметров
-      return new URLSearchParams(queryParams).toString();
-    }
-    return '';
-  }, [activeWallet]);
-
   return (
-    <PageTemplate backUrl='/' backUrlText={t('home')!}>
-      <div className={styles.wrapper}>
-        <iframe
-          src={`${appEnvs.BUY_THEPOWER_URL}?${params}`}
-          width='100%'
-          height='600px'
-          title='Buy Iframe'
+    <PageTemplate
+      backUrl='/'
+      backUrlText={t('home')!}
+      topBarChild={t('deposit')}
+    >
+      <div className={styles.buyPage}>
+        <CopyButton
+          textButton={activeWallet?.address || ''}
+          className={styles.addressButton}
+          iconClassName={styles.copyIcon}
         />
+        <div className={styles.title}>{t('selectPaymentMethod')}</div>
+        <div className={styles.cards}>
+          <CardLink
+            label={t('crypto')}
+            to={`${RoutesEnum.buy}${RoutesEnum.crypto}`}
+            className={styles.cardLink}
+          >
+            <CryptoSvg />
+          </CardLink>
+          <CardLink
+            label={t('fiat')}
+            to={`${RoutesEnum.buy}${RoutesEnum.fiat}`}
+            className={styles.cardLink}
+          >
+            <FiatSvg />
+          </CardLink>
+        </div>
       </div>
     </PageTemplate>
   );

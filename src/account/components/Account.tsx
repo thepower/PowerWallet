@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Drawer, IconButton } from '@mui/material';
 import cn from 'classnames';
 import { useTranslation } from 'react-i18next';
@@ -41,7 +41,6 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   const [openedRenameAccountModal, setOpenedRenameAccountModal] =
     useState(false);
 
-  const importAccountInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { exportAccountMutation } = useExportAccount();
@@ -51,6 +50,7 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   const { activeWallet, setActiveWalletByAddress } = useWalletsStore();
 
   const handleCreateAccount = () => {
+    setIsAccountMenuOpened(false);
     navigate(RoutesEnum.signup);
   };
 
@@ -175,7 +175,6 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   return (
     <div className={cn(styles.account, className)}>
       <input
-        ref={importAccountInputRef}
         className={styles.importAccountInput}
         onChange={setAccountFileOnChange}
         type='file'

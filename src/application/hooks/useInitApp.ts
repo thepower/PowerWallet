@@ -11,6 +11,8 @@ export const useInitApp = () => {
   const navigate = useNavigate();
   const initApp = () => {
     if (activeWallet) {
+      // const currentQueryParams = location.search
+      console.log(location.search);
       navigate(window.location.pathname);
     } else if (!(isSignupPage || isSSOPage)) {
       navigate(RoutesEnum.root);

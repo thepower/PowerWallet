@@ -3,6 +3,8 @@ import ArrowLDisabled from './arrowLDisabled.svg?react';
 import ArrowR from './arrowR.svg?react';
 import ArrowRDisabled from './arrowRDisabled.svg?react';
 import BellIcon from './bell.svg?react';
+import BigFingerPrintIcon from './big-fingerprint.svg?react';
+import CryptoSvg from './btc.svg?react';
 import BuySvg from './buy.svg?react';
 import ChevronDown from './chevron_down.svg?react';
 import ChevronLeftIcon from './chevron_left.svg?react';
@@ -14,6 +16,7 @@ import CreateIcon from './create.svg?react';
 import ExportIcon from './export.svg?react';
 import FaucetSvg from './faucet.svg?react';
 import FavIcon from './fav.svg?react';
+import FiatSvg from './fiat.svg?react';
 import HeartIcon from './heart.svg?react';
 import ImportIcon from './import.svg?react';
 import LangIcon from './lang.svg?react';
@@ -36,6 +39,7 @@ import UnCheckedIcon from './unSelect.svg?react';
 import WalletsSvg from './wallets.svg?react';
 
 export {
+  BigFingerPrintIcon,
   SponsorSvg,
   RenameIcon,
   ChevronLeftIcon,
@@ -71,5 +75,7 @@ export {
   OneLayersIcon,
   TwoLayersIcon,
   ThreeLayersIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  CryptoSvg,
+  FiatSvg
 };
