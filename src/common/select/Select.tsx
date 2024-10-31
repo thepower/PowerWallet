@@ -28,7 +28,8 @@ class Select extends React.PureComponent<SelectProps> {
     root: styles.inputBaseRoot,
     input: styles.inputBaseInput,
     focused: styles.inputBaseFocused,
-    sizeSmall: styles.inputBaseSizeSmall
+    sizeSmall: styles.inputBaseSizeSmall,
+    colorSecondary: styles.inputBaseColorSecondary
   };
 
   private menuClasses: Partial<MenuClasses> = {
@@ -43,13 +44,14 @@ class Select extends React.PureComponent<SelectProps> {
   };
 
   render() {
-    const { className, value, items, onChange, ...otherProps } = this.props;
+    const { className, value, items, onChange, color, ...otherProps } =
+      this.props;
     const { selectClasses, inputBaseClasses, menuClasses, menuItemClasses } =
       this;
     return (
       <MuiSelect
         className={cn(className, !!value && styles.selected)}
-        input={<InputBase classes={inputBaseClasses} />}
+        input={<InputBase classes={inputBaseClasses} color={color} />}
         classes={selectClasses}
         IconComponent={ChevronDownIcon}
         MenuProps={{

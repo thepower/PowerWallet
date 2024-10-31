@@ -20,6 +20,7 @@ import FiatSvg from './fiat.svg?react';
 import HeartIcon from './heart.svg?react';
 import ImportIcon from './import.svg?react';
 import LangIcon from './lang.svg?react';
+import LogInIcon from './log-in.svg?react';
 import LogoIcon from './logo.svg?react';
 import MenuIcon from './menu.svg?react';
 import MoneyBugIcon from './money-bug.svg?react';
@@ -39,6 +40,7 @@ import UnCheckedIcon from './unSelect.svg?react';
 import WalletsSvg from './wallets.svg?react';
 
 export {
+  LogInIcon,
   BigFingerPrintIcon,
   SponsorSvg,
   RenameIcon,

@@ -1,17 +1,23 @@
+import { useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { WalletApi } from '@thepowereco/tssdk';
+import { AddressApi } from '@thepowereco/tssdk';
 import { format } from 'date-fns';
 import { groupBy } from 'lodash';
+import { formatUnits } from 'viem';
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
-import { TransactionType } from 'myAssets/types';
+import {
+  BlockType,
+  TransactionFormattedType,
+  TransactionType
+} from 'myAssets/types';
 
 export function useTransactionsHistory({
   initialBlock,
   tokenAddress,
   perPage = 10
 }: {
-  initialBlock?: string;
+  initialBlock?: number;
   tokenAddress?: string;
   perPage?: number;
 }) {
@@ -24,14 +30,14 @@ export function useTransactionsHistory({
     tokenAddress,
     perPage = 10
   }: {
-    pageParam: string;
+    pageParam: number;
     tokenAddress?: string;
     perPage: number;
   }): Promise<{
-    transactions: TransactionType[];
-    nextPageParam: string | null;
+    transactions: TransactionFormattedType[];
+    nextPageParam: number | null;
   }> {
-    const transactionHistory = new Map<string, TransactionType>();
+    const transactionHistory = new Map<string, TransactionFormattedType>();
     let loadedBlocks = 0;
     let lastBlock = pageParam;
 
@@ -43,36 +49,92 @@ export function useTransactionsHistory({
       throw new Error('Wallet not found');
     }
 
-    const walletApi = new WalletApi(networkApi);
+    while (lastBlock !== 0 && loadedBlocks < perPage) {
+      const block: BlockType<TransactionType> =
+        await networkApi.getBlockByHeight(
+          `${lastBlock}?addr=${activeWallet.address}`
+        );
 
-    while (lastBlock !== '0000000000000000' && loadedBlocks < perPage) {
-      const block: any = await walletApi.getBlock(
-        lastBlock,
-        activeWallet.address
-      );
       loadedBlocks += 1;
 
+      const txsWithId = Object.keys(block.txs).reduce((acc, key) => {
+        const tx = block.txs[key];
+
+        const extraFields: Record<string, any> = {
+          id: key,
+          blockNumber: block.header.height,
+          blockHash: block.hash,
+          sig: Array.isArray(tx.sig)
+            ? tx.sig.reduce(
+                (acc: any, item: any) =>
+                  Object.assign(acc, { [item.extra.pubkey]: item.signature }),
+                {}
+              )
+            : []
+        };
+
+        if (tx.payload) {
+          const payment =
+            tx.payload.find((elem: any) => elem.purpose === 'transfer') ||
+            tx.payload.find(
+              (elem: any) =>
+                elem.purpose === 'srcfee' ||
+                tx.payload.find((elem: any) => elem.purpose === 'srcfeehint')
+            );
+
+          if (payment) {
+            extraFields.currency = payment?.cur || '---';
+            extraFields.amount =
+              payment?.cur && payment?.amount
+                ? formatUnits(
+                    BigInt(payment.amount),
+                    networkApi.decimals[payment.cur]
+                  )
+                : 0;
+          }
+        }
+
+        Object.assign(acc, {
+          [key]: {
+            ...tx,
+            ...extraFields
+          }
+        });
+
+        return acc;
+      }, {});
+
       const txs = Object.fromEntries(
-        Object.entries<Omit<TransactionType, 'id'>>(block.txs).filter(
+        Object.entries<TransactionFormattedType>(txsWithId).filter(
           ([, tx]) =>
-            !tokenAddress || tx.from === tokenAddress || tx.to === tokenAddress
+            !tokenAddress ||
+            tx.from?.toLowerCase() === tokenAddress?.toLowerCase() ||
+            tx.to?.toLowerCase() === tokenAddress?.toLowerCase()
         )
       );
 
       for (const [key, tx] of Object.entries(txs)) {
-        transactionHistory.set(key, {
-          id: key,
-          ...tx
-        });
+        transactionHistory.set(key, tx);
       }
 
+      const foundLastBlock = block.ledger_patch.find(
+        (patch) =>
+          patch[1] === 'lastblk' &&
+          patch[0] ===
+            `0x${AddressApi.textAddressToHex(
+              activeWallet.address
+            )}`.toLocaleLowerCase()
+      )?.[3];
+
       lastBlock =
-        block.bals[activeWallet.address]?.lastblk || '0000000000000000';
+        foundLastBlock && typeof foundLastBlock === 'number'
+          ? foundLastBlock
+          : 0;
     }
 
     return {
       transactions: Array.from(transactionHistory.values()),
-      nextPageParam: lastBlock !== '0000000000000000' ? lastBlock : null
+      nextPageParam: lastBlock !== 0 ? lastBlock : null
     };
   }
 
@@ -96,17 +158,22 @@ export function useTransactionsHistory({
         perPage
       });
     },
+
     getNextPageParam: (lastPage) => lastPage.nextPageParam,
     enabled: tokenAddress
       ? !!initialBlock && !!activeWallet?.address
       : !!initialBlock && !!activeWallet?.address && !!tokenAddress
   });
 
-  const allTransactions =
-    data?.pages.flatMap((page) => page.transactions) || [];
+  const allTransactions = useMemo(
+    () => data?.pages.flatMap((page) => page.transactions) || [],
+    [data]
+  );
 
-  const groupedTransactions = groupBy(allTransactions, (trx) =>
-    format(new Date(trx.timestamp), 'dd MMM yyyy')
+  const groupedTransactions = useMemo(
+    () =>
+      groupBy(allTransactions, (trx) => format(new Date(trx.t), 'dd MMM yyyy')),
+    [allTransactions]
   );
 
   return {

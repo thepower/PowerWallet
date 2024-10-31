@@ -39,12 +39,14 @@ export const useSendTx = ({
       }
       const walletApi = new WalletApi(networkApi);
 
+      const token = 'SK';
+
       const response = await walletApi.makeNewTx({
         wif,
         from: activeWallet.address,
         to,
-        token: 'SK',
-        inputAmount: parseUnits(amount, 9),
+        token,
+        inputAmount: parseUnits(amount, networkApi.decimals[token]),
         message: comment ?? ''
       });
 

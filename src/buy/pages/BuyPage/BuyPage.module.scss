@@ -1,6 +1,11 @@
 @use '@/styles/mixins' as *;
 
-.buyPage {}
+.buyPage {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 8px 16px;
+
+}
 
 .addressButton {
   margin: 0 auto 24px auto;
@@ -21,9 +26,21 @@
   display: flex;
   justify-content: center;
   gap: 24px;
+
+  @include mobile {
+    flex-direction: column;
+  }
 }
 
 .cardLink {
   height: auto;
   padding: 20px;
+
+  @include mobile {
+    :global(.fill) {
+      fill: url('#hover') !important;
+    }
+  }
 }
+
+@include icon-colors('.cardLink');

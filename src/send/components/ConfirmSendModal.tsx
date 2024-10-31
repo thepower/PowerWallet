@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import { useTranslation } from 'react-i18next';
+import { sliceString } from 'application/utils/applicationUtils';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { TToken } from 'myAssets/types';
 import styles from './ConfirmSendModal.module.scss';
@@ -50,8 +51,17 @@ const ConfirmSendModal: React.FC<ConfirmSendModalProps> = ({
 
   const fields = useMemo(
     () => [
-      { key: t('from'), value: from },
-      { key: t('to'), value: trxValues.address },
+      {
+        key: t('from'),
+        value: from?.length && from.length > 20 ? sliceString(from, 10) : from
+      },
+      {
+        key: t('to'),
+        value:
+          trxValues.address?.length && trxValues.address.length > 20
+            ? sliceString(trxValues.address, 10)
+            : trxValues.address
+      },
       {
         key: t('amount'),
         value: `${trxValues.amount} ${token ? token.symbol : 'SK'}`

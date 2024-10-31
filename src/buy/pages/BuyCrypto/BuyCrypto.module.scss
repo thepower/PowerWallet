@@ -1,14 +1,21 @@
 @use '@/styles/mixins' as *;
 
+.form {
+  position: relative;
+
+}
+
 .inputs {
   display: flex;
   flex-direction: column;
   row-gap: 40px;
+
+  padding-top: 56px;
 }
 
 .wallet {
   position: absolute;
   z-index: 1;
-  top: 4px;
-  right: 12px;
+  top: 0;
+  right: 0;
 }

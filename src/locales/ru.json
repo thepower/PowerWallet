@@ -205,6 +205,20 @@
     "pleaseConfirmYourAction": "Пожалуйста, подтвердите свои действия",
     "thisSecureStepIsNecessary": "Этот безопасный шаг необходим для авторизации ваших действий в DApp",
     "yourDigitalSignatureIsASafeguard": "Ваша цифровая подпись является защитой, гарантирующей, что все действия явно согласованы с вами, и обеспечивающей безопасность вашей учетной записи в блокчейне.",
-    "importWallet": "Импорт кошелька"
+    "importWallet": "Импорт кошелька",
+    "amountMustBeMore": "Сумма должна быть больше 0",
+    "onlyInteger": "Только целые числа",
+    "approveAmount": "Одобрить сумму",
+    "connectWallet": "Подключить кошелек",
+    "somethingWentWrong": "Что то пошло не так",
+    "enterAmountPlaceholder": "Введите сумму",
+    "insufficientBalance": "Недостаточный баланс",
+    "switchNetwork": "Сменить сеть",
+    "enterWalletAddressPlaceholder": "Введите адрес кошелька",
+    "approveSuccess": "Успешное одобрение",
+    "approveError": "Ошибка одобрения",
+    "convertSuccess": "Успешная конвертация",
+    "convertError": "Ошибка конвертации",
+    "token": "Токен"
   }
 }

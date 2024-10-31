@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from 'react';
-import { IconButton } from '@mui/material';
 import { AddressApi } from '@thepowereco/tssdk';
 import { waitForTransaction } from '@wagmi/core';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
@@ -20,7 +19,14 @@ import abis from 'abis';
 import appEnvs from 'appEnvs';
 import { defaultEvmChain } from 'application/components/App';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
-import { Button, OutlinedInput, PageTemplate, Select } from 'common';
+import { LogInIcon } from 'assets/icons';
+import {
+  Button,
+  IconButton,
+  OutlinedInput,
+  PageTemplate,
+  Select
+} from 'common';
 import styles from './BuyCrypto.module.scss';
 
 type InitialValues = {
@@ -29,14 +35,22 @@ type InitialValues = {
   token: string;
 };
 
+const tokens = [
+  {
+    title: 'SK',
+    value: appEnvs.SWAP_WSK_EVM_CONTRACT_ADDRESS
+  }
+];
+
 export const BuyCryptoPage: React.FC = () => {
   const modal = useWeb3Modal();
   const { address: userEvmAddress, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const { activeWallet } = useWalletsStore();
+
   const initialValues = useMemo<InitialValues>(
     () => ({
-      token: '',
+      token: tokens[0].value,
       amount: 0,
       address: activeWallet?.address || ''
     }),
@@ -53,12 +67,12 @@ export const BuyCryptoPage: React.FC = () => {
       yup.object({
         amount: yup
           .number()
-          .required(t('requiredField'))
+          .required(t('required'))
           .moreThan(0, t('amountMustBeMore'))
           .integer(t('onlyInteger')),
         address: yup
           .string()
-          .required(t('requiredField'))
+          .required(t('required'))
           .test(
             'test-address',
             t('invalidAddress'),
@@ -88,7 +102,6 @@ export const BuyCryptoPage: React.FC = () => {
     enabled: isEnableOrWatched
   });
 
-  console.log({ tokenSell, token: formik.values.token });
   const { data: stableDecimals } = useContractRead({
     address: tokenSell,
     abi: abis.erc20.abi,
@@ -170,7 +183,7 @@ export const BuyCryptoPage: React.FC = () => {
           toast.error(`${t('approveError')} ${amount} ${stableSymbol}`);
         }
         toast.success(`${t('approveSuccess')} ${amount} ${stableSymbol}`);
-        await refetchStableAllowance(); // Update the allowance state
+        await refetchStableAllowance();
       } catch (error) {
         toast.error(`${t('approveError')} ${amount} ${stableSymbol}`);
       }
@@ -295,7 +308,7 @@ export const BuyCryptoPage: React.FC = () => {
       <form className={styles.form} onSubmit={formik.handleSubmit}>
         {isConnected && (
           <IconButton className={styles.wallet} onClick={onDisconnectHandler}>
-            {/* <LogInIcon /> */}
+            <LogInIcon />
           </IconButton>
         )}
         <div className={styles.inputs}>
@@ -303,18 +316,13 @@ export const BuyCryptoPage: React.FC = () => {
             size='small'
             id='tokenSelect'
             label={t('token')}
-            items={[
-              {
-                title: 'WSK',
-                value: appEnvs.SWAP_WSK_EVM_CONTRACT_ADDRESS
-              }
-            ]}
+            items={tokens}
             disabled={formik.isSubmitting}
             {...formik.getFieldProps('token')}
           />
           <OutlinedInput
             id='amount'
-            label={t('amount')}
+            // label={t('amount')}
             placeholder={t('enterAmountPlaceholder')}
             type='number'
             size='small'
@@ -326,7 +334,7 @@ export const BuyCryptoPage: React.FC = () => {
           />
           <OutlinedInput
             id='address'
-            label={t('address')}
+            // label={t('address')}
             placeholder={t('enterWalletAddressPlaceholder')}
             size='small'
             errorMessage={formik.errors.address}

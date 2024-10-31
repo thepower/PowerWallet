@@ -205,6 +205,20 @@
     "pleaseConfirmYourAction": "Please confirm your action",
     "thisSecureStepIsNecessary": "This secure  step is necessary to authorize your action within the DApp",
     "yourDigitalSignatureIsASafeguard": "Your digital signature is a safeguard,  ensuring that all activities are explicitly consented by you and keeping  your blockchain account safe",
-    "importWallet": "Import Wallet"
+    "importWallet": "Import Wallet",
+    "amountMustBeMore": "Amount must be greater than 0",
+    "onlyInteger": "Only Whole Numbers",
+    "approveAmount": "Approve Amount",
+    "connectWallet": "Connect Wallet",
+    "somethingWentWrong": "Something went wrong",
+    "enterAmountPlaceholder": "Enter amount",
+    "insufficientBalance": "insufficient balance",
+    "switchNetwork": "Switch Network",
+    "enterWalletAddressPlaceholder": "Enter wallet address",
+    "approveSuccess": "Successful approval",
+    "approveError": "Error approval",
+    "convertSuccess": "Successful convert",
+    "convertError": "Error convert",
+    "token": "Token"
   }
 }

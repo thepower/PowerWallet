@@ -38,7 +38,7 @@ const TokenTransactionsPageComponent: React.FC = () => {
 
   const { groupedTransactions, fetchNextPage, isLoading, isFetchingNextPage } =
     useTransactionsHistory({
-      initialBlock: walletData?.lastblk,
+      initialBlock: walletData?.lastblock.tx,
       tokenAddress: token?.address
     });
 

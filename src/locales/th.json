@@ -107,7 +107,7 @@
     "repeatPassword": "ทำซ้ำรหัสผ่าน",
     "processingVerySoonEverythingWillHappen": "กำลังประมวลผล...",
     "toLoginYouNeedEnter": "เพื่อเข้าสู่ระบบคุณต้องป้อนที่อยู่และกุญแจส่วนตัวหรือชุดคำลับ",
-    "address": "ที่อยู่",
+    "address": "",
     "loginImport": "สร้าง เข้าสู่ระบบ หรือนำเข้าบัญชี",
     "loginToAccount": "เข้าสู่บัญชี",
     "createAccountError": "การสร้างบัญชีผิดพลาด",
@@ -205,6 +205,20 @@
     "pleaseConfirmYourAction": "กรุณายืนยันการกระทำของคุณ",
     "thisSecureStepIsNecessary": "ขั้นตอนการรักษาความปลอดภัยนี้เป็นสิ่งจำเป็นเพื่ออนุญาตการดำเนินการของคุณภายใน",
     "yourDigitalSignatureIsASafeguard": "ลายเซ็นดิจิตอลของคุณคือการป้องกันเพื่อให้มั่นใจว่ากิจกรรมทั้งหมดได้รับการยินยอมจากคุณอย่างชัดเจนและทำให้บัญชีบล็อกเชนของคุณปลอดภัย",
-    "importWallet": "นำเข้ากระเป๋าเงิน"
+    "importWallet": "นำเข้ากระเป๋าเงิน",
+    "amountMustBeMore": "",
+    "onlyInteger": "",
+    "approveAmount": "",
+    "connectWallet": "",
+    "somethingWentWrong": "",
+    "enterAmountPlaceholder": "",
+    "insufficientBalance": "",
+    "switchNetwork": "",
+    "enterWalletAddressPlaceholder": "",
+    "approveSuccess": "",
+    "approveError": "",
+    "convertSuccess": "",
+    "convertError": "",
+    "token": ""
   }
 }

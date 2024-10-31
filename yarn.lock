@@ -2675,10 +2675,10 @@
   dependencies:
     "@tanstack/query-core" "5.52.3"
 
-"@thepowereco/tssdk@^2.2.8":
-  version "2.2.8"
-  resolved "https://registry.yarnpkg.com/@thepowereco/tssdk/-/tssdk-2.2.8.tgz#8be220eedf4653ae04c63802ccfffa2796cc2a98"
-  integrity sha512-A7va/7cBWNZ58I2D5oBmaGdGJgJx6Dn0nkoYoJsk+baZO6ZkCRitCFK7BYgEz+ADNZ4+CIWaRtYya4eF9pz07g==
+"@thepowereco/tssdk@^2.2.10":
+  version "2.2.10"
+  resolved "https://registry.yarnpkg.com/@thepowereco/tssdk/-/tssdk-2.2.10.tgz#fc41a322600b70606d0b549dd403d120a5ac301e"
+  integrity sha512-vThanEeup/mxcXdLZtIkSn2+QK7glJK/ak6g2hq7eJask2nrAuwdTBkl9DAn4tLVpB9eTzzAzg/dqh94mkVyLg==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.1.1"
     abitype "^1.0.2"
@@ -8565,9 +8565,9 @@ viem@^2.1.1:
     ws "8.18.0"
 
 viem@^2.19.6:
-  version "2.21.34"
-  resolved "https://registry.yarnpkg.com/viem/-/viem-2.21.34.tgz#5206148a6aa659113d7844db53247a411d28569e"
-  integrity sha512-IR8ucya4dkVJv1jzv/qBz1TxYbSoXZuJPuqQk1/AybU9VuGdMUayittYwr0Navs97XFNml6UWGVya07apoaBmQ==
+  version "2.21.37"
+  resolved "https://registry.yarnpkg.com/viem/-/viem-2.21.37.tgz#4d67bee8749321b0fd142c54df2021d5774403b1"
+  integrity sha512-JupwyttT4aJNnP9+kD7E8jorMS5VmgpC3hm3rl5zXsO8WNBTsP3JJqZUSg4AG6s2lTrmmpzS/qpmXMZu5gJw5Q==
   dependencies:
     "@adraffy/ens-normalize" "1.11.0"
     "@noble/curves" "1.6.0"
