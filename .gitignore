@@ -4,6 +4,7 @@ dump.rdb
 /build
 /dist
 /uploads
+/.yarn
 
 # Logs
 *.log

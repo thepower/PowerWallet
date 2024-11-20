@@ -458,5 +458,5 @@ export const erc20 = {
       stateMutability: 'nonpayable',
       type: 'function'
     }
-  ]
-} as const;
+  ] as const
+};

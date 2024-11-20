@@ -2,7 +2,6 @@
 
 .form {
   position: relative;
-
 }
 
 .inputs {
@@ -16,6 +15,12 @@
 .wallet {
   position: absolute;
   z-index: 1;
+  width: auto;
   top: 0;
   right: 0;
+}
+
+.selectsSet {
+  display: flex;
+  column-gap: 40px;
 }

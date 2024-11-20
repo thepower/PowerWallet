@@ -24,10 +24,11 @@ if (!projectId) {
 
 const queryClient = new QueryClient();
 
-export const defaultEvmChain =
-  import.meta.env.MODE === 'prod' ? bsc : bscTestnet;
+const isProduction = import.meta.env.MODE === 'prod';
 
-const chains = [bsc, bscTestnet];
+export const defaultEvmChain = isProduction ? bsc : bscTestnet;
+
+const chains = isProduction ? [bsc] : [bscTestnet];
 
 const wagmiConfig = defaultWagmiConfig({
   projectId,
@@ -37,6 +38,8 @@ const wagmiConfig = defaultWagmiConfig({
 createWeb3Modal({ projectId, wagmiConfig });
 
 export const App = () => (
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   <WagmiConfig config={wagmiConfig}>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>

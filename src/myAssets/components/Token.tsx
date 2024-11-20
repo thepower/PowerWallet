@@ -75,6 +75,8 @@ const TokenComponent: FC<TokenProps> = ({
     );
   };
 
+  // if (!balance || balance === '0') return null;
+
   const renderSymbol = () => {
     const { symbol } = token;
     return onClickCheckBox ? `${symbol} ${balance}` : symbol;

@@ -1,96 +1,97 @@
 export const swapEVM = {
   abi: [
     {
-      type: 'constructor',
       inputs: [
-        { name: '_seller', type: 'address', internalType: 'address' },
-        { name: '_token_sell', type: 'address', internalType: 'address' },
-        { name: '_token_buy', type: 'address', internalType: 'address' },
-        { name: '_numerator', type: 'uint256', internalType: 'uint256' },
-        { name: '_denominator', type: 'uint256', internalType: 'uint256' }
+        { internalType: 'address', name: '_seller', type: 'address' },
+        { internalType: 'address', name: '_token_pay', type: 'address' },
+        { internalType: 'address', name: '_token_buy', type: 'address' },
+        { internalType: 'uint256', name: '_numerator', type: 'uint256' },
+        { internalType: 'uint256', name: '_denominator', type: 'uint256' }
       ],
-      stateMutability: 'nonpayable'
+      stateMutability: 'nonpayable',
+      type: 'constructor'
     },
-    { type: 'receive', stateMutability: 'payable' },
     {
-      type: 'function',
+      inputs: [
+        { internalType: 'uint256', name: 'input', type: 'uint256' },
+        { internalType: 'uint256', name: 'min_output', type: 'uint256' }
+      ],
       name: 'buy',
-      inputs: [
-        { name: 'input', type: 'uint256', internalType: 'uint256' },
-        { name: 'min_output', type: 'uint256', internalType: 'uint256' }
-      ],
       outputs: [],
-      stateMutability: 'nonpayable'
+      stateMutability: 'nonpayable',
+      type: 'function'
     },
     {
-      type: 'function',
+      inputs: [
+        { internalType: 'uint256', name: 'input', type: 'uint256' },
+        { internalType: 'uint256', name: 'min_output', type: 'uint256' },
+        { internalType: 'address', name: 'send2bridge', type: 'address' },
+        { internalType: 'address', name: 'recipient', type: 'address' },
+        { internalType: 'address', name: 'auth_to', type: 'address' }
+      ],
       name: 'buy_and_bridge',
-      inputs: [
-        { name: 'input', type: 'uint256', internalType: 'uint256' },
-        { name: 'min_output', type: 'uint256', internalType: 'uint256' },
-        { name: 'send2bridge', type: 'address', internalType: 'address' },
-        { name: 'recipient', type: 'address', internalType: 'address' }
-      ],
       outputs: [],
-      stateMutability: 'nonpayable'
+      stateMutability: 'nonpayable',
+      type: 'function'
     },
     {
-      type: 'function',
+      inputs: [
+        { internalType: 'uint256', name: 'input', type: 'uint256' },
+        { internalType: 'uint256', name: 'output', type: 'uint256' }
+      ],
       name: 'calc',
-      inputs: [
-        { name: 'input', type: 'uint256', internalType: 'uint256' },
-        { name: 'output', type: 'uint256', internalType: 'uint256' }
-      ],
       outputs: [
-        { name: '', type: 'uint256', internalType: 'uint256' },
-        { name: '', type: 'uint256', internalType: 'uint256' }
+        { internalType: 'uint256', name: '', type: 'uint256' },
+        { internalType: 'uint256', name: '', type: 'uint256' }
       ],
-      stateMutability: 'view'
+      stateMutability: 'view',
+      type: 'function'
     },
     {
-      type: 'function',
+      inputs: [],
       name: 'denominator',
-      inputs: [],
-      outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
-      stateMutability: 'view'
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function'
     },
     {
-      type: 'function',
+      inputs: [],
       name: 'numerator',
-      inputs: [],
-      outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
-      stateMutability: 'view'
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function'
     },
     {
-      type: 'function',
+      inputs: [],
       name: 'seller',
-      inputs: [],
-      outputs: [{ name: '', type: 'address', internalType: 'address' }],
-      stateMutability: 'view'
+      outputs: [{ internalType: 'address', name: '', type: 'address' }],
+      stateMutability: 'view',
+      type: 'function'
     },
     {
-      type: 'function',
-      name: 'setPrice',
       inputs: [
-        { name: '_numerator', type: 'uint256', internalType: 'uint256' },
-        { name: '_denominator', type: 'uint256', internalType: 'uint256' }
+        { internalType: 'uint256', name: '_numerator', type: 'uint256' },
+        { internalType: 'uint256', name: '_denominator', type: 'uint256' }
       ],
+      name: 'setPrice',
       outputs: [],
-      stateMutability: 'nonpayable'
+      stateMutability: 'nonpayable',
+      type: 'function'
     },
     {
-      type: 'function',
+      inputs: [],
       name: 'token_buy',
-      inputs: [],
-      outputs: [{ name: '', type: 'address', internalType: 'contract WSK' }],
-      stateMutability: 'view'
+      outputs: [{ internalType: 'contract WSK', name: '', type: 'address' }],
+      stateMutability: 'view',
+      type: 'function'
     },
     {
-      type: 'function',
-      name: 'token_sell',
       inputs: [],
-      outputs: [{ name: '', type: 'address', internalType: 'contract ERC20' }],
-      stateMutability: 'view'
-    }
+      name: 'token_pay',
+      outputs: [{ internalType: 'contract ERC20', name: '', type: 'address' }],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    { stateMutability: 'payable', type: 'receive' }
   ] as const
 };
