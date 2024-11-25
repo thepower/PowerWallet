@@ -57,7 +57,6 @@
   background: #121923;
   @include border-gradient();
 
-
   span {
     @include text-gradient($the-power-gradient, 5px);
   }
@@ -85,7 +84,6 @@
   pointer-events: none;
 
   @include border-gradient(#26354d);
-
 
   span {
     @include text-gradient(#79789d, 5px);

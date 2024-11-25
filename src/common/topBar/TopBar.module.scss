@@ -19,7 +19,6 @@
   }
 }
 
-
 .childrenOutsideBar {
   display: none;
 
@@ -40,15 +39,12 @@
   line-height: 28px;
 }
 
-
 .controlsSet {
   display: flex;
   align-items: center;
 }
 
-
 .title {
-
   @include text-gradient();
   font-size: 24px;
   font-style: normal;

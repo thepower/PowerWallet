@@ -41,7 +41,7 @@ const TokenComponent: FC<TokenProps> = ({
   const balance = useMemo(
     () =>
       type === TokenKind.Native
-        ? getNativeTokenAmountBySymbol(address).formattedAmount
+        ? getNativeTokenAmountBySymbol(address)?.formattedAmount || '0'
         : tokenBalance,
     [type, getNativeTokenAmountBySymbol, address, tokenBalance]
   );

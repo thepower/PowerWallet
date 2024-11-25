@@ -38,7 +38,7 @@ const WalletCard: FC<WalletCardProps> = ({ wallet, onSelectWallet }) => {
   );
 
   const SK = getNativeTokenAmountBySymbol('SK');
-  const fixedSK = parseFloat(SK.formattedAmount).toFixed(3);
+  const fixedSK = SK ? parseFloat(SK.formattedAmount).toFixed(3) : '0';
 
   return (
     <div

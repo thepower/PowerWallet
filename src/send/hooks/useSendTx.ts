@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { WalletApi } from '@thepowereco/tssdk';
 import { toast } from 'react-toastify';
 import { parseUnits } from 'viem/utils';
+import { appQueryKeys } from 'application/queryKeys';
 import { useStore } from 'application/store';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
@@ -61,10 +62,10 @@ export const useSendTx = ({
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['walletData', activeWallet.address]
+        queryKey: appQueryKeys.walletData(activeWallet.address)
       });
       queryClient.invalidateQueries({
-        queryKey: ['walletData', to]
+        queryKey: appQueryKeys.walletData(to)
       });
     } catch (error: any) {
       toast.error(`${i18n.t('anErrorOccurredToken')} ${error}`);

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { NetworkApi } from '@thepowereco/tssdk';
+import { appQueryKeys } from 'application/queryKeys';
 
 const getNetworkChains = async () => {
   try {
@@ -18,7 +19,7 @@ export const useNetworkChains = () => {
     isLoading,
     isSuccess
   } = useQuery({
-    queryKey: ['networkChains'],
+    queryKey: appQueryKeys.networkChains(),
     queryFn: getNetworkChains
   });
 

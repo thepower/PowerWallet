@@ -19,14 +19,12 @@
   text-align: center;
 }
 
-
 .seedPhrase {
   display: grid;
   gap: 10px;
   grid-template-columns: 1fr 1fr;
 
   span {
-
     display: flex;
     width: 90px;
     height: 40px;
@@ -53,7 +51,6 @@
 @include icon-colors('.copyIcon', url('#pressed'));
 
 .tip {
-
   max-width: 250px;
   color: #6b798f;
   font-size: 16px;
@@ -105,7 +102,6 @@
 }
 
 .text {
-
   @include text-gradient;
   font-size: 24px;
   font-style: normal;

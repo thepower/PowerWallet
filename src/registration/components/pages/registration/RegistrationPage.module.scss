@@ -48,7 +48,6 @@
   margin-bottom: 8px;
 }
 
-
 .registrationPageTitle {
   @include text-gradient();
 
@@ -214,13 +213,10 @@
 }
 
 .passwordInput {
-
-
   @media screen and (max-width: $tablet) {
     width: 100%;
   }
 }
-
 
 .importAccountInput {
   width: 1px;
@@ -228,7 +224,6 @@
   opacity: 0;
   visibility: hidden;
 }
-
 
 .exportModalTitleHolder {
   display: flex;
@@ -274,7 +269,6 @@
   line-height: 20px;
   text-align: center;
 }
-
 
 .exportModalForm {
   display: flex;

@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { WalletApi } from '@thepowereco/tssdk';
 import { formatUnits } from 'viem/utils';
+import { appQueryKeys } from 'application/queryKeys';
 import { Wallet } from 'application/utils/localStorageUtils';
 import { LoadBalanceType, TokenKind, TToken } from 'myAssets/types';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
@@ -30,7 +31,7 @@ export const useWalletData = (wallet: Wallet | null) => {
     isLoading,
     isSuccess
   } = useQuery<LoadBalanceType>({
-    queryKey: ['walletData', wallet?.address],
+    queryKey: appQueryKeys.walletData(wallet?.address),
     queryFn: () => getBalance(wallet?.address),
     enabled: !!wallet?.address && !!networkApi
   });
@@ -58,18 +59,22 @@ export const useWalletData = (wallet: Wallet | null) => {
 
   const getNativeTokenAmountBySymbol = useCallback(
     (symbol?: string) => {
-      return {
-        amount: (symbol && walletData?.amount?.[symbol])?.toString() || '0',
-        formattedAmount:
-          (symbol &&
-            networkApi?.decimals[symbol] &&
-            walletData?.amount?.[symbol] &&
-            formatUnits(
-              BigInt(walletData?.amount?.[symbol]),
-              networkApi?.decimals[symbol]
-            )) ||
-          '0'
-      };
+      if (symbol && walletData?.amount?.[symbol]) {
+        return {
+          amount: (symbol && walletData?.amount?.[symbol])?.toString() || '0',
+          formattedAmount:
+            (symbol &&
+              networkApi?.decimals[symbol] &&
+              walletData?.amount?.[symbol] &&
+              formatUnits(
+                BigInt(walletData?.amount?.[symbol]),
+                networkApi?.decimals[symbol]
+              )) ||
+            '0'
+        };
+      } else {
+        return null;
+      }
     },
     [networkApi?.decimals, walletData?.amount]
   );

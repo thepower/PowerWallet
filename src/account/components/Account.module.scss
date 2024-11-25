@@ -12,7 +12,6 @@
   text-decoration: none !important;
 }
 
-
 .account {
   display: flex;
   flex-direction: row;
@@ -25,13 +24,11 @@
     font-size: 14px;
     line-height: 16px;
 
-    >*:first-of-type {
+    > *:first-of-type {
       text-decoration: none;
     }
   }
 }
-
-
 
 .drawerPaper {
   z-index: 250;
@@ -154,7 +151,9 @@
     background: #2e353d;
 
     .accountActionText {
-      @include text-gradient(linear-gradient(90deg, #1768e5 50.44%, #00f0ff 129.31%));
+      @include text-gradient(
+        linear-gradient(90deg, #1768e5 50.44%, #00f0ff 129.31%)
+      );
     }
   }
 }

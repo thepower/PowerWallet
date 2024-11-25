@@ -96,7 +96,7 @@ const SendPageComponent: FC = () => {
       case TokenKind.Erc721:
         return tokenBalance;
       case TokenKind.Native:
-        return nativeTokenAmount.formattedAmount;
+        return nativeTokenAmount?.formattedAmount;
       default:
         return '0';
     }

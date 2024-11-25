@@ -1,6 +1,7 @@
 import { experimental_createPersister } from '@tanstack/query-persist-client-core';
 import { useQuery } from '@tanstack/react-query';
 import { NetworkApi } from '@thepowereco/tssdk';
+import { appQueryKeys } from 'application/queryKeys';
 import { localStorageRootPath } from 'application/utils/localStorageUtils';
 
 export const persister = experimental_createPersister({
@@ -30,7 +31,7 @@ export const useNetworkApi = ({ chainId }: { chainId?: number }) => {
     isLoading,
     isSuccess
   } = useQuery({
-    queryKey: ['networkApi', chainId],
+    queryKey: appQueryKeys.networkApi(chainId),
     queryFn: () => bootstrap(chainId),
     staleTime: 1000 * 60 * 60 * 24,
     select: (data) => {

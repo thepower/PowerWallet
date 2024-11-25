@@ -11,6 +11,7 @@ import {
   TransactionFormattedType,
   TransactionType
 } from 'myAssets/types';
+import { appQueryKeys } from 'application/queryKeys';
 
 export function useTransactionsHistory({
   initialBlock,
@@ -147,8 +148,8 @@ export function useTransactionsHistory({
     isFetchingNextPage
   } = useInfiniteQuery({
     queryKey: tokenAddress
-      ? ['transactionsHistory', activeWallet?.address, tokenAddress]
-      : ['transactionsHistory', activeWallet?.address],
+      ? appQueryKeys.transactionsHistory(activeWallet?.address, tokenAddress)
+      : appQueryKeys.transactionsHistory(activeWallet?.address),
     initialPageParam: initialBlock!,
 
     queryFn: ({ pageParam }) => {

@@ -3,6 +3,7 @@ import { AddressApi } from '@thepowereco/tssdk';
 import axios, { AxiosResponse } from 'axios';
 import range from 'lodash/range';
 import abis from 'abis';
+import { appQueryKeys } from 'application/queryKeys';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 
@@ -86,41 +87,39 @@ export const useERC721Tokens = ({
     return { id: tokenId, image: uri };
   };
 
-  const getERC721Tokens = async (address: string | null | undefined) => {
-    if (!address) {
-      throw new Error('Address not found');
-    }
-
-    if (!networkApi) {
-      throw new Error('Network API not available');
-    }
-
-    const balanceBigint = await networkApi.executeCall(
-      {
-        abi: abis.erc721.abi,
-        functionName: 'balanceOf',
-        args: [AddressApi.textAddressToEvmAddress(address)]
-      },
-      {
-        address
-      }
-    );
-    const balance = Number(balanceBigint);
-
-    const tokens = await Promise.all(
-      range(0, balance).map((id) => getErc721Token(id))
-    );
-
-    return tokens;
-  };
-
   const {
     data: erc721Tokens,
     isLoading,
     isSuccess
   } = useQuery({
-    queryKey: ['ERC721Tokens', activeWallet?.address, tokenAddress],
-    queryFn: () => getERC721Tokens(activeWallet?.address),
+    queryKey: appQueryKeys.ERC721Tokens(activeWallet?.address, tokenAddress),
+    queryFn: async () => {
+      if (!activeWallet?.address) {
+        throw new Error('Address not found');
+      }
+
+      if (!networkApi) {
+        throw new Error('Network API not available');
+      }
+
+      const balanceBigint = await networkApi.executeCall(
+        {
+          abi: abis.erc721.abi,
+          functionName: 'balanceOf',
+          args: [AddressApi.textAddressToEvmAddress(activeWallet.address)]
+        },
+        {
+          address: activeWallet.address
+        }
+      );
+      const balance = Number(balanceBigint);
+
+      const tokens = await Promise.all(
+        range(0, balance).map((id) => getErc721Token(id))
+      );
+
+      return tokens;
+    },
     enabled:
       !!activeWallet?.address && !!networkApi && !!tokenAddress && !!enabled
   });

@@ -5,6 +5,7 @@ import abis from 'abis';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { TokenKind } from 'myAssets/types';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
+import { appQueryKeys } from 'application/queryKeys';
 
 export const useTokenBalance = ({
   tokenAddress,
@@ -73,7 +74,7 @@ export const useTokenBalance = ({
     isLoading,
     isSuccess
   } = useQuery({
-    queryKey: ['tokenBalance', activeWallet?.address, tokenAddress],
+    queryKey: appQueryKeys.tokenBalance(activeWallet?.address, tokenAddress),
     queryFn: getTokenBalance,
 
     enabled:

@@ -1,7 +1,7 @@
 @use '@/styles/mixins' as *;
 
 .wrapper {
-  padding: 16px 32PX;
+  padding: 16px 32px;
 
   @include mobile {
     padding: 0 16px 8px 16px;
@@ -35,8 +35,6 @@
     justify-content: space-between;
   }
 }
-
-
 
 .tokensHeadRow {
   display: flex;

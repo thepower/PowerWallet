@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { GetChainResultType } from 'account/typings/accountTypings';
 import appEnvs from 'appEnvs';
+import { appQueryKeys } from 'application/queryKeys';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { useNetworkApi } from '../../application/hooks';
@@ -37,7 +38,7 @@ export const useAccountLoginToWallet = ({
       await networkApi?.getAddressChain(address);
 
     queryClient.invalidateQueries({
-      queryKey: ['walletData', address]
+      queryKey: appQueryKeys.walletData(address)
     });
     return {
       chainId: subChain.chain,

@@ -7,6 +7,7 @@ import { useStore } from 'application/store';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
+import { appQueryKeys } from 'application/queryKeys';
 
 type Args = {
   wif: string;
@@ -65,10 +66,10 @@ export const useSendErc721TokenTx = ({
           to
         });
         queryClient.invalidateQueries({
-          queryKey: ['tokenBalance', activeWallet?.address, address]
+          queryKey: appQueryKeys.tokenBalance(activeWallet?.address, address)
         });
         queryClient.invalidateQueries({
-          queryKey: ['tokenBalance', to, address]
+          queryKey: appQueryKeys.tokenBalance(to, address)
         });
       }
     } catch (error: any) {

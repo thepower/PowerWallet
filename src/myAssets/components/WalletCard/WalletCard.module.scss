@@ -1,6 +1,5 @@
 @use '@/styles/mixins' as *;
 
-
 .walletCard {
   width: 248px;
   height: 130px;
@@ -11,7 +10,7 @@
 
   cursor: pointer;
 
-  border: 1px solid rgba(176, 178, 183, 0.20);
+  border: 1px solid rgba(176, 178, 183, 0.2);
 }
 
 .walletCardActive {
@@ -22,11 +21,11 @@
   }
 
   & .balance {
-    color: #F5F5F7;
+    color: #f5f5f7;
   }
 
   & .copyAddressButton {
-    color: #F5F5F7;
+    color: #f5f5f7;
   }
 }
 
@@ -34,13 +33,13 @@
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
-  color: #B0B2B7;
+  color: #b0b2b7;
 
   margin-bottom: 12px;
 }
 
 .chainId {
-  color: rgba(245, 245, 247, 0.40);
+  color: rgba(245, 245, 247, 0.4);
   font-size: 12px;
   font-weight: 500;
   line-height: 20px;
@@ -49,22 +48,19 @@
 }
 
 .balance {
-
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
 
-  color: #F5F5F766;
+  color: #f5f5f766;
 
   margin-bottom: 18px;
 }
 
-
-@include icon-colors('.copyIcon', #B0B2B7);
-
+@include icon-colors('.copyIcon', #b0b2b7);
 
 .copyAddressButton {
-  color: #F5F5F766;
+  color: #f5f5f766;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
