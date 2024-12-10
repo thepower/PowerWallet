@@ -122,7 +122,6 @@ const LoginPageComponent: FC = () => {
             parsedData.returnUrl
           );
           window.close();
-          // window.location.replace(`${parsedData.callbackUrl}sso/${stringData}`);
         } else {
           toast.error(t('wrongChainLogin'));
         }

@@ -29,7 +29,7 @@ export const useExportAccount = () => {
   const navigate = useNavigate();
 
   const exportAccount = async ({
-    hint,
+    hint = '',
     password,
     isWithoutGoHome,
     additionalActionOnSuccess,
@@ -47,12 +47,12 @@ export const useExportAccount = () => {
         activeWallet.encryptedWif,
         password
       );
-      const exportedData: string = WalletApi.getExportData(
-        decryptedWif,
+      const exportedData: string = WalletApi.getExportData({
+        wif: decryptedWif,
         address,
         password,
         hint
-      );
+      });
 
       const blob: Blob = new Blob([exportedData], {
         type: 'octet-stream'

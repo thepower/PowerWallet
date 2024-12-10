@@ -38,15 +38,20 @@ export const useImportWalletFromFile = () => {
       try {
         const data = await getFileData(accountFile, FileReaderType.binary);
         const walletData = WalletApi.parseExportData(data!, password);
-        const encryptedWif = CryptoApi.encryptWif(walletData.wif!, password);
+
+        if (!walletData) {
+          throw new Error('unable to decrypt data');
+        }
+
+        const encryptedWif = CryptoApi.encryptWif(walletData.wif, password);
 
         const loginResult = await loginMutation({
-          address: walletData.address,
+          address: walletData?.address,
           encryptedWif
         });
 
         additionalActionOnSuccess?.({
-          address: walletData.address,
+          address: walletData?.address,
           chainId: loginResult?.chainId
         });
 

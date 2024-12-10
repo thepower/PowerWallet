@@ -1,11 +1,35 @@
 import { useQuery } from '@tanstack/react-query';
-import { AddressApi } from '@thepowereco/tssdk';
+import { AddressApi, NetworkApi } from '@thepowereco/tssdk';
 import axios, { AxiosResponse } from 'axios';
 import range from 'lodash/range';
 import abis from 'abis';
 import { appQueryKeys } from 'application/queryKeys';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
+
+async function checkTokenOfOwnerByIndex({
+  ownerAddress,
+  tokenAddress,
+  networkApi
+}: {
+  ownerAddress: `0x${string}`;
+  tokenAddress: `0x${string}`;
+  networkApi: NetworkApi;
+}) {
+  try {
+    await networkApi.executeCall(
+      {
+        abi: abis.erc721.abi,
+        functionName: 'tokenOfOwnerByIndex',
+        args: [AddressApi.textAddressToEvmAddress(ownerAddress), BigInt(1)]
+      },
+      { address: tokenAddress }
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
 
 async function getMetaData(uri: string) {
   try {
@@ -102,6 +126,21 @@ export const useERC721Tokens = ({
         throw new Error('Network API not available');
       }
 
+      if (!tokenAddress) {
+        throw new Error('Token address not found');
+      }
+
+      const isMethodTokenOfOwnerByIndexSupported =
+        await checkTokenOfOwnerByIndex({
+          ownerAddress: activeWallet.address as `0x${string}`,
+          tokenAddress: tokenAddress as `0x${string}`,
+          networkApi
+        });
+
+      if (!isMethodTokenOfOwnerByIndexSupported) {
+        return [];
+      }
+
       const balanceBigint = await networkApi.executeCall(
         {
           abi: abis.erc721.abi,
@@ -109,9 +148,10 @@ export const useERC721Tokens = ({
           args: [AddressApi.textAddressToEvmAddress(activeWallet.address)]
         },
         {
-          address: activeWallet.address
+          address: tokenAddress!
         }
       );
+
       const balance = Number(balanceBigint);
 
       const tokens = await Promise.all(

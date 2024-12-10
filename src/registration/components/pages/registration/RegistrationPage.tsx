@@ -60,7 +60,7 @@ const RegistrationPageComponent: FC = () => {
 
   const getRegistrationBreadcrumbs = useMemo(
     () =>
-      !isAddressInParams && parsedData
+      !isAddressInParams && parsedData && parsedData?.callbackUrl
         ? [
             {
               label: getRegistrationTabs(t).selectNetwork,
@@ -157,6 +157,7 @@ const RegistrationPageComponent: FC = () => {
             className={styles.registrationPageTitle}
             onClick={resetStage}
           >
+            {' '}
             Power Wallet
           </Link>
           <LangMenu className={styles.registrationPageLangSelect} />

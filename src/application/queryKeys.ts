@@ -19,6 +19,14 @@ class QueryKeys {
     ...(address ? [address] : []),
     ...(tokenAddress ? [tokenAddress] : [])
   ];
+  tokenTransactionsHistory = (
+    address?: string | null,
+    tokenAddress?: string
+  ) => [
+    'tokenTransactionsHistory',
+    ...(address ? [address] : []),
+    ...(tokenAddress ? [tokenAddress] : [])
+  ];
   ERC721Tokens = (address?: string | null, tokenAddress?: string) => [
     'ERC721Tokens',
     ...(address ? [address] : []),

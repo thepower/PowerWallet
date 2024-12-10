@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import isArray from 'lodash/isArray';
 
 import { useTranslation } from 'react-i18next';
+import { isAddress } from 'viem';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { TransactionFormattedType } from 'myAssets/types';
 import {
@@ -23,6 +24,20 @@ import {
 } from './icons';
 import styles from './Transaction.module.scss';
 import { FaucetSvg, SendSvg } from '../../assets/icons';
+
+const transformAddress = (address: string) => {
+  try {
+    if (AddressApi.isEvmAddressValid(address)) {
+      return AddressApi.evmAddressToTextAddress(address);
+    } else if (isAddress(address)) {
+      return address;
+    } else {
+      return AddressApi.hexToTextAddress(address);
+    }
+  } catch (error) {
+    return '-';
+  }
+};
 
 type OwnProps = { trx: TransactionFormattedType };
 type TransactionProps = OwnProps;
@@ -51,23 +66,21 @@ const Transaction: React.FC<TransactionProps> = ({ trx }) => {
 
     const rows = [
       { Icon: <SuccessIcon />, key: t('tx'), value: trx.id },
+      { Icon: <SuccessIcon />, key: t('txHash'), value: trx.txHash },
       {
         Icon: <FromArrowIcon />,
         key: t('from'),
-        value:
-          trx.from.length > 20
-            ? trx.from
-            : AddressApi.hexToTextAddress(trx.from)
+        value: transformAddress(trx.from)
       },
       {
         Icon: <ToArrowIcon />,
         key: t('to'),
-        value: trx.to.length > 20 ? trx.to : AddressApi.hexToTextAddress(trx.to)
+        value: transformAddress(trx.to)
       },
       { Icon: <CoinIcon />, key: t('amount'), value: trx.amount },
-      ...(sponsor
-        ? [{ Icon: <CoinIcon />, key: t('sponsor'), value: sponsor }]
-        : []),
+      { Icon: <CoinIcon />, key: t('tokenId'), value: trx.tokenId },
+
+      { Icon: <CoinIcon />, key: t('sponsor'), value: sponsor },
       { Icon: <LogoIcon />, key: t('cur'), value: trx.currency },
       {
         Icon: <WatchIcon />,
@@ -90,13 +103,15 @@ const Transaction: React.FC<TransactionProps> = ({ trx }) => {
 
     return (
       <div className={styles.grid}>
-        {rows.map(({ Icon, key, value }) => (
-          <React.Fragment key={key}>
-            {Icon}
-            <span className={styles.key}>{`${key}:`}</span>
-            <span className={styles.value}>{value}</span>
-          </React.Fragment>
-        ))}
+        {rows.map(({ Icon, key, value }) =>
+          value ? (
+            <React.Fragment key={key}>
+              {Icon}
+              <span className={styles.key}>{`${key}:`}</span>
+              <span className={styles.value}>{value}</span>
+            </React.Fragment>
+          ) : null
+        )}
       </div>
     );
   }, [trx, t]);
@@ -113,7 +128,10 @@ const Transaction: React.FC<TransactionProps> = ({ trx }) => {
     return null;
   }, [trx.txext, t]);
 
-  const isReceived = activeWallet?.address === trx.to;
+  const isReceived = activeWallet?.address
+    ? AddressApi.textAddressToEvmAddress(activeWallet.address).toLowerCase() ===
+      trx.to.toLowerCase()
+    : false;
 
   const name =
     wallets.find((w) => w.address === trx.from)?.name ||

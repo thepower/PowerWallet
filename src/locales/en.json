@@ -219,6 +219,9 @@
     "approveError": "Error approval",
     "convertSuccess": "Successful convert",
     "convertError": "Error convert",
-    "token": "Token"
+    "token": "Token",
+    "loadMore": "Load more",
+    "tokenId": "Token ID",
+    "txHash": "Tx Hash"
   }
 }

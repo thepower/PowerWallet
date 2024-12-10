@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
+import { useAppKit } from '@reown/appkit/react';
 import { AddressApi } from '@thepowereco/tssdk';
-import { waitForTransaction } from '@wagmi/core';
-import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { waitForTransactionReceipt, writeContract } from '@wagmi/core';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -9,10 +9,10 @@ import { parseUnits } from 'viem';
 import {
   useAccount,
   useChainId,
-  useContractWrite,
-  useSwitchNetwork,
-  useContractReads,
-  useNetwork
+  useSwitchChain,
+  useReadContracts,
+  useChains,
+  useConfig
 } from 'wagmi';
 import { bscTestnet } from 'wagmi/chains';
 import * as yup from 'yup';
@@ -25,9 +25,8 @@ import styles from './BuyCrypto.module.scss';
 
 enum Token {
   WSK = 'WSK',
-  TOY = 'TOY',
-  USDCoy = 'USDCoy',
-  USDtoy18 = 'USDtoy18'
+  USDC = 'USDC',
+  USDT = 'USDT'
 }
 
 type InitialValues = {
@@ -42,21 +41,17 @@ type TokenPair = `${string}-${string}`;
 
 const swapsMap: Record<number, Record<TokenPair, `0x${string}`>> = {
   [bscTestnet.id]: {
-    [`${Token.TOY}-${Token.WSK}`]: appEnvs.SWAP_TOY_TO_WSK_EVM_CONTRACT_ADDRESS,
-    [`${Token.USDCoy}-${Token.WSK}`]:
-      appEnvs.SWAP_USDCoy_TO_WSK_EVM_CONTRACT_ADDRESS,
-    [`${Token.USDtoy18}-${Token.WSK}`]:
-      appEnvs.SWAP_USDtoy18_TO_WSK_EVM_CONTRACT_ADDRESS
+    [`${Token.USDC}-${Token.WSK}`]:
+      appEnvs.SWAP_USDC_TO_SK_EVM_CONTRACT_ADDRESS,
+    [`${Token.USDT}-${Token.WSK}`]: appEnvs.SWAP_USDT_TO_SK_EVM_CONTRACT_ADDRESS
   }
 };
 
 const bridgeMap: Record<number, Record<TokenPair, `0x${string}`>> = {
   [bscTestnet.id]: {
     [`${Token.WSK}-${Token.WSK}`]: appEnvs.WSK_EVM_CONTRACT_ADDRESS,
-    [`${Token.TOY}-${Token.TOY}`]: appEnvs.TOY_EVM_CONTRACT_ADDRESS,
-    [`${Token.USDCoy}-${Token.USDCoy}`]: appEnvs.USDCoy_EVM_CONTRACT_ADDRESS,
-    [`${Token.USDtoy18}-${Token.USDtoy18}`]:
-      appEnvs.USDtoy18_EVM_CONTRACT_ADDRESS
+    [`${Token.USDC}-${Token.USDC}`]: appEnvs.USDC_EVM_CONTRACT_ADDRESS,
+    [`${Token.USDT}-${Token.USDT}`]: appEnvs.USDT_EVM_CONTRACT_ADDRESS
   }
 };
 
@@ -67,12 +62,12 @@ type TokenOption = {
 
 const tokens: TokenOption[] = [
   {
-    title: Token.USDtoy18,
-    value: Token.USDtoy18
+    title: Token.USDT,
+    value: Token.USDT
   },
   {
-    title: Token.USDCoy,
-    value: Token.USDCoy
+    title: Token.USDC,
+    value: Token.USDC
   },
   {
     title: Token.WSK,
@@ -81,10 +76,10 @@ const tokens: TokenOption[] = [
 ];
 
 export const BuyCryptoPage: React.FC = () => {
-  const modal = useWeb3Modal();
+  const modal = useAppKit();
   const { address: userEvmAddress, isConnected } = useAccount();
   const { activeWallet } = useWalletsStore();
-  const { chains } = useNetwork();
+  const chains = useChains();
   const initialValues = useMemo<InitialValues>(
     () => ({
       chainId: defaultEvmChain.id,
@@ -98,8 +93,9 @@ export const BuyCryptoPage: React.FC = () => {
 
   const { t } = useTranslation();
   const chain = useChainId();
-  const { switchNetwork, isLoading: isSwitchNetworkLoading } =
-    useSwitchNetwork();
+  const config = useConfig();
+  const { switchChainAsync, isPending: isSwitchNetworkLoading } =
+    useSwitchChain();
 
   const validationSchema = useMemo(
     () =>
@@ -148,7 +144,7 @@ export const BuyCryptoPage: React.FC = () => {
       formik.values.tokenBuy
   );
 
-  const { data: swapData } = useContractReads({
+  const { data: swapData } = useReadContracts({
     contracts: [
       {
         address: swapAddress,
@@ -167,14 +163,16 @@ export const BuyCryptoPage: React.FC = () => {
         args: [BigInt(formik.values.amount), BigInt(formik.values.amount)]
       }
     ],
-    enabled: isEnableOrWatched && !isBridge
+    query: {
+      enabled: isEnableOrWatched && !isBridge
+    }
   });
 
   const tokenPay = swapData?.[0].result;
   const tokenBuy = swapData?.[1].result;
   const calculatedResultAmount = swapData?.[2].result?.[1];
 
-  const { data: tokenPayData, refetch: refetchTokenPayData } = useContractReads(
+  const { data: tokenPayData, refetch: refetchTokenPayData } = useReadContracts(
     {
       contracts: [
         {
@@ -203,7 +201,9 @@ export const BuyCryptoPage: React.FC = () => {
           ]
         }
       ],
-      enabled: Boolean(isEnableOrWatched && (tokenPay || bridgeTokenAddress))
+      query: {
+        enabled: Boolean(isEnableOrWatched && (tokenPay || bridgeTokenAddress))
+      }
     }
   );
 
@@ -212,7 +212,7 @@ export const BuyCryptoPage: React.FC = () => {
   const tokenPayBalance = tokenPayData?.[2].result as bigint;
   const tokenPayAllowance = tokenPayData?.[3].result as bigint;
 
-  const { data: tokenBuyData } = useContractReads({
+  const { data: tokenBuyData } = useReadContracts({
     contracts: [
       // {
       //   address: tokenBuy,
@@ -237,31 +237,15 @@ export const BuyCryptoPage: React.FC = () => {
       //   args: [userEvmAddress!, swapAddress]
       // }
     ],
-    enabled: Boolean(isEnableOrWatched && tokenBuy && !isBridge)
+    query: {
+      enabled: Boolean(isEnableOrWatched && tokenBuy && !isBridge)
+    }
   });
 
   // const tokenBuyDecimals = tokenBuyData?.[0].result as number;
   const tokenBuySymbol = tokenBuyData?.[0].result as string;
   // const tokenBuyBalance = tokenBuyData?.[2].result as bigint;
   // const tokenBuyAllowance = tokenBuyData?.[3].result as bigint;
-
-  const { writeAsync: approve } = useContractWrite({
-    address: isBridge ? bridgeTokenAddress : tokenPay,
-    abi: abis.erc20.abi,
-    functionName: 'approve'
-  });
-
-  const { writeAsync: buyAndBridge } = useContractWrite({
-    address: swapAddress,
-    abi: abis.swapEVM.abi,
-    functionName: 'buy_and_bridge'
-  });
-
-  const { writeAsync: convertToken } = useContractWrite({
-    address: appEnvs.BRIDGE_EVM_CONTRACT_ADDRESS,
-    abi: abis.bridgeEVM.abi,
-    functionName: 'convert_token'
-  });
 
   const getIsEnoughUSDTAllowance = useCallback(
     (amount: number) =>
@@ -287,14 +271,19 @@ export const BuyCryptoPage: React.FC = () => {
 
     if (isEnoughUSDTBalance && !isEnoughUSDTAllowance) {
       try {
-        const { hash } = await approve({
+        const hash = await writeContract(config, {
+          address: isBridge ? bridgeTokenAddress : tokenPay!,
+          abi: abis.erc20.abi,
+          functionName: 'approve',
           args: [
             isBridge ? appEnvs.BRIDGE_EVM_CONTRACT_ADDRESS : swapAddress,
             parseUnits(amount.toString(), tokenPayDecimals!)
           ]
         });
-
-        const { status } = await waitForTransaction({ hash });
+        const { status } = await waitForTransactionReceipt(config, {
+          confirmations: 2,
+          hash
+        });
         if (status === 'success') {
           toast.success(`${t('approveSuccess')} ${amount} ${tokenPaySymbol}`);
         } else {
@@ -308,7 +297,10 @@ export const BuyCryptoPage: React.FC = () => {
     } else if (isEnoughUSDTBalance && isEnoughUSDTAllowance) {
       try {
         if (isBridge) {
-          const { hash } = await convertToken({
+          const hash = await writeContract(config, {
+            address: appEnvs.BRIDGE_EVM_CONTRACT_ADDRESS,
+            abi: abis.bridgeEVM.abi,
+            functionName: 'convert_token',
             args: [
               bridgeTokenAddress,
               AddressApi.textAddressToEvmAddress(address),
@@ -316,7 +308,10 @@ export const BuyCryptoPage: React.FC = () => {
               '0x0000000000000000000000000000000000000000'
             ]
           });
-          const { status } = await waitForTransaction({ hash });
+          const { status } = await waitForTransactionReceipt(config, {
+            confirmations: 2,
+            hash
+          });
 
           if (status === 'success') {
             toast.success(`${t('convertSuccess')} ${amount} ${tokenPaySymbol}`);
@@ -324,7 +319,10 @@ export const BuyCryptoPage: React.FC = () => {
             toast.error(`${t('convertError')} ${amount} ${tokenPaySymbol}`);
           }
         } else {
-          const { hash } = await buyAndBridge({
+          const hash = await writeContract(config, {
+            address: swapAddress,
+            abi: abis.swapEVM.abi,
+            functionName: 'buy_and_bridge',
             args: [
               parseUnits(amount.toString(), tokenPayDecimals!),
               parseUnits(amount.toString(), tokenPayDecimals!),
@@ -333,7 +331,10 @@ export const BuyCryptoPage: React.FC = () => {
               '0x0000000000000000000000000000000000000000'
             ]
           });
-          const { status } = await waitForTransaction({ hash });
+          const { status } = await waitForTransactionReceipt(config, {
+            confirmations: 2,
+            hash
+          });
 
           if (status === 'success') {
             toast.success(`${t('convertSuccess')} ${amount} ${tokenPaySymbol}`);
@@ -348,14 +349,19 @@ export const BuyCryptoPage: React.FC = () => {
   }
 
   const onConnectHandler = useCallback(
-    () => modal.open({ view: 'Connect' }) as any,
+    () => modal.open({ view: 'Connect' }),
     [modal]
   );
 
   const renderBuyButton = useCallback(() => {
     if (!isConnected) {
       return (
-        <Button onClick={onConnectHandler} variant='contained' fullWidth>
+        <Button
+          onClick={onConnectHandler}
+          variant='contained'
+          fullWidth
+          className={styles.submitButton}
+        >
           {t('connectWallet')}
         </Button>
       );
@@ -364,10 +370,11 @@ export const BuyCryptoPage: React.FC = () => {
     if (chain !== formik.values.chainId) {
       return (
         <Button
-          onClick={() => switchNetwork?.(formik.values.chainId)}
+          onClick={() => switchChainAsync?.({ chainId: formik.values.chainId })}
           variant='contained'
           fullWidth
           loading={isSwitchNetworkLoading}
+          className={styles.submitButton}
         >
           {t('switchNetwork')}
         </Button>
@@ -381,7 +388,12 @@ export const BuyCryptoPage: React.FC = () => {
       !!formik.values.tokenPay
     ) {
       return (
-        <Button fullWidth variant='contained' disabled>
+        <Button
+          fullWidth
+          variant='contained'
+          className={styles.submitButton}
+          disabled
+        >
           {t('insufficientBalance')}
         </Button>
       );
@@ -395,6 +407,7 @@ export const BuyCryptoPage: React.FC = () => {
           variant='contained'
           loading={formik.isSubmitting}
           disabled={!formik.isValid || !(formik.values.amount > 0)}
+          className={styles.submitButton}
         >
           {t('approveAmount') +
             (formik.values?.amount
@@ -406,12 +419,11 @@ export const BuyCryptoPage: React.FC = () => {
 
     return (
       <Button
-        fullWidth
         type='submit'
         variant='contained'
         loading={formik.isSubmitting}
         disabled={!formik.isValid}
-        color='success'
+        className={styles.submitButton}
       >
         {isBridge
           ? t('Bridge') +
@@ -427,7 +439,10 @@ export const BuyCryptoPage: React.FC = () => {
   }, [
     isConnected,
     chain,
-    formik.values,
+    formik.values.chainId,
+    formik.values.amount,
+    formik.values.tokenBuy,
+    formik.values.tokenPay,
     formik.isSubmitting,
     formik.isValid,
     getIsEnoughUSDTBalance,
@@ -439,7 +454,7 @@ export const BuyCryptoPage: React.FC = () => {
     tokenBuySymbol,
     onConnectHandler,
     isSwitchNetworkLoading,
-    switchNetwork
+    switchChainAsync
   ]);
 
   return (
@@ -451,7 +466,7 @@ export const BuyCryptoPage: React.FC = () => {
       <form className={styles.form} onSubmit={formik.handleSubmit}>
         {isConnected && (
           <div className={styles.wallet}>
-            <w3m-account-button />
+            <appkit-button />
           </div>
         )}
         <div className={styles.inputs}>

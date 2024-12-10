@@ -219,6 +219,9 @@
     "approveError": "Ошибка одобрения",
     "convertSuccess": "Успешная конвертация",
     "convertError": "Ошибка конвертации",
-    "token": "Токен"
+    "token": "Токен",
+    "loadMore": "Загрузить больше",
+    "tokenId": "Идентификатор токена",
+    "txHash": "Tx Hash"
   }
 }

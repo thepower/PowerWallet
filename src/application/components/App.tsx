@@ -4,11 +4,12 @@ import {
   StyledEngineProvider
 } from '@mui/material/styles';
 import { StylesProvider } from '@mui/styles';
+import { bsc, bscTestnet } from '@reown/appkit/networks';
+import { createAppKit } from '@reown/appkit/react';
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react';
 import { BrowserRouter } from 'react-router-dom';
-import { WagmiConfig } from 'wagmi';
-import { bsc, bscTestnet } from 'wagmi/chains';
+import { WagmiProvider } from 'wagmi';
 import appEnvs from 'appEnvs';
 import { AppRoutes } from './AppRoutes';
 import InitGradientsSvg from './initGradientsSvg.svg?react';
@@ -28,19 +29,34 @@ const isProduction = import.meta.env.MODE === 'prod';
 
 export const defaultEvmChain = isProduction ? bsc : bscTestnet;
 
-const chains = isProduction ? [bsc] : [bscTestnet];
+const metadata = {
+  name: 'PowerWallet',
+  description: 'PowerWallet',
+  url: 'https://example.com', // origin must match your domain & subdomain
+  icons: ['https://avatars.githubusercontent.com/u/179229932']
+};
 
-const wagmiConfig = defaultWagmiConfig({
+const networks = isProduction ? [bsc] : [bscTestnet];
+
+const wagmiAdapter = new WagmiAdapter({
+  networks,
   projectId,
-  chains
+  ssr: true
 });
 
-createWeb3Modal({ projectId, wagmiConfig });
+// 5. Create modal
+createAppKit({
+  adapters: [wagmiAdapter],
+  networks: isProduction ? [bsc] : [bscTestnet],
+  projectId,
+  metadata,
+  features: {
+    analytics: true // Optional - defaults to your Cloud configuration
+  }
+});
 
 export const App = () => (
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  <WagmiConfig config={wagmiConfig}>
+  <WagmiProvider config={wagmiAdapter.wagmiConfig}>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <StylesProvider injectFirst>
@@ -57,5 +73,5 @@ export const App = () => (
         </StylesProvider>
       </BrowserRouter>
     </QueryClientProvider>
-  </WagmiConfig>
+  </WagmiProvider>
 );

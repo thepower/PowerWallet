@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { AddressApi } from '@thepowereco/tssdk';
 import { formatUnits } from 'viem/utils';
 import abis from 'abis';
+import { appQueryKeys } from 'application/queryKeys';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { TokenKind } from 'myAssets/types';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
-import { appQueryKeys } from 'application/queryKeys';
 
 export const useTokenBalance = ({
   tokenAddress,

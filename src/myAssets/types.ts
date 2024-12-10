@@ -107,6 +107,8 @@ export type TransactionFormattedType = TransactionType & {
   amount: string;
   blockHeight: number;
   blockHash: string;
+  txHash?: string;
+  tokenId?: string;
 };
 
 export enum TokenKind {

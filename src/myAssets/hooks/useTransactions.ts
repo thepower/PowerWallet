@@ -5,22 +5,24 @@ import { format } from 'date-fns';
 import { groupBy } from 'lodash';
 import { formatUnits } from 'viem';
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
+import { appQueryKeys } from 'application/queryKeys';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import {
   BlockType,
   TransactionFormattedType,
   TransactionType
 } from 'myAssets/types';
-import { appQueryKeys } from 'application/queryKeys';
 
 export function useTransactionsHistory({
   initialBlock,
   tokenAddress,
-  perPage = 10
+  perPage = 10,
+  enabled
 }: {
   initialBlock?: number;
-  tokenAddress?: string;
   perPage?: number;
+  tokenAddress?: string;
+  enabled?: boolean;
 }) {
   const { activeWallet } = useWalletsStore();
 
@@ -28,11 +30,9 @@ export function useTransactionsHistory({
 
   async function fetchTransactionsHistory({
     pageParam,
-    tokenAddress,
     perPage = 10
   }: {
     pageParam: number;
-    tokenAddress?: string;
     perPage: number;
   }): Promise<{
     transactions: TransactionFormattedType[];
@@ -147,23 +147,19 @@ export function useTransactionsHistory({
     hasNextPage,
     isFetchingNextPage
   } = useInfiniteQuery({
-    queryKey: tokenAddress
-      ? appQueryKeys.transactionsHistory(activeWallet?.address, tokenAddress)
-      : appQueryKeys.transactionsHistory(activeWallet?.address),
+    queryKey: appQueryKeys.transactionsHistory(activeWallet?.address),
+
     initialPageParam: initialBlock!,
 
     queryFn: ({ pageParam }) => {
       return fetchTransactionsHistory({
         pageParam,
-        tokenAddress,
         perPage
       });
     },
 
     getNextPageParam: (lastPage) => lastPage.nextPageParam,
-    enabled: tokenAddress
-      ? !!initialBlock && !!activeWallet?.address
-      : !!initialBlock && !!activeWallet?.address && !!tokenAddress
+    enabled: !!initialBlock && !!activeWallet?.address && enabled
   });
 
   const allTransactions = useMemo(

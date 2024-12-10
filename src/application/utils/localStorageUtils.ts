@@ -144,7 +144,13 @@ export const useTokensStore = create<TokenStore>()(
 
       getTokenByAddress: (address?: string) => {
         const { tokens } = get();
-        return tokens.find((token) => token.address === address) || null;
+        return (
+          tokens.find(
+            (token) =>
+              token.address?.toLocaleLowerCase() ===
+              address?.toLocaleLowerCase()
+          ) || null
+        );
       },
 
       toggleTokenVisibility: (address: string) => {

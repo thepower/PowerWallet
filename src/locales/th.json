@@ -219,6 +219,9 @@
     "approveError": "",
     "convertSuccess": "",
     "convertError": "",
-    "token": ""
+    "token": "",
+    "loadMore": "",
+    "tokenId": "",
+    "txHash": ""
   }
 }

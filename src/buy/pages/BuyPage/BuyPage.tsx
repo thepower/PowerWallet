@@ -33,13 +33,13 @@ const BuyPageComponent: FC = () => {
           >
             <CryptoSvg />
           </CardLink>
-          <CardLink
+          {/* <CardLink
             label={t('fiat')}
             to={`${RoutesEnum.buy}${RoutesEnum.fiat}`}
             className={styles.cardLink}
           >
             <FiatSvg />
-          </CardLink>
+          </CardLink> */}
         </div>
       </div>
     </PageTemplate>

@@ -3,11 +3,11 @@ import { AddressApi, EvmContract } from '@thepowereco/tssdk';
 import { toast } from 'react-toastify';
 import abis from 'abis';
 
+import { appQueryKeys } from 'application/queryKeys';
 import { useStore } from 'application/store';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
-import { appQueryKeys } from 'application/queryKeys';
 
 type Args = {
   wif: string;

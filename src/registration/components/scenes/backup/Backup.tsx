@@ -8,7 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import * as yup from 'yup';
 import { useExportAccount } from 'account/hooks';
 import { useStore } from 'application/store';
-import { RoutesEnum } from 'application/typings/routes';
+import { AppQueryParams, RoutesEnum } from 'application/typings/routes';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import {
   Button,
@@ -19,6 +19,7 @@ import {
 } from 'common';
 import { useCreateWallet } from 'registration/hooks/useCreateWallet';
 import { BackupAccountStepsEnum } from 'registration/typings/registrationTypes';
+import { stringToObject } from 'sso/utils';
 import styles from './Backup.module.scss';
 
 const initialValues = {
@@ -64,6 +65,12 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
     () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
     [dataOrReferrer]
   );
+
+  const parsedData: AppQueryParams = useMemo(() => {
+    if (!isAddressInParams && dataOrReferrer)
+      return stringToObject(dataOrReferrer);
+    return null;
+  }, [dataOrReferrer, isAddressInParams]);
 
   useEffect(() => {
     if (!seedPhrase) {
@@ -243,7 +250,7 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
       password: usedPassword,
       isWithoutGoHome: true,
       additionalActionOnSuccess: () => {
-        if (dataOrReferrer && !isAddressInParams) {
+        if (dataOrReferrer && !isAddressInParams && parsedData?.callbackUrl) {
           setNextStep();
         } else {
           navigate(RoutesEnum.root);
@@ -256,6 +263,7 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
     usedPassword,
     dataOrReferrer,
     isAddressInParams,
+    parsedData?.callbackUrl,
     setNextStep,
     navigate,
     resetStore
