@@ -1,11 +1,12 @@
 import React, { FC, memo, useMemo } from 'react';
 import cn from 'classnames';
 
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { RoutesEnum } from 'application/typings/routes';
+import { sliceString } from 'application/utils/applicationUtils';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { LogoIcon } from 'assets/icons';
-import { Checkbox, Switch } from 'common';
+import { Checkbox, CopyButton, Switch } from 'common';
 import { useTokenBalance } from 'myAssets/hooks/useTokenBalance';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
 import { TokenKind, TToken } from 'myAssets/types';
@@ -28,6 +29,7 @@ const TokenComponent: FC<TokenProps> = ({
   onClickSwitch,
   onClickCheckBox
 }) => {
+  const navigate = useNavigate();
   const { type, address } = token;
   const { activeWallet } = useWalletsStore();
 
@@ -37,13 +39,13 @@ const TokenComponent: FC<TokenProps> = ({
   });
 
   const { getNativeTokenAmountBySymbol } = useWalletData(activeWallet);
-
+  const isNativeToken = type === TokenKind.Native;
   const balance = useMemo(
     () =>
-      type === TokenKind.Native
+      isNativeToken
         ? getNativeTokenAmountBySymbol(address)?.formattedAmount || '0'
         : tokenBalance,
-    [type, getNativeTokenAmountBySymbol, address, tokenBalance]
+    [isNativeToken, getNativeTokenAmountBySymbol, address, tokenBalance]
   );
 
   const onClickToken = () => {
@@ -69,9 +71,9 @@ const TokenComponent: FC<TokenProps> = ({
       ? `${RoutesEnum.tokenSelection}/${token.address}`
       : `/${token.type}/${token.address}${RoutesEnum.transactions}`;
     return (
-      <Link to={link} className={styles.asset}>
+      <div className={styles.asset} onClick={() => navigate(link)}>
         {children}
-      </Link>
+      </div>
     );
   };
 
@@ -102,7 +104,10 @@ const TokenComponent: FC<TokenProps> = ({
           className={styles.assetCheckBox}
           size={'medium'}
           checked={isCheckBoxChecked}
-          onClick={() => onClickCheckBox(token.address)}
+          onClick={(e) => {
+            e?.stopPropagation();
+            onClickCheckBox(token.address);
+          }}
           disableRipple
         />
       );
@@ -118,6 +123,14 @@ const TokenComponent: FC<TokenProps> = ({
           <div className={styles.info}>
             <span className={styles.symbol}>{renderSymbol()}</span>
             <span className={styles.name}>{token?.name}</span>
+            {!isNativeToken && (
+              <CopyButton
+                textButton={sliceString(token.address, 8)}
+                copyInfo={token.address}
+                className={styles.address}
+                iconClassName={styles.copyIcon}
+              />
+            )}
           </div>
           {renderRightCol()}
         </div>

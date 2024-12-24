@@ -79,6 +79,10 @@
       grid-column: 2 span;
     }
   }
+
+  &._erc721 {
+    grid-template-columns: 1fr;
+  }
 }
 
 .activeBugIcon {

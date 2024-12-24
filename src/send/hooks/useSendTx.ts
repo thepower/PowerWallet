@@ -6,6 +6,7 @@ import { appQueryKeys } from 'application/queryKeys';
 import { useStore } from 'application/store';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
+import { getWalletData } from 'myAssets/hooks';
 import { Maybe } from 'typings/common';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 
@@ -38,6 +39,12 @@ export const useSendTx = ({
       if (!activeWallet) {
         throw new Error('Wallet not found');
       }
+
+      const walletData = await getWalletData(
+        { address: to, chainId: 0, name: '', encryptedWif: '' },
+        networkApi
+      );
+
       const walletApi = new WalletApi(networkApi);
 
       const token = 'SK';
@@ -48,7 +55,9 @@ export const useSendTx = ({
         to,
         token,
         inputAmount: parseUnits(amount, networkApi.decimals[token]),
-        message: comment ?? ''
+        message: comment ?? '',
+        gasToken: walletData?.code ? 'NORUN' : undefined,
+        gasValue: walletData?.code ? 0n : undefined
       });
 
       const { txId } = response as { txId: string; status: string };

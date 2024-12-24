@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { RoutesEnum } from 'application/typings/routes';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
-import { CryptoSvg, FiatSvg } from 'assets/icons';
+import { CryptoSvg } from 'assets/icons';
 import { CardLink, CopyButton, PageTemplate } from 'common';
 
 import styles from './BuyPage.module.scss';

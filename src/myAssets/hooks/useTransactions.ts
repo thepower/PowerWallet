@@ -15,7 +15,6 @@ import {
 
 export function useTransactionsHistory({
   initialBlock,
-  tokenAddress,
   perPage = 10,
   enabled
 }: {
@@ -106,26 +105,30 @@ export function useTransactionsHistory({
       }, {});
 
       const txs = Object.fromEntries(
-        Object.entries<TransactionFormattedType>(txsWithId).filter(
-          ([, tx]) =>
-            !tokenAddress ||
-            tx.from?.toLowerCase() === tokenAddress?.toLowerCase() ||
-            tx.to?.toLowerCase() === tokenAddress?.toLowerCase()
-        )
+        Object.entries<TransactionFormattedType>(txsWithId).filter(([, tx]) => {
+          const address = `0x${AddressApi.textAddressToHex(
+            activeWallet.address
+          )}`.toLowerCase();
+          return (
+            tx.from?.toLowerCase() === address ||
+            tx.to?.toLowerCase() === address
+          );
+        })
       );
 
       for (const [key, tx] of Object.entries(txs)) {
         transactionHistory.set(key, tx);
       }
 
-      const foundLastBlock = block.ledger_patch.find(
-        (patch) =>
+      const foundLastBlock = block.ledger_patch.find((patch) => {
+        return (
           patch[1] === 'lastblk' &&
           patch[0] ===
             `0x${AddressApi.textAddressToHex(
               activeWallet.address
             )}`.toLocaleLowerCase()
-      )?.[3];
+        );
+      })?.[3];
 
       lastBlock =
         foundLastBlock && typeof foundLastBlock === 'number'

@@ -9,6 +9,10 @@ class QueryKeys {
     'newOrder',
     ...(address ? [address] : [])
   ];
+  priceData = (keccack256?: string | null) => [
+    'newOrder',
+    ...(keccack256 ? [keccack256] : [])
+  ];
   tokenBalance = (address?: string | null, tokenAddress?: string) => [
     'tokenBalance',
     ...(address ? [address] : []),

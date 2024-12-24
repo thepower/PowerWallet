@@ -38,18 +38,24 @@ const TokenTransactionsPageComponent: React.FC = () => {
 
   const isNative = type === TokenKind.Native;
 
-  const { groupedTransactions, fetchNextPage, isLoading, isFetchingNextPage } =
-    useTransactionsHistory({
-      initialBlock: walletData?.lastblock.tx,
-      tokenAddress: token?.address,
-      enabled: isNative
-    });
+  const {
+    groupedTransactions,
+    fetchNextPage,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage: hasNextPageTransactions
+  } = useTransactionsHistory({
+    initialBlock: walletData?.lastblock?.tx,
+    tokenAddress: token?.address,
+    enabled: isNative
+  });
 
   const {
     groupedTokenTransactions,
     fetchNextPage: fetchTokenTransactionsNextPage,
     isLoading: isLoadingTokenTransactions,
-    isFetchingNextPage: isFetchingTokenTransactions
+    isFetchingNextPage: isFetchingTokenTransactions,
+    hasNextPage: hasNextPageTokenTransactions
   } = useTokenTransactionsHistory({
     tokenAddress: address as string,
     enabled: !isNative
@@ -127,6 +133,9 @@ const TokenTransactionsPageComponent: React.FC = () => {
         onClick={loadMore}
         variant='contained'
         loading={isFetchingTokenTransactions || isFetchingNextPage}
+        disabled={
+          isNative ? !hasNextPageTransactions : !hasNextPageTokenTransactions
+        }
       >
         {t('loadMore')}
       </Button>

@@ -1,11 +1,14 @@
 @use '@/styles/mixins' as *;
 
 .asset {
-  display: block;
+  display: flex;
   padding: 12px 16px;
+  align-items: center;
+
   border-radius: 5px;
   border: 1px solid rgba(176, 178, 183, 0.2);
   margin-top: 20px;
+  height: 93px;
 
   &:hover {
     background: #252b35;
@@ -39,12 +42,13 @@
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
+  width: 100%;
 }
 
 .icon {
   display: flex;
-  width: 48px;
-  height: 48px;
+  width: 60px;
+  height: 60px;
   align-items: center;
   justify-content: center;
   border-radius: 5px;
@@ -60,6 +64,7 @@
 .info {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .name {
@@ -74,19 +79,36 @@
   }
 }
 
+.rightColWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 .amount {
-  padding: 12px 0 12px;
-  margin-left: auto;
   color: #f5f5f7;
   font-size: 18px;
   font-weight: 400;
   line-height: 24px;
+
+  margin-left: auto;
 
   @include mobile {
     font-size: 16px;
     font-weight: 500;
     line-height: 20px;
   }
+}
+
+.address {
+  color: #6b798f;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 14px;
+}
+
+.copyIcon {
+  width: 16px;
+  height: 16px;
 }
 
 .assetSwitch {

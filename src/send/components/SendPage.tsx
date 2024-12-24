@@ -2,6 +2,7 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { InputAdornment, TextField } from '@mui/material';
 import { CryptoApi } from '@thepowereco/tssdk';
 import cn from 'classnames';
+import classNames from 'classnames';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -176,13 +177,7 @@ const SendPageComponent: FC = () => {
     }
   };
 
-  const handleSubmit = async (
-    values: FormValues
-    // formikHelpers: FormikHelpers<FormValues>
-  ) => {
-    // if (!AddressApi.isTextAddressValid(values.address) && !isAddre) {
-    //   formikHelpers.setFieldError('address', t('invalidAddress')!);
-    // } else {
+  const handleSubmit = async (values: FormValues) => {
     try {
       if (!activeWallet) {
         throw new Error('Wallet not found');
@@ -192,7 +187,6 @@ const SendPageComponent: FC = () => {
     } catch (error) {
       setOpenModal(true);
     }
-    // }
   };
   const onSubmit = async (values: FormValues, password: string) => {
     if (!activeWallet) {
@@ -228,7 +222,11 @@ const SendPageComponent: FC = () => {
         onSubmit={onSubmit}
       />
       <form className={styles.form} onSubmit={formik.handleSubmit}>
-        <div className={styles.fields}>
+        <div
+          className={classNames(styles.fields, {
+            [styles._erc721]: isErc721Token
+          })}
+        >
           {!isErc721Token && (
             <TextField
               variant='standard'

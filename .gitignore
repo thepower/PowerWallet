@@ -5,6 +5,7 @@ dump.rdb
 /dist
 /uploads
 /.yarn
+/tars
 
 # Logs
 *.log

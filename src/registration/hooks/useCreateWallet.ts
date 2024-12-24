@@ -89,7 +89,7 @@ export const useCreateWallet = () => {
     },
 
     onError: (e) => {
-      console.error('createWalletSaga', e);
+      console.error('createWallet', e);
       toast.error(i18n.t('createAccountError'));
     }
   });

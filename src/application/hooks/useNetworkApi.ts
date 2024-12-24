@@ -44,6 +44,7 @@ export const useNetworkApi = ({ chainId }: { chainId?: number }) => {
       }
     },
     enabled: !!chainId,
+    // retry: 3,
     persister
   });
 

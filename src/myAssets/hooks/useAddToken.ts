@@ -49,7 +49,10 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
       throw new Error('Wallet not found');
     }
     try {
-      const existedToken = tokens.find((token) => token.address === address);
+      const existedToken = tokens.find(
+        (token) =>
+          token.address === address && token.chainId === activeWallet.chainId
+      );
 
       if (existedToken && existedToken?.chainId) {
         toast.error(i18n.t('tokenHasAlreadyBeenAdded'));
@@ -69,6 +72,7 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
             address
           }
         );
+
         const symbol: string = await networkApi.executeCall(
           {
             abi: abis.erc721.abi,

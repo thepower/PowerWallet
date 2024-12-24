@@ -2069,6 +2069,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kurkle/color@npm:^0.3.0":
+  version: 0.3.4
+  resolution: "@kurkle/color@npm:0.3.4"
+  checksum: 10c0/0e9fd55c614b005c5f0c4c755bca19ec0293bc7513b4ea3ec1725234f9c2fa81afbc78156baf555c8b9cb0d305619253c3f5bca016067daeebb3d00ebb4ea683
+  languageName: node
+  linkType: hard
+
 "@lit-labs/ssr-dom-shim@npm:^1.0.0, @lit-labs/ssr-dom-shim@npm:^1.1.0, @lit-labs/ssr-dom-shim@npm:^1.2.0":
   version: 1.2.1
   resolution: "@lit-labs/ssr-dom-shim@npm:1.2.1"
@@ -4071,9 +4078,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@thepowereco/tssdk@npm:^2.2.12-canary.4":
-  version: 2.2.12-canary.4
-  resolution: "@thepowereco/tssdk@npm:2.2.12-canary.4"
+"@thepowereco/tssdk@npm:^2.2.14-canary.0":
+  version: 2.2.14-canary.0
+  resolution: "@thepowereco/tssdk@npm:2.2.14-canary.0"
   dependencies:
     "@bitcoinerlab/secp256k1": "npm:^1.1.1"
     abitype: "npm:^1.0.2"
@@ -4087,7 +4094,7 @@ __metadata:
     msgpackr: "npm:^1.11.0"
     viem: "npm:^2.19.6"
     wif: "npm:^5.0.0"
-  checksum: 10c0/72d32ae54da061713c186b74a567d542f8510a76014e2010a51c3586018f4db68bbc972a75de4272fa9b3e7d39f9ab206cbb1f00f81d8b4654e6a69e843505b1
+  checksum: 10c0/4c38b9fece1ca57b8785f13ea286c71e2f5f496cca71169dfb1225ea50020217d3716abd3d086bef32236e96fbbdad16a4e043741e2346b302a69bea679e860e
   languageName: node
   linkType: hard
 
@@ -5694,6 +5701,25 @@ __metadata:
     ansi-styles: "npm:^4.1.0"
     supports-color: "npm:^7.1.0"
   checksum: 10c0/4a3fef5cc34975c898ffe77141450f679721df9dde00f6c304353fa9c8b571929123b26a0e4617bde5018977eb655b31970c297b91b63ee83bb82aeb04666880
+  languageName: node
+  linkType: hard
+
+"chart.js@npm:^4.4.7":
+  version: 4.4.7
+  resolution: "chart.js@npm:4.4.7"
+  dependencies:
+    "@kurkle/color": "npm:^0.3.0"
+  checksum: 10c0/9db499993c561f11184112003956ba96cf00513e025f58846be36e75ebddc6cbab2f93626c3734c305bc801e9362a9ef193b9591e679c59903b2ecb48cfcb317
+  languageName: node
+  linkType: hard
+
+"chartjs-adapter-date-fns@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "chartjs-adapter-date-fns@npm:3.0.0"
+  peerDependencies:
+    chart.js: ">=2.8.0"
+    date-fns: ">=2.0.0"
+  checksum: 10c0/bc785632da9e6253a969c84f5d382e39944246de8410285f060d6715b3ed681cee80142bb2c410329b4c21094efc6d54f9c289200463dce865f736a01a76de4b
   languageName: node
   linkType: hard
 
@@ -10351,7 +10377,7 @@ __metadata:
     "@swc/plugin-emotion": "npm:^4.0.3"
     "@tanstack/query-persist-client-core": "npm:^5.62.2"
     "@tanstack/react-query": "npm:^5.62.2"
-    "@thepowereco/tssdk": "npm:^2.2.12-canary.4"
+    "@thepowereco/tssdk": "npm:^2.2.14-canary.0"
     "@types/bs58": "npm:^4.0.4"
     "@types/file-saver": "npm:^2.0.7"
     "@types/node": "npm:20.7.1"
@@ -10364,6 +10390,8 @@ __metadata:
     "@vitejs/plugin-react": "npm:4.1.0"
     "@vitejs/plugin-react-swc": "npm:^3.7.0"
     axios: "npm:^1.6.8"
+    chart.js: "npm:^4.4.7"
+    chartjs-adapter-date-fns: "npm:^3.0.0"
     classnames: "npm:^2.3.1"
     csv-parse: "npm:^4.16.3"
     date-fns: "npm:^3.6.0"
@@ -10389,6 +10417,8 @@ __metadata:
     lodash: "npm:^4.17.21"
     prettier: "npm:3.0.3"
     react: "npm:^18.2.0"
+    react-chartjs-2: "npm:^5.2.0"
+    react-countdown: "npm:^2.3.6"
     react-dom: "npm:^18.2.0"
     react-i18next: "npm:^13.0.1"
     react-router-dom: "npm:^6.26.1"
@@ -10499,7 +10529,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.6.2, prop-types@npm:^15.8.1":
+"prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -10648,6 +10678,28 @@ __metadata:
     randombytes: "npm:^2.0.5"
     safe-buffer: "npm:^5.1.0"
   checksum: 10c0/11aeed35515872e8f8a2edec306734e6b74c39c46653607f03c68385ab8030e2adcc4215f76b5e4598e028c4750d820afd5c65202527d831d2a5f207fe2bc87c
+  languageName: node
+  linkType: hard
+
+"react-chartjs-2@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "react-chartjs-2@npm:5.2.0"
+  peerDependencies:
+    chart.js: ^4.1.1
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 10c0/437e443a268b7eebab3f1a6f0f5d936e58caf650fca55f568a612a46c563d22af683a64185eac8005aa644e4960a5a72cc1075a2574b89ec46c7653aaf4025e2
+  languageName: node
+  linkType: hard
+
+"react-countdown@npm:^2.3.6":
+  version: 2.3.6
+  resolution: "react-countdown@npm:2.3.6"
+  dependencies:
+    prop-types: "npm:^15.7.2"
+  peerDependencies:
+    react: ">= 15"
+    react-dom: ">= 15"
+  checksum: 10c0/defb75cb9802c499eb0d5f6c8c6e4269de1005f9c05d5162bccf45063782fd2f5f87acd95d11f70e623fa75085a546b9d0fb0df27c5287ed6a86334342d903cf
   languageName: node
   linkType: hard
 

@@ -4,10 +4,12 @@ export type LoadBalanceType = {
   amount: {
     [key: string]: number;
   };
+  code?: number;
   lastblock: {
     tx: number;
   };
   pubkey: string;
+  rawDataURL: string;
   seq: number;
   t: number;
 };

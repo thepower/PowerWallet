@@ -314,8 +314,10 @@ export function useTokenTransactionsHistory({
       }
     });
 
+    const reversedLogs = logs.reverse();
+
     if (logs && logs.length > 0) {
-      for (const log of logs) {
+      for (const log of reversedLogs) {
         // @ts-ignore
         const value = log.args?.value ? log.args.value.toString() : '0';
 

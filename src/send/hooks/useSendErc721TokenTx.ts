@@ -71,6 +71,9 @@ export const useSendErc721TokenTx = ({
         queryClient.invalidateQueries({
           queryKey: appQueryKeys.tokenBalance(to, address)
         });
+        queryClient.invalidateQueries({
+          queryKey: appQueryKeys.tokenTransactionsHistory(to, address)
+        });
       }
     } catch (error: any) {
       console.error(error);

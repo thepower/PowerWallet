@@ -7,12 +7,13 @@ export const useInitApp = () => {
 
   const isSignupPage = useMatch(`${RoutesEnum.signup}/:dataOrReferrer?`);
   const isSSOPage = useMatch(`${RoutesEnum.sso}/:data?`);
+  const isBuyCryptoPage = useMatch(`${RoutesEnum.buy}${RoutesEnum.crypto}`);
 
   const navigate = useNavigate();
   const initApp = () => {
     if (activeWallet) {
-      navigate(window.location.pathname);
-    } else if (!(isSignupPage || isSSOPage)) {
+      // navigate(window.location.pathname);
+    } else if (!(isSignupPage || isSSOPage || isBuyCryptoPage)) {
       navigate(RoutesEnum.root);
     }
   };

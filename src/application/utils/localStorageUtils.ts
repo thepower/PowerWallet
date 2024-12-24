@@ -1,7 +1,7 @@
 import { create, Mutate, StoreApi } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { TToken } from 'myAssets/types';
+import { TokenKind, TToken } from 'myAssets/types';
 
 export interface Wallet {
   name: string;
@@ -107,22 +107,45 @@ interface TokenStore {
   removeToken: (address: string) => void;
   getTokenByAddress: (address?: string) => TToken | null;
   toggleTokenVisibility: (address: string) => void;
-  isAddressUnique: (address: string) => boolean;
+  isAddressUnique: (token: TToken) => boolean;
   clearTokens: () => void;
 }
 
 export const useTokensStore = create<TokenStore>()(
   persist(
     (set, get) => ({
-      tokens: [],
+      tokens: [
+        {
+          name: 'Wrapped SK',
+          symbol: 'WSK',
+          address: '0x07B99099dCEc5c98B151889bCEdd2Cf0b6c31D95',
+          decimals: 18,
+          chainId: 100501,
+          type: TokenKind.Erc20,
+          isShow: true
+        },
+        {
+          name: 'Wrapped SK',
+          symbol: 'WSK',
+          address: '0x07B99099dCEc5c98B151889bCEdd2Cf0b6c31D95',
+          decimals: 18,
+          chainId: 3,
+          type: TokenKind.Erc20,
+          isShow: true
+        }
+      ],
 
-      isAddressUnique: (address: string): boolean => {
-        return !get().tokens.some((token) => token.address === address);
+      isAddressUnique: (newtToken: TToken): boolean => {
+        return !get().tokens.some(
+          (token) =>
+            newtToken.address === token.address &&
+            newtToken.chainId === token?.chainId
+        );
       },
 
       addToken: (newToken: TToken) => {
         const { tokens, isAddressUnique } = get();
-        if (!isAddressUnique(newToken.address)) {
+        if (!isAddressUnique(newToken)) {
           return;
         }
         set({ tokens: [...tokens, newToken] });
