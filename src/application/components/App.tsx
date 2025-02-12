@@ -29,21 +29,21 @@ export const queryClient = new QueryClient();
 export const isProduction =
   import.meta.env.MODE === 'prod' || import.meta.env.MODE === 'c100501';
 
-// const power = {
-//   id: 1000000003,
-//   name: 'POWER',
-//   nativeCurrency: {
-//     decimals: 18,
-//     name: 'SK',
-//     symbol: 'tSK'
-//   },
-//   rpcUrls: {
-//     default: {
-//       http: ['https://c3n2.thepower.io:1446/jsonrpc']
-//     }
-//   },
-//   testnet: true
-// };
+const power = {
+  id: 1000000003,
+  name: 'POWER',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'SK',
+    symbol: 'tSK'
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://c3n2.thepower.io:1446/jsonrpc']
+    }
+  },
+  testnet: true
+};
 
 export const defaultEvmChain = isProduction ? bsc : bscTestnet;
 
@@ -54,7 +54,7 @@ const metadata = {
   icons: [`${appEnvs.WALLET_THEPOWER_URL}/logo-512x512.png`]
 };
 
-const networks = isProduction ? [bsc] : [bscTestnet];
+const networks = isProduction ? [bsc] : [power, bscTestnet];
 
 const wagmiAdapter = new WagmiAdapter({
   networks,
@@ -64,7 +64,7 @@ const wagmiAdapter = new WagmiAdapter({
 // 5. Create modal
 createAppKit({
   adapters: [wagmiAdapter],
-  networks: isProduction ? [bsc] : [bscTestnet],
+  networks: isProduction ? [bsc] : [power, bscTestnet],
   projectId,
   metadata,
   features: {

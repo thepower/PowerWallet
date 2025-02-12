@@ -212,7 +212,7 @@
     "connectWallet": "Connect Wallet",
     "somethingWentWrong": "Something went wrong",
     "enterAmountPlaceholder": "Enter amount",
-    "insufficientBalance": "insufficient balance",
+    "insufficientBalance": "Insufficient balance",
     "switchNetwork": "Switch Network",
     "enterWalletAddressPlaceholder": "Enter wallet address",
     "approveSuccess": "Successful approval",
@@ -222,6 +222,15 @@
     "token": "Token",
     "loadMore": "Load more",
     "tokenId": "Token ID",
-    "txHash": "Tx Hash"
+    "txHash": "Tx Hash",
+    "heyThere": "👋 Hey there!",
+    "specialPersonalOffer": "We’re excited to share\na special personal offer just for you",
+    "tokenPrice": "Token Price",
+    "loading": "Loading...",
+    "availableAllocation": "Available allocation",
+    "discountedTokensPromo": "Enjoy your discounted tokens during this promotional event!",
+    "offerAvailable": "Offer Available",
+    "enterPromoCodePlaceholder": "Enter promo code",
+    "bridgeIsNotAvailable": "Bridge is not available"
   }
 }

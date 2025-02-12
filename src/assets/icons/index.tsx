@@ -23,6 +23,7 @@ import LangIcon from './lang.svg?react';
 import LogInIcon from './log-in.svg?react';
 import LogoIcon from './logo.svg?react';
 import MenuIcon from './menu.svg?react';
+import MetamaskSvg from './metamask.svg?react';
 import MoneyBugIcon from './money-bug.svg?react';
 import OneLayersIcon from './one-layer.svg?react';
 import RefreshIcon from './refresh.svg?react';
@@ -79,5 +80,6 @@ export {
   ThreeLayersIcon,
   ChevronRightIcon,
   CryptoSvg,
-  FiatSvg
+  FiatSvg,
+  MetamaskSvg
 };
