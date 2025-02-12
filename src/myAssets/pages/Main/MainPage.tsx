@@ -142,9 +142,9 @@ const MainPageComponent: FC = () => {
           >
             <SendSvg />
           </CardLink>
-          <CardLink to={RoutesEnum.buy} label={t('deposit')} target={'_self'}>
+          {/* <CardLink to={RoutesEnum.buy} label={t('deposit')} target={'_self'}>
             <BuySvg />
-          </CardLink>
+          </CardLink> */}
         </div>
         <div className={styles.btnWrapper}>
           <Button
