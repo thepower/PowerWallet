@@ -105,7 +105,7 @@ export const useRestoreOldVersionAccount = () => {
     const { address, wif } = retrieveOldKeys();
 
     if (!networkApi || !address || !wif) return;
-    console.log(1);
+
     const isWalletExist = wallets.some((wallet) => wallet.address === address);
     const isAlreadyMigrated = isMigrationCompleted(address);
 

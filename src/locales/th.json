@@ -231,6 +231,8 @@
     "discountedTokensPromo": "เพลิดเพลินกับโทเค็นส่วนลดของคุณในช่วงกิจกรรมส่งเสริมการขายนี้!",
     "offerAvailable": "ข้อเสนอที่มีอยู่",
     "enterPromoCodePlaceholder": "ป้อนรหัสโปรโมชั่น",
-    "bridgeIsNotAvailable": "บริดจ์ไม่พร้อมใช้งาน"
+    "bridgeIsNotAvailable": "บริดจ์ไม่พร้อมใช้งาน",
+    "noTokensAvailable": "ไม่มีโทเค็นที่พร้อมใช้งาน",
+    "noNFTsAvailable": "ไม่มี NFT ที่พร้อมใช้งาน"
   }
 }

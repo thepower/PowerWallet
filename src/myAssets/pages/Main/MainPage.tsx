@@ -7,8 +7,17 @@ import {
   useTokensStore,
   useWalletsStore
 } from 'application/utils/localStorageUtils';
-import { BuySvg, FaucetSvg, SendSvg } from 'assets/icons';
-import { Button, CardLink, PageTemplate, Tabs } from 'common';
+import {
+  //  BuySvg,
+  FaucetSvg,
+  SendSvg
+} from 'assets/icons';
+import {
+  // Button,
+  CardLink,
+  PageTemplate,
+  Tabs
+} from 'common';
 import hooks from 'hooks';
 import WalletCard from 'myAssets/components/WalletCard/WalletCard';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
@@ -146,7 +155,7 @@ const MainPageComponent: FC = () => {
             <BuySvg />
           </CardLink> */}
         </div>
-        <div className={styles.btnWrapper}>
+        {/* <div className={styles.btnWrapper}>
           <Button
             to={RoutesEnum.referralProgram}
             className={styles.referralBtn}
@@ -154,7 +163,7 @@ const MainPageComponent: FC = () => {
           >
             {t('inviteFriendsEarnRewards')}
           </Button>
-        </div>
+        </div> */}
         <div className={styles.tokensHeadRow}>
           <div className={styles.title}>{t('tokens')}</div>
           <Link to={`${RoutesEnum.add}`}>

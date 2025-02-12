@@ -12,7 +12,7 @@ import { AddTokenPage } from 'myAssets/pages/AddToken/AddTokenPage';
 import { MainPage } from 'myAssets/pages/Main/MainPage';
 import { TokenSelectionPage } from 'myAssets/pages/TokenSelection/TokenSelectionPage';
 import { TokenTransactionsPage } from 'myAssets/pages/TokenTransactions/TokenTransactionsPage';
-import { ReferralProgramPage } from 'referral-program/components/pages/ReferralProgramPage';
+// import { ReferralProgramPage } from 'referral-program/components/pages/ReferralProgramPage';
 import { LoginPage } from 'registration/components/pages/login/LoginPage';
 import { RegistrationPage } from 'registration/components/pages/registration/RegistrationPage';
 import { WelcomePage } from 'registration/components/pages/welcome/WelcomePage';
@@ -48,10 +48,10 @@ const AppRoutesComponent: React.FC = () => {
         path={walletAddress ? '/' : '/:referrer?'}
         element={walletAddress ? <MainPage /> : <WelcomePage />}
       />
-      <Route
+      {/* <Route
         path={RoutesEnum.referralProgram}
         element={<ReferralProgramPage />}
-      />
+      /> */}
       <Route path={RoutesEnum.add} element={<AddTokenPage />} />
       <Route
         path={`${RoutesEnum.signAndSend}/:message`}

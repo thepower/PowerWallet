@@ -129,6 +129,7 @@ const TokenSelectionPageComponent: React.FC = () => {
   const onChangeTab = (_event: React.SyntheticEvent, value: MyAssetsTabs) => {
     setTab(value);
   };
+
   const renderAssetsList = useCallback(() => {
     if (isGetErc721TokensLoading) {
       return (
@@ -154,44 +155,56 @@ const TokenSelectionPageComponent: React.FC = () => {
     }
 
     if (collectionAddress) {
+      if (!erc721Tokens?.length) {
+        return (
+          <form className={styles.form} onSubmit={formik.handleSubmit}>
+            <OutlinedInput
+              id='tokenId'
+              placeholder={t('enterTokenIdPlaceholder')}
+              type='number'
+              size='small'
+              errorMessage={formik.errors.tokenId}
+              error={formik.touched.tokenId && Boolean(formik.errors.tokenId)}
+              disabled={formik.isSubmitting}
+              fullWidth
+              {...formik.getFieldProps('tokenId')}
+            />
+            <Button
+              fullWidth
+              type='submit'
+              variant='contained'
+              loading={formik.isSubmitting}
+              disabled={!formik.isValid}
+            >
+              {t('select')}
+            </Button>
+          </form>
+        );
+      }
+
       return (
         <ul className={styles.tokensList}>
-          {erc721Tokens?.length ? (
-            erc721Tokens.map((token) => (
-              <li key={token.id}>
-                <Erc721Token
-                  collection={collection!}
-                  token={token}
-                  isCheckBoxChecked={selectedToken === token.id}
-                  onClickCheckBox={onClickCheckBox}
-                />
-              </li>
-            ))
-          ) : (
-            <form className={styles.form} onSubmit={formik.handleSubmit}>
-              <OutlinedInput
-                id='tokenId'
-                placeholder={t('enterTokenIdPlaceholder')}
-                type='number'
-                size='small'
-                errorMessage={formik.errors.tokenId}
-                error={formik.touched.tokenId && Boolean(formik.errors.tokenId)}
-                disabled={formik.isSubmitting}
-                fullWidth
-                {...formik.getFieldProps('tokenId')}
+          {erc721Tokens.map((token) => (
+            <li key={token.id}>
+              <Erc721Token
+                collection={collection!}
+                token={token}
+                isCheckBoxChecked={selectedToken === token.id}
+                onClickCheckBox={onClickCheckBox}
               />
-              <Button
-                fullWidth
-                type='submit'
-                variant='contained'
-                loading={formik.isSubmitting}
-                disabled={!formik.isValid}
-              >
-                {t('select')}
-              </Button>
-            </form>
-          )}
+            </li>
+          ))}
         </ul>
+      );
+    }
+
+    if (!currentTokens.length) {
+      return (
+        <div className={styles.noTokens}>
+          {t(
+            tab === MyAssetsTabs.Erc20 ? 'noTokensAvailable' : 'noNFTsAvailable'
+          )}
+        </div>
       );
     }
 

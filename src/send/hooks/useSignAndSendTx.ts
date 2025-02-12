@@ -104,9 +104,7 @@ export const useSignAndSendTx = ({
 
       newDecodedTxBody.s = newSequence;
 
-      newDecodedTxBody.f = Buffer.from(
-        AddressApi.parseTextAddress(activeWallet.address)
-      );
+      newDecodedTxBody.f = AddressApi.parseTextAddress(activeWallet.address);
 
       const response = await networkApi.sendTxAndWaitForResponse(
         packAndSignTX(newDecodedTxBody, wif)
@@ -118,8 +116,7 @@ export const useSignAndSendTx = ({
         setSentData({
           txId,
           comment: comment || '',
-          amount:
-            amount && transferToken ? `${amount} ${transferToken}` : '-' || 0,
+          amount: amount && transferToken ? `${amount} ${transferToken}` : '-',
           from: activeWallet.address,
           to,
           returnURL

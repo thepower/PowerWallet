@@ -6,7 +6,7 @@ import isObject from 'lodash/isObject';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
-import { formatUnits } from 'viem/utils';
+import { bytesToString, formatUnits } from 'viem/utils';
 
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
 
@@ -113,7 +113,7 @@ const SignAndSendPageComponent: FC = () => {
       txBody.t = BigInt(Date.now());
 
       if (sponsor) {
-        txBody.e.sponsor = [Buffer.from(AddressApi.parseTextAddress(sponsor))];
+        txBody.e.sponsor = AddressApi.parseTextAddress(sponsor);
       }
 
       if (!gas) {
@@ -247,14 +247,21 @@ const SignAndSendPageComponent: FC = () => {
   const renderExtraDataTable = () => {
     if (!decodedTxBody?.e || isEmpty(decodedTxBody?.e)) return null;
 
-    return (
-      <CardTable
-        items={Object.entries(decodedTxBody?.e).map(([key, value]) => ({
+    const items = Object.entries(decodedTxBody?.e).map(([key, value]) => {
+      if (key === 'sponsor' && value instanceof Uint8Array) {
+        return {
           key,
-          value: value.toString()
-        }))}
-      />
-    );
+          value: AddressApi.encodeAddress(value)?.txt
+        };
+      } else {
+        return {
+          key,
+          value: typeof value === 'string' ? value : bytesToString(value)
+        };
+      }
+    });
+
+    return <CardTable items={items} />;
   };
 
   const renderContent = () => {

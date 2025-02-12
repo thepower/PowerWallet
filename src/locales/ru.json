@@ -231,6 +231,8 @@
     "discountedTokensPromo": "Наслаждайтесь скидками на токены во время этой промо-акции!",
     "offerAvailable": "Предложение доступно",
     "enterPromoCodePlaceholder": "Введите промокод",
-    "bridgeIsNotAvailable": "Мост недоступен"
+    "bridgeIsNotAvailable": "Мост недоступен",
+    "noTokensAvailable": "Нет доступных токенов",
+    "noNFTsAvailable": "Нет доступных NFT"
   }
 }

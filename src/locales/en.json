@@ -231,6 +231,8 @@
     "discountedTokensPromo": "Enjoy your discounted tokens during this promotional event!",
     "offerAvailable": "Offer Available",
     "enterPromoCodePlaceholder": "Enter promo code",
-    "bridgeIsNotAvailable": "Bridge is not available"
+    "bridgeIsNotAvailable": "Bridge is not available",
+    "noTokensAvailable": "No Tokens Available",
+    "noNFTsAvailable": "No NFTs Available"
   }
 }
