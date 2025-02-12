@@ -5,76 +5,134 @@ import { useNetworkApi } from './useNetworkApi';
 
 const OLD_ADDRESS_KEY = 'thepowereco/address';
 const OLD_WIF_KEY = 'thepowereco/wif';
+const MIGRATION_COMPLETED_KEY = 'thepowereco/migration-completed';
 
 export const useRestoreOldVersionAccount = () => {
-  const isMigratingRef = useRef(false); // Using ref to prevent simultaneous migrations
+  const isMigratingRef = useRef(false);
+  const mounted = useRef(true);
   const { addWallet, wallets } = useWalletsStore();
   const { networkApi } = useNetworkApi({ chainId: appEnvs.DEFAULT_CHAIN_ID });
 
-  const retrieveOldKeys = () => {
+  const isMigrationCompleted = useCallback((address: string) => {
+    try {
+      const completedMigrations = JSON.parse(
+        localStorage.getItem(MIGRATION_COMPLETED_KEY) || '[]'
+      );
+      return completedMigrations.includes(address);
+    } catch (error) {
+      console.error('Error checking migration flag:', error);
+      return false;
+    }
+  }, []);
+
+  const setMigrationCompleted = useCallback((address: string) => {
+    try {
+      const completedMigrations = JSON.parse(
+        localStorage.getItem(MIGRATION_COMPLETED_KEY) || '[]'
+      );
+      if (!completedMigrations.includes(address)) {
+        completedMigrations.push(address);
+        localStorage.setItem(
+          MIGRATION_COMPLETED_KEY,
+          JSON.stringify(completedMigrations)
+        );
+      }
+    } catch (error) {
+      console.error('Error setting migration flag:', error);
+    }
+  }, []);
+
+  const retrieveOldKeys = useCallback(() => {
     try {
       const address = localStorage.getItem(OLD_ADDRESS_KEY);
       const wif = localStorage.getItem(OLD_WIF_KEY);
+
+      if (!address || !wif) {
+        return { address: null, wif: null };
+      }
+
       return {
-        address: address ? JSON.parse(address) : null,
-        wif: wif ? JSON.parse(wif) : null
+        address: JSON.parse(address),
+        wif: JSON.parse(wif)
       };
     } catch (error) {
       console.error('Error parsing old wallet keys:', error);
       return { address: null, wif: null };
     }
-  };
+  }, []);
 
-  const removeOldKeys = () => {
-    localStorage.removeItem(OLD_ADDRESS_KEY);
-    localStorage.removeItem(OLD_WIF_KEY);
-  };
+  const migrateWallet = useCallback(
+    async (address: string, wif: string) => {
+      if (!mounted.current) return;
 
-  const migrateWallet = async (address: string, wif: string) => {
-    try {
-      isMigratingRef.current = true;
+      try {
+        isMigratingRef.current = true;
 
-      const result = await networkApi?.getAddressChain(address);
-      if (!result?.chain) {
-        console.warn('Failed to retrieve chain for address:', address);
-        isMigratingRef.current = false;
-        return;
+        const result = await networkApi?.getAddressChain(address);
+        if (!mounted.current) return;
+
+        if (!result?.chain) {
+          throw new Error('Failed to retrieve chain for address: ' + address);
+        }
+
+        addWallet({
+          name: `wallet ${wallets.length + 1}`,
+          chainId: result.chain,
+          address,
+          encryptedWif: wif
+        });
+
+        console.log('Wallet migrated successfully');
+        setMigrationCompleted(address);
+      } catch (error) {
+        console.error('Error during wallet migration:', error);
+        if (mounted.current) {
+          isMigratingRef.current = false;
+        }
+        throw error;
+      } finally {
+        if (mounted.current) {
+          isMigratingRef.current = false;
+        }
       }
-
-      addWallet({
-        name: `wallet ${wallets.length + 1}`,
-        chainId: result.chain,
-        address,
-        encryptedWif: wif
-      });
-
-      console.log('Wallet migrated successfully');
-      removeOldKeys();
-    } catch (error) {
-      console.error('Error during wallet migration:', error);
-    } finally {
-      isMigratingRef.current = false;
-    }
-  };
+    },
+    [networkApi, addWallet, wallets, setMigrationCompleted]
+  );
 
   const restoreOldVersionAccount = useCallback(async () => {
-    if (isMigratingRef.current) return; // Prevent simultaneous migrations
+    if (isMigratingRef.current || !mounted.current) return;
 
     const { address, wif } = retrieveOldKeys();
 
     if (!networkApi || !address || !wif) return;
-
+    console.log(1);
     const isWalletExist = wallets.some((wallet) => wallet.address === address);
-    if (isWalletExist) {
-      removeOldKeys();
+    const isAlreadyMigrated = isMigrationCompleted(address);
+
+    if (isWalletExist || isAlreadyMigrated) {
       return;
     }
 
-    await migrateWallet(address, wif);
-  }, [networkApi, wallets, addWallet]);
+    try {
+      await migrateWallet(address, wif);
+    } catch (error) {
+      // Error already logged in migrateWallet
+    }
+  }, [
+    networkApi,
+    wallets,
+    migrateWallet,
+    retrieveOldKeys,
+    isMigrationCompleted
+  ]);
 
   useEffect(() => {
+    mounted.current = true;
     restoreOldVersionAccount();
+
+    return () => {
+      mounted.current = false;
+    };
   }, [restoreOldVersionAccount]);
 
   return {
