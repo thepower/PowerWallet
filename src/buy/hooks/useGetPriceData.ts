@@ -7,6 +7,13 @@ import abis from 'abis';
 import { appQueryKeys } from 'application/queryKeys';
 import { TimeSeriesData } from 'buy/components/LineChart';
 
+export interface PriceData {
+  data: TimeSeriesData[];
+  offerAvailable: number | null;
+  availableAllocation: string;
+  isDiscountExist?: boolean;
+}
+
 export const useGetPriceData = ({
   promoCodeKeccak256,
   swapAddress
@@ -20,12 +27,8 @@ export const useGetPriceData = ({
     isLoading,
     isSuccess,
     refetch
-  } = useQuery<{
-    data: TimeSeriesData[];
-    offerAvailable: number;
-    availableAllocation: string;
-  }>({
-    queryKey: appQueryKeys.priceData(promoCodeKeccak256),
+  } = useQuery<PriceData>({
+    queryKey: appQueryKeys.priceData(promoCodeKeccak256, swapAddress),
 
     queryFn: async () => {
       const currentTimestamp = Math.floor(Date.now() / 1000);
@@ -61,14 +64,19 @@ export const useGetPriceData = ({
         return {
           offerAvailable: 0,
           availableAllocation: '0',
-          data: []
+          data: [],
+          isDiscountExist: false
         };
       }
 
-      const offerAvailable =
-        Number(discountData[2]) -
-        ((currentTimestamp - Number(discountData[0])) %
-          Number(discountData[2]));
+      const isEnded = currentTimestamp > Number(discountData[1]);
+      const isNotStarted = currentTimestamp < Number(discountData[0]);
+
+      const offerAvailable = !(isEnded || isNotStarted)
+        ? Number(discountData[2]) -
+          ((currentTimestamp - Number(discountData[0])) %
+            Number(discountData[2]))
+        : null;
 
       const availableAllocation = formatEther(discountData[4]);
 
@@ -115,7 +123,8 @@ export const useGetPriceData = ({
       return {
         offerAvailable,
         availableAllocation,
-        data: priceData
+        data: priceData,
+        isDiscountExist: discountData && discountData.every(Boolean)
       };
     },
     enabled: Boolean(promoCodeKeccak256 && swapAddress)

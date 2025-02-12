@@ -115,6 +115,31 @@ const TokenComponent: FC<TokenProps> = ({
     return <span className={styles.amount}>{balance}</span>;
   };
 
+  // const { watchAsset } = useWatchAsset();
+
+  // const AddTokenIcon = useMemo(() => {
+  //   return (
+  //     <IconButton
+  //       className={styles.addTokenButton}
+  //       disableRipple
+  //       onClick={(e) => {
+  //         e?.stopPropagation();
+
+  //         watchAsset({
+  //           type: 'ERC20',
+  //           options: {
+  //             address: token.address,
+  //             symbol: token.symbol,
+  //             decimals: token.decimals
+  //           }
+  //         });
+  //       }}
+  //     >
+  //       <MetamaskSvg />
+  //     </IconButton>
+  //   );
+  // }, []);
+
   return (
     <>
       {renderWrapper(

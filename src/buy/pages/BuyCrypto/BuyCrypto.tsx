@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppKit } from '@reown/appkit/react';
 import { AddressApi } from '@thepowereco/tssdk';
-import { waitForTransactionReceipt, writeContract } from '@wagmi/core';
+import { Config, waitForTransactionReceipt, writeContract } from '@wagmi/core';
 import { useFormik } from 'formik';
+import { TFunction } from 'i18next';
 import { round } from 'lodash';
-import Countdown from 'react-countdown';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { formatUnits, parseUnits } from 'viem';
+import { isAddress, parseUnits } from 'viem';
 import {
   useAccount,
   useChainId,
@@ -16,133 +16,161 @@ import {
   useReadContracts,
   useChains,
   useConfig,
-  useReadContract
+  useWatchAsset
 } from 'wagmi';
-import { bsc, bscTestnet } from 'wagmi/chains';
 import * as yup from 'yup';
 import abis from 'abis';
 import appEnvs from 'appEnvs';
 import { defaultEvmChain } from 'application/components/App';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
-import { LineChart } from 'buy/components/LineChart';
-import { useDeboucedKeccak256, useGetPriceData } from 'buy/hooks';
+import { ActionButton } from 'buy/components/ActionButton/ActionButton';
+import { SpecialOffer } from 'buy/components/SpecialOffer/SpecialOffer';
+import {
+  bridgeMap,
+  bridgeTokensMap,
+  buyTokens,
+  payTokens,
+  swapsMap
+} from 'buy/constants';
+import {
+  useDeboucedKeccak256,
+  useGetPriceData,
+  useTokenPrice
+} from 'buy/hooks';
+import { useTargetTime } from 'buy/hooks/useTargetTime';
+import { useTokenData } from 'buy/hooks/useTokenData';
+import { InitialValues, Token, TokenData } from 'buy/types';
 import { Button, OutlinedInput, PageTemplate, Select } from 'common';
 
 import styles from './BuyCrypto.module.scss';
 
-enum ChainId {
-  c3 = 3,
-  c100501 = 100501
-}
+export const handleSubmitTransaction = async (
+  config: Config,
+  values: InitialValues,
+  tokenData: TokenData,
+  isBridge: boolean,
+  swapAddress: `0x${string}`,
+  bridgeAddress: `0x${string}`,
+  bridgeTokenAddress: `0x${string}`,
+  promoCodeKeccak256: `0x${string}`,
+  t: TFunction
+): Promise<void> => {
+  const { amountPay, address } = values;
 
-enum Token {
-  WSK = 'WSK',
-  USDC = 'USDC',
-  USDT = 'USDT'
-}
+  try {
+    if (isBridge) {
+      const hash = await writeContract(config, {
+        address: bridgeAddress,
+        abi: abis.bridgeEVM.abi,
+        functionName: 'convert_token',
+        args: [
+          bridgeTokenAddress,
+          isAddress(address)
+            ? address
+            : AddressApi.textAddressToEvmAddress(address),
+          parseUnits(amountPay.toString(), tokenData.decimals),
+          '0x0000000000000000000000000000000000000000'
+        ]
+      });
 
-type InitialValues = {
-  chainId: number;
-  amountPay: number;
-  amountBuy: number;
-  address: string;
-  tokenPay: Token;
-  tokenBuy: Token;
-  lastTouch: 'tokenPay' | 'tokenBuy';
-  promoCode: string;
-};
+      const { status } = await waitForTransactionReceipt(config, {
+        confirmations: 2,
+        hash
+      });
 
-type TokenPair = `${string}-${string}`;
+      if (status === 'success') {
+        toast.success(
+          `${t('convertSuccess')} ${amountPay} ${tokenData.symbol}`
+        );
+      } else {
+        toast.error(`${t('convertError')} ${amountPay} ${tokenData.symbol}`);
+      }
+    } else {
+      const hash = await writeContract(config, {
+        address: swapAddress,
+        abi: abis.swapEVM.abi,
+        functionName: 'buy_and_bridge',
+        args: [
+          parseUnits(amountPay.toString(), tokenData.decimals),
+          parseUnits(amountPay.toString(), tokenData.decimals),
+          bridgeAddress,
+          isAddress(address)
+            ? address
+            : AddressApi.textAddressToEvmAddress(address),
+          '0x0000000000000000000000000000000000000000',
+          promoCodeKeccak256
+        ]
+      });
 
-const swapsMap: Record<string, Record<TokenPair, `0x${string}`>> = {
-  [`${bscTestnet.id}-${ChainId.c3}`]: {
-    [`${Token.USDC}-${Token.WSK}`]:
-      appEnvs.C97_C3_SWAP_USDC_TO_SK_EVM_CONTRACT_ADDRESS,
-    [`${Token.USDT}-${Token.WSK}`]:
-      appEnvs.C97_C3_SWAP_USDT_TO_SK_EVM_CONTRACT_ADDRESS
-  },
-  [`${bsc.id}-${ChainId.c100501}`]: {
-    [`${Token.USDC}-${Token.WSK}`]:
-      appEnvs.C56_C100501_SWAP_USDC_TO_SK_EVM_CONTRACT_ADDRESS,
-    [`${Token.USDT}-${Token.WSK}`]:
-      appEnvs.C56_C100501_SWAP_USDT_TO_SK_EVM_CONTRACT_ADDRESS
+      const { status } = await waitForTransactionReceipt(config, {
+        confirmations: 2,
+        hash
+      });
+
+      if (status === 'success') {
+        toast.success(
+          `${t('convertSuccess')} ${amountPay} ${tokenData.symbol}`
+        );
+
+        // watchAsset(config, {
+
+        // })
+      } else {
+        toast.error(`${t('convertError')} ${amountPay} ${tokenData.symbol}`);
+      }
+    }
+  } catch (error) {
+    toast.error(`${t('convertError')} ${amountPay} ${tokenData.symbol}`);
+    throw error;
   }
 };
 
-const bridgeTokensMap: Record<string, Record<TokenPair, `0x${string}`>> = {
-  [`${bscTestnet.id}-${ChainId.c3}`]: {
-    [`${Token.WSK}-${Token.WSK}`]: appEnvs.C97_WSK_EVM_CONTRACT_ADDRESS,
-    [`${Token.USDC}-${Token.USDC}`]: appEnvs.C97_USDC_EVM_CONTRACT_ADDRESS,
-    [`${Token.USDT}-${Token.USDT}`]: appEnvs.C97_USDT_EVM_CONTRACT_ADDRESS
-  },
-  [`${bsc.id}-${ChainId.c100501}`]: {
-    [`${Token.WSK}-${Token.WSK}`]: appEnvs.C97_WSK_EVM_CONTRACT_ADDRESS,
-    [`${Token.USDC}-${Token.USDC}`]: appEnvs.C97_USDC_EVM_CONTRACT_ADDRESS,
-    [`${Token.USDT}-${Token.USDT}`]: appEnvs.C97_USDT_EVM_CONTRACT_ADDRESS
+export const handleApproveTransaction = async (
+  config: Config,
+  values: InitialValues,
+  tokenData: TokenData,
+  isBridge: boolean,
+  swapAddress: `0x${string}`,
+  bridgeAddress: `0x${string}`,
+  bridgeTokenAddress: `0x${string}`,
+  tokenPay: `0x${string}`,
+  t: TFunction
+): Promise<void> => {
+  const { amountPay } = values;
+
+  try {
+    const hash = await writeContract(config, {
+      address: isBridge ? bridgeTokenAddress : tokenPay!,
+      abi: abis.erc20.abi,
+      functionName: 'approve',
+      args: [
+        isBridge ? bridgeAddress : swapAddress,
+        parseUnits(amountPay.toString(), tokenData.decimals)
+      ]
+    });
+
+    const { status } = await waitForTransactionReceipt(config, {
+      confirmations: 2,
+      hash
+    });
+
+    if (status === 'success') {
+      toast.success(`${t('approveSuccess')} ${amountPay} ${tokenData.symbol}`);
+    } else {
+      toast.error(`${t('approveError')} ${amountPay} ${tokenData.symbol}`);
+    }
+  } catch (error) {
+    toast.error(`${t('approveError')} ${amountPay} ${tokenData.symbol}`);
+    throw error;
   }
 };
-
-const bridgeMap: Record<string, `0x${string}`> = {
-  [`${bscTestnet.id}-${ChainId.c3}`]:
-    appEnvs.C97_C3_BRIDGE_EVM_CONTRACT_ADDRESS,
-  [`${bsc.id}-${ChainId.c100501}`]:
-    appEnvs.C56_C100501_BRIDGE_EVM_CONTRACT_ADDRESS
-};
-
-type TokenOption = {
-  title: Token;
-  value: Token;
-};
-
-const payTokens: TokenOption[] = [
-  {
-    title: Token.USDT,
-    value: Token.USDT
-  }
-  // {
-  //   title: Token.USDC,
-  //   value: Token.USDC
-  // },
-  // {
-  //   title: Token.WSK,
-  //   value: Token.WSK
-  // }
-];
-
-const buyTokens: TokenOption[] = [
-  // {
-  //   title: Token.USDT,
-  //   value: Token.USDT
-  // },
-  // {
-  //   title: Token.USDC,
-  //   value: Token.USDC
-  // },
-  {
-    title: Token.WSK,
-    value: Token.WSK
-  }
-];
 
 export const BuyCryptoPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const promoCode = searchParams.get?.('promoCode');
   const [offerEndTime, setOfferEndTime] = useState<number | null>(null);
 
-  const [targetTime, setTargetTime] = useState(() =>
-    BigInt(Math.floor(Date.now() / 1000) + 300)
-  );
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const now = BigInt(Math.floor(Date.now() / 1000));
-      // Если хотите, чтобы +5 мин считались заново от текущего момента:
-      setTargetTime(now + 300n);
-    }, 10000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
+  const targetTime = useTargetTime();
   const config = useConfig();
   const modal = useAppKit();
   const { address: userEvmAddress, isConnected } = useAccount();
@@ -156,10 +184,10 @@ export const BuyCryptoPage: React.FC = () => {
       amountPay: 0,
       amountBuy: 0,
       lastTouch: 'tokenPay',
-      address: activeWallet?.address || '',
+      address: activeWallet?.address || userEvmAddress || '',
       promoCode: promoCode || ''
     }),
-    [activeWallet?.address, promoCode]
+    [activeWallet?.address, promoCode, userEvmAddress]
   );
 
   const { t } = useTranslation();
@@ -174,10 +202,14 @@ export const BuyCryptoPage: React.FC = () => {
         tokenBuy: yup.string().required(t('required')),
         amountPay: yup
           .number()
+          .transform((value) => (Number.isNaN(value) ? null : value))
           .moreThan(0, t('amountMustBeMore'))
+          .nullable()
           .required(t('required')),
         amountBuy: yup
           .number()
+          .transform((value) => (Number.isNaN(value) ? null : value))
+          .nullable()
           .moreThan(0, t('amountMustBeMore'))
           .required(t('required')),
         address: yup
@@ -186,7 +218,9 @@ export const BuyCryptoPage: React.FC = () => {
           .test(
             'test-address',
             t('invalidAddress'),
-            (value) => !!value && AddressApi.isTextAddressValid(value)
+            (value) =>
+              !!value &&
+              (AddressApi.isTextAddressValid(value) || isAddress(value))
           ),
         promoCode: yup.string()
       }),
@@ -199,34 +233,39 @@ export const BuyCryptoPage: React.FC = () => {
     validationSchema
   });
 
+  useEffect(() => {
+    if (!activeWallet && userEvmAddress) {
+      formik.setFieldValue('address', userEvmAddress);
+    }
+  }, [userEvmAddress]);
+
   const promoCodeKeccak256 = useDeboucedKeccak256(formik.values.promoCode);
 
   const isBridge = formik.values.tokenPay === formik.values.tokenBuy;
 
   const swapAddress =
-    swapsMap?.[`${formik.values.chainId}-${activeWallet?.chainId}`]?.[
-      `${formik.values.tokenPay}-${formik.values.tokenBuy}`
-    ];
+    swapsMap?.[
+      `${formik.values.chainId}-${
+        activeWallet?.chainId || appEnvs.DEFAULT_CHAIN_ID
+      }`
+    ]?.[`${formik.values.tokenPay}-${formik.values.tokenBuy}`];
 
   const bridgeTokenAddress =
-    bridgeTokensMap?.[`${formik.values.chainId}-${activeWallet?.chainId}`]?.[
-      `${formik.values.tokenPay}-${formik.values.tokenBuy}`
-    ];
+    bridgeTokensMap?.[
+      `${formik.values.chainId}-${
+        activeWallet?.chainId || appEnvs.DEFAULT_CHAIN_ID
+      }`
+    ]?.[`${formik.values.tokenPay}-${formik.values.tokenBuy}`];
 
   const bridgeAddress =
-    bridgeMap?.[`${formik.values.chainId}-${activeWallet?.chainId}`];
-
-  const isBridgeIsNotAvailable = !Boolean(
-    isBridge ? bridgeTokenAddress : swapAddress
-  );
+    bridgeMap?.[
+      `${formik.values.chainId}-${
+        activeWallet?.chainId || appEnvs.DEFAULT_CHAIN_ID
+      }`
+    ];
 
   const isEnableOrWatched = Boolean(
-    userEvmAddress &&
-      formik.values.address &&
-      formik.values.tokenPay &&
-      formik.values.tokenBuy
-    //  &&
-    // (formik.values.amountPay || formik.values.amountBuy)
+    formik.values.tokenPay && formik.values.tokenBuy
   );
 
   const { data: swapData } = useReadContracts({
@@ -250,63 +289,28 @@ export const BuyCryptoPage: React.FC = () => {
   const tokenPay = swapData?.[0].result;
   const tokenBuy = swapData?.[1].result;
 
-  const { data: tokenPayData, refetch: refetchTokenPayData } = useReadContracts(
-    {
-      contracts: [
-        {
-          address: isBridge ? bridgeTokenAddress : tokenPay,
-          abi: abis.erc20.abi,
-          functionName: 'decimals'
-        },
-        {
-          address: isBridge ? bridgeTokenAddress : tokenPay,
-          abi: abis.erc20.abi,
-          functionName: 'symbol'
-        },
-        {
-          address: isBridge ? bridgeTokenAddress : tokenPay,
-          abi: abis.erc20.abi,
-          functionName: 'balanceOf',
-          args: [userEvmAddress!]
-        },
-        {
-          address: isBridge ? bridgeTokenAddress : tokenPay,
-          abi: abis.erc20.abi,
-          functionName: 'allowance',
-          args: [userEvmAddress!, isBridge ? bridgeTokenAddress : swapAddress]
-        }
-      ],
-      query: {
-        enabled: Boolean(isEnableOrWatched && (tokenPay || bridgeTokenAddress))
-      }
-    }
+  const tokenPayData = useTokenData(
+    isBridge ? bridgeTokenAddress : tokenPay,
+    userEvmAddress,
+    isBridge ? bridgeAddress : swapAddress,
+    isEnableOrWatched
   );
 
-  const tokenPayDecimals = tokenPayData?.[0].result as number;
-  const tokenPaySymbol = tokenPayData?.[1].result as string;
-  const tokenPayBalance = tokenPayData?.[2].result as bigint;
-  const tokenPayAllowance = tokenPayData?.[3].result as bigint;
+  const tokenPayDecimals = tokenPayData?.decimals;
+  const tokenPaySymbol = tokenPayData?.symbol;
+  const tokenPayBalance = tokenPayData?.balance;
+  const tokenPayAllowance = tokenPayData?.allowance;
 
-  const { data: calc } = useReadContract({
-    address: swapAddress,
-    abi: abis.swapEVM.abi,
-    functionName: 'calc',
-    args: [parseUnits('1', tokenPayDecimals!), promoCodeKeccak256, targetTime],
-    query: {
-      enabled: isEnableOrWatched && !isBridge
-    }
+  const { tokenPrice } = useTokenPrice({
+    isBridge,
+    swapAddress,
+    tokenPayDecimals,
+    promoCodeKeccak256,
+    targetTime,
+    isEnableOrWatched
   });
 
-  const tokenPrice = useMemo(() => {
-    if (calc && calc.length === 2) {
-      const amountPay = formatUnits(calc[0], tokenPayDecimals!);
-      const amountBuy = formatUnits(calc[1], tokenPayDecimals!);
-
-      return round(Number(amountPay) / Number(amountBuy), 6);
-    }
-
-    return 0;
-  }, [calc, tokenPayDecimals]);
+  const { watchAssetAsync } = useWatchAsset();
 
   const handleAmountPayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value);
@@ -355,6 +359,11 @@ export const BuyCryptoPage: React.FC = () => {
         address: tokenBuy,
         abi: abis.erc20.abi,
         functionName: 'symbol'
+      },
+      {
+        address: tokenBuy,
+        abi: abis.erc20.abi,
+        functionName: 'decimals'
       }
     ],
     query: {
@@ -362,7 +371,8 @@ export const BuyCryptoPage: React.FC = () => {
     }
   });
 
-  const tokenBuySymbol = tokenBuyData?.[0].result as string;
+  const tokenBuySymbol = tokenBuyData?.[0].result;
+  const tokenBuyDecimals = tokenBuyData?.[1].result;
 
   const getIsEnoughTokenAllowance = useCallback(
     (amount: number) =>
@@ -380,212 +390,51 @@ export const BuyCryptoPage: React.FC = () => {
     [tokenPayBalance, tokenPayDecimals]
   );
 
-  async function handleSubmit({ amountPay, address }: InitialValues) {
-    if (!AddressApi.isTextAddressValid(address)) return;
+  async function handleSubmit(values: InitialValues) {
+    const isEnoughTokenAllowance = getIsEnoughTokenAllowance(values.amountPay);
+    const isEnoughTokenBalance = getIsEnoughTokenBalance(values.amountPay);
 
-    const isEnoughUSDTAllowance = getIsEnoughTokenAllowance(amountPay);
-    const isEnoughUSDTBalance = getIsEnoughTokenBalance(amountPay);
-
-    if (isEnoughUSDTBalance && !isEnoughUSDTAllowance) {
-      try {
-        const hash = await writeContract(config, {
-          address: isBridge ? bridgeTokenAddress : tokenPay!,
-          abi: abis.erc20.abi,
-          functionName: 'approve',
-          args: [
-            isBridge ? bridgeAddress : swapAddress,
-            parseUnits(amountPay.toString(), tokenPayDecimals!)
-          ]
-        });
-        const { status } = await waitForTransactionReceipt(config, {
-          confirmations: 2,
-          hash
-        });
-        if (status === 'success') {
-          toast.success(
-            `${t('approveSuccess')} ${amountPay} ${tokenPaySymbol}`
-          );
-        } else {
-          toast.error(`${t('approveError')} ${amountPay} ${tokenPaySymbol}`);
+    if (isEnoughTokenBalance && !isEnoughTokenAllowance) {
+      await handleApproveTransaction(
+        config,
+        values,
+        tokenPayData,
+        isBridge,
+        swapAddress!,
+        bridgeAddress!,
+        bridgeTokenAddress!,
+        tokenPay!,
+        t
+      );
+      await tokenPayData.refetch();
+    } else if (isEnoughTokenBalance && isEnoughTokenAllowance) {
+      await handleSubmitTransaction(
+        config,
+        values,
+        tokenPayData,
+        isBridge,
+        swapAddress!,
+        bridgeAddress!,
+        bridgeTokenAddress!,
+        promoCodeKeccak256,
+        t
+      );
+      // if (!activeWallet) {
+      await switchChainAsync({
+        chainId: chains[appEnvs.DEFAULT_CHAIN_ID].id
+      });
+      await watchAssetAsync({
+        type: 'ERC20',
+        options: {
+          address: tokenBuy!,
+          symbol: tokenBuySymbol!,
+          decimals: tokenBuyDecimals!
         }
-        toast.success(`${t('approveSuccess')} ${amountPay} ${tokenPaySymbol}`);
-        await refetchTokenPayData();
-      } catch (error) {
-        toast.error(`${t('approveError')} ${amountPay} ${tokenPaySymbol}`);
-      }
-    } else if (isEnoughUSDTBalance && isEnoughUSDTAllowance) {
-      try {
-        if (isBridge) {
-          const hash = await writeContract(config, {
-            address: bridgeAddress,
-            abi: abis.bridgeEVM.abi,
-            functionName: 'convert_token',
-            args: [
-              bridgeTokenAddress,
-              AddressApi.textAddressToEvmAddress(address),
-              parseUnits(amountPay.toString(), tokenPayDecimals!),
-              '0x0000000000000000000000000000000000000000'
-            ]
-          });
-          const { status } = await waitForTransactionReceipt(config, {
-            confirmations: 2,
-            hash
-          });
-
-          if (status === 'success') {
-            toast.success(
-              `${t('convertSuccess')} ${amountPay} ${tokenPaySymbol}`
-            );
-          } else {
-            toast.error(`${t('convertError')} ${amountPay} ${tokenPaySymbol}`);
-          }
-        } else {
-          const hash = await writeContract(config, {
-            address: swapAddress,
-            abi: abis.swapEVM.abi,
-            functionName: 'buy_and_bridge',
-            args: [
-              parseUnits(amountPay.toString(), tokenPayDecimals!),
-              parseUnits(amountPay.toString(), tokenPayDecimals!),
-              bridgeAddress,
-              AddressApi.textAddressToEvmAddress(address),
-              '0x0000000000000000000000000000000000000000',
-              promoCodeKeccak256
-            ]
-          });
-
-          const { status } = await waitForTransactionReceipt(config, {
-            confirmations: 2,
-            hash
-          });
-
-          if (status === 'success') {
-            toast.success(
-              `${t('convertSuccess')} ${amountPay} ${tokenPaySymbol}`
-            );
-          } else {
-            toast.error(`${t('convertError')} ${amountPay} ${tokenPaySymbol}`);
-          }
-        }
-        formik.resetForm();
-      } catch (error) {
-        toast.error(`${t('convertError')} ${amountPay} ${tokenPaySymbol}`);
-      }
+      });
+      // }
+      formik.resetForm();
     }
   }
-
-  const onConnectHandler = useCallback(
-    () => modal.open({ view: 'Connect' }),
-    [modal]
-  );
-
-  const renderBuyButton = useCallback(() => {
-    if (isBridgeIsNotAvailable) {
-      return (
-        <Button
-          variant='contained'
-          fullWidth
-          disabled
-          className={styles.submitButton}
-        >
-          {t('bridgeIsNotAvailable')}
-        </Button>
-      );
-    }
-
-    if (!isConnected) {
-      return (
-        <Button
-          onClick={onConnectHandler}
-          variant='contained'
-          fullWidth
-          className={styles.submitButton}
-        >
-          {t('connectWallet')}
-        </Button>
-      );
-    }
-
-    if (chain !== formik.values.chainId) {
-      return (
-        <Button
-          onClick={() => switchChainAsync?.({ chainId: formik.values.chainId })}
-          variant='contained'
-          fullWidth
-          loading={isSwitchNetworkLoading}
-          className={styles.submitButton}
-        >
-          {t('switchNetwork')}
-        </Button>
-      );
-    }
-
-    if (
-      !getIsEnoughTokenBalance(formik.values.amountPay) &&
-      +formik.values.amountPay > 0 &&
-      !!formik.values.tokenBuy &&
-      !!formik.values.tokenPay
-    ) {
-      return (
-        <Button
-          fullWidth
-          variant='contained'
-          className={styles.submitButton}
-          disabled
-        >
-          {t('insufficientBalance')}
-        </Button>
-      );
-    }
-
-    if (!getIsEnoughTokenAllowance(formik.values.amountPay)) {
-      return (
-        <Button
-          fullWidth
-          type='submit'
-          variant='contained'
-          loading={formik.isSubmitting}
-          disabled={!formik.isValid || !(+formik.values.amountPay > 0)}
-          className={styles.submitButton}
-        >
-          {t('approveAmount') +
-            (formik.values?.amountPay
-              ? ` ${formik.values.amountPay} ${tokenPaySymbol}`
-              : '')}
-        </Button>
-      );
-    }
-
-    return (
-      <Button
-        type='submit'
-        variant='contained'
-        loading={formik.isSubmitting}
-        disabled={!formik.isValid}
-        className={styles.submitButton}
-      >
-        {isBridge ? t('Bridge') : t('Buy and bridge')}
-      </Button>
-    );
-  }, [
-    isBridgeIsNotAvailable,
-    isConnected,
-    chain,
-    formik.values.chainId,
-    formik.values.amountPay,
-    formik.values.tokenBuy,
-    formik.values.tokenPay,
-    formik.isSubmitting,
-    formik.isValid,
-    getIsEnoughTokenBalance,
-    getIsEnoughTokenAllowance,
-    isBridge,
-    t,
-    tokenPaySymbol,
-    onConnectHandler,
-    isSwitchNetworkLoading,
-    switchChainAsync
-  ]);
 
   const { priceData, refetch: refetchPriceData } = useGetPriceData({
     promoCodeKeccak256,
@@ -603,25 +452,9 @@ export const BuyCryptoPage: React.FC = () => {
     }
   }, [priceData?.offerAvailable]);
 
-  const renderOfferAvailable = useCallback(() => {
-    return (
-      <>
-        <div className={styles.specialOffer__timeLeft}>
-          {offerEndTime ? (
-            <Countdown
-              date={offerEndTime}
-              onComplete={handleCountdownComplete}
-            />
-          ) : (
-            t('loading')
-          )}
-        </div>
-        <div className={styles.specialOffer__subtitle}>
-          {t('offerAvailable')}
-        </div>
-      </>
-    );
-  }, [handleCountdownComplete, offerEndTime, t]);
+  const isBridgeIsNotAvailable = !Boolean(
+    isBridge ? bridgeTokenAddress : swapAddress
+  );
 
   return (
     <PageTemplate
@@ -630,35 +463,13 @@ export const BuyCryptoPage: React.FC = () => {
       topBarChild={t('deposit')}
     >
       <form className={styles.form} onSubmit={formik.handleSubmit}>
-        {isConnected && formik.values.promoCode && (
-          <>
-            <div className={styles.specialOffer}>
-              <div className={styles.specialOffer__tittle}>{t('heyThere')}</div>
-              <div className={styles.specialOffer__text}>
-                {t('specialPersonalOffer')}
-              </div>
-              <div className={styles.specialOffer__price}>
-                {`${tokenPrice} ${tokenPaySymbol}` || t('loading')}
-              </div>
-              <div className={styles.specialOffer__subtitle}>
-                {t('tokenPrice')}
-              </div>
-              {renderOfferAvailable()}
-              <div className={styles.specialOffer__allocation}>
-                {priceData?.availableAllocation
-                  ? `${priceData?.availableAllocation} ${tokenBuySymbol}`
-                  : t('loading')}
-              </div>
-              <div className={styles.specialOffer__subtitle}>
-                {t('availableAllocation')}
-              </div>
-              <div className={styles.specialOffer__tip}>
-                {t('discountedTokensPromo')}
-              </div>
-            </div>
-            <LineChart data={priceData?.data ? priceData.data : []} />
-          </>
-        )}
+        <SpecialOffer
+          onCountdownComplete={handleCountdownComplete}
+          priceData={priceData}
+          tokenBuySymbol={tokenBuySymbol}
+          tokenPaySymbol={tokenPaySymbol}
+          tokenPrice={tokenPrice}
+        />
         {isConnected && (
           <div className={styles.wallet}>
             <appkit-button />
@@ -751,7 +562,27 @@ export const BuyCryptoPage: React.FC = () => {
             fullWidth
             {...formik.getFieldProps('promoCode')}
           />
-          {renderBuyButton()}
+          {!isBridgeIsNotAvailable ? (
+            <ActionButton
+              formik={formik}
+              isConnected={isConnected}
+              chain={chain}
+              tokenData={tokenPayData}
+              isBridge={isBridge}
+              onConnect={() => modal.open({ view: 'Connect' })}
+              onSwitchChain={switchChainAsync}
+              isSwitchNetworkLoading={isSwitchNetworkLoading}
+            />
+          ) : (
+            <Button
+              variant='contained'
+              fullWidth
+              disabled
+              className={styles.submitButton}
+            >
+              {t('bridgeIsNotAvailable')}
+            </Button>
+          )}
         </div>
       </form>
     </PageTemplate>

@@ -1,4 +1,6 @@
-const DEFAULT_CHAIN_ID = +(import.meta.env.VITE_DEFAULT_CHAIN_ID as string);
+import { ChainId } from 'buy/types';
+
+const DEFAULT_CHAIN_ID = +import.meta.env.VITE_DEFAULT_CHAIN_ID as ChainId;
 
 const C97_C3_BRIDGE_EVM_CONTRACT_ADDRESS = import.meta.env
   .VITE_C97_C3_BRIDGE_EVM_CONTRACT_ADDRESS;
