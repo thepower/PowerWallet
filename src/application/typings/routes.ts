@@ -11,7 +11,8 @@ export enum RoutesEnum {
   signup = '/signup',
   root = '/',
   login = '/login',
-  sso = '/sso'
+  sso = '/sso',
+  vesting = '/vesting'
 }
 
 export type AppQueryParams = {
