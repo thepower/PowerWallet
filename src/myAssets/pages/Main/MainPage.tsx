@@ -10,7 +10,8 @@ import {
 import {
   //  BuySvg,
   FaucetSvg,
-  SendSvg
+  SendSvg,
+  VestingSvg
 } from 'assets/icons';
 import {
   // Button,
@@ -150,6 +151,14 @@ const MainPageComponent: FC = () => {
             rel='noreferrer'
           >
             <SendSvg />
+          </CardLink>
+          <CardLink
+            to={RoutesEnum.vesting}
+            label={t('vesting')}
+            target={'_self'}
+            rel='noreferrer'
+          >
+            <VestingSvg />
           </CardLink>
           {/* <CardLink to={RoutesEnum.buy} label={t('deposit')} target={'_self'}>
             <BuySvg />

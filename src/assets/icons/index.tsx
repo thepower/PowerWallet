@@ -38,6 +38,7 @@ import SupportIcon from './support.svg?react';
 import ThreeLayersIcon from './three-layers.svg?react';
 import TwoLayersIcon from './two-layers.svg?react';
 import UnCheckedIcon from './unSelect.svg?react';
+import VestingSvg from './vesting.svg?react';
 import WalletsSvg from './wallets.svg?react';
 
 export {
@@ -81,5 +82,6 @@ export {
   ChevronRightIcon,
   CryptoSvg,
   FiatSvg,
-  MetamaskSvg
+  MetamaskSvg,
+  VestingSvg
 };

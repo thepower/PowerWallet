@@ -309,10 +309,10 @@ export const useVestingContract = () => {
           ticks: {
             source: 'data',
             autoSkip: true,
-            maxTicksLimit: 6
-            // callback: (value) => {
-            //   return formatDateLocale(new Date(value));
-            // }
+            maxTicksLimit: 6,
+            callback: (value) => {
+              return formatDateLocale(new Date(value));
+            }
           }
         },
         y: {
@@ -360,10 +360,10 @@ export const useVestingContract = () => {
           padding: 12,
           displayColors: false,
           callbacks: {
-            // title: (tooltipItems) => {
-            //   const date = new Date(tooltipItems[0].parsed.x);
-            //   return formatDateLocale(date);
-            // }
+            title: (tooltipItems) => {
+              const date = new Date(tooltipItems[0].parsed.x);
+              return formatDateLocale(date);
+            }
           }
         }
       }

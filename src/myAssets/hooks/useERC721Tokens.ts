@@ -21,7 +21,7 @@ async function checkTokenOfOwnerByIndex({
       {
         abi: abis.erc721.abi,
         functionName: 'tokenOfOwnerByIndex',
-        args: [AddressApi.textAddressToEvmAddress(ownerAddress), BigInt(1)]
+        args: [AddressApi.textAddressToEvmAddress(ownerAddress), BigInt(0)]
       },
       { address: tokenAddress }
     );
