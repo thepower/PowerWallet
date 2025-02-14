@@ -12,6 +12,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { WagmiProvider } from 'wagmi';
 import appEnvs from 'appEnvs';
+import ConfirmModal from 'common/confirmModal/ConfirmModal';
 import { AppRoutes } from './AppRoutes';
 import InitGradientsSvg from './initGradientsSvg.svg?react';
 import { UnderConstruction } from '../../common';
@@ -83,6 +84,7 @@ export const App = () => (
                 <InitGradientsSvg className='initSvgClass' />
                 <ToastNotification />
                 <UnderConstruction />
+                <ConfirmModal />
                 <AppRoutes />
               </CssBaseline>
             </MuiThemeProvider>

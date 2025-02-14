@@ -19,7 +19,7 @@ import { WelcomePage } from 'registration/components/pages/welcome/WelcomePage';
 import { SendPage } from 'send/components/SendPage';
 import { SignAndSendPage } from 'sign-and-send/components/SingAndSendPage';
 import { SSOPage } from 'sso/pages/sso/SSOPage';
-import { VestingNFTPage } from '../../vesting/pages/VestingNFT/VestingNFT';
+import { VestingPage } from 'vesting/pages/vesting/VestingPage';
 
 import { RoutesEnum } from '../typings/routes';
 
@@ -87,7 +87,7 @@ const AppRoutesComponent: React.FC = () => {
         path={`/:type/:address${RoutesEnum.transactions}`}
         element={<TokenTransactionsPage />}
       />
-      <Route path={RoutesEnum.vesting} element={<VestingNFTPage />} />
+      <Route path={RoutesEnum.vesting} element={<VestingPage />} />
     </Routes>
   );
 };

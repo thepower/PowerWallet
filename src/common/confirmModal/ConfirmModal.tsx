@@ -2,29 +2,24 @@ import React, { useCallback } from 'react';
 import { CryptoApi } from '@thepowereco/tssdk';
 import { FormikHelpers, useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
+import { useStore } from 'application/store';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import styles from './ConfirmModal.module.scss';
 import { Button, Modal, OutlinedInput } from '..';
 
-interface OwnProps {
-  open: boolean;
-  onClose: () => void;
-  callback: (decryptedWif: string) => void;
-}
-
 const initialValues = { password: '' };
 type Values = typeof initialValues;
 
-type ConfirmModalProps = OwnProps;
-
-const ConfirmModal: React.FC<ConfirmModalProps> = ({
-  onClose,
-  open,
-  callback
-}) => {
+const ConfirmModal: React.FC = () => {
   const { activeWallet } = useWalletsStore();
-
+  const {
+    confirmModal,
+    closeConfirmModal,
+    resolveConfirmModal,
+    rejectConfirmModal
+  } = useStore();
   const { t } = useTranslation();
+
   const handleSubmit = useCallback(
     async (values: Values, formikHelpers: FormikHelpers<Values>) => {
       try {
@@ -35,7 +30,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           activeWallet.encryptedWif,
           ''
         );
-        callback(decryptedWif);
+        resolveConfirmModal(decryptedWif);
       } catch (e) {
         try {
           if (!activeWallet) {
@@ -45,13 +40,14 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             activeWallet.encryptedWif,
             values.password
           );
-          callback(decryptedWif);
+          resolveConfirmModal(decryptedWif);
         } catch (error) {
+          rejectConfirmModal(error);
           formikHelpers.setFieldError('password', t('invalidPasswordError')!);
         }
       }
     },
-    [activeWallet, callback, t]
+    [activeWallet, rejectConfirmModal, resolveConfirmModal, t]
   );
 
   const formik = useFormik({
@@ -60,7 +56,11 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   });
 
   return (
-    <Modal open={open} onClose={onClose} contentClassName={styles.modalContent}>
+    <Modal
+      open={confirmModal.isOpen}
+      onClose={closeConfirmModal}
+      contentClassName={styles.modalContent}
+    >
       <form className={styles.form} onSubmit={formik.handleSubmit}>
         <p className={styles.title}>{t('confirmAction')}</p>
         <p className={styles.subTitle}>
@@ -69,7 +69,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         <OutlinedInput
           inputRef={(input) => input && input.focus()}
           placeholder={t('password')!}
-          type={'password'}
+          type='password'
           autoComplete='new-password'
           autoFocus
           errorMessage={formik.errors.password}

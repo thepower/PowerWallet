@@ -8,6 +8,7 @@ import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import { bytesToString, formatUnits } from 'viem/utils';
 
+import { useConfirmModalPromise } from 'application/hooks';
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
 
 import { useStore } from 'application/store';
@@ -21,7 +22,6 @@ import { TxBody, TxKindByName, TxPurpose } from 'sign-and-send/typing';
 import { objectToString, stringToObject } from 'sso/utils';
 import styles from './SingAndSendPage.module.scss';
 import { ThePowerLogoIcon } from './ThePowerLogoIcon';
-import ConfirmModal from '../../common/confirmModal/ConfirmModal';
 
 const { autoAddFee, autoAddGas } = TransactionsApi;
 
@@ -38,12 +38,14 @@ const SignAndSendPageComponent: FC = () => {
   const { signAndSendTxMutation, isPending } = useSignAndSendTx({
     throwOnError: true
   });
+
+  const { confirm } = useConfirmModalPromise();
+
   const { sentData, setSentData } = useStore();
 
   const feeSettings = networkApi?.feeSettings;
   const gasSettings = networkApi?.gasSettings;
 
-  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
   const [returnURL, setReturnURL] = useState<string | undefined>();
   const [decodedTxBody, setDecodedTxBody] = useState<TxBody | undefined>();
 
@@ -149,7 +151,7 @@ const SignAndSendPageComponent: FC = () => {
     };
   }, []);
 
-  const handleClickSignAndSend = () => {
+  const handleClickSignAndSend = async () => {
     try {
       if (!activeWallet) {
         throw new Error('Wallet not found');
@@ -183,8 +185,33 @@ const SignAndSendPageComponent: FC = () => {
         });
       }
     } catch (err) {
-      console.error({ err });
-      setConfirmModalOpen(true);
+      const decryptedWif = await confirm();
+
+      if (decodedTxBody && decryptedWif) {
+        signAndSendTxMutation({
+          wif: decryptedWif,
+          decodedTxBody,
+          returnURL,
+          additionalActionOnSuccess: (txResponse) => {
+            window.opener.postMessage?.(
+              objectToString({
+                type: 'signAndSendMessageResponse',
+                data: txResponse
+              }),
+              returnURL
+            );
+          },
+          additionalActionOnError: (error) => {
+            window.opener.postMessage?.(
+              objectToString({
+                type: 'signAndSendMessageError',
+                data: error
+              }),
+              returnURL
+            );
+          }
+        });
+      }
     }
   };
 
@@ -197,40 +224,6 @@ const SignAndSendPageComponent: FC = () => {
       returnURL
     );
     window.close();
-  };
-
-  const signAndSendCallback = (decryptedWif: string) => {
-    if (decodedTxBody) {
-      signAndSendTxMutation({
-        wif: decryptedWif,
-        decodedTxBody,
-        returnURL,
-        additionalActionOnSuccess: (txResponse) => {
-          window.opener.postMessage?.(
-            objectToString({
-              type: 'signAndSendMessageResponse',
-              data: txResponse
-            }),
-            returnURL
-          );
-        },
-        additionalActionOnError: (error) => {
-          window.opener.postMessage?.(
-            objectToString({
-              type: 'signAndSendMessageError',
-              data: error
-            }),
-            returnURL
-          );
-        }
-      });
-
-      setConfirmModalOpen(false);
-    }
-  };
-
-  const closeModal = () => {
-    setConfirmModalOpen(false);
   };
 
   const renderHeader = () => (
@@ -373,11 +366,6 @@ const SignAndSendPageComponent: FC = () => {
 
   return (
     <div className={cn(styles.signAndSendPage)}>
-      <ConfirmModal
-        open={isConfirmModalOpen}
-        onClose={closeModal}
-        callback={signAndSendCallback}
-      />
       {renderHeader()}
       {!sentData ? renderContent() : <TxResult sentData={sentData} />}
     </div>

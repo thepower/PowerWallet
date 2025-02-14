@@ -13,7 +13,7 @@ export interface VestDetails {
   startTime: number;
   endTime: number;
   cliff: number;
-  tokenId?: string;
+  tokenId: string;
   decimals?: number;
   symbol?: string;
   formattedPayout?: string;
