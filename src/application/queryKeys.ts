@@ -37,6 +37,23 @@ class QueryKeys {
     ...(address ? [address] : []),
     ...(tokenAddress ? [tokenAddress] : [])
   ];
+  tokenDetails = (tokenAddress?: string) => [
+    'tokenDetails',
+    ...(tokenAddress ? [tokenAddress] : [])
+  ];
+  vestingDetails = (address?: string | null) => [
+    'vestingDetails',
+    ...(address ? [address] : [])
+  ];
+  userVestings = (address?: string | null) => [
+    'userVestings',
+    ...(address ? [address] : [])
+  ];
+  userVesting = (address?: string | null, id?: string | bigint) => [
+    'userVesting',
+    ...(address ? [address] : []),
+    ...(id ? [id] : [])
+  ];
 }
 
 export const appQueryKeys = new QueryKeys();

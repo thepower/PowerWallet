@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { CryptoApi } from '@thepowereco/tssdk';
 import {
   CategoryScale,
@@ -17,9 +17,10 @@ import { formatUnits } from 'viem/utils';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { Button, PageTemplate } from 'common';
 import ConfirmModal from 'common/confirmModal/ConfirmModal';
+import { useChartOptions, useClaimTokens } from 'vesting/hooks';
+import { useUserVestings, VestDetails } from 'vesting/hooks/useUserVestings';
 import styles from './VestingNFT.module.scss';
-import { useVestingContract } from '../../hooks/useVestingContract';
-import type { VestDetails } from '../../hooks/useVestingContract';
+
 import 'chartjs-adapter-date-fns';
 
 ChartJS.register(
@@ -42,17 +43,11 @@ export const VestingNFTPage: React.FC = () => {
   const { activeWallet } = useWalletsStore();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
-  const {
-    userVestings,
-    fetchUserVestings,
-    claimTokensMutation,
-    isClaimPending,
-    chartOptions
-  } = useVestingContract();
+  const { claimTokens, isClaimPending } = useClaimTokens();
 
-  useEffect(() => {
-    fetchUserVestings();
-  }, []);
+  const { chartOptions } = useChartOptions();
+
+  const { userVestings, isLoading } = useUserVestings();
 
   const handleClaim = useCallback(
     (tokenId: string) => {
@@ -64,7 +59,7 @@ export const VestingNFTPage: React.FC = () => {
           activeWallet.encryptedWif,
           ''
         );
-        claimTokensMutation({
+        claimTokens({
           wif: decryptedWif,
           tokenId
         });
@@ -74,24 +69,24 @@ export const VestingNFTPage: React.FC = () => {
         setIsConfirmModalOpen(true);
       }
     },
-    [activeWallet, claimTokensMutation]
+    [activeWallet, claimTokens]
   );
 
   const handleConfirm = useCallback(
     async (decryptedWif: string) => {
       if (!selectedTokenId) return;
       try {
-        await claimTokensMutation({
+        await claimTokens({
           wif: decryptedWif,
           tokenId: selectedTokenId
         });
         setIsConfirmModalOpen(false);
-        await fetchUserVestings();
+        // await fetchUserVestings();
       } catch (error) {
         console.error('Error confirming claim:', error);
       }
     },
-    [claimTokensMutation, selectedTokenId, fetchUserVestings]
+    [claimTokens, selectedTokenId]
   );
 
   const getVestingChartData = useCallback(
@@ -220,6 +215,34 @@ export const VestingNFTPage: React.FC = () => {
     );
   }, []);
 
+  const renderSkeletons = () => {
+    return Array(3)
+      .fill(null)
+      .map((_, index) => (
+        <div
+          key={`skeleton-${index}`}
+          className={`${styles.vestingCard} ${styles.skeleton}`}
+        >
+          <div className={styles.skeletonHeader}>
+            <div className={styles.skeletonTitle}></div>
+            <div className={styles.skeletonProgress}></div>
+          </div>
+          <div className={styles.info}>
+            {Array(6)
+              .fill(null)
+              .map((_, i) => (
+                <p key={i}>
+                  <span className={styles.skeletonText}></span>
+                  <span className={styles.skeletonValue}></span>
+                </p>
+              ))}
+          </div>
+          <div className={`${styles.chart} ${styles.skeletonChart}`}></div>
+          <div className={styles.skeletonButton}></div>
+        </div>
+      ));
+  };
+
   return (
     <PageTemplate
       topBarChild={t('vesting')}
@@ -227,151 +250,158 @@ export const VestingNFTPage: React.FC = () => {
       backUrlText={t('home')!}
     >
       <div className={styles.container}>
-        {userVestings.length > 0 ? (
-          <div className={styles.vestingGrid}>
-            {userVestings.map((vesting) => {
-              const progress = getProgress(vesting.startTime, vesting.endTime);
-
-              return (
-                <div key={vesting.tokenId} className={styles.vestingCard}>
-                  <h3>
-                    {t('vestingNFT')} #{vesting.tokenId}
-                    <span className={styles.progress}>
-                      {progress}% {t('vested')}
-                    </span>
-                  </h3>
-
-                  <div className={styles.info}>
-                    <p>
-                      <span>{t('totalAmount')}</span>
-                      <span>
-                        {vesting.formattedPayout} {vesting.symbol}
-                      </span>
-                    </p>
-                    <p>
-                      <span>{t('claimableAmount')}</span>
-                      <span>
-                        {vesting.claimableAmount} {vesting.symbol}
-                      </span>
-                    </p>
-                    <p>
-                      <span>{t('claimedAmount')}</span>
-                      <span>
-                        {vesting.claimedPayout} {vesting.symbol}
-                      </span>
-                    </p>
-                    <p>
-                      <span>{t('vestedPayout')}</span>
-                      <span>
-                        {vesting.vestedPayoutAtTime} {vesting.symbol}
-                      </span>
-                    </p>
-                    <p>
-                      <span>{t('tokenContract')}</span>
-                      <span className={styles.address}>
-                        {vesting.payoutToken}
-                      </span>
-                    </p>
-                    <p>
-                      <span>{t('timeRemaining')}</span>
-                      <span>{getTimeRemaining(vesting.endTime)}</span>
-                    </p>
-                    <p>
-                      <span>{t('startDate')}</span>
-                      <span>
-                        {new Date(
-                          vesting.startTime * 1000
-                        ).toLocaleDateString()}
-                      </span>
-                    </p>
-                    <p>
-                      <span>{t('endDate')}</span>
-                      <span>
-                        {new Date(vesting.endTime * 1000).toLocaleDateString()}
-                      </span>
-                    </p>
-                    <p>
-                      <span>{t('cliffPeriod')}</span>
-                      <span>
-                        {vesting.cliff > 0
-                          ? new Date(vesting.cliff * 1000).toLocaleDateString()
-                          : t('noCliff')}
-                      </span>
-                    </p>
-                  </div>
-
-                  <div className={styles.chart}>
-                    <Line
-                      data={getVestingChartData(vesting)}
-                      options={{
-                        ...chartOptions,
-                        maintainAspectRatio: false,
-                        plugins: {
-                          ...chartOptions.plugins,
-                          tooltip: {
-                            callbacks: {
-                              label: (context) => {
-                                const point = context.raw as ChartPoint;
-                                return `${t(
-                                  'vestedAmount'
-                                )}: ${point?.y.toFixed(6)} ${vesting.symbol}`;
-                              },
-                              title: (tooltipItems) => {
-                                return new Date(
-                                  tooltipItems[0].parsed.x
-                                ).toLocaleDateString();
-                              }
-                            }
-                          }
-                        },
-                        scales: {
-                          x: {
-                            type: 'time',
-                            time: {
-                              unit: 'day',
-                              displayFormats: {
-                                day: 'MMM d, yyyy'
-                              }
-                            },
-                            grid: {
-                              display: false
-                            },
-                            min: new Date(vesting.startTime * 1000).getTime(),
-                            max: new Date(vesting.endTime * 1000).getTime()
-                          },
-                          y: {
-                            beginAtZero: true,
-                            grid: {
-                              color: 'rgba(75, 192, 192, 0.1)'
-                            },
-                            ticks: {
-                              precision: 6
-                            }
-                          }
-                        }
-                      }}
-                    />
-                  </div>
-
-                  <Button
-                    variant='contained'
-                    onClick={() => handleClaim(vesting.tokenId!)}
-                    disabled={
-                      isClaimPending || Number(vesting?.vestedPayoutAtTime) <= 0
-                    }
-                    className={styles.claimButton}
-                  >
-                    {Number(vesting?.vestedPayoutAtTime) <= 0
-                      ? t('notYetClaimable')
-                      : t('claim')}
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
+        {isLoading ? (
+          <div className={styles.vestingGrid}>{renderSkeletons()}</div>
         ) : (
-          <div className={styles.noVestings}>
-            <p>{t('noVestingsFound')}</p>
+          <div className={styles.vestingGrid}>
+            {userVestings &&
+              userVestings.map((vesting) => {
+                const progress = getProgress(
+                  vesting.startTime,
+                  vesting.endTime
+                );
+
+                return (
+                  <div key={vesting.tokenId} className={styles.vestingCard}>
+                    <h3>
+                      {t('vestingNFT')} #{vesting.tokenId}
+                      <span className={styles.progress}>
+                        {progress}% {t('vested')}
+                      </span>
+                    </h3>
+
+                    <div className={styles.info}>
+                      <p>
+                        <span>{t('totalAmount')}</span>
+                        <span>
+                          {vesting.formattedPayout} {vesting.symbol}
+                        </span>
+                      </p>
+                      <p>
+                        <span>{t('claimableAmount')}</span>
+                        <span>
+                          {vesting.claimableAmount} {vesting.symbol}
+                        </span>
+                      </p>
+                      <p>
+                        <span>{t('claimedAmount')}</span>
+                        <span>
+                          {vesting.claimedPayout} {vesting.symbol}
+                        </span>
+                      </p>
+                      <p>
+                        <span>{t('vestedPayout')}</span>
+                        <span>
+                          {vesting.vestedPayoutAtTime} {vesting.symbol}
+                        </span>
+                      </p>
+                      <p>
+                        <span>{t('tokenContract')}</span>
+                        <span className={styles.address}>
+                          {vesting.payoutToken}
+                        </span>
+                      </p>
+                      <p>
+                        <span>{t('timeRemaining')}</span>
+                        <span>{getTimeRemaining(vesting.endTime)}</span>
+                      </p>
+                      <p>
+                        <span>{t('startDate')}</span>
+                        <span>
+                          {new Date(
+                            vesting.startTime * 1000
+                          ).toLocaleDateString()}
+                        </span>
+                      </p>
+                      <p>
+                        <span>{t('endDate')}</span>
+                        <span>
+                          {new Date(
+                            vesting.endTime * 1000
+                          ).toLocaleDateString()}
+                        </span>
+                      </p>
+                      <p>
+                        <span>{t('cliffPeriod')}</span>
+                        <span>
+                          {vesting.cliff > 0
+                            ? new Date(
+                                vesting.cliff * 1000
+                              ).toLocaleDateString()
+                            : t('noCliff')}
+                        </span>
+                      </p>
+                    </div>
+
+                    <div className={styles.chart}>
+                      <Line
+                        data={getVestingChartData(vesting)}
+                        options={{
+                          ...chartOptions,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            ...chartOptions.plugins,
+                            tooltip: {
+                              callbacks: {
+                                label: (context) => {
+                                  const point = context.raw as ChartPoint;
+                                  return `${t(
+                                    'vestedAmount'
+                                  )}: ${point?.y.toFixed(6)} ${vesting.symbol}`;
+                                },
+                                title: (tooltipItems) => {
+                                  return new Date(
+                                    tooltipItems[0].parsed.x
+                                  ).toLocaleDateString();
+                                }
+                              }
+                            }
+                          },
+                          scales: {
+                            x: {
+                              type: 'time',
+                              time: {
+                                unit: 'day',
+                                displayFormats: {
+                                  day: 'MMM d, yyyy'
+                                }
+                              },
+                              grid: {
+                                display: false
+                              },
+                              min: new Date(vesting.startTime * 1000).getTime(),
+                              max: new Date(vesting.endTime * 1000).getTime()
+                            },
+                            y: {
+                              beginAtZero: true,
+                              grid: {
+                                color: 'rgba(75, 192, 192, 0.1)'
+                              },
+                              ticks: {
+                                precision: 6
+                              }
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+
+                    <Button
+                      variant='contained'
+                      onClick={() => handleClaim(vesting.tokenId!)}
+                      disabled={
+                        isClaimPending ||
+                        Number(vesting?.vestedPayoutAtTime) <= 0
+                      }
+                      className={styles.claimButton}
+                    >
+                      {Number(vesting?.vestedPayoutAtTime) <= 0
+                        ? t('notYetClaimable')
+                        : t('claim')}
+                    </Button>
+                  </div>
+                );
+              })}
           </div>
         )}
 
