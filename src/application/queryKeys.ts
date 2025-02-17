@@ -41,15 +41,16 @@ class QueryKeys {
     'tokenDetails',
     ...(tokenAddress ? [tokenAddress] : [])
   ];
-  vestingDetails = (address?: string | null) => [
+  vestingDetails = (address?: string | null, id?: string) => [
     'vestingDetails',
-    ...(address ? [address] : [])
+    ...(address ? [address] : []),
+    ...(id ? [id] : [])
   ];
   userVestings = (address?: string | null) => [
     'userVestings',
     ...(address ? [address] : [])
   ];
-  userVesting = (address?: string | null, id?: string | bigint) => [
+  userVesting = (address?: string | null, id?: string) => [
     'userVesting',
     ...(address ? [address] : []),
     ...(id ? [id] : [])

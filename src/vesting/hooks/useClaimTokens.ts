@@ -53,13 +53,31 @@ export const useClaimTokens = () => {
         );
 
         if (response?.txId) {
-          queryClient.invalidateQueries({
-            queryKey: appQueryKeys.walletData(activeWallet.address)
-          });
+          // Более частое обновление после клейма для получения актуальных данных
+          setTimeout(() => {
+            queryClient.invalidateQueries({
+              queryKey: appQueryKeys.walletData(activeWallet.address),
+              refetchInterval: 1000 // Рефетч каждую секунду
+            });
 
-          queryClient.invalidateQueries({
-            queryKey: appQueryKeys.vestingDetails(activeWallet.address)
-          });
+            queryClient.invalidateQueries({
+              queryKey: appQueryKeys.vestingDetails(
+                activeWallet.address,
+                tokenId
+              ),
+              refetchInterval: 1000
+            });
+
+            queryClient.invalidateQueries({
+              queryKey: appQueryKeys.userVesting(activeWallet.address, tokenId),
+              refetchInterval: 1000
+            });
+
+            queryClient.invalidateQueries({
+              queryKey: appQueryKeys.userVestings(activeWallet.address),
+              refetchInterval: 1000
+            });
+          }, 1000);
 
           toast.success(t('claimSuccess'));
         }

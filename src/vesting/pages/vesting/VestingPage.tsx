@@ -70,12 +70,21 @@ export const VestingPage: React.FC = () => {
       <div className={styles.container}>
         {isLoading ? (
           <div className={styles.vestingGrid}>{renderSkeletons()}</div>
-        ) : (
+        ) : userVestings && userVestings.length > 0 ? (
           <div className={styles.vestingGrid}>
-            {userVestings &&
-              userVestings.map((vesting) => (
-                <VestingCard key={vesting.tokenId} vesting={vesting} />
-              ))}
+            {userVestings.map((vesting) => (
+              <VestingCard key={vesting.tokenId} vesting={vesting} />
+            ))}
+          </div>
+        ) : (
+          <div className={styles.noVestings}>
+            <h3>{t('noVestingsTitle', 'No Vesting Tokens')}</h3>
+            <p>
+              {t(
+                'noVestingsDescription',
+                'You currently have no vesting tokens in your wallet.'
+              )}
+            </p>
           </div>
         )}
       </div>

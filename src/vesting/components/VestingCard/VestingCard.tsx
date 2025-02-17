@@ -70,17 +70,15 @@ export const VestingCard: FC<Props> = ({ vesting }) => {
 
       const { startTime, endTime, payout, decimals = 18 } = vesting;
       const totalDuration = endTime - startTime;
-      const numPoints = 50; // Увеличиваем количество точек для более плавного графика
+      const numPoints = 20;
       const dataPoints: ChartPoint[] = [];
       const currentTime = Math.floor(Date.now() / 1000);
 
-      // Добавляем начальную точку
       dataPoints.push({
         x: new Date(startTime * 1000).getTime(),
         y: 0
       });
 
-      // Если есть cliff период, добавляем точку конца cliff
       if (vesting.cliff > startTime) {
         dataPoints.push({
           x: new Date(vesting.cliff * 1000).getTime(),
@@ -88,7 +86,6 @@ export const VestingCard: FC<Props> = ({ vesting }) => {
         });
       }
 
-      // Добавляем промежуточные точки
       for (let i = 1; i < numPoints; i++) {
         const timestamp = startTime + (totalDuration * i) / numPoints;
         if (timestamp <= startTime) continue;
@@ -111,7 +108,6 @@ export const VestingCard: FC<Props> = ({ vesting }) => {
         });
       }
 
-      // Добавляем текущую точку времени
       if (currentTime > startTime && currentTime < endTime) {
         let currentVestedAmount = 0n;
         if (currentTime <= vesting.cliff) {
@@ -130,13 +126,11 @@ export const VestingCard: FC<Props> = ({ vesting }) => {
         });
       }
 
-      // Добавляем конечную точку
       dataPoints.push({
         x: new Date(endTime * 1000).getTime(),
         y: Number(formatUnits(payout, decimals))
       });
 
-      // Сортируем точки по времени
       dataPoints.sort((a, b) => a.x - b.x);
 
       return {

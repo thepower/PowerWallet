@@ -32,7 +32,9 @@ export const fetchTokenDetails = (
 
       const details = { decimals, symbol };
       return details;
-    }
+    },
+    staleTime: 4 * 60 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000
   });
 
 export const fetchUserVesting = (
@@ -41,7 +43,7 @@ export const fetchUserVesting = (
   id: bigint
 ) =>
   queryClient.fetchQuery({
-    queryKey: appQueryKeys.userVesting(activeWallet?.address, id),
+    queryKey: appQueryKeys.userVesting(activeWallet?.address, id.toString()),
     queryFn: async () => {
       if (!networkApi) {
         throw new Error('Network API is not ready');
@@ -117,7 +119,9 @@ export const fetchUserVesting = (
         claimedPayout: formattedClaimed,
         vestedPayoutAtTime: formattedVestedPayoutAtTime
       };
-    }
+    },
+    staleTime: 2 * 60 * 60 * 1000, // 2 часа для вестинга
+    gcTime: 24 * 60 * 60 * 1000
   });
 
 export const fetchVestingDetails = (
@@ -126,7 +130,7 @@ export const fetchVestingDetails = (
   id: bigint
 ) =>
   queryClient.fetchQuery({
-    queryKey: appQueryKeys.vestingDetails(activeWallet?.address),
+    queryKey: appQueryKeys.vestingDetails(activeWallet?.address, id.toString()),
     queryFn: async () => {
       if (!networkApi) {
         throw new Error('Network API is not ready');
@@ -173,5 +177,7 @@ export const fetchVestingDetails = (
         console.error('Error fetching vesting details:', error);
         throw error;
       }
-    }
+    },
+    staleTime: 2 * 60 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000
   });

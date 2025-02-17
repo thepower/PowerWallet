@@ -72,7 +72,10 @@ export const useUserVestings = () => {
         console.error('Error fetching user vestings:', error);
         throw error;
       }
-    }
+    },
+    staleTime: 2 * 60 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000,
+    enabled: !!activeWallet && !!networkApi
   });
 
   return {
