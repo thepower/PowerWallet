@@ -4,6 +4,7 @@ import { ChartData } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { useTranslation } from 'react-i18next';
 import { formatUnits } from 'viem';
+import appEnvs from 'appEnvs';
 import { useConfirmModalPromise } from 'application/hooks';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { Button } from 'common';
@@ -289,17 +290,26 @@ export const VestingCard: FC<Props> = ({ vesting }) => {
         </p>
       </div>
 
-      <Button
-        variant='contained'
-        onClick={() => handleClaim(vesting.tokenId!)}
-        disabled={isClaimPending || Number(vesting?.vestedPayoutAtTime) <= 0}
-        className={styles.claimButton}
-        loading={isClaimPending}
-      >
-        {Number(vesting?.vestedPayoutAtTime) <= 0
-          ? t('notYetClaimable')
-          : t('claim')}
-      </Button>
+      <div className={styles.actions}>
+        <Button
+          variant='contained'
+          onClick={() => handleClaim(vesting.tokenId!)}
+          disabled={isClaimPending || Number(vesting?.vestedPayoutAtTime) <= 0}
+          className={styles.claimButton}
+          loading={isClaimPending}
+        >
+          {Number(vesting?.vestedPayoutAtTime) <= 0
+            ? t('notYetClaimable')
+            : t('claim')}
+        </Button>
+        <Button
+          variant='outlined'
+          to={`/erc721/${appEnvs.VESTING_CONTRACT_ADDRESS}/${vesting.tokenId}/send`}
+          className={styles.sendButton}
+        >
+          {t('send')}
+        </Button>
+      </div>
     </div>
   );
 };

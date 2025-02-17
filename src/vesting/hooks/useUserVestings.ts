@@ -75,7 +75,8 @@ export const useUserVestings = () => {
     },
     staleTime: 2 * 60 * 60 * 1000,
     gcTime: 24 * 60 * 60 * 1000,
-    enabled: !!activeWallet && !!networkApi
+    enabled: !!activeWallet && !!networkApi,
+    retry: false
   });
 
   return {
