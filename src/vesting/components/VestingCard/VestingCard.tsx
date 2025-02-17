@@ -292,6 +292,13 @@ export const VestingCard: FC<Props> = ({ vesting }) => {
 
       <div className={styles.actions}>
         <Button
+          variant='outlined'
+          to={`/erc721/${appEnvs.VESTING_CONTRACT_ADDRESS}/${vesting.tokenId}/send`}
+          className={styles.sendButton}
+        >
+          {t('send')}
+        </Button>
+        <Button
           variant='contained'
           onClick={() => handleClaim(vesting.tokenId!)}
           disabled={isClaimPending || Number(vesting?.vestedPayoutAtTime) <= 0}
@@ -301,13 +308,6 @@ export const VestingCard: FC<Props> = ({ vesting }) => {
           {Number(vesting?.vestedPayoutAtTime) <= 0
             ? t('notYetClaimable')
             : t('claim')}
-        </Button>
-        <Button
-          variant='outlined'
-          to={`/erc721/${appEnvs.VESTING_CONTRACT_ADDRESS}/${vesting.tokenId}/send`}
-          className={styles.sendButton}
-        >
-          {t('send')}
         </Button>
       </div>
     </div>

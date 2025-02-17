@@ -37,25 +37,22 @@ export const VestingPage: React.FC = () => {
     return Array(1)
       .fill(null)
       .map((_, index) => (
-        <div
-          key={`skeleton-${index}`}
-          className={`${styles.vestingCard} ${styles.skeleton}`}
-        >
+        <div key={`skeleton-${index}`} className={styles.skeleton}>
           <div className={styles.skeletonHeader}>
             <div className={styles.skeletonTitle}></div>
             <div className={styles.skeletonProgress}></div>
           </div>
+          <div className={styles.skeletonChart}></div>
           <div className={styles.info}>
-            {Array(6)
+            {Array(9)
               .fill(null)
               .map((_, i) => (
                 <p key={i}>
-                  <span className={styles.skeletonText}></span>
-                  <span className={styles.skeletonValue}></span>
+                  <span></span>
+                  <span></span>
                 </p>
               ))}
           </div>
-          <div className={`${styles.chart} ${styles.skeletonChart}`}></div>
           <div className={styles.skeletonButton}></div>
         </div>
       ));
