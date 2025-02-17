@@ -21,8 +21,10 @@ import {
   RenameIcon
 } from 'assets/icons';
 import { CopyButton } from 'common';
+import { KeyIcon } from 'myAssets/components/icons';
 import styles from './Account.module.scss';
 import { AccountActionsList } from './AccountActionsList';
+import { ChangePasswordModal } from './ChangePasswordModal';
 import { RenameAccountModal } from './RenameAccountModal';
 import { ResetAccountModal } from './ResetAccountModal';
 import { ExportAccountModal } from '../../registration/components/modals/ExportAccountModal';
@@ -39,6 +41,8 @@ const Account: React.FC<AccountProps> = ({ className }) => {
     useState(false);
   const [openedResetAccountModal, setOpenedResetAccountModal] = useState(false);
   const [openedRenameAccountModal, setOpenedRenameAccountModal] =
+    useState(false);
+  const [openedChangePasswordModal, setOpenedChangePasswordModal] =
     useState(false);
 
   const navigate = useNavigate();
@@ -65,6 +69,10 @@ const Account: React.FC<AccountProps> = ({ className }) => {
 
   const handleRenameAccount = () => {
     setOpenedRenameAccountModal(true);
+  };
+
+  const handleChangePassword = () => {
+    setOpenedChangePasswordModal(true);
   };
 
   const closeImportAccountModal = () => {
@@ -140,6 +148,11 @@ const Account: React.FC<AccountProps> = ({ className }) => {
     setIsAccountMenuOpened(false);
   };
 
+  const closeChangePasswordModal = () => {
+    setOpenedChangePasswordModal(false);
+    setIsAccountMenuOpened(false);
+  };
+
   const getAccountActionsData = () => [
     {
       title: t('createNewAccount'),
@@ -150,6 +163,11 @@ const Account: React.FC<AccountProps> = ({ className }) => {
       title: t('renameAccount'),
       action: handleRenameAccount,
       Icon: RenameIcon
+    },
+    {
+      title: t('changePassword'),
+      action: handleChangePassword,
+      Icon: KeyIcon
     },
     {
       title: t('exportAccount'),
@@ -231,6 +249,10 @@ const Account: React.FC<AccountProps> = ({ className }) => {
       <RenameAccountModal
         open={openedRenameAccountModal}
         onClose={closeRenameAccountModal}
+      />
+      <ChangePasswordModal
+        open={openedChangePasswordModal}
+        onClose={closeChangePasswordModal}
       />
     </div>
   );

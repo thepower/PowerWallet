@@ -164,7 +164,7 @@
     "tokenHasAlreadyBeenAdded": "เพิ่มโทเค็นแล้ว",
     "chooseDeInfraNetwork": "เลือกเครือข่าย DeInfra",
     "enterAccountNumberAndSeedPhrase": "กรอกหมายเลขบัญชีและคำศัพท์เมล็ดพันธุ์",
-    "IDontWantUsePassword": "ฉันไม่ต้องการใช้รหัสผ่านเพื่อเข้ารหัสกุญแจของฉัน",
+    "IDontWantUsePassword": "ฉันไม่ต้องการใช้รหัสผ่าน",
     "enterAddressAndSeedPhrase": "กรอกที่อยู่และคำศัพท์เมล็ดพันธุ์",
     "enter": "กรอก",
     "uploadPEMFileToImportAccount": "อัปโหลดไฟล์ PEM เพื่อนำเข้าบัญชี",
@@ -255,6 +255,13 @@
     "tokenContract": "สัญญาโทเค็น",
     "claimableAmount": "จำนวนที่สามารถเรียกร้อง",
     "claimedAmount": "จำนวนที่ถูกเรียกร้องแล้ว",
-    "vestedPayout": "การจ่ายเงินตามสิทธิ์"
+    "vestedPayout": "การจ่ายเงินตามสิทธิ์",
+    "changePassword": "เปลี่ยนรหัสผ่าน",
+    "oldPassword": "รหัสผ่านเดิม",
+    "newPassword": "รหัสผ่านใหม่",
+    "confirmPassword": "ยืนยันรหัสผ่าน",
+    "noOldPassword": "ไม่มีรหัสผ่าน",
+    "passwordMinLength": "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร",
+    "passwordsMustMatch": "รหัสผ่านต้องตรงกัน"
   }
 }

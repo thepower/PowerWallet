@@ -164,7 +164,7 @@
     "tokenHasAlreadyBeenAdded": "Токен уже был добавлен",
     "chooseDeInfraNetwork": "Выбертите DeInfra сеть",
     "enterAccountNumberAndSeedPhrase": "Введите номер аккаунта и seed фразу",
-    "IDontWantUsePassword": "Я не хочу использовать пароль для шифрования своего ключа",
+    "IDontWantUsePassword": "Я не хочу использовать пароль",
     "enterAddressAndSeedPhrase": "Введите адрес и seed фразу",
     "enter": "Войти",
     "uploadPEMFileToImportAccount": "Загрузите PEM файл для импорта аккаунта",
@@ -255,6 +255,13 @@
     "tokenContract": "Адрес токена",
     "claimableAmount": "Доступная сумма",
     "claimedAmount": "Полученная сумма",
-    "vestedPayout": "Выплата по вестингу"
+    "vestedPayout": "Выплата по вестингу",
+    "changePassword": "Изменить пароль",
+    "oldPassword": "Старый пароль",
+    "newPassword": "Новый пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "noOldPassword": "Без пароля",
+    "passwordMinLength": "Пароль должен быть не менее 8 символов",
+    "passwordsMustMatch": "Пароли должны совпадать"
   }
 }

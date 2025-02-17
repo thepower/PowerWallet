@@ -164,7 +164,7 @@
     "tokenHasAlreadyBeenAdded": "the token has already been added",
     "chooseDeInfraNetwork": "Choose DeInfra network",
     "enterAccountNumberAndSeedPhrase": "Enter account number and seed phrase",
-    "IDontWantUsePassword": "I don't want to use a password to encrypt my key",
+    "IDontWantUsePassword": "I don't want to use a password",
     "enterAddressAndSeedPhrase": "Enter the address and seed phrase",
     "enter": "Enter",
     "uploadPEMFileToImportAccount": "Upload the PEM file to import an account",
@@ -255,6 +255,13 @@
     "tokenContract": "Token Contract",
     "claimableAmount": "Claimable Amount",
     "claimedAmount": "Claimed Amount",
-    "vestedPayout": "Vested Payout"
+    "vestedPayout": "Vested Payout",
+    "changePassword": "Change Password",
+    "oldPassword": "Old Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "noOldPassword": "Without password",
+    "passwordMinLength": "Password must be at least 8 characters",
+    "passwordsMustMatch": "Passwords must match"
   }
 }
