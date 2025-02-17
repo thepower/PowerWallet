@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import omit from 'lodash/omit';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import appEnvs from 'appEnvs';
@@ -7,18 +8,8 @@ import {
   useTokensStore,
   useWalletsStore
 } from 'application/utils/localStorageUtils';
-import {
-  //  BuySvg,
-  FaucetSvg,
-  SendSvg,
-  VestingSvg
-} from 'assets/icons';
-import {
-  // Button,
-  CardLink,
-  PageTemplate,
-  Tabs
-} from 'common';
+import { FaucetSvg, SendSvg, VestingSvg } from 'assets/icons';
+import { CardLink, PageTemplate, Tabs, SearchInput } from 'common';
 import hooks from 'hooks';
 import WalletCard from 'myAssets/components/WalletCard/WalletCard';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
@@ -29,6 +20,7 @@ import { Token } from '../../components/Token';
 
 const MainPageComponent: FC = () => {
   const { t } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const { scrollContainerRef, scrollToElementByIndex } =
     hooks.useSmoothHorizontalScroll();
@@ -37,14 +29,36 @@ const MainPageComponent: FC = () => {
   const { activeWallet, wallets } = useWalletsStore();
 
   const walletsWithActiveWalletAtFirst = useMemo(() => {
-    if (activeWallet) {
-      return [
-        activeWallet,
-        ...wallets.filter((wallet) => wallet.address !== activeWallet.address)
-      ];
+    let filteredWallets = wallets;
+    if (searchTerm) {
+      filteredWallets = wallets.filter((wallet) => {
+        const walletWithoutEncryptedWif = omit(wallet, 'encryptedWif');
+        return JSON.stringify(walletWithoutEncryptedWif).includes(searchTerm);
+      });
     }
-    return wallets;
-  }, [activeWallet, wallets]);
+
+    if (activeWallet) {
+      const activeWalletInFiltered = filteredWallets.find(
+        (w) => w.address === activeWallet.address
+      );
+      if (activeWalletInFiltered) {
+        return [
+          activeWallet,
+          ...filteredWallets.filter(
+            (wallet) => wallet.address !== activeWallet.address
+          )
+        ];
+      }
+    }
+    return filteredWallets;
+  }, [activeWallet, wallets, searchTerm]);
+
+  const handleSearch = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value);
+    },
+    []
+  );
 
   const chainId = activeWallet?.chainId;
 
@@ -110,7 +124,7 @@ const MainPageComponent: FC = () => {
         scrollContainer.removeEventListener('wheel', handleWheel);
       }
     };
-  }, []);
+  }, [scrollContainerRef]);
 
   const renderWallets = useCallback(() => {
     return (
@@ -119,7 +133,10 @@ const MainPageComponent: FC = () => {
           <WalletCard
             key={wallet.address}
             wallet={wallet}
-            onSelectWallet={() => scrollToElementByIndex(0)}
+            onSelectWallet={() => {
+              scrollToElementByIndex(0);
+              setSearchTerm('');
+            }}
           />
         ))}
       </div>
@@ -133,6 +150,16 @@ const MainPageComponent: FC = () => {
   return (
     <PageTemplate>
       <div className={styles.wrapper}>
+        {wallets.length > 2 && (
+          <div className={styles.searchWrapper}>
+            <SearchInput
+              value={searchTerm}
+              onChange={handleSearch}
+              onClickSearch={() => {}}
+              className={styles.searchInput}
+            />
+          </div>
+        )}
         {renderWallets()}
         <div className={styles.linksGroup}>
           <CardLink
