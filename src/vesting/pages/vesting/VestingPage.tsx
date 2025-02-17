@@ -34,7 +34,7 @@ export const VestingPage: React.FC = () => {
   const { userVestings, isLoading } = useUserVestings();
 
   const renderSkeletons = () => {
-    return Array(3)
+    return Array(1)
       .fill(null)
       .map((_, index) => (
         <div

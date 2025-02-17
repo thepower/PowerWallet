@@ -191,57 +191,6 @@ export const VestingCard: FC<Props> = ({ vesting }) => {
         </span>
       </h3>
 
-      <div className={styles.info}>
-        <p>
-          <span>{t('totalAmount')}</span>
-          <span>
-            {vesting.formattedPayout} {vesting.symbol}
-          </span>
-        </p>
-        <p>
-          <span>{t('claimableAmount')}</span>
-          <span>
-            {vesting.claimableAmount} {vesting.symbol}
-          </span>
-        </p>
-        <p>
-          <span>{t('claimedAmount')}</span>
-          <span>
-            {vesting.claimedPayout} {vesting.symbol}
-          </span>
-        </p>
-        <p>
-          <span>{t('vestedPayout')}</span>
-          <span>
-            {vesting.vestedPayoutAtTime} {vesting.symbol}
-          </span>
-        </p>
-        <p>
-          <span>{t('tokenContract')}</span>
-          <span className={styles.address}>{vesting.payoutToken}</span>
-        </p>
-        <p>
-          <span>{t('timeRemaining')}</span>
-          <span>{getTimeRemaining(vesting.endTime)}</span>
-        </p>
-        <p>
-          <span>{t('startDate')}</span>
-          <span>{new Date(vesting.startTime * 1000).toLocaleDateString()}</span>
-        </p>
-        <p>
-          <span>{t('endDate')}</span>
-          <span>{new Date(vesting.endTime * 1000).toLocaleDateString()}</span>
-        </p>
-        <p>
-          <span>{t('cliffPeriod')}</span>
-          <span>
-            {vesting.cliff > 0
-              ? new Date(vesting.cliff * 1000).toLocaleDateString()
-              : t('noCliff')}
-          </span>
-        </p>
-      </div>
-
       <div className={styles.chart}>
         <Line
           data={getVestingChartData(vesting)}
@@ -295,11 +244,63 @@ export const VestingCard: FC<Props> = ({ vesting }) => {
         />
       </div>
 
+      <div className={styles.info}>
+        <p>
+          <span>{t('totalAmount')}</span>
+          <span>
+            {vesting.formattedPayout} {vesting.symbol}
+          </span>
+        </p>
+        <p>
+          <span>{t('claimableAmount')}</span>
+          <span>
+            {vesting.claimableAmount} {vesting.symbol}
+          </span>
+        </p>
+        <p>
+          <span>{t('claimedAmount')}</span>
+          <span>
+            {vesting.claimedPayout} {vesting.symbol}
+          </span>
+        </p>
+        <p>
+          <span>{t('vestedPayout')}</span>
+          <span>
+            {vesting.vestedPayoutAtTime} {vesting.symbol}
+          </span>
+        </p>
+        <p>
+          <span>{t('tokenContract')}</span>
+          <span className={styles.address}>{vesting.payoutToken}</span>
+        </p>
+        <p>
+          <span>{t('timeRemaining')}</span>
+          <span>{getTimeRemaining(vesting.endTime)}</span>
+        </p>
+        <p>
+          <span>{t('startDate')}</span>
+          <span>{new Date(vesting.startTime * 1000).toLocaleDateString()}</span>
+        </p>
+        <p>
+          <span>{t('endDate')}</span>
+          <span>{new Date(vesting.endTime * 1000).toLocaleDateString()}</span>
+        </p>
+        <p>
+          <span>{t('cliffPeriod')}</span>
+          <span>
+            {vesting.cliff > 0
+              ? new Date(vesting.cliff * 1000).toLocaleDateString()
+              : t('noCliff')}
+          </span>
+        </p>
+      </div>
+
       <Button
         variant='contained'
         onClick={() => handleClaim(vesting.tokenId!)}
         disabled={isClaimPending || Number(vesting?.vestedPayoutAtTime) <= 0}
         className={styles.claimButton}
+        loading={isClaimPending}
       >
         {Number(vesting?.vestedPayoutAtTime) <= 0
           ? t('notYetClaimable')
