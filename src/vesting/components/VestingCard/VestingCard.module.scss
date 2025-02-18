@@ -11,6 +11,10 @@
   position: relative;
   overflow: hidden;
 
+  @include mobile {
+    padding: 20px;
+  }
+
   &::after {
     content: '';
     position: absolute;
@@ -21,7 +25,6 @@
     background:  $the-power-gradient;
     opacity: 0.7;
   }
-
 
   h3 {
     margin: 0 0 24px;
@@ -73,6 +76,11 @@
   position: relative;
   overflow: hidden;
 
+  @include mobile {
+    padding: 16px;
+    gap: 12px;
+  }
+
   &::before {
     content: '';
     position: absolute;
@@ -92,6 +100,23 @@
     align-items: center;
     font-size: 0.95rem;
     position: relative;
+
+    @include mobile {
+      font-size: 0.9rem;
+
+      .addressContainer {
+        max-width: 140px;
+      }
+
+      .address {
+        max-width: 100px;
+      }
+
+      span:last-child {
+        padding: 3px 8px;
+        font-size: 0.9rem;
+      }
+    }
 
     .addressContainer {
       display: flex;
@@ -150,6 +175,12 @@
   border-radius: 12px;
   border: 1px solid rgba(75, 192, 192, 0.1);
   position: relative;
+
+  @include mobile {
+    height: 180px;
+    padding: 12px;
+    margin: 16px 0;
+  }
   
   &::before {
     content: '';
@@ -166,16 +197,30 @@
 .actions {
   display: flex;
   gap: 12px;
+
+  @include mobile {
+    flex-direction: column;
+  }
 }
 
 .claimButton {
   width: 100%;
   border-radius: 12px;
+
+  @include mobile {
+    height: 44px;
+    font-size: 0.95rem;
+  }
 }
 
 .sendButton, .addTokenButton {
   width: 100%;
   border-radius: 12px;
+
+  @include mobile {
+    height: 44px;
+    font-size: 0.95rem;
+  }
 }
 
 .claimableAmount {
