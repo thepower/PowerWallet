@@ -1,13 +1,19 @@
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useMemo } from 'react';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { CryptoApi } from '@thepowereco/tssdk';
 import { ChartData } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 import { formatUnits } from 'viem';
 import appEnvs from 'appEnvs';
 import { useConfirmModalPromise } from 'application/hooks';
-import { useWalletsStore } from 'application/utils/localStorageUtils';
+import {
+  useTokensStore,
+  useWalletsStore
+} from 'application/utils/localStorageUtils';
 import { Button } from 'common';
+import { TokenKind } from 'myAssets/types';
 import { useChartOptions, useClaimTokens, VestDetails } from 'vesting/hooks';
 import styles from './VestingCard.module.scss';
 
@@ -26,6 +32,56 @@ export const VestingCard: FC<Props> = ({ vesting }) => {
   const { confirm } = useConfirmModalPromise();
   const { activeWallet } = useWalletsStore();
   const { claimTokens, isClaimPending } = useClaimTokens();
+  const { addToken, isAddressUnique } = useTokensStore();
+
+  const newToken = useMemo(
+    () => ({
+      name: vesting?.symbol || '',
+      symbol: vesting?.symbol || '',
+      address: vesting?.payoutToken,
+      decimals: vesting?.decimals || 18,
+      chainId: activeWallet?.chainId || null,
+      type: TokenKind.Erc20,
+      isShow: true
+    }),
+    [
+      vesting?.symbol,
+      vesting?.payoutToken,
+      vesting?.decimals,
+      activeWallet?.chainId
+    ]
+  );
+
+  const isTokenAdded = useMemo(
+    () => isAddressUnique(newToken),
+    [isAddressUnique, newToken]
+  );
+
+  const handleAddToken = useCallback(async () => {
+    if (!vesting.payoutToken) return;
+
+    if (activeWallet?.chainId) {
+      if (isAddressUnique(newToken)) {
+        addToken(newToken);
+
+        toast.done(t('tokenAdded'));
+      } else {
+        toast.warn(t('tokenAlreadyAdded'));
+      }
+    }
+  }, [
+    vesting.payoutToken,
+    activeWallet?.chainId,
+    isAddressUnique,
+    newToken,
+    addToken,
+    t
+  ]);
+
+  const handleCopyAddress = useCallback(() => {
+    navigator.clipboard.writeText(vesting.payoutToken);
+    toast.success(t('copiedToClipboard'));
+  }, [vesting.payoutToken, t]);
 
   const handleClaim = useCallback(
     async (tokenId: string) => {
@@ -266,7 +322,19 @@ export const VestingCard: FC<Props> = ({ vesting }) => {
         </p>
         <p>
           <span>{t('tokenContract')}</span>
-          <span className={styles.address}>{vesting.payoutToken}</span>
+          <span className={styles.addressContainer}>
+            <span onClick={handleCopyAddress} className={styles.address}>
+              {vesting.payoutToken}
+            </span>
+            <AddCircleOutlineIcon
+              className={styles.addTokenIcon}
+              onClick={handleAddToken}
+              style={{
+                opacity: isTokenAdded ? 0.5 : 1,
+                cursor: isTokenAdded ? 'default' : 'pointer'
+              }}
+            />
+          </span>
         </p>
         <p>
           <span>{t('timeRemaining')}</span>

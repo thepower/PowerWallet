@@ -1,5 +1,6 @@
 import React, { useCallback, useRef } from 'react';
 import cn from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import styles from './CopyButton.module.scss';
 import { CopySvg } from '../../assets/icons';
@@ -17,6 +18,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({
   copyInfo,
   iconClassName
 }) => {
+  const { t } = useTranslation();
   const ref = useRef<HTMLButtonElement>(null);
   const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     (e) => {
@@ -25,10 +27,10 @@ const CopyButton: React.FC<CopyButtonProps> = ({
         navigator.clipboard.writeText(
           copyInfo || ref.current.textContent || ''
         );
-        toast.success('Copied to clipboard');
+        toast.success(t('copiedToClipboard'));
       }
     },
-    [copyInfo]
+    [copyInfo, t]
   );
 
   return (

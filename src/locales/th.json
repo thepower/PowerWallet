@@ -262,6 +262,10 @@
     "confirmPassword": "ยืนยันรหัสผ่าน",
     "noOldPassword": "ไม่มีรหัสผ่าน",
     "passwordMinLength": "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร",
-    "passwordsMustMatch": "รหัสผ่านต้องตรงกัน"
+    "passwordsMustMatch": "รหัสผ่านต้องตรงกัน",
+    "noVestingsTitle": "ไม่มีโทเค็นที่ล็อกไว้",
+    "noVestingsDescription": "ขณะนี้คุณไม่มีโทเค็นที่ล็อกไว้ในกระเป๋าเงิน",
+    "copiedToClipboard": "คัดลอกไปยังคลิปบอร์ดแล้ว",
+    "tokenAlreadyAdded": "มีโทเค็นนี้อยู่แล้ว"
   }
 }

@@ -32,9 +32,9 @@ const WalletCard: FC<WalletCardProps> = ({ wallet, onSelectWallet }) => {
     (e) => {
       e.stopPropagation();
       navigator.clipboard.writeText(wallet?.address || '');
-      toast.success('Copied to clipboard');
+      toast.success(t('copiedToClipboard'));
     },
-    [wallet?.address]
+    [wallet?.address, t]
   );
 
   const SK = getNativeTokenAmountBySymbol('SK');

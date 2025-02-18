@@ -93,6 +93,13 @@
     font-size: 0.95rem;
     position: relative;
 
+    .addressContainer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 180px;
+    }
+
     .address {
       max-width: 140px;
       overflow: hidden;
@@ -102,6 +109,16 @@
       
       &:hover {
         background: rgba(75, 192, 192, 0.2);
+      }
+    }
+
+    .addTokenIcon {
+      font-size: 20px;
+      color: $blue;
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: scale(1.1);
       }
     }
 
@@ -156,11 +173,10 @@
   border-radius: 12px;
 }
 
-.sendButton {
+.sendButton, .addTokenButton {
   width: 30%;
   border-radius: 12px;
 }
-
 
 .claimableAmount {
   color: var(--success-color);

@@ -262,6 +262,10 @@
     "confirmPassword": "Подтвердите пароль",
     "noOldPassword": "Без пароля",
     "passwordMinLength": "Пароль должен быть не менее 8 символов",
-    "passwordsMustMatch": "Пароли должны совпадать"
+    "passwordsMustMatch": "Пароли должны совпадать",
+    "noVestingsTitle": "Нет токенов в вестинге",
+    "noVestingsDescription": "В вашем кошельке нет токенов в вестинге",
+    "copiedToClipboard": "Скопировано в буфер обмена",
+    "tokenAlreadyAdded": "Токен уже добавлен"
   }
 }

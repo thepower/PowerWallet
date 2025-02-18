@@ -262,6 +262,10 @@
     "confirmPassword": "Confirm Password",
     "noOldPassword": "Without password",
     "passwordMinLength": "Password must be at least 8 characters",
-    "passwordsMustMatch": "Passwords must match"
+    "passwordsMustMatch": "Passwords must match",
+    "noVestingsTitle": "No Vesting Tokens",
+    "noVestingsDescription": "You currently have no vesting tokens in your wallet",
+    "copiedToClipboard": "Copied to clipboard",
+    "tokenAlreadyAdded": "Token already added"
   }
 }
