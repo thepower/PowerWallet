@@ -112,7 +112,11 @@ const TokenComponent: FC<TokenProps> = ({
         />
       );
     }
-    return <span className={styles.amount}>{balance}</span>;
+    return (
+      <span className={styles.amount} title={balance}>
+        {balance}
+      </span>
+    );
   };
 
   // const { watchAsset } = useWatchAsset();
