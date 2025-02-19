@@ -1,42 +1,78 @@
-.walletCard {
-  width: 280px;
-  height: 156px;
+@use '@/styles/mixins' as *;
 
-  padding: 20px 24px;
+.walletCard {
+  width: 248px;
+  height: 130px;
+
+  padding: 16px 24px;
 
   border-radius: 5px;
-  border: 1px solid;
 
-  box-shadow: 20px 30px 110px 0px rgba(0, 0, 0, 0.12), 5px 5px 10px 0px rgba(229, 23, 208, 0.10), -5px -5px 10px 0px rgba(229, 23, 208, 0.10);
-  backdrop-filter: blur(65px);
   cursor: pointer;
+
+  border: 1px solid rgba(176, 178, 183, 0.2);
 }
 
-.chainId {
-  color: #F5F5F7;
+.walletCardActive {
+  @include border-gradient-background(#020409);
 
+  & .name {
+    @include text-gradient;
+  }
+
+  & .balance {
+    color: #f5f5f7;
+  }
+
+  & .copyAddressButton {
+    color: #f5f5f7;
+  }
+}
+
+.name {
   font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 20px;
+  color: #b0b2b7;
 
   margin-bottom: 12px;
 }
 
-.balance {
-  color: #F5F5F7;
-  font-size: 18px;
-  font-style: normal;
+.chainId {
+  color: rgba(245, 245, 247, 0.4);
+  font-size: 12px;
   font-weight: 500;
-  line-height: 24px;
-
-  margin-bottom: 30px;
-}
-
-.address {
-  color: #F5F5F7;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
   line-height: 20px;
+
+  margin-bottom: 3px;
 }
+
+.balance {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+
+  color: #f5f5f766;
+
+  margin-bottom: 18px;
+}
+
+@include icon-colors('.copyIcon', #b0b2b7);
+
+.copyAddressButton {
+  color: #f5f5f766;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+
+  display: flex;
+  align-items: center;
+  background: none;
+  cursor: pointer;
+}
+
+.copyAddressIcon {
+  margin-left: 8px;
+}
+
+@include icon-colors('.copyAddressIcon');

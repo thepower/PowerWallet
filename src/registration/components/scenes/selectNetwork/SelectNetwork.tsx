@@ -2,11 +2,10 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { useMediaQuery } from '@mui/material';
 import { NetworkEnum } from '@thepowereco/tssdk';
 import { useTranslation } from 'react-i18next';
-import { useNetworkChains } from 'application/hooks/useNetworkChains';
+import { useNetworkChains } from 'application/hooks';
 import { useStore } from 'application/store';
 import { ChevronLeftIcon, ChevronRightIcon } from 'assets/icons';
-import { Button, IconButton, WizardComponentProps } from 'common';
-import ChainSelect from 'common/chainSelect/ChainSelect';
+import { Button, IconButton, Select, WizardComponentProps } from 'common';
 import hooks from 'hooks';
 import { RegistrationCard } from 'registration/components/common/registrationCard/RegistrationCard';
 
@@ -136,7 +135,7 @@ export const SelectNetworkComponent: React.FC<SelectNetworkProps> = ({
     return (
       <div className={styles.selectChain}>
         <div className={styles.selectChainTitle}>{t('selectChain')}</div>
-        <ChainSelect
+        <Select
           id='chain-select'
           name='chain-select'
           value={chain || selectedChains[0]}

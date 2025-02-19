@@ -1,12 +1,14 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, useEffect, FC, useMemo } from 'react';
 import { AddressApi, CryptoApi, TransactionsApi } from '@thepowereco/tssdk';
-import { correctAmount } from '@thepowereco/tssdk/dist/utils/numbers';
 import cn from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import isObject from 'lodash/isObject';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
+import { toast } from 'react-toastify';
+import { bytesToString, formatUnits } from 'viem/utils';
 
+import { useConfirmModalPromise } from 'application/hooks';
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
 
 import { useStore } from 'application/store';
@@ -20,7 +22,6 @@ import { TxBody, TxKindByName, TxPurpose } from 'sign-and-send/typing';
 import { objectToString, stringToObject } from 'sso/utils';
 import styles from './SingAndSendPage.module.scss';
 import { ThePowerLogoIcon } from './ThePowerLogoIcon';
-import ConfirmModal from '../../common/confirmModal/ConfirmModal';
 
 const { autoAddFee, autoAddGas } = TransactionsApi;
 
@@ -31,32 +32,74 @@ const txKindMap: { [key: number]: string } = Object.entries(
 const SignAndSendPageComponent: FC = () => {
   const { t } = useTranslation();
   const { message } = useParams<{ message: string }>();
-  const { activeWallet } = useWalletsStore();
+  const { activeWallet, wallets, setActiveWalletByAddress } = useWalletsStore();
   const { networkApi } = useNetworkApi({ chainId: activeWallet?.chainId });
 
   const { signAndSendTxMutation, isPending } = useSignAndSendTx({
     throwOnError: true
   });
+
+  const { confirm } = useConfirmModalPromise();
+
   const { sentData, setSentData } = useStore();
 
   const feeSettings = networkApi?.feeSettings;
   const gasSettings = networkApi?.gasSettings;
 
-  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
   const [returnURL, setReturnURL] = useState<string | undefined>();
   const [decodedTxBody, setDecodedTxBody] = useState<TxBody | undefined>();
 
+  const decodedMessage = useMemo<{
+    sponsor: string;
+    returnUrl: string;
+    body: TxBody;
+  }>(() => {
+    try {
+      return message ? stringToObject(message) : null;
+    } catch (error) {
+      return null;
+    }
+  }, [message]);
+
+  const fromAddress = useMemo(() => {
+    try {
+      return AddressApi.encodeAddress(decodedMessage.body.f)?.txt;
+    } catch (error) {
+      return;
+    }
+  }, [decodedMessage?.body?.f]);
+
+  const isWalletExists = useMemo<boolean>(() => {
+    return wallets.some((wallet) => wallet.address === fromAddress);
+  }, [fromAddress, wallets]);
+
+  const isCurrentActiveWallet = useMemo<boolean>(() => {
+    return activeWallet?.address === fromAddress;
+  }, [activeWallet?.address, fromAddress]);
+
+  useEffect(() => {
+    if (isWalletExists && !isCurrentActiveWallet) {
+      fromAddress && setActiveWalletByAddress(fromAddress);
+    } else if (!isWalletExists) {
+      toast.error('Wallet not found');
+    }
+  }, [
+    fromAddress,
+    isCurrentActiveWallet,
+    isWalletExists,
+    setActiveWalletByAddress
+  ]);
+
   useEffect(() => {
     try {
-      if (!message) {
+      if (!decodedMessage) {
         throw new Error('Message not found');
       }
       if (!activeWallet) {
         throw new Error('Wallet not found');
       }
 
-      const decodedMessage = stringToObject(message);
-      let txBody: TxBody = decodedMessage?.body;
+      let txBody = decodedMessage?.body;
       setReturnURL(decodedMessage?.returnUrl);
       const sponsor = decodedMessage?.sponsor;
 
@@ -69,11 +112,10 @@ const SignAndSendPageComponent: FC = () => {
         txBody.e = {};
       }
 
-      txBody.f = Buffer.from(AddressApi.parseTextAddress(activeWallet.address));
       txBody.t = BigInt(Date.now());
 
       if (sponsor) {
-        txBody.e.sponsor = [Buffer.from(AddressApi.parseTextAddress(sponsor))];
+        txBody.e.sponsor = AddressApi.parseTextAddress(sponsor);
       }
 
       if (!gas) {
@@ -99,9 +141,9 @@ const SignAndSendPageComponent: FC = () => {
         setDecodedTxBody(txBody);
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
-  }, [message, activeWallet, gasSettings, feeSettings]);
+  }, [message, activeWallet, gasSettings, feeSettings, decodedMessage]);
 
   useEffect(() => {
     return () => {
@@ -109,7 +151,7 @@ const SignAndSendPageComponent: FC = () => {
     };
   }, []);
 
-  const handleClickSignAndSend = () => {
+  const handleClickSignAndSend = async () => {
     try {
       if (!activeWallet) {
         throw new Error('Wallet not found');
@@ -143,8 +185,33 @@ const SignAndSendPageComponent: FC = () => {
         });
       }
     } catch (err) {
-      console.error({ err });
-      setConfirmModalOpen(true);
+      const decryptedWif = await confirm();
+
+      if (decodedTxBody && decryptedWif) {
+        signAndSendTxMutation({
+          wif: decryptedWif,
+          decodedTxBody,
+          returnURL,
+          additionalActionOnSuccess: (txResponse) => {
+            window.opener.postMessage?.(
+              objectToString({
+                type: 'signAndSendMessageResponse',
+                data: txResponse
+              }),
+              returnURL
+            );
+          },
+          additionalActionOnError: (error) => {
+            window.opener.postMessage?.(
+              objectToString({
+                type: 'signAndSendMessageError',
+                data: error
+              }),
+              returnURL
+            );
+          }
+        });
+      }
     }
   };
 
@@ -157,40 +224,6 @@ const SignAndSendPageComponent: FC = () => {
       returnURL
     );
     window.close();
-  };
-
-  const signAndSendCallback = (decryptedWif: string) => {
-    if (decodedTxBody) {
-      signAndSendTxMutation({
-        wif: decryptedWif,
-        decodedTxBody,
-        returnURL,
-        additionalActionOnSuccess: (txResponse) => {
-          window.opener.postMessage?.(
-            objectToString({
-              type: 'signAndSendMessageResponse',
-              data: txResponse
-            }),
-            returnURL
-          );
-        },
-        additionalActionOnError: (error) => {
-          window.opener.postMessage?.(
-            objectToString({
-              type: 'signAndSendMessageError',
-              data: error
-            }),
-            returnURL
-          );
-        }
-      });
-
-      setConfirmModalOpen(false);
-    }
-  };
-
-  const closeModal = () => {
-    setConfirmModalOpen(false);
   };
 
   const renderHeader = () => (
@@ -207,14 +240,21 @@ const SignAndSendPageComponent: FC = () => {
   const renderExtraDataTable = () => {
     if (!decodedTxBody?.e || isEmpty(decodedTxBody?.e)) return null;
 
-    return (
-      <CardTable
-        items={Object.entries(decodedTxBody?.e).map(([key, value]) => ({
+    const items = Object.entries(decodedTxBody?.e).map(([key, value]) => {
+      if (key === 'sponsor' && value instanceof Uint8Array) {
+        return {
           key,
-          value: value.toString()
-        }))}
-      />
-    );
+          value: AddressApi.encodeAddress(value)?.txt
+        };
+      } else {
+        return {
+          key,
+          value: typeof value === 'string' ? value : bytesToString(value)
+        };
+      }
+    });
+
+    return <CardTable items={items} />;
   };
 
   const renderContent = () => {
@@ -229,15 +269,19 @@ const SignAndSendPageComponent: FC = () => {
     const transfer = decodedTxBody?.p?.find(
       (item) => item?.[0] === TxPurpose.TRANSFER
     );
-    const transferAmount = transfer?.[2]
-      ? correctAmount(transfer?.[2], transfer?.[1])
-      : null;
+    const transferAmount =
+      transfer?.[2] && networkApi?.decimals[transfer?.[1]]
+        ? formatUnits(transfer?.[2], networkApi?.decimals[transfer?.[1]])
+        : null;
     const transferCur = transfer?.[1];
 
     const fee = decodedTxBody?.p?.find(
       (item) => item?.[0] === TxPurpose.SRCFEE
     );
-    const feeAmount = fee?.[2] ? correctAmount(fee?.[2], fee?.[1]) : null;
+    const feeAmount =
+      fee?.[2] && networkApi?.decimals[fee?.[1]]
+        ? formatUnits(fee?.[2], networkApi?.decimals[fee?.[1]])
+        : null;
     const feeCur = fee?.[1];
 
     const call = decodedTxBody?.c;
@@ -259,6 +303,7 @@ const SignAndSendPageComponent: FC = () => {
             onClick={handleClickSignAndSend}
             fullWidth
             variant='contained'
+            disabled={!isWalletExists || !isCurrentActiveWallet}
           >
             {t('signAndSend')}
           </Button>
@@ -321,11 +366,6 @@ const SignAndSendPageComponent: FC = () => {
 
   return (
     <div className={cn(styles.signAndSendPage)}>
-      <ConfirmModal
-        open={isConfirmModalOpen}
-        onClose={closeModal}
-        callback={signAndSendCallback}
-      />
       {renderHeader()}
       {!sentData ? renderContent() : <TxResult sentData={sentData} />}
     </div>

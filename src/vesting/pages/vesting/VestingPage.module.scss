@@ -1,0 +1,269 @@
+@use '@/styles/mixins' as *;
+@use '@/styles/variables' as *;
+
+.container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @include mobile {
+    padding: 16px;
+  }
+}
+
+.vestingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(542px, 1fr));
+  gap: 32px;
+  margin-top: 32px;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.details {
+  background: var(--mui-palette-background-paper);
+  border-radius: 8px;
+  padding: 24px;
+  
+  h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: var(--mui-palette-text-primary);
+  }
+}
+
+.noVestings {
+  text-align: center;
+  // color: var(--mui-palette-text-secondary);
+  margin-top: 64px;
+  padding: 48px;
+  background: linear-gradient(145deg, var(--mui-palette-background-paper) 0%, rgba(75, 192, 192, 0.02) 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 1px dashed rgba(75, 192, 192, 0.2);
+
+  p {
+    font-size: 1.1rem;
+    margin: 0;
+    opacity: 0.8;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  width: 542px;
+  height: 820px;
+  background: linear-gradient(145deg, var(--mui-palette-background-paper) 0%, rgba(75, 192, 192, 0.05) 100%);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(75, 192, 192, 0.1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @include mobile {
+    width: 100%;
+    height: auto;
+    min-height: 720px;
+    padding: 20px;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: $the-power-gradient;
+    opacity: 0.7;
+  }
+
+  .skeletonHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    height: 40px;
+  }
+
+  .skeletonTitle {
+    width: 200px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    
+    &::before {
+      content: '';
+      display: block;
+      width: 8px;
+      height: 24px;
+      background: $blue;
+      border-radius: 4px;
+      margin-right: 12px;
+    }
+    background: linear-gradient(
+      90deg,
+      rgba(75, 192, 192, 0.1) 0%,
+      rgba(75, 192, 192, 0.15) 20%,
+      rgba(75, 192, 192, 0.1) 40%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite ease-in-out;
+  }
+
+  .skeletonProgress {
+    width: 120px;
+    height: 28px;
+    border-radius: 12px;
+    background: rgba(75, 192, 192, 0.1);
+  }
+
+  .info {
+    display: grid;
+    gap: 16px;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 20px;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    height: 320px;
+
+    @include mobile {
+      padding: 16px;
+      height: auto;
+      min-height: 280px;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: $blue;
+      opacity: 0.3;
+    }
+
+    p {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0;
+      
+      span {
+        height: 28px;
+        background: linear-gradient(
+          90deg,
+          rgba(75, 192, 192, 0.1) 0%,
+          rgba(75, 192, 192, 0.15) 20%,
+          rgba(75, 192, 192, 0.1) 40%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite ease-in-out;
+        
+        &:first-child {
+          width: 120px;
+        }
+        
+        &:last-child {
+          width: 140px;
+          border-radius: 6px;
+          padding: 4px 12px;
+        }
+      }
+    }
+  }
+
+  .skeletonText,
+  .skeletonValue {
+    height: 24px;  // увеличиваем высоту текста
+    margin-bottom: 8px;  // добавляем отступ между элементами
+    background: linear-gradient(
+      90deg,
+      rgba(75, 192, 192, 0.1) 0%,
+      rgba(75, 192, 192, 0.15) 20%,
+      rgba(75, 192, 192, 0.1) 40%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite ease-in-out;
+  }
+
+  .skeletonValue {
+    background: rgba(75, 192, 192, 0.1);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-family: monospace;
+  }
+
+  .skeletonChart {
+    height: 220px;
+    padding: 20px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(75, 192, 192, 0.02));
+    border-radius: 12px;
+    border: 1px solid rgba(75, 192, 192, 0.1);
+    position: relative;
+
+    @include mobile {
+      height: 180px;
+      padding: 12px;
+    }
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at top right, rgba(75, 192, 192, 0.03), transparent 70%);
+      pointer-events: none;
+    }
+  }
+
+  .skeletonButton {
+    margin-top: auto;
+    display: flex;
+    gap: 12px;
+    
+    &::before {
+      content: '';
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(45deg, rgba(75, 192, 192, 0.3) 0%, rgba(75, 192, 192, 0.2) 100%);
+      animation: shimmer 1.5s infinite ease-in-out;
+    }
+    
+    &::after {
+      content: '';
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(45deg, rgba(75, 192, 192, 0.5) 0%, rgba(75, 192, 192, 0.3) 100%);
+      animation: shimmer 1.5s infinite ease-in-out;
+    }
+  }
+}

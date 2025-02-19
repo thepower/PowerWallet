@@ -4,15 +4,16 @@ import { CryptoApi, WalletApi } from '@thepowereco/tssdk';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import { FileReaderType, getFileData } from 'common';
 import i18n from 'locales/initTranslation';
-import { AddActionOnDecryptErrorType } from 'typings/common';
+import { AddActionOnSuccessAndDecryptType } from 'typings/common';
 import { useAccountLoginToWallet } from './useAccountLoginToWallet';
 
 type Args = {
   accountFile: File;
   password: string;
+  isWithoutGoHome?: boolean;
 };
 
 export const useImportWalletFromFile = () => {
@@ -22,20 +23,39 @@ export const useImportWalletFromFile = () => {
   const { mutate: importWalletFromFileMutation, isPending } = useMutation<
     void,
     Error,
-    AddActionOnDecryptErrorType<Args>
+    AddActionOnSuccessAndDecryptType<
+      Args,
+      { address?: string; chainId?: number }
+    >
   >({
     mutationFn: async ({
       accountFile,
       password,
-      additionalActionOnDecryptError
+      additionalActionOnSuccess,
+      additionalActionOnDecryptError,
+      isWithoutGoHome
     }) => {
       try {
         const data = await getFileData(accountFile, FileReaderType.binary);
         const walletData = WalletApi.parseExportData(data!, password);
-        const encryptedWif = CryptoApi.encryptWif(walletData.wif!, password);
 
-        await loginMutation({ address: walletData.address, encryptedWif });
-        navigate(WalletRoutesEnum.root);
+        if (!walletData) {
+          throw new Error('unable to decrypt data');
+        }
+
+        const encryptedWif = CryptoApi.encryptWif(walletData.wif, password);
+
+        const loginResult = await loginMutation({
+          address: walletData?.address,
+          encryptedWif
+        });
+
+        additionalActionOnSuccess?.({
+          address: walletData?.address,
+          chainId: loginResult?.chainId
+        });
+
+        !isWithoutGoHome && navigate(RoutesEnum.root);
       } catch (e: any) {
         if (
           additionalActionOnDecryptError &&
@@ -54,6 +74,6 @@ export const useImportWalletFromFile = () => {
 
   return {
     importWalletFromFileMutation,
-    isLoading: isPending
+    isPending
   };
 };

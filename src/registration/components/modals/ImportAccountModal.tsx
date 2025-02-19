@@ -1,5 +1,4 @@
 import React from 'react';
-import classnames from 'classnames';
 import { Form, Formik, FormikHelpers } from 'formik';
 import { WithTranslation, withTranslation } from 'react-i18next';
 import { Button, Modal, OutlinedInput } from 'common';
@@ -53,21 +52,15 @@ class ImportAccountModalComponent extends React.PureComponent<
               <OutlinedInput
                 inputRef={(input) => input && input.focus()}
                 placeholder={this.props.t('password')!}
-                className={classnames(
-                  styles.passwordInput,
-                  styles.importModalPasswordInput
-                )}
-                name='password'
-                value={formikProps.values.password}
-                onChange={formikProps.handleChange}
-                onBlur={formikProps.handleBlur}
                 type={'password'}
                 autoFocus
                 errorMessage={formikProps.errors.password}
+                size='small'
                 error={
                   formikProps.touched.password &&
                   Boolean(formikProps.errors.password)
                 }
+                {...formikProps.getFieldProps('password')}
               />
               <Button
                 size='medium'

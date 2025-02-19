@@ -27,7 +27,15 @@ const LoginToDappComponent: React.FC<LoginToDappProps> = () => {
         address: activeWallet?.address,
         returnUrl: parsedData?.returnUrl
       });
-      window.location.replace(`${parsedData.callbackUrl}sso/${stringData}`);
+      window.opener.postMessage?.(
+        objectToString({
+          type: 'authenticateResponse',
+          data: stringData
+        }),
+        parsedData.returnUrl
+      );
+      window.close();
+      // window.location.replace(`${parsedData.callbackUrl}sso/${stringData}`);
     }
   }, [parsedData?.callbackUrl, parsedData?.returnUrl, activeWallet]);
 

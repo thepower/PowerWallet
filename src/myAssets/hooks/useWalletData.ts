@@ -1,59 +1,93 @@
+import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { WalletApi } from '@thepowereco/tssdk';
+import { NetworkApi, WalletApi } from '@thepowereco/tssdk';
+import { formatUnits } from 'viem/utils';
+import { queryClient } from 'application/components/App';
+import { appQueryKeys } from 'application/queryKeys';
 import { Wallet } from 'application/utils/localStorageUtils';
 import { LoadBalanceType, TokenKind, TToken } from 'myAssets/types';
 import { useNetworkApi } from '../../application/hooks/useNetworkApi';
 
+const getBalance = async (
+  address: string | null | undefined,
+  networkApi?: NetworkApi
+) => {
+  if (!address) {
+    throw new Error('Address not found');
+  }
+
+  if (!networkApi) {
+    throw new Error('Network API not available');
+  }
+
+  const walletApi = new WalletApi(networkApi);
+
+  const walletData = await walletApi?.loadBalance(address);
+
+  return walletData;
+};
+
+export const getWalletData = (wallet: Wallet | null, networkApi?: NetworkApi) =>
+  queryClient.fetchQuery<LoadBalanceType>({
+    queryKey: appQueryKeys.walletData(wallet?.address),
+    queryFn: () => getBalance(wallet?.address, networkApi)
+  });
+
 export const useWalletData = (wallet: Wallet | null) => {
   const { networkApi } = useNetworkApi({ chainId: wallet?.chainId });
-
-  const getBalance = async (address: string | null | undefined) => {
-    try {
-      if (!address) {
-        throw new Error('Address not found');
-      }
-
-      if (!networkApi) {
-        throw new Error('Network API not available');
-      }
-
-      const walletApi = new WalletApi(networkApi);
-
-      const walletData = await walletApi?.loadBalance(address);
-
-      return walletData;
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const {
     data: walletData,
     isLoading,
     isSuccess
   } = useQuery<LoadBalanceType>({
-    queryKey: ['walletData', wallet?.address],
-    queryFn: () => getBalance(wallet?.address),
+    queryKey: appQueryKeys.walletData(wallet?.address),
+    queryFn: () => getBalance(wallet?.address, networkApi),
     enabled: !!wallet?.address && !!networkApi
   });
 
-  const nativeTokens = Object.entries(walletData?.amount || {}).map(
-    ([symbol, amount]) =>
-      ({
-        type: TokenKind.Native,
-        name: symbol,
-        address: symbol,
-        symbol,
-        decimals: '9',
-        amount,
-        isShow: true,
-        chainId: wallet?.chainId
-      }) as TToken
+  const nativeTokens = useMemo(
+    () =>
+      Object.entries(walletData?.amount || {}).map(
+        ([symbol, amount]) =>
+          ({
+            type: TokenKind.Native,
+            name: symbol,
+            address: symbol,
+            symbol,
+            decimals: networkApi?.decimals.SK,
+            amount,
+            formattedAmount: networkApi?.decimals[symbol]
+              ? formatUnits(BigInt(amount), networkApi?.decimals[symbol])
+              : '0',
+            isShow: true,
+            chainId: wallet?.chainId
+          }) as TToken
+      ),
+    [walletData?.amount, networkApi?.decimals, wallet?.chainId]
   );
 
-  const getNativeTokenAmountBySymbol = (symbol?: string) => {
-    return symbol && walletData?.amount?.[symbol];
-  };
+  const getNativeTokenAmountBySymbol = useCallback(
+    (symbol?: string) => {
+      if (symbol && walletData?.amount?.[symbol]) {
+        return {
+          amount: (symbol && walletData?.amount?.[symbol])?.toString() || '0',
+          formattedAmount:
+            (symbol &&
+              networkApi?.decimals[symbol] &&
+              walletData?.amount?.[symbol] &&
+              formatUnits(
+                BigInt(walletData?.amount?.[symbol]),
+                networkApi?.decimals[symbol]
+              )) ||
+            '0'
+        };
+      } else {
+        return null;
+      }
+    },
+    [networkApi?.decimals, walletData?.amount]
+  );
 
   return {
     nativeTokens,

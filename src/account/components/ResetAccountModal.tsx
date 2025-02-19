@@ -27,7 +27,7 @@ const ResetAccountModalComponent: FC<ResetAccountModalProps> = ({
   ) => {
     const { password } = values;
 
-    resetWallet({ password });
+    resetWallet({ password, additionalActionOnSuccess: onClose });
 
     formikHelpers.setFieldValue('password', '');
     onClose();
@@ -44,32 +44,26 @@ const ResetAccountModalComponent: FC<ResetAccountModalProps> = ({
       onClose={onClose}
       open={open}
     >
-      <form className={styles.resetModalForm} onSubmit={formik.handleSubmit}>
-        <div className={styles.exportModalTitleHolder}>
-          <div className={styles.exportModalTitle}>{t('resetAccount')}</div>
-          <div className={styles.exportModalTitle}>
-            {t('areYouSureYouWantResetYourAccount')}
-          </div>
-          <div className={styles.exportModalTitle}>
-            {t('enterYourPasswordConfirmAccountReset')}
-          </div>
+      <div className={styles.exportModalTitleHolder}>
+        <div className={styles.exportModalTitle}>{t('resetAccount')}</div>
+        <div className={styles.exportModalTitle}>
+          {t('areYouSureYouWantResetYourAccount')}
         </div>
+        <div className={styles.exportModalTitle}>
+          {t('enterYourPasswordConfirmAccountReset')}
+        </div>
+      </div>
+      <form className={styles.resetModalForm} onSubmit={formik.handleSubmit}>
         <OutlinedInput
           inputRef={(input) => input && input.focus()}
           placeholder={t('password')!}
-          className={classnames(
-            styles.passwordInput,
-            styles.importModalPasswordInput
-          )}
-          name='password'
-          value={formik.values.password}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
           type={'password'}
           autoComplete='new-password'
           autoFocus
+          size='small'
           errorMessage={formik.errors.password}
           error={formik.touched.password && Boolean(formik.errors.password)}
+          {...formik.getFieldProps('password')}
         />
         <Button
           className={classnames(
@@ -79,8 +73,11 @@ const ResetAccountModalComponent: FC<ResetAccountModalProps> = ({
           variant='outlined'
           size='large'
           type='submit'
+          disabled={!formik.isValid || formik.isSubmitting || !formik.dirty}
         >
-          <span className={styles.registrationNextButtonText}>{t('next')}</span>
+          <span className={styles.registrationNextButtonText}>
+            {t('confirm')}
+          </span>
         </Button>
       </form>
     </Modal>

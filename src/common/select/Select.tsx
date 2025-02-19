@@ -12,13 +12,13 @@ import {
 
 import cn from 'classnames';
 import { ChevronDownIcon } from 'assets/icons/ChevronDown';
-import styles from './ChainSelect.module.scss';
+import styles from './Select.module.scss';
 
-type ChainSelectProps = MuiSelectProps & {
-  items: { title: string; value: number }[];
+type SelectProps = MuiSelectProps & {
+  items: { title: string; value: any }[];
 };
 
-class ChainSelect extends React.PureComponent<ChainSelectProps> {
+class Select extends React.PureComponent<SelectProps> {
   private selectClasses: Partial<SelectClasses> = {
     select: styles.select,
     icon: styles.icon
@@ -27,7 +27,9 @@ class ChainSelect extends React.PureComponent<ChainSelectProps> {
   private inputBaseClasses: Partial<InputBaseClasses> = {
     root: styles.inputBaseRoot,
     input: styles.inputBaseInput,
-    focused: styles.inputBaseFocused
+    focused: styles.inputBaseFocused,
+    sizeSmall: styles.inputBaseSizeSmall,
+    colorSecondary: styles.inputBaseColorSecondary
   };
 
   private menuClasses: Partial<MenuClasses> = {
@@ -41,19 +43,15 @@ class ChainSelect extends React.PureComponent<ChainSelectProps> {
     root: styles.menuItemRoot
   };
 
-  constructor(props: ChainSelectProps) {
-    super(props);
-    this.state = {};
-  }
-
   render() {
-    const { className, value, items, onChange, ...otherProps } = this.props;
+    const { className, value, items, onChange, color, ...otherProps } =
+      this.props;
     const { selectClasses, inputBaseClasses, menuClasses, menuItemClasses } =
       this;
     return (
       <MuiSelect
         className={cn(className, !!value && styles.selected)}
-        input={<InputBase classes={inputBaseClasses} />}
+        input={<InputBase classes={inputBaseClasses} color={color} />}
         classes={selectClasses}
         IconComponent={ChevronDownIcon}
         MenuProps={{
@@ -83,4 +81,4 @@ class ChainSelect extends React.PureComponent<ChainSelectProps> {
   }
 }
 
-export default ChainSelect;
+export default Select;

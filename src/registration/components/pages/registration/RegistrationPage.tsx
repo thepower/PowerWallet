@@ -2,11 +2,10 @@ import { FC, useCallback, useEffect, useMemo } from 'react';
 import { FormControlLabel } from '@mui/material';
 import { AddressApi } from '@thepowereco/tssdk';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 import { useStore } from 'application/store';
-import { AppQueryParams, WalletRoutesEnum } from 'application/typings/routes';
-import { useWalletsStore } from 'application/utils/localStorageUtils';
+import { AppQueryParams, RoutesEnum } from 'application/typings/routes';
 import { BreadcrumbsTypeEnum, Checkbox, LangMenu, Wizard } from 'common';
 
 import { stringToObject } from 'sso/utils';
@@ -27,7 +26,6 @@ const RegistrationPageComponent: FC = () => {
     () => dataOrReferrer && AddressApi.isTextAddressValid(dataOrReferrer),
     [dataOrReferrer]
   );
-  const { activeWallet } = useWalletsStore();
   const {
     isRandomChain,
     creatingStep,
@@ -39,29 +37,20 @@ const RegistrationPageComponent: FC = () => {
     setIsWithoutPassword,
     setSelectedNetwork
   } = useStore();
+
   const parsedData: AppQueryParams = useMemo(() => {
     if (!isAddressInParams && dataOrReferrer)
       return stringToObject(dataOrReferrer);
     return null;
   }, [dataOrReferrer, isAddressInParams]);
 
-  const navigate = useNavigate();
-
   useEffect(() => {
-    // if (activeWallet?.address) {
-    //   if (!isAddressInParams) {
-    //     navigate(`${WalletRoutesEnum.sso}/${dataOrReferrer}`);
-    //   } else {
-    //     navigate(WalletRoutesEnum.root);
-    //   }
-    // } else
-
     if (parsedData?.chainID) {
       setCreatingStep(CreateAccountStepsEnum.backup);
       setIsRandomChain(false);
       setSelectedChain(parsedData.chainID);
     }
-  }, [activeWallet, dataOrReferrer, isAddressInParams, navigate, parsedData]);
+  }, [parsedData]);
 
   const resetStage = useCallback(() => {
     setCreatingStep(CreateAccountStepsEnum.selectNetwork);
@@ -71,7 +60,7 @@ const RegistrationPageComponent: FC = () => {
 
   const getRegistrationBreadcrumbs = useMemo(
     () =>
-      !isAddressInParams && parsedData
+      !isAddressInParams && parsedData && parsedData?.callbackUrl
         ? [
             {
               label: getRegistrationTabs(t).selectNetwork,
@@ -164,10 +153,11 @@ const RegistrationPageComponent: FC = () => {
         <div className={styles.registrationPageHeader}>
           <div style={{ width: '48px' }} />
           <Link
-            to={WalletRoutesEnum.root}
+            to={RoutesEnum.root}
             className={styles.registrationPageTitle}
             onClick={resetStage}
           >
+            {' '}
             Power Wallet
           </Link>
           <LangMenu className={styles.registrationPageLangSelect} />

@@ -1,15 +1,16 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import omit from 'lodash/omit';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import appEnvs from 'appEnvs';
-import { useStore } from 'application/store';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import {
   useTokensStore,
   useWalletsStore
 } from 'application/utils/localStorageUtils';
-import { BuySvg, FaucetSvg, LogoIcon, SendSvg } from 'assets/icons';
-import { Button, CardLink, CopyButton, PageTemplate, Tabs } from 'common';
+import { FaucetSvg, SendSvg, VestingSvg } from 'assets/icons';
+import { CardLink, PageTemplate, Tabs, SearchInput } from 'common';
+import hooks from 'hooks';
 import WalletCard from 'myAssets/components/WalletCard/WalletCard';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
 import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
@@ -19,30 +20,54 @@ import { Token } from '../../components/Token';
 
 const MainPageComponent: FC = () => {
   const { t } = useTranslation();
-  const { setIsShowUnderConstruction } = useStore();
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { scrollContainerRef, scrollToElementByIndex } =
+    hooks.useSmoothHorizontalScroll();
 
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
   const { activeWallet, wallets } = useWalletsStore();
 
+  const walletsWithActiveWalletAtFirst = useMemo(() => {
+    let filteredWallets = wallets;
+    if (searchTerm) {
+      filteredWallets = wallets.filter((wallet) => {
+        const walletWithoutEncryptedWif = omit(wallet, 'encryptedWif');
+        return JSON.stringify(walletWithoutEncryptedWif).includes(searchTerm);
+      });
+    }
+
+    if (activeWallet) {
+      const activeWalletInFiltered = filteredWallets.find(
+        (w) => w.address === activeWallet.address
+      );
+      if (activeWalletInFiltered) {
+        return [
+          activeWallet,
+          ...filteredWallets.filter(
+            (wallet) => wallet.address !== activeWallet.address
+          )
+        ];
+      }
+    }
+    return filteredWallets;
+  }, [activeWallet, wallets, searchTerm]);
+
+  const handleSearch = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value);
+    },
+    []
+  );
+
   const chainId = activeWallet?.chainId;
 
-  const { walletData, nativeTokens } = useWalletData(activeWallet);
+  const { nativeTokens } = useWalletData(activeWallet);
 
   const { tokens } = useTokensStore();
 
-  useEffect(() => {
-    // updateTokensAmountsTrigger();
-  }, []);
-
   const onChangeTab = (_event: React.SyntheticEvent, value: MyAssetsTabs) => {
     setTab(value);
-  };
-
-  const handleShowUnderConstruction = (event: React.MouseEvent) => {
-    event.preventDefault();
-    setIsShowUnderConstruction(true);
   };
 
   const erc20tokens = tokens.filter(
@@ -71,7 +96,7 @@ const MainPageComponent: FC = () => {
     }
 
     return (
-      <ul className={styles.tokensList}>
+      <ul>
         {currentTokens.map((token) => (
           <li key={token.address}>
             <Token token={token} />
@@ -99,97 +124,97 @@ const MainPageComponent: FC = () => {
         scrollContainer.removeEventListener('wheel', handleWheel);
       }
     };
-  }, []);
+  }, [scrollContainerRef]);
 
   const renderWallets = useCallback(() => {
     return (
       <div ref={scrollContainerRef} className={styles.wallets}>
-        {wallets.map((wallet, i) => (
-          <WalletCard key={wallet.address} index={i} wallet={wallet} />
+        {walletsWithActiveWalletAtFirst.map((wallet) => (
+          <WalletCard
+            key={wallet.address}
+            wallet={wallet}
+            onSelectWallet={() => {
+              scrollToElementByIndex(0);
+              setSearchTerm('');
+            }}
+          />
         ))}
       </div>
     );
-  }, [wallets]);
+  }, [
+    scrollContainerRef,
+    scrollToElementByIndex,
+    walletsWithActiveWalletAtFirst
+  ]);
 
   return (
     <PageTemplate>
       <div className={styles.wrapper}>
-        {wallets.length > 1 && renderWallets()}
-        <div className={styles.account}>
-          <div className={styles.title}>{t('accountNumber')}</div>
-          <CopyButton
-            textButton={activeWallet?.address || ''}
-            className={styles.addressButton}
-            iconClassName={styles.copyIcon}
-          />
-          <div className={styles.accountChain}>{`Chain: ${chainId}`}</div>
-        </div>
-        <div className={styles.panel}>
-          <div className={styles.info}>
-            <div className={styles.infoTitle}>{t('skBalance')}</div>
-            <div className={styles.balance}>
-              <LogoIcon className={styles.icon} />
-              {!walletData?.amount?.SK || walletData?.amount?.SK === 0 ? (
-                <span className={styles.emptyTitle}>
-                  {t('yourTokensWillBeHere')}
-                </span>
-              ) : (
-                walletData?.amount?.SK
-              )}
-            </div>
+        {wallets.length > 2 && (
+          <div className={styles.searchWrapper}>
+            <SearchInput
+              value={searchTerm}
+              onChange={handleSearch}
+              onClickSearch={() => {}}
+              className={styles.searchInput}
+            />
           </div>
-          <div className={styles.linksGroup}>
-            <CardLink
-              label={t('faucet')}
-              isAnchor
-              to={appEnvs.FAUCET_THEPOWER_URL}
-              target='_blank'
-              rel='noreferrer'
-            >
-              <FaucetSvg />
-            </CardLink>
-            <CardLink
-              to={WalletRoutesEnum.tokenSelection}
-              label={t('send')}
-              target={'_self'}
-              rel='noreferrer'
-            >
-              <SendSvg />
-            </CardLink>
-            <CardLink
-              onClick={handleShowUnderConstruction}
-              to={WalletRoutesEnum.buy}
-              label={t('buy')}
-              target={'_self'}
-            >
-              <BuySvg />
-            </CardLink>
-          </div>
+        )}
+        {renderWallets()}
+        <div className={styles.linksGroup}>
+          <CardLink
+            label={t('faucet')}
+            isAnchor
+            to={appEnvs.FAUCET_THEPOWER_URL}
+            target='_blank'
+            rel='noreferrer'
+          >
+            <FaucetSvg />
+          </CardLink>
+          <CardLink
+            to={RoutesEnum.tokenSelection}
+            label={t('send')}
+            target={'_self'}
+            rel='noreferrer'
+          >
+            <SendSvg />
+          </CardLink>
+          <CardLink
+            to={RoutesEnum.vesting}
+            label={t('vesting')}
+            target={'_self'}
+            rel='noreferrer'
+          >
+            <VestingSvg />
+          </CardLink>
+          {/* <CardLink to={RoutesEnum.buy} label={t('deposit')} target={'_self'}>
+            <BuySvg />
+          </CardLink> */}
         </div>
-        <div className={styles.btnWrapper}>
+        {/* <div className={styles.btnWrapper}>
           <Button
-            to={WalletRoutesEnum.referralProgram}
+            to={RoutesEnum.referralProgram}
             className={styles.referralBtn}
             variant='contained'
           >
             {t('inviteFriendsEarnRewards')}
           </Button>
-        </div>
+        </div> */}
         <div className={styles.tokensHeadRow}>
           <div className={styles.title}>{t('tokens')}</div>
-          <Link to={`${WalletRoutesEnum.add}`}>
+          <Link to={`${RoutesEnum.add}`}>
             <AddButton>{t('addToken')}</AddButton>
           </Link>
         </div>
+        <Tabs
+          tabs={MyAssetsTabs}
+          tabsLabels={getMyAssetsTabsLabels()}
+          value={tab}
+          onChange={onChangeTab}
+          tabsRootClassName={styles.myAssetsTabsRoot}
+        />
+        {renderAssetsList()}
       </div>
-      <Tabs
-        tabs={MyAssetsTabs}
-        tabsLabels={getMyAssetsTabsLabels()}
-        value={tab}
-        onChange={onChangeTab}
-        tabsRootClassName={styles.myAssetsTabsRoot}
-      />
-      <div className={styles.tokens}>{renderAssetsList()}</div>
     </PageTemplate>
   );
 };

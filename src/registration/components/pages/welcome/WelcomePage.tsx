@@ -1,25 +1,42 @@
 import { FC, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import appEnvs from 'appEnvs';
+import { RoutesEnum } from 'application/typings/routes';
 import { Button, LangMenu } from 'common';
 
+import { objectToString } from 'sso/utils';
 import styles from './WelcomePage.module.scss';
 
 const WelcomePageComponent: FC = () => {
   const { t } = useTranslation();
   const { referrer } = useParams<{ referrer: string }>();
   const navigate = useNavigate();
+
   useEffect(() => {
     if (referrer) {
-      navigate(`${WalletRoutesEnum.signup}/${referrer}`);
+      navigate(`${RoutesEnum.signup}/${referrer}`);
     }
   }, [navigate, referrer]);
 
+  const stringData = objectToString({
+    chainID: appEnvs.DEFAULT_CHAIN_ID
+  });
+
   return (
     <div className={styles.registrationPage}>
-      <LangMenu className={styles.langSelect} />
-      <Link to={WalletRoutesEnum.root} className={styles.registrationTitle}>
+      <div className={styles.controlsHolder}>
+        <Button
+          size='small'
+          variant='outlined'
+          type='button'
+          to={RoutesEnum.signup}
+        >
+          {t('selectChain')}
+        </Button>
+        <LangMenu />
+      </div>
+      <Link to={RoutesEnum.root} className={styles.registrationTitle}>
         Power Wallet
       </Link>
       <div className={styles.registrationDesc}>{t('registrationPageDesc')}</div>
@@ -28,7 +45,7 @@ const WelcomePageComponent: FC = () => {
           size='large'
           variant='contained'
           type='button'
-          to={WalletRoutesEnum.signup}
+          to={`${RoutesEnum.signup}/${stringData}`}
         >
           {t('registrationPageJoinButton')}
         </Button>
@@ -36,7 +53,7 @@ const WelcomePageComponent: FC = () => {
           size='large'
           variant='outlined'
           type='button'
-          to={WalletRoutesEnum.login}
+          to={RoutesEnum.login}
         >
           {t('registrationPageImportAccountButton')}
         </Button>

@@ -1,0 +1,10 @@
+.widgetColor {
+  --primaryFill: #1768e5;
+  --primaryText: #1768e5;
+  --secondaryText: #6b798f;
+  --successColor: #00d2a8;
+  --warningColor: #df3e6f;
+  --backgroundColor: #1b222c;
+  --formStrokeColor: #e6e6eb;
+  --boxShadow: rgba(40, 51, 78, 0.3);
+}

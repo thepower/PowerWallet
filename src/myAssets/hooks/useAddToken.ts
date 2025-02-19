@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import abis from 'abis';
 
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import {
   useTokensStore,
   useWalletsStore
@@ -49,29 +49,20 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
       throw new Error('Wallet not found');
     }
     try {
-      const existedToken = tokens.find((token) => token.address === address);
+      const existedToken = tokens.find(
+        (token) =>
+          token.address === address && token.chainId === activeWallet.chainId
+      );
 
       if (existedToken && existedToken?.chainId) {
         toast.error(i18n.t('tokenHasAlreadyBeenAdded'));
         return;
       }
 
-      const contractNetworkApi = networkApi;
-      const { chain }: { chain?: number } =
-        await networkApi.getAddressChain(address);
-
-      if (!chain) {
-        toast.error(i18n.t('addressNotFound'));
-      }
-
-      if (chain !== networkApi.getChain()) {
-        toast.error(i18n.t('wrongChain'));
-      }
-
-      const isErc721 = await getIsErc721(contractNetworkApi, address);
+      const isErc721 = await getIsErc721(networkApi, address);
 
       if (isErc721) {
-        const name: string = await contractNetworkApi.executeCall(
+        const name: string = await networkApi.executeCall(
           {
             abi: abis.erc721.abi,
             functionName: 'name',
@@ -81,7 +72,8 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
             address
           }
         );
-        const symbol: string = await contractNetworkApi.executeCall(
+
+        const symbol: string = await networkApi.executeCall(
           {
             abi: abis.erc721.abi,
             functionName: 'symbol',
@@ -96,13 +88,13 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
           name,
           symbol,
           address,
-          decimals: '1',
+          decimals: 1,
           type: TokenKind.Erc721,
-          chainId: chain!,
+          chainId: activeWallet.chainId || null,
           isShow: true
         });
       } else {
-        const name: string = await contractNetworkApi.executeCall(
+        const name: string = await networkApi.executeCall(
           {
             abi: abis.erc20.abi,
             functionName: 'name',
@@ -113,7 +105,7 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
           }
         );
 
-        const symbol: string = await contractNetworkApi.executeCall(
+        const symbol: string = await networkApi.executeCall(
           {
             abi: abis.erc20.abi,
             functionName: 'symbol',
@@ -124,7 +116,7 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
           }
         );
 
-        const decimalsNumber = await contractNetworkApi.executeCall(
+        const decimals = await networkApi.executeCall(
           {
             abi: abis.erc20.abi,
             functionName: 'decimals',
@@ -135,20 +127,19 @@ export const useAddToken = ({ throwOnError }: { throwOnError?: boolean }) => {
           }
         );
 
-        const decimals = decimalsNumber.toString();
-
         addToken({
           name,
           symbol,
           address,
           decimals,
-          chainId: chain!,
+          chainId: activeWallet.chainId || null,
           type: TokenKind.Erc20,
           isShow: true
         });
       }
-      if (!withoutRedirect) navigate(WalletRoutesEnum.root);
+      if (!withoutRedirect) navigate(RoutesEnum.root);
     } catch (error: any) {
+      console.log(error);
       toast.error(`${i18n.t('somethingWentWrongCode')} ${error?.code}`);
     }
   };

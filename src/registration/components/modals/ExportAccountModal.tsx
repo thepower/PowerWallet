@@ -1,66 +1,72 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@mui/material';
 import classnames from 'classnames';
+import { FormikHelpers, useFormik } from 'formik';
+import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
+import * as yup from 'yup';
 import { useExportAccount } from 'account/hooks';
 import { Modal, OutlinedInput } from '../../../common';
-import { compareTwoStrings } from '../../utils/registrationUtils';
 import styles from '../pages/registration/RegistrationPage.module.scss';
+
+const initialValues = {
+  password: '',
+  confirmedPassword: '',
+  hint: ''
+};
+
+type Values = typeof initialValues;
 
 type ExportAccountModalProps = {
   open: boolean;
   onClose: () => void;
 };
 
+const validationSchema = (t: TFunction) =>
+  yup.object().shape({
+    password: yup.string().required(t('required')),
+    confirmedPassword: yup
+      .string()
+      .required(t('required'))
+      .oneOf([yup.ref('password'), null], t('oopsPasswordsDidntMatch'))
+  });
+
 const ExportAccountModalComponent: React.FC<ExportAccountModalProps> = ({
   open,
   onClose
 }) => {
-  const [password, setPassword] = useState('');
-  const [confirmedPassword, setConfirmedPassword] = useState('');
-  const [hint, setHint] = useState('');
-  const [passwordsNotEqual, setPasswordsNotEqual] = useState(false);
   const { t } = useTranslation();
 
   const { exportAccountMutation } = useExportAccount();
 
-  const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-    setPasswordsNotEqual(false);
-  };
-
-  const handleChangeConfirmedPassword = (
-    event: React.ChangeEvent<HTMLInputElement>
+  const handleSubmitExportModal = async (
+    { password, hint }: Values,
+    formikHelpers: FormikHelpers<Values>
   ) => {
-    setConfirmedPassword(event.target.value);
-    setPasswordsNotEqual(false);
-  };
-
-  const handleChangeHint = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setHint(event.target.value);
-  };
-
-  const handleSubmitExportModal = async () => {
-    const passwordsNotEqual = !compareTwoStrings(password, confirmedPassword);
-
-    if (passwordsNotEqual) {
-      setPasswordsNotEqual(true);
-      return;
-    }
-
     exportAccountMutation({
       password,
       hint,
       additionalActionOnSuccess: () => {
-        setPassword('');
-        setConfirmedPassword('');
-        setHint('');
-        setPasswordsNotEqual(false);
+        formikHelpers.resetForm();
 
         onClose();
       }
     });
   };
+
+  const formik = useFormik({
+    initialValues: {
+      password: '',
+      confirmedPassword: '',
+      hint: ''
+    },
+    onSubmit: handleSubmitExportModal,
+    validationSchema: validationSchema(t)
+  });
+
+  useEffect(() => {
+    formik.resetForm();
+  }, []);
 
   return (
     <Modal
@@ -75,42 +81,50 @@ const ExportAccountModalComponent: React.FC<ExportAccountModalProps> = ({
           {t('exportFileEncrypted')}
         </div>
       </div>
-      <OutlinedInput
-        placeholder={t('password')}
-        className={classnames(styles.passwordInput, styles.passwordInputPadded)}
-        value={password}
-        onChange={handleChangePassword}
-        type='password'
-        autoFocus
-      />
-      <OutlinedInput
-        placeholder={t('repeatedPassword')}
-        className={styles.passwordInput}
-        value={confirmedPassword}
-        onChange={handleChangeConfirmedPassword}
-        error={passwordsNotEqual}
-        errorMessage={t('oopsPasswordsDidntMatch')}
-        type='password'
-      />
-      <div className={styles.exportModalHintDesc}>{t('hintForPassword')}</div>
-      <OutlinedInput
-        placeholder={t('hint')}
-        className={styles.exportModalHintTextArea}
-        value={hint}
-        onChange={handleChangeHint}
-        multiline
-      />
-      <Button
-        className={classnames(
-          styles.registrationNextButton,
-          styles.registrationNextButton_outlined
-        )}
-        variant='outlined'
-        size='large'
-        onClick={handleSubmitExportModal}
-      >
-        <span className={styles.registrationNextButtonText}>{t('next')}</span>
-      </Button>
+      <form className={styles.exportModalForm} onSubmit={formik.handleSubmit}>
+        <OutlinedInput
+          size='small'
+          placeholder={t('password')}
+          error={formik.touched.password && Boolean(formik.errors.password)}
+          errorMessage={formik.errors.password}
+          type='password'
+          autoFocus
+          fullWidth
+          {...formik.getFieldProps('password')}
+        />
+        <OutlinedInput
+          size='small'
+          placeholder={t('repeatedPassword')}
+          error={
+            formik.touched.confirmedPassword &&
+            Boolean(formik.errors.confirmedPassword)
+          }
+          fullWidth
+          errorMessage={formik.errors.confirmedPassword}
+          type='password'
+          {...formik.getFieldProps('confirmedPassword')}
+        />
+        <OutlinedInput
+          size='small'
+          placeholder={t('hint')}
+          fullWidth
+          {...formik.getFieldProps('hint')}
+        />
+        <Button
+          className={classnames(
+            styles.registrationNextButton,
+            styles.registrationNextButton_outlined
+          )}
+          variant='outlined'
+          size='large'
+          type='submit'
+          disabled={!formik.isValid || formik.isSubmitting || !formik.dirty}
+        >
+          <span className={styles.registrationNextButtonText}>
+            {t('confirm')}
+          </span>
+        </Button>
+      </form>
     </Modal>
   );
 };

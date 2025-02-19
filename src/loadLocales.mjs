@@ -15,7 +15,7 @@ const drive = google.drive('v3');
 
 const auth = new google.auth.GoogleAuth({
   keyFilename: path.join(__dirname, './regal-sun-332215-9c9a74b9465e.json'),
-  scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+  scopes: ['https://www.googleapis.com/auth/drive.readonly']
 });
 
 google.options({ auth });
@@ -25,11 +25,11 @@ const fileId = '1T6E0jgp7L3-Qrnr2B7WrGm966wSOoyB_J6r0kFwfLEU';
 async function loadLocales() {
   const res = await drive.files.export({
     fileId,
-    mimeType: 'text/csv',
+    mimeType: 'text/csv'
   });
   const parsedData = parse(res.data, {
     skip_empty_lines: true,
-    columns: true,
+    columns: true
   });
   if (res.data) {
     const langs = ['en', 'ru', 'th'];
@@ -54,7 +54,7 @@ async function loadLocales() {
               (err) => {
                 if (err) reject(err);
                 resolve(true);
-              },
+              }
             );
           });
         } catch (error) {

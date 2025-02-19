@@ -386,5 +386,5 @@ export const erc721 = {
       stateMutability: 'nonpayable',
       type: 'function'
     }
-  ]
-} as const;
+  ] as const
+};

@@ -2,8 +2,8 @@ import React, { FC, memo } from 'react';
 import cn from 'classnames';
 import { Checkbox, Divider } from 'common';
 import { TErc721Token, TToken } from 'myAssets/types';
-
 import styles from './Erc721Token.module.scss';
+import NFTDefault from './icons/nft-default.svg';
 
 type OwnProps = {
   collection: TToken;
@@ -27,7 +27,7 @@ const Erc721TokenComponent: FC<TokenProps> = ({
   };
 
   const renderIcon = () => (
-    <img className={styles.icon} src={token?.image} alt={token?.name} />
+    <img className={styles.icon} src={NFTDefault} alt={token?.name} />
   );
 
   const renderRightCol = () => {

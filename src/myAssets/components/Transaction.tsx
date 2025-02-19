@@ -1,13 +1,14 @@
-import React, { useState, KeyboardEvent } from 'react';
+import React, { useState, KeyboardEvent, useCallback } from 'react';
 import { Collapse } from '@mui/material';
+import { AddressApi } from '@thepowereco/tssdk';
 import cn from 'classnames';
 import { format } from 'date-fns';
 import isArray from 'lodash/isArray';
 
 import { useTranslation } from 'react-i18next';
+import { isAddress } from 'viem';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
-import { Divider } from 'common';
-import { TransactionType } from 'myAssets/types';
+import { TransactionFormattedType } from 'myAssets/types';
 import {
   BarCodeIcon,
   CoinIcon,
@@ -24,13 +25,26 @@ import {
 import styles from './Transaction.module.scss';
 import { FaucetSvg, SendSvg } from '../../assets/icons';
 
-type OwnProps = { trx: TransactionType };
+const transformAddress = (address: string) => {
+  try {
+    if (AddressApi.isEvmAddressValid(address)) {
+      return AddressApi.evmAddressToTextAddress(address);
+    } else if (isAddress(address)) {
+      return address;
+    } else {
+      return AddressApi.hexToTextAddress(address);
+    }
+  } catch (error) {
+    return '-';
+  }
+};
+
+type OwnProps = { trx: TransactionFormattedType };
 type TransactionProps = OwnProps;
 
 const Transaction: React.FC<TransactionProps> = ({ trx }) => {
   const [expanded, setExpanded] = useState(false);
-  const { activeWallet } = useWalletsStore();
-
+  const { activeWallet, wallets } = useWalletsStore();
   const { t } = useTranslation();
   const handleClick = () => {
     setExpanded((prev) => !prev);
@@ -42,17 +56,36 @@ const Transaction: React.FC<TransactionProps> = ({ trx }) => {
     }
   };
 
-  const renderGrid = () => {
+  const renderGrid = useCallback(() => {
+    const sponsor =
+      !isArray(trx.txext) &&
+      trx?.txext?.sponsor?.length &&
+      trx?.txext?.sponsor
+        .map((sponsor) => sponsor && AddressApi.hexToTextAddress(sponsor))
+        .join(',');
+
     const rows = [
       { Icon: <SuccessIcon />, key: t('tx'), value: trx.id },
-      { Icon: <FromArrowIcon />, key: t('from'), value: trx.from },
-      { Icon: <ToArrowIcon />, key: t('to'), value: trx.to },
+      { Icon: <SuccessIcon />, key: t('txHash'), value: trx.txHash },
+      {
+        Icon: <FromArrowIcon />,
+        key: t('from'),
+        value: transformAddress(trx.from)
+      },
+      {
+        Icon: <ToArrowIcon />,
+        key: t('to'),
+        value: transformAddress(trx.to)
+      },
       { Icon: <CoinIcon />, key: t('amount'), value: trx.amount },
-      { Icon: <LogoIcon />, key: t('cur'), value: trx.cur },
+      { Icon: <CoinIcon />, key: t('tokenId'), value: trx.tokenId },
+
+      { Icon: <CoinIcon />, key: t('sponsor'), value: sponsor },
+      { Icon: <LogoIcon />, key: t('cur'), value: trx.currency },
       {
         Icon: <WatchIcon />,
         key: t('timestamp'),
-        value: format(trx.timestamp, 'MMMM dd, yyyy, \'at\' p')
+        value: format(trx.t, "MMMM dd, yyyy, 'at' p")
       },
       { Icon: <BarCodeIcon />, key: t('seq'), value: trx.seq },
       {
@@ -65,23 +98,45 @@ const Transaction: React.FC<TransactionProps> = ({ trx }) => {
         key: t('signature'),
         value: trx.sig[trx.sigverify?.pubkeys?.[0]]
       },
-      { Icon: <CubeIcon />, key: t('inBlock'), value: trx.inBlock }
+      { Icon: <CubeIcon />, key: t('inBlock'), value: trx.blockHash }
     ];
 
     return (
       <div className={styles.grid}>
-        {rows.map(({ Icon, key, value }) => (
-          <React.Fragment key={key}>
-            {Icon}
-            <span className={styles.key}>{`${key}:`}</span>
-            <span className={styles.value}>{value}</span>
-          </React.Fragment>
-        ))}
+        {rows.map(({ Icon, key, value }) =>
+          value ? (
+            <React.Fragment key={key}>
+              {Icon}
+              <span className={styles.key}>{`${key}:`}</span>
+              <span className={styles.value}>{value}</span>
+            </React.Fragment>
+          ) : null
+        )}
       </div>
     );
-  };
+  }, [trx, t]);
 
-  const isReceived = activeWallet?.address === trx.to;
+  const renderComment = useCallback(() => {
+    if (!isArray(trx.txext) && trx?.txext?.msg) {
+      return (
+        <div className={styles.comment}>
+          <div className={styles.commentTitle}>{t('comment')}</div>
+          <div className={styles.msg}>{trx.txext.msg}</div>
+        </div>
+      );
+    }
+    return null;
+  }, [trx.txext, t]);
+
+  const isReceived = activeWallet?.address
+    ? AddressApi.textAddressToEvmAddress(activeWallet.address).toLowerCase() ===
+      trx.to.toLowerCase()
+    : false;
+
+  const name =
+    wallets.find((w) => w.address === trx.from)?.name ||
+    activeWallet?.name ||
+    '-';
 
   return (
     <>
@@ -102,28 +157,21 @@ const Transaction: React.FC<TransactionProps> = ({ trx }) => {
               )}
             </div>
             <div className={styles.info}>
-              <span className={styles.name}>{t('myWallet')}</span>
+              <span className={styles.name}>{name}</span>
               <span className={cn(styles.date, styles.fullDate)}>
-                {format(trx.timestamp, 'dd MMM yyyy \'at\' p')}
+                {format(trx.t, "dd MMM yyyy 'at' p")}
               </span>
               <span className={cn(styles.date, styles.compactDate)}>
-                {format(trx.timestamp, '\'at\' p')}
+                {format(trx.t, "'at' p")}
               </span>
             </div>
-            {trx.amount && (
-              <span className={styles.amount}>
-                {`${isReceived ? '+' : '-'} ${
-                  trx.amount.toFixed?.(2) || trx.amount
-                } ${trx.cur}`}
-              </span>
-            )}
+            <span className={styles.amount}>
+              {`${isReceived ? '+' : '-'} ${trx.amount || trx.amount} ${
+                trx.currency
+              }`}
+            </span>
           </div>
-          {!isArray(trx.txext) && (
-            <div className={styles.comment}>
-              <div className={styles.commentTitle}>{t('comment')}</div>
-              <div className={styles.msg}>{trx.txext.msg}</div>
-            </div>
-          )}
+          {renderComment()}
         </div>
         <Collapse in={expanded}>
           <div className={styles.content}>
@@ -135,7 +183,7 @@ const Transaction: React.FC<TransactionProps> = ({ trx }) => {
               onKeyDown={handleKeyDown}
             >
               <span className={styles.title}>
-                {`${t('transaction')} #${trx.timestamp}`}
+                {`${t('transaction')} #${trx.t}`}
               </span>
               <MinimizeIcon
                 className={cn(
@@ -145,11 +193,9 @@ const Transaction: React.FC<TransactionProps> = ({ trx }) => {
               />
             </div>
             {renderGrid()}
-            {/* <CopyButton textButton={t('copy')} copyInfo={trx.id} /> */}
           </div>
         </Collapse>
       </div>
-      <Divider className={styles.divider} />
     </>
   );
 };

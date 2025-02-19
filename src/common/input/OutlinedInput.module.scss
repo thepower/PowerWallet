@@ -4,7 +4,8 @@
 }
 
 .errorMessage {
-  color: #ac2d2d;
+  position: absolute;
+  bottom: -50%;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
@@ -13,9 +14,8 @@
 .formControl {
   display: flex;
   width: 100%;
-  align-items: center;
 }
 
 .bordered {
-  border: 1px solid #f5f5f7;
+  border: 1px solid transparent;
 }

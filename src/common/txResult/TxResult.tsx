@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import appEnvs from 'appEnvs';
 import { SentData } from 'application/store';
+import { sliceString } from 'application/utils/applicationUtils';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { Button } from 'common';
 import { SuccessSvg } from './icons';
@@ -43,11 +44,19 @@ const TxResult: React.FC<TxResultProps> = ({ sentData, className }) => {
         </div>
         <div>
           <div className={styles.resultKey}>{t('from')}</div>
-          <div className={styles.resultValue}>{sentData?.from}</div>
+          <div className={styles.resultValue}>
+            {sentData?.from?.length && sentData?.from.length > 20
+              ? sliceString(sentData?.from, 10)
+              : sentData?.from}
+          </div>
         </div>
         <div>
           <div className={styles.resultKey}>{t('to')}</div>
-          <div className={styles.resultValue}>{sentData?.to}</div>
+          <div className={styles.resultValue}>
+            {sentData?.to?.length && sentData?.to.length > 20
+              ? sliceString(sentData?.to, 10)
+              : sentData?.to}
+          </div>
         </div>
         <div>
           <div className={styles.resultKey}>{t('tx')}</div>

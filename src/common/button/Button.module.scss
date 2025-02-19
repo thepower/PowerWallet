@@ -1,5 +1,5 @@
-@import 'src/styles/variables';
-@import 'src/styles/mixins';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .root {
   border-radius: 5px;
@@ -51,31 +51,21 @@
   &:active {
     background: $active-gradient;
   }
-
-  &:disabled {
-    background: #26354d;
-
-    background-color: #26354d !important;
-
-    color: #79789d;
-    pointer-events: none;
-  }
 }
 
 .outlined {
   background: #121923;
   @include border-gradient();
 
-
   span {
-    @include text-gradient();
+    @include text-gradient($the-power-gradient, 5px);
   }
 
   &:hover {
     @include border-gradient($hover-gradient);
 
     span {
-      @include text-gradient($hover-gradient);
+      @include text-gradient($hover-gradient, 5px);
     }
   }
 
@@ -83,20 +73,19 @@
     @include border-gradient($active-gradient);
 
     span {
-      @include text-gradient($active-gradient);
+      @include text-gradient($active-gradient, 5px);
     }
   }
+}
 
-  &:disabled {
-    background: #26354d;
-    background-color: #26354d !important;
-    pointer-events: none;
+.disabled {
+  background: #26354d !important;
+  background-color: #26354d !important;
+  pointer-events: none;
 
-    @include border-gradient(#26354d);
+  @include border-gradient(#26354d);
 
-
-    span {
-      @include text-gradient(#79789d);
-    }
+  span {
+    @include text-gradient(#79789d, 5px);
   }
 }

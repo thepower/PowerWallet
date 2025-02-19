@@ -1,12 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { GetChainResultType } from 'account/typings/accountTypings';
 import appEnvs from 'appEnvs';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { appQueryKeys } from 'application/queryKeys';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
-import { useNetworkApi } from '../../application/hooks/useNetworkApi';
+import { useNetworkApi } from '../../application/hooks';
 
 type Args = {
   address?: string;
@@ -27,8 +26,7 @@ export const useAccountLoginToWallet = ({
   const { networkApi } = useNetworkApi({
     chainId: appEnvs.DEFAULT_CHAIN_ID
   });
-  const { addWallet } = useWalletsStore();
-  const navigate = useNavigate();
+  const { addWallet, wallets } = useWalletsStore();
   const queryClient = useQueryClient();
   const loginToWallet = async ({ address, encryptedWif }: Args) => {
     if (!address || !encryptedWif) {
@@ -40,7 +38,7 @@ export const useAccountLoginToWallet = ({
       await networkApi?.getAddressChain(address);
 
     queryClient.invalidateQueries({
-      queryKey: ['walletData', address]
+      queryKey: appQueryKeys.walletData(address)
     });
     return {
       chainId: subChain.chain,
@@ -58,11 +56,11 @@ export const useAccountLoginToWallet = ({
     onSuccess: (params) => {
       if (params) {
         addWallet({
+          name: 'wallet ' + (wallets.length + 1),
           chainId: params.chainId,
           address: params.address,
           encryptedWif: params.encryptedWif
         });
-        navigate(WalletRoutesEnum.root);
       }
     },
     onError: (e) => {

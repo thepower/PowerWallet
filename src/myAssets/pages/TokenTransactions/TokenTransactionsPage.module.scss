@@ -1,4 +1,4 @@
-@import 'src/styles/utils';
+@use '@/styles/mixins' as *;
 
 .transactions {
   padding: 30px 32px;
@@ -9,8 +9,6 @@
 }
 
 .groupByDates {
-  margin-top: 40px;
-
   > :not(:first-child) {
     margin-top: 40px;
   }
@@ -29,4 +27,13 @@
   > :not(:first-child) {
     margin-top: 40px;
   }
+}
+
+.addressButton {
+  margin: 16px auto 0 auto;
+}
+
+.loadMoreButton {
+  max-width: 200px;
+  margin: 0 auto 24px auto;
 }

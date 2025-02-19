@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Drawer, IconButton } from '@mui/material';
 import cn from 'classnames';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,7 @@ import {
   useResetWallet
 } from 'account/hooks';
 import { useStore } from 'application/store';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import {
   SupportIcon,
@@ -17,11 +17,15 @@ import {
   ExportIcon,
   ImportIcon,
   ResetIcon,
-  CloseIcon
+  CloseIcon,
+  RenameIcon
 } from 'assets/icons';
 import { CopyButton } from 'common';
+import { KeyIcon } from 'myAssets/components/icons';
 import styles from './Account.module.scss';
 import { AccountActionsList } from './AccountActionsList';
+import { ChangePasswordModal } from './ChangePasswordModal';
+import { RenameAccountModal } from './RenameAccountModal';
 import { ResetAccountModal } from './ResetAccountModal';
 import { ExportAccountModal } from '../../registration/components/modals/ExportAccountModal';
 import { ImportAccountModal } from '../../registration/components/modals/ImportAccountModal';
@@ -32,27 +36,26 @@ type AccountProps = { className?: string };
 const Account: React.FC<AccountProps> = ({ className }) => {
   const [accountFile, setAccountFile] = useState<Maybe<File>>(null);
   const [openedImportAccountModal, setOpenedImportAccountModal] =
-    useState<boolean>(false);
+    useState(false);
   const [openedExportAccountModal, setOpenedExportAccountModal] =
-    useState<boolean>(false);
-  const [openedResetAccountModal, setOpenedResetAccountModal] =
-    useState<boolean>(false);
-  const importAccountInputRef = useRef<HTMLInputElement>(null);
+    useState(false);
+  const [openedResetAccountModal, setOpenedResetAccountModal] = useState(false);
+  const [openedRenameAccountModal, setOpenedRenameAccountModal] =
+    useState(false);
+  const [openedChangePasswordModal, setOpenedChangePasswordModal] =
+    useState(false);
+
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { exportAccountMutation } = useExportAccount();
   const { importWalletFromFileMutation } = useImportWalletFromFile();
   const { resetWallet } = useResetWallet();
   const { isAccountMenuOpened, setIsAccountMenuOpened } = useStore();
-  const { activeWallet } = useWalletsStore();
-
-  // const handleReferralProgram = () => {
-  //   routeTo(WalletRoutesEnum.referralProgram);
-  //   toggleOpenedAccountMenu();
-  // };
+  const { activeWallet, setActiveWalletByAddress } = useWalletsStore();
 
   const handleCreateAccount = () => {
-    navigate(WalletRoutesEnum.signup);
+    setIsAccountMenuOpened(false);
+    navigate(RoutesEnum.signup);
   };
 
   const handleExportAccount = () => {
@@ -64,25 +67,35 @@ const Account: React.FC<AccountProps> = ({ className }) => {
     });
   };
 
+  const handleRenameAccount = () => {
+    setOpenedRenameAccountModal(true);
+  };
+
+  const handleChangePassword = () => {
+    setOpenedChangePasswordModal(true);
+  };
+
   const closeImportAccountModal = () => {
     setOpenedImportAccountModal(false);
+    setIsAccountMenuOpened(false);
   };
 
   const handleOpenImportFile = () => {
-    // if (importAccountInputRef.current) {
-    //   importAccountInputRef.current.click();
-    // }
-    navigate(WalletRoutesEnum.login);
-    setIsAccountMenuOpened(!isAccountMenuOpened);
+    navigate(RoutesEnum.login);
+    setIsAccountMenuOpened(false);
   };
 
   const handleImportAccount = (password: string) => {
     importWalletFromFileMutation({
       password,
-      accountFile: accountFile!
+      accountFile: accountFile!,
+      additionalActionOnSuccess: (params) => {
+        if (params && params.address) {
+          setActiveWalletByAddress(params.address);
+          setOpenedImportAccountModal(false);
+        }
+      }
     });
-
-    setOpenedImportAccountModal(false);
   };
 
   const setAccountFileOnChange = (
@@ -97,17 +110,22 @@ const Account: React.FC<AccountProps> = ({ className }) => {
     importWalletFromFileMutation({
       password: '',
       accountFile,
+      additionalActionOnSuccess: (params) => {
+        if (params && params.address) {
+          setActiveWalletByAddress(params.address);
+          setOpenedImportAccountModal(false);
+        }
+      },
       additionalActionOnDecryptError: () => {
         setAccountFile(accountFile);
         setOpenedImportAccountModal(true);
       }
     });
-
-    setIsAccountMenuOpened(!isAccountMenuOpened);
   };
 
   const closeExportAccountModal = () => {
     setOpenedExportAccountModal(false);
+    setIsAccountMenuOpened(false);
   };
 
   const handleResetAccount = () => {
@@ -122,18 +140,34 @@ const Account: React.FC<AccountProps> = ({ className }) => {
 
   const closeResetAccountModal = () => {
     setOpenedResetAccountModal(false);
+    setIsAccountMenuOpened(false);
+  };
+
+  const closeRenameAccountModal = () => {
+    setOpenedRenameAccountModal(false);
+    setIsAccountMenuOpened(false);
+  };
+
+  const closeChangePasswordModal = () => {
+    setOpenedChangePasswordModal(false);
+    setIsAccountMenuOpened(false);
   };
 
   const getAccountActionsData = () => [
-    // {
-    //   title: t('referralProgram'),
-    //   action: handleReferralProgram,
-    //   Icon: CreateIcon,
-    // },
     {
       title: t('createNewAccount'),
       action: handleCreateAccount,
       Icon: CreateIcon
+    },
+    {
+      title: t('renameAccount'),
+      action: handleRenameAccount,
+      Icon: RenameIcon
+    },
+    {
+      title: t('changePassword'),
+      action: handleChangePassword,
+      Icon: KeyIcon
     },
     {
       title: t('exportAccount'),
@@ -159,7 +193,6 @@ const Account: React.FC<AccountProps> = ({ className }) => {
   return (
     <div className={cn(styles.account, className)}>
       <input
-        ref={importAccountInputRef}
         className={styles.importAccountInput}
         onChange={setAccountFileOnChange}
         type='file'
@@ -212,6 +245,14 @@ const Account: React.FC<AccountProps> = ({ className }) => {
       <ResetAccountModal
         open={openedResetAccountModal}
         onClose={closeResetAccountModal}
+      />
+      <RenameAccountModal
+        open={openedRenameAccountModal}
+        onClose={closeRenameAccountModal}
+      />
+      <ChangePasswordModal
+        open={openedChangePasswordModal}
+        onClose={closeChangePasswordModal}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-export enum WalletRoutesEnum {
+export enum RoutesEnum {
   referralProgram = '/referral-program',
   signAndSend = '/sign-and-send',
   send = '/send',
@@ -6,16 +6,17 @@ export enum WalletRoutesEnum {
   transactions = '/transactions',
   add = '/add',
   buy = '/buy',
+  crypto = '/crypto',
+  fiat = '/fiat',
   signup = '/signup',
   root = '/',
   login = '/login',
-  sso = '/sso'
+  sso = '/sso',
+  vesting = '/vesting'
 }
 
 export type AppQueryParams = {
   callbackUrl?: string;
   returnUrl?: string;
   chainID?: number;
-  isShowSeedAfterRegistration?: boolean;
-  isAutoDownloadSeed?: boolean;
 };

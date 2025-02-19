@@ -38,7 +38,7 @@
   "plugins": ["react-hooks", "prettier", "import"],
   "rules": {
     "import/order": [
-      "warn",
+      "error",
       {
         "groups": ["builtin", "external", "internal"],
         "pathGroups": [

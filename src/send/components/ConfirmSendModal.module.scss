@@ -1,5 +1,5 @@
-@import '../../styles/variables';
-@import '../../styles/mixins';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .modalContent {
   max-width: 384px !important;
@@ -40,6 +40,8 @@
   grid-gap: 8px 16px;
   grid-template-columns: auto 1fr;
   text-align: left;
+
+  margin-bottom: 16px;
 
   > * {
     grid-column: 1 span;

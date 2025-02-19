@@ -1,3 +1,4 @@
+import path from 'path';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
@@ -13,11 +14,19 @@ export default defineConfig({
     strictPort: true,
     host: true
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler'
+      }
+    }
+  },
   plugins: [
     react({
       jsxImportSource: '@emotion/react',
       plugins: [['@swc/plugin-emotion', {}]]
     }),
+
     basicSsl(),
     tsconfigPaths(),
     svgrPlugin(),
@@ -29,23 +38,6 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}']
-
-        // runtimeCaching: [
-        //   {
-        //     urlPattern: /\.(?:png|jpg|jpeg|svg|gif|mp4)$/,
-        //     handler: 'CacheFirst',
-        //     options: {
-        //       cacheName: 'images-cache',
-        //       expiration: {
-        //         maxEntries: 50, // Количество изображений, которые будут храниться в кэше
-        //         maxAgeSeconds: 30 * 24 * 60 * 60 // Время хранения (например, 30 дней)
-        //       },
-        //       cacheableResponse: {
-        //         statuses: [0, 200]
-        //       }
-        //     }
-        //   }
-        // ]
       },
       manifest: {
         name: 'Power Wallet',
@@ -91,9 +83,13 @@ export default defineConfig({
       }
     }
   },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src')
+    }
+  },
   preview: {
     port: 3002,
-    https: true,
     host: 'localhost',
     strictPort: true
   }

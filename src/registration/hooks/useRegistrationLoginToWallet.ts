@@ -6,7 +6,7 @@ import { ECPairInterface } from 'ecpair';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAccountLoginToWallet } from 'account/hooks/useAccountLoginToWallet';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import i18n from 'locales/initTranslation';
 
 type Args = {
@@ -68,7 +68,7 @@ export const useRegistrationLoginToWallet = ({
       }
       if (encryptedWif) {
         await accLoginMutation({ address, encryptedWif });
-        navigate(WalletRoutesEnum.root);
+        navigate(RoutesEnum.root);
       } else {
         console.error('loginToWalletSaga if (!wif)', encryptedWif);
         toast.error(i18n.t('loginError'));
@@ -86,7 +86,7 @@ export const useRegistrationLoginToWallet = ({
   >({
     mutationFn: loginToWallet,
     // onSuccess: () => {
-    //   navigate(WalletRoutesEnum.root);
+    //   navigate(RoutesEnum.root);
     // },
     throwOnError
   });

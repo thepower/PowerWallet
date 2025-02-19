@@ -1,11 +1,14 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormControlLabel } from '@mui/material';
 import { AddressApi, CryptoApi } from '@thepowereco/tssdk';
+import { useFormik } from 'formik';
+import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+import * as yup from 'yup';
 import { useExportAccount } from 'account/hooks';
 import { useStore } from 'application/store';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { AppQueryParams, RoutesEnum } from 'application/typings/routes';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import {
   Button,
@@ -16,18 +19,32 @@ import {
 } from 'common';
 import { useCreateWallet } from 'registration/hooks/useCreateWallet';
 import { BackupAccountStepsEnum } from 'registration/typings/registrationTypes';
-import { compareTwoStrings } from 'registration/utils/registrationUtils';
+import { stringToObject } from 'sso/utils';
 import styles from './Backup.module.scss';
+
+const initialValues = {
+  password: '',
+  confirmedPassword: ''
+};
+
+type Values = typeof initialValues;
+
+const validationSchema = (t: TFunction) =>
+  yup.object().shape({
+    password: yup.string().required(t('required')),
+    confirmedPassword: yup
+      .string()
+      .required(t('required'))
+      .oneOf([yup.ref('password'), null], t('oopsPasswordsDidntMatch'))
+  });
 
 type BackupProps = WizardComponentProps;
 
 const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
   const { t } = useTranslation();
-  const [password, setPassword] = useState('');
-  const [confirmedPassword, setConfirmedPassword] = useState('');
-  const [passwordsNotEqual, setPasswordsNotEqual] = useState(false);
 
   const [isSeedPhraseSaved, setIsSeedPhraseSaved] = useState(false);
+  const [usedPassword, setUsedPassword] = useState('');
   const navigate = useNavigate();
   const {
     selectedChain,
@@ -35,7 +52,8 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
     backupStep,
     isWithoutPassword,
     setBackupStep,
-    setSeedPhrase
+    setSeedPhrase,
+    resetStore
   } = useStore();
   const { dataOrReferrer } = useParams<{ dataOrReferrer?: string }>();
   const { activeWallet } = useWalletsStore();
@@ -48,6 +66,12 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
     [dataOrReferrer]
   );
 
+  const parsedData: AppQueryParams = useMemo(() => {
+    if (!isAddressInParams && dataOrReferrer)
+      return stringToObject(dataOrReferrer);
+    return null;
+  }, [dataOrReferrer, isAddressInParams]);
+
   useEffect(() => {
     if (!seedPhrase) {
       const phrase: string = CryptoApi.generateSeedPhrase();
@@ -59,32 +83,8 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
   const onClickNext = useCallback(() => {
     if (backupStep === BackupAccountStepsEnum.generateSeedPhrase) {
       setBackupStep(BackupAccountStepsEnum.encryptPrivateKey);
-    } else if (backupStep === BackupAccountStepsEnum.encryptPrivateKey) {
-      const passwordsNotEqual = compareTwoStrings(password, confirmedPassword);
-
-      if (!passwordsNotEqual && !isWithoutPassword) {
-        setPasswordsNotEqual(true);
-        return;
-      }
-      if (seedPhrase) {
-        createWalletMutation({
-          seedPhrase,
-          password: isWithoutPassword ? '' : password,
-          referrer: isAddressInParams ? dataOrReferrer : ''
-        });
-      }
     }
-  }, [
-    backupStep,
-    setBackupStep,
-    password,
-    confirmedPassword,
-    isWithoutPassword,
-    seedPhrase,
-    createWalletMutation,
-    isAddressInParams,
-    dataOrReferrer
-  ]);
+  }, [backupStep, setBackupStep]);
 
   const renderSeedPhrase = useCallback(() => {
     if (seedPhrase) {
@@ -103,6 +103,43 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
   const onClickCheckbox = useCallback(() => {
     setIsSeedPhraseSaved(!isSeedPhraseSaved);
   }, [isSeedPhraseSaved]);
+
+  const handleCreateWallet = useCallback(
+    ({ password }: Values) => {
+      if (backupStep === BackupAccountStepsEnum.encryptPrivateKey) {
+        if (seedPhrase) {
+          createWalletMutation({
+            seedPhrase,
+            password: isWithoutPassword ? '' : password,
+            referrer: isAddressInParams ? dataOrReferrer : '',
+            additionalActionOnSuccess: (password) => {
+              if (password) setUsedPassword(password);
+            }
+          });
+        }
+      }
+    },
+    [
+      backupStep,
+      createWalletMutation,
+      dataOrReferrer,
+      isAddressInParams,
+      isWithoutPassword,
+      seedPhrase
+    ]
+  );
+
+  const formik = useFormik({
+    initialValues,
+    onSubmit: handleCreateWallet,
+    validationSchema: !isWithoutPassword ? validationSchema(t) : null
+  });
+
+  useEffect(() => {
+    if (isWithoutPassword) {
+      formik.resetForm();
+    }
+  }, [isWithoutPassword]);
 
   const renderCheckBox = useCallback(
     () => (
@@ -152,102 +189,84 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
     ),
     [
       t,
-      seedPhrase,
-      isSeedPhraseSaved,
-      onClickNext,
       renderSeedPhrase,
-      renderCheckBox
+      seedPhrase,
+      renderCheckBox,
+      onClickNext,
+      isSeedPhraseSaved
     ]
   );
 
-  const onChangePassword = (
-    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    setPassword(event.target.value);
-    setPasswordsNotEqual(false);
-  };
-
-  const onChangeConfirmedPassword = (
-    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    setConfirmedPassword(event.target.value);
-    setPasswordsNotEqual(false);
-  };
+  useEffect(() => {
+    formik.setSubmitting(isWalletCreating);
+  }, [isWalletCreating]);
 
   const renderEncryptPrivateKey = useCallback(
     () => (
       <>
         <div className={styles.title}>{t('enterPasswordEncryptYour')}</div>
-        <div className={styles.passwordForm}>
+        <form onSubmit={formik.handleSubmit} className={styles.passwordForm}>
           <OutlinedInput
-            id='password'
-            name='password'
             placeholder={t('password')!}
-            className={styles.passwordInput}
-            value={password}
-            onChange={onChangePassword}
             autoComplete='new-password'
             size='small'
             type={'password'}
-            disabled={isWalletCreating || isWithoutPassword}
+            error={Boolean(formik.touched.password && formik.errors.password)}
+            errorMessage={formik.errors.password}
+            disabled={isWithoutPassword}
+            {...formik.getFieldProps('password')}
           />
           <OutlinedInput
-            id='confirmedPassword'
-            name='confirmedPassword'
             placeholder={t('repeatPassword')!}
-            className={styles.passwordInput}
-            value={confirmedPassword}
-            onChange={onChangeConfirmedPassword}
             type={'password'}
-            error={passwordsNotEqual}
             autoComplete='new-password'
             size='small'
-            errorMessage={t('oopsPasswordsDidntMatch')!}
-            disabled={isWalletCreating || isWithoutPassword}
+            error={Boolean(
+              formik.touched.confirmedPassword &&
+                formik.errors.confirmedPassword
+            )}
+            errorMessage={formik.errors.confirmedPassword}
+            disabled={isWithoutPassword}
+            {...formik.getFieldProps('confirmedPassword')}
           />
           <Button
             className={styles.button}
             variant='contained'
             size='large'
-            onClick={onClickNext}
+            type='submit'
             loading={isWalletCreating}
-            disabled={passwordsNotEqual || (!password && !isWithoutPassword)}
+            disabled={!formik.isValid || formik.isSubmitting}
           >
             {t('next')}
           </Button>
-        </div>
+        </form>
       </>
     ),
-    [
-      confirmedPassword,
-      isWalletCreating,
-      isWithoutPassword,
-      onClickNext,
-      password,
-      passwordsNotEqual,
-      t
-    ]
+    [formik, isWalletCreating, isWithoutPassword, t]
   );
 
   const onClickExportAccount = useCallback(() => {
     exportAccountMutation({
-      password,
+      password: usedPassword,
       isWithoutGoHome: true,
       additionalActionOnSuccess: () => {
-        if (dataOrReferrer && !isAddressInParams) {
+        if (dataOrReferrer && !isAddressInParams && parsedData?.callbackUrl) {
           setNextStep();
         } else {
-          navigate(WalletRoutesEnum.root);
+          navigate(RoutesEnum.root);
+          resetStore();
         }
       }
     });
   }, [
-    dataOrReferrer,
     exportAccountMutation,
+    usedPassword,
+    dataOrReferrer,
     isAddressInParams,
+    parsedData?.callbackUrl,
+    setNextStep,
     navigate,
-    password,
-    setNextStep
+    resetStore
   ]);
 
   const renderRegistrationCompleted = useCallback(() => {
@@ -279,20 +298,12 @@ const BackupComponent: FC<BackupProps> = ({ setNextStep }) => {
           variant='contained'
           size='large'
           onClick={onClickExportAccount}
-          disabled={passwordsNotEqual}
         >
           {t('exportAccount')}
         </Button>
       </div>
     );
-  }, [
-    seedPhrase,
-    onClickExportAccount,
-    passwordsNotEqual,
-    selectedChain,
-    activeWallet,
-    t
-  ]);
+  }, [seedPhrase, onClickExportAccount, selectedChain, activeWallet, t]);
 
   const renderContent = useCallback(() => {
     switch (backupStep) {

@@ -2,16 +2,16 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import { useTranslation } from 'react-i18next';
 
-import { InView } from 'react-intersection-observer';
 import { useParams } from 'react-router-dom';
 import {
   useTokensStore,
   useWalletsStore
 } from 'application/utils/localStorageUtils';
-import { PageTemplate, FullScreenLoader } from 'common';
+import { PageTemplate, FullScreenLoader, CopyButton, Button } from 'common';
 
 import Transaction from 'myAssets/components/Transaction';
-import { useTransactionsHistory } from 'myAssets/hooks/useLoadTransactions';
+import { useTokenTransactionsHistory } from 'myAssets/hooks';
+import { useTransactionsHistory } from 'myAssets/hooks/useTransactions';
 import { useWalletData } from 'myAssets/hooks/useWalletData';
 import { TokenKind } from 'myAssets/types';
 import styles from './TokenTransactionsPage.module.scss';
@@ -36,27 +36,61 @@ const TokenTransactionsPageComponent: React.FC = () => {
     [getTokenByAddress, address]
   );
 
-  const { groupedTransactions, fetchNextPage, isLoading, isFetchingNextPage } =
-    useTransactionsHistory({
-      initialBlock: walletData?.lastblk,
-      tokenAddress: token?.address
-    });
+  const isNative = type === TokenKind.Native;
+
+  const {
+    groupedTransactions,
+    fetchNextPage,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage: hasNextPageTransactions
+  } = useTransactionsHistory({
+    initialBlock: walletData?.lastblock?.tx,
+    tokenAddress: token?.address,
+    enabled: isNative
+  });
+
+  const {
+    groupedTokenTransactions,
+    fetchNextPage: fetchTokenTransactionsNextPage,
+    isLoading: isLoadingTokenTransactions,
+    isFetchingNextPage: isFetchingTokenTransactions,
+    hasNextPage: hasNextPageTokenTransactions
+  } = useTokenTransactionsHistory({
+    tokenAddress: address as string,
+    enabled: !isNative
+  });
 
   useEffect(() => {
     if (walletData) {
-      fetchNextPage();
+      if (isNative) {
+        fetchNextPage();
+      } else {
+        fetchTokenTransactionsNextPage();
+      }
     }
-  }, [walletData]);
+  }, [fetchNextPage, fetchTokenTransactionsNextPage, isNative, walletData]);
 
-  const handleChangeView = (inView: boolean) => {
-    if (inView && !isLoading && !isFetchingNextPage && walletData) {
-      fetchNextPage();
+  const loadMore = () => {
+    if (
+      (!isLoadingTokenTransactions || !isLoading) &&
+      (!isFetchingTokenTransactions || !isFetchingNextPage) &&
+      walletData
+    ) {
+      if (isNative) {
+        fetchNextPage();
+      } else {
+        fetchTokenTransactionsNextPage();
+      }
     }
   };
+
   const renderTransactionsList = useCallback(
     () =>
-      groupedTransactions &&
-      Object.entries(groupedTransactions).map(([date, transactions]) => (
+      (groupedTransactions || groupedTokenTransactions) &&
+      Object.entries(
+        isNative ? groupedTransactions : groupedTokenTransactions
+      ).map(([date, transactions]) => (
         <li key={date}>
           <p className={styles.date}>{date}</p>
           <ul className={styles.transactionsList}>
@@ -68,12 +102,15 @@ const TokenTransactionsPageComponent: React.FC = () => {
           </ul>
         </li>
       )),
-    [groupedTransactions]
+    [groupedTokenTransactions, groupedTransactions, isNative]
   );
 
   const tokenSymbol = type === TokenKind.Native ? address : token?.symbol;
 
-  if (isLoading && isEmpty(groupedTransactions)) {
+  if (
+    (isLoadingTokenTransactions || isLoading) &&
+    isEmpty(groupedTokenTransactions)
+  ) {
     return <FullScreenLoader />;
   }
 
@@ -83,14 +120,25 @@ const TokenTransactionsPageComponent: React.FC = () => {
       backUrl='/'
       backUrlText={t('home')!}
     >
-      <div className={styles.TokenTransactionsPage}>
-        <div className={styles.transactions}>
-          <ul className={styles.groupByDates}>{renderTransactionsList()}</ul>
-        </div>
-        <InView onChange={handleChangeView}>
-          <div />
-        </InView>
+      <CopyButton
+        textButton={activeWallet?.address || ''}
+        className={styles.addressButton}
+        iconClassName={styles.copyIcon}
+      />
+      <div className={styles.transactions}>
+        <ul className={styles.groupByDates}>{renderTransactionsList()}</ul>
       </div>
+      <Button
+        className={styles.loadMoreButton}
+        onClick={loadMore}
+        variant='contained'
+        loading={isFetchingTokenTransactions || isFetchingNextPage}
+        disabled={
+          isNative ? !hasNextPageTransactions : !hasNextPageTokenTransactions
+        }
+      >
+        {t('loadMore')}
+      </Button>
     </PageTemplate>
   );
 };

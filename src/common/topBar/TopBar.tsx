@@ -70,9 +70,9 @@ const TopBar: React.FC<TopBarProps> = ({
       {renderCenter()}
       <div className={cn(styles.controlsSet)}>
         <LangMenu />
-        <IconButton onClick={handleShowUnderConstruction}>
+        {/* <IconButton onClick={handleShowUnderConstruction}>
           <BellIcon />
-        </IconButton>
+        </IconButton> */}
       </div>
     </header>
   );

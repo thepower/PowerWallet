@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import { useTranslation } from 'react-i18next';
+import { sliceString } from 'application/utils/applicationUtils';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { TToken } from 'myAssets/types';
 import styles from './ConfirmSendModal.module.scss';
@@ -11,7 +12,7 @@ interface OwnProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (values: FormValues, password: string) => Promise<void>;
-  token?: TToken;
+  token: TToken | null;
   trxValues: {
     amount: string;
     comment: string;
@@ -50,8 +51,17 @@ const ConfirmSendModal: React.FC<ConfirmSendModalProps> = ({
 
   const fields = useMemo(
     () => [
-      { key: t('from'), value: from },
-      { key: t('to'), value: trxValues.address },
+      {
+        key: t('from'),
+        value: from?.length && from.length > 20 ? sliceString(from, 10) : from
+      },
+      {
+        key: t('to'),
+        value:
+          trxValues.address?.length && trxValues.address.length > 20
+            ? sliceString(trxValues.address, 10)
+            : trxValues.address
+      },
       {
         key: t('amount'),
         value: `${trxValues.amount} ${token ? token.symbol : 'SK'}`
@@ -80,11 +90,6 @@ const ConfirmSendModal: React.FC<ConfirmSendModalProps> = ({
             <OutlinedInput
               inputRef={(input) => input && input.focus()}
               placeholder={t('password')!}
-              className={styles.passwordInput}
-              name='password'
-              value={formikProps.values.password}
-              onChange={formikProps.handleChange}
-              onBlur={formikProps.handleBlur}
               type={'password'}
               autoFocus
               errorMessage={formikProps.errors.password}
@@ -92,6 +97,7 @@ const ConfirmSendModal: React.FC<ConfirmSendModalProps> = ({
                 formikProps.touched.password &&
                 Boolean(formikProps.errors.password)
               }
+              {...formikProps.getFieldProps('password')}
             />
             <Button variant='outlined' type='submit' className={styles.button}>
               {t('next')}

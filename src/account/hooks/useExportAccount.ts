@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { useStore } from 'application/store';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { RoutesEnum } from 'application/typings/routes';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
 import {
@@ -29,7 +29,7 @@ export const useExportAccount = () => {
   const navigate = useNavigate();
 
   const exportAccount = async ({
-    hint,
+    hint = '',
     password,
     isWithoutGoHome,
     additionalActionOnSuccess,
@@ -37,7 +37,6 @@ export const useExportAccount = () => {
   }: Args) => {
     const currentNetworkChain = activeWallet?.chainId;
     const currentRegistrationChain = selectedChain;
-
     try {
       if (!activeWallet) {
         throw new Error('Wallet not found');
@@ -48,12 +47,12 @@ export const useExportAccount = () => {
         activeWallet.encryptedWif,
         password
       );
-      const exportedData: string = WalletApi.getExportData(
-        decryptedWif,
+      const exportedData: string = WalletApi.getExportData({
+        wif: decryptedWif,
         address,
         password,
         hint
-      );
+      });
 
       const blob: Blob = new Blob([exportedData], {
         type: 'octet-stream'
@@ -69,12 +68,11 @@ export const useExportAccount = () => {
       fileSaver.saveAs(blob, fileName, { autoBom: true });
 
       if (!isWithoutGoHome) {
-        navigate(WalletRoutesEnum.root);
+        navigate(RoutesEnum.root);
       }
 
       additionalActionOnSuccess?.();
     } catch (e: any) {
-      console.error('exportAccountSaga', e);
       if (
         additionalActionOnDecryptError &&
         e.message === 'unable to decrypt data'

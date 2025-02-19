@@ -29,6 +29,12 @@ interface State {
 
   sentData: Maybe<SentData>;
 
+  confirmModal: {
+    isOpen: boolean;
+    resolve: ((value: string) => void) | null;
+    reject: ((reason?: any) => void) | null;
+  };
+
   setSelectedNetwork: (network: Maybe<NetworkEnum>) => void;
   setSelectedChain: (chainId: Maybe<number>) => void;
   setSeedPhrase: (seedPhrase: string) => void;
@@ -39,10 +45,14 @@ interface State {
   setIsAccountMenuOpened: (isAccountMenuOpened: boolean) => void;
   setIsShowUnderConstruction: (isShowUnderConstruction: boolean) => void;
   setSentData: (sentData: Maybe<SentData>) => void;
+  openConfirmModal: () => Promise<string>;
+  closeConfirmModal: () => void;
+  resolveConfirmModal: (value: string) => void;
+  rejectConfirmModal: (resason: any) => void;
   resetStore: () => void;
 }
 
-export const useStore = create<State>((set) => ({
+export const useStore = create<State>((set, get) => ({
   selectedNetwork: null,
   selectedChain: null,
   seedPhrase: null,
@@ -55,6 +65,12 @@ export const useStore = create<State>((set) => ({
   isShowUnderConstruction: false,
 
   sentData: null,
+
+  confirmModal: {
+    isOpen: false,
+    resolve: null,
+    reject: null
+  },
 
   setSelectedNetwork: (network: Maybe<NetworkEnum>) =>
     set((state) => ({ ...state, selectedNetwork: network })),
@@ -86,6 +102,60 @@ export const useStore = create<State>((set) => ({
   setSentData: (sentData: Maybe<SentData>) =>
     set((state) => ({ ...state, sentData })),
 
+  openConfirmModal: () => {
+    return new Promise<string>((resolve, reject) => {
+      set({
+        confirmModal: {
+          isOpen: true,
+          resolve,
+          reject
+        }
+      });
+    });
+  },
+
+  closeConfirmModal: () => {
+    const { confirmModal } = get();
+    if (confirmModal.resolve) {
+      confirmModal.resolve('');
+    }
+    set({
+      confirmModal: {
+        isOpen: false,
+        resolve: null,
+        reject: null
+      }
+    });
+  },
+
+  resolveConfirmModal: (value: string) => {
+    const { confirmModal } = get();
+    if (confirmModal.resolve) {
+      confirmModal.resolve(value);
+    }
+    set({
+      confirmModal: {
+        isOpen: false,
+        resolve: null,
+        reject: null
+      }
+    });
+  },
+
+  rejectConfirmModal: (resason: any) => {
+    const { confirmModal } = get();
+    if (confirmModal.reject) {
+      confirmModal.reject(resason);
+    }
+    set({
+      confirmModal: {
+        isOpen: false,
+        resolve: null,
+        reject: null
+      }
+    });
+  },
+
   resetStore: () =>
     set(() => ({
       selectedNetwork: null,
@@ -97,6 +167,11 @@ export const useStore = create<State>((set) => ({
       isRandomChain: true,
       isAccountMenuOpened: false,
       isShowUnderConstruction: false,
-      sentData: null
+      sentData: null,
+      confirmModal: {
+        isOpen: false,
+        resolve: null,
+        reject: null
+      }
     }))
 }));

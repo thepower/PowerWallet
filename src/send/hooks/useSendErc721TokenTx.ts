@@ -3,6 +3,7 @@ import { AddressApi, EvmContract } from '@thepowereco/tssdk';
 import { toast } from 'react-toastify';
 import abis from 'abis';
 
+import { appQueryKeys } from 'application/queryKeys';
 import { useStore } from 'application/store';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
 import i18n from 'locales/initTranslation';
@@ -47,25 +48,33 @@ export const useSendErc721TokenTx = ({
           functionName: 'transferFrom',
           args: [
             AddressApi.textAddressToEvmAddress(activeWallet.address),
-            AddressApi.textAddressToEvmAddress(to),
+            AddressApi.isTextAddressValid(to)
+              ? AddressApi.textAddressToEvmAddress(to)
+              : (to as `0x${string}`),
             BigInt(id)
           ]
         },
         { key: { wif, address: activeWallet.address } }
       );
 
-      const { txId } = response;
-
-      setSentData({
-        txId,
-        comment: '',
-        amount: '1',
-        from: activeWallet.address,
-        to
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['tokenBalance', activeWallet?.address, address]
-      });
+      if (response?.txId) {
+        setSentData({
+          txId: response.txId,
+          comment: '',
+          amount: '1',
+          from: activeWallet.address,
+          to
+        });
+        queryClient.invalidateQueries({
+          queryKey: appQueryKeys.tokenBalance(activeWallet?.address, address)
+        });
+        queryClient.invalidateQueries({
+          queryKey: appQueryKeys.tokenBalance(to, address)
+        });
+        queryClient.invalidateQueries({
+          queryKey: appQueryKeys.tokenTransactionsHistory(to, address)
+        });
+      }
     } catch (error: any) {
       console.error(error);
       toast.error(`${i18n.t('anErrorOccurredToken')} ${error}`);

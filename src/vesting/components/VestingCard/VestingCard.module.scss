@@ -1,0 +1,229 @@
+@use '@/styles/mixins' as *;
+@use '@/styles/variables' as *;
+
+.vestingCard {
+  background: linear-gradient(145deg, var(--mui-palette-background-paper) 0%, rgba(75, 192, 192, 0.05) 100%);
+  border-radius: 16px;
+  padding: 28px;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(75, 192, 192, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  @include mobile {
+    padding: 20px;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background:  $the-power-gradient;
+    opacity: 0.7;
+  }
+
+  h3 {
+    margin: 0 0 24px;
+    color: var(--mui-palette-text-primary);
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    .progress {
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 12px;
+      background: rgba(75, 192, 192, 0.1);
+      color: $blue;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      
+      &::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+    }
+
+    &::before {
+      content: '';
+      display: block;
+      width: 8px;
+      height: 24px;
+      background: $blue;
+      border-radius: 4px;
+    }
+  }
+}
+
+.info {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 28px;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 20px;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+
+  @include mobile {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: $blue;
+    opacity: 0.3;
+  }
+
+  p {
+    margin: 0;
+    color: var(--mui-palette-text-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    position: relative;
+
+    @include mobile {
+      font-size: 0.9rem;
+
+      .addressContainer {
+        max-width: 140px;
+      }
+
+      .address {
+        max-width: 100px;
+      }
+
+      span:last-child {
+        padding: 3px 8px;
+        font-size: 0.9rem;
+      }
+    }
+
+    .addressContainer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 180px;
+    }
+
+    .address {
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+      
+      &:hover {
+        background: rgba(75, 192, 192, 0.2);
+      }
+    }
+
+    .addTokenIcon {
+      font-size: 20px;
+      color: $blue;
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+
+    span:first-child {
+      opacity: 0.8;
+    }
+
+    span:last-child {
+      font-weight: 500;
+      color: var(--mui-palette-text-primary);
+      background: rgba(75, 192, 192, 0.1);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-family: monospace;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(75, 192, 192, 0.15);
+      }
+    }
+  }
+}
+
+.chart {
+  margin: 24px 0;
+  height: 220px;
+  padding: 20px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(75, 192, 192, 0.02));
+  border-radius: 12px;
+  border: 1px solid rgba(75, 192, 192, 0.1);
+  position: relative;
+
+  @include mobile {
+    height: 180px;
+    padding: 12px;
+    margin: 16px 0;
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(75, 192, 192, 0.03), transparent 70%);
+    pointer-events: none;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.claimButton {
+  width: 100%;
+  border-radius: 12px;
+
+  @include mobile {
+    height: 44px;
+    font-size: 0.95rem;
+  }
+}
+
+.sendButton, .addTokenButton {
+  width: 100%;
+  border-radius: 12px;
+
+  @include mobile {
+    height: 44px;
+    font-size: 0.95rem;
+  }
+}
+
+.claimableAmount {
+  color: var(--success-color);
+  font-weight: 600;
+}

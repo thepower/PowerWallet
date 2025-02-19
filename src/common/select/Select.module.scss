@@ -1,5 +1,5 @@
-@import 'src/styles/variables';
-@import 'src/styles/mixins';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .select {
   border: 1px solid transparent;
@@ -21,7 +21,7 @@
   box-sizing: border-box;
   align-items: center;
   justify-content: flex-start;
-  padding: 12px 28px !important;
+  padding: 12px 28px 12px 14px !important;
   color: #6b798f;
 
   &:hover {
@@ -34,12 +34,24 @@
   height: 40px;
 }
 
+.inputBaseColorSecondary {
+  background: #252b35;
+}
+
+.inputBaseSizeSmall {
+  height: 48px;
+
+  & .icon {
+    top: 12px;
+    right: 12px;
+  }
+}
+
 .menuRoot {
   z-index: 99999999;
 }
 
 .menuPaper {
-
   @include border-gradient-background(#151c25);
 
   max-height: 264px;

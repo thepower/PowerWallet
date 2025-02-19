@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { ClosedEyeIcon } from 'assets/icons/ClosedEyeIcon';
 import { EyeIcon } from 'assets/icons/EyeIcon';
-import styles from './Input.module.scss';
+import styles from './OutlinedInput.module.scss';
 
 interface OutlinedInputProps extends MUIOutlinedInputProps {
   errorMessage?: string;
@@ -53,7 +53,7 @@ export const OutlinedInput: FC<OutlinedInputProps> = memo(
     };
 
     return (
-      <FormControl className={styles.formControl}>
+      <FormControl className={styles.formControl} error={error}>
         <MUIOutlinedInput
           className={className}
           value={value}
@@ -62,11 +62,12 @@ export const OutlinedInput: FC<OutlinedInputProps> = memo(
           classes={{
             notchedOutline: value ? styles.bordered : ''
           }}
+          error={error}
           endAdornment={getEndAdornment()}
           {...otherProps}
         />
         {error && (
-          <FormHelperText className={styles.errorMessage}>
+          <FormHelperText error={error} className={styles.errorMessage}>
             {errorMessage}
           </FormHelperText>
         )}
