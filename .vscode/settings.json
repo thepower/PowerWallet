@@ -3,12 +3,8 @@
     "source.fixAll": "always",
     "source.fixAll.eslint": "always"
   },
-  "editor.formatOnSave": true,
-  "[javascript]": {
-    "editor.formatOnSave": false
-  },
-  "[typescript]": {
-    "editor.formatOnSave": false
-  },
-  "prettier.requireConfig": true
+  "prettier.requireConfig": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.enable": true,
+  "biome.enabled": false,
 }
