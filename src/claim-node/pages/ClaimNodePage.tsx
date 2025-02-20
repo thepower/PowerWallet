@@ -48,12 +48,10 @@ export const ClaimNodePage: React.FC = () => {
     >
       <div className={styles.container}>
         <div className={styles.nodeIntro}>
-          <h1 className={styles.title}>Power Node</h1>
-          <p className={styles.subtitle}>
-            Unlock the power of decentralization with your very own Power Node
-          </p>
+          <h1 className={styles.title}>{t('powerNode')}</h1>
+          <p className={styles.subtitle}>{t('powerNodeSubtitle')}</p>
           <p className={styles.description}>
-            Required for node operation and connectivity to the network
+            {t('powerNodeOperationDescription')}
           </p>
           <div className={styles.nftSection}>
             <NodeNftSvg className={styles.nftImage} />
@@ -67,8 +65,8 @@ export const ClaimNodePage: React.FC = () => {
                 )}
               >
                 {claimStatus?.isEligible && claimStatus?.isAvailable
-                  ? 'Ready to Mint'
-                  : 'Not Available'}
+                  ? t('readyToMint')
+                  : t('notAvailable')}
               </div>
               <div className={styles.infoGrid}>
                 <div className={styles.infoRow}>
@@ -108,16 +106,16 @@ export const ClaimNodePage: React.FC = () => {
               </div>
             </div>
             <div className={styles.stakeInfo}>
-              <span className={styles.stakeLabel}>Stake:</span>
+              <span className={styles.stakeLabel}>{t('stake')}:</span>
               <span className={styles.stakeValue}>25,000 $SK</span>
-              <span className={styles.stakeLocked}>locked into the NFT</span>
+              <span className={styles.stakeLocked}>{t('lockedIntoNFT')}</span>
             </div>
             {!claimStatus?.isEligible ||
               !claimStatus?.isAvailable ||
               availableNodes <= 0 ||
               (isClaimPending && (
                 <Button variant='contained' onClick={handleClaim}>
-                  {isClaimPending ? t('minting...') : t('Mint Power Node NFT')}
+                  {isClaimPending ? t('claiming') : t('claimPowerNodeNFT')}
                 </Button>
               ))}
           </div>

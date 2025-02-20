@@ -277,6 +277,15 @@
     "nodeClaimSuccess": "Node claimed successfully",
     "nodeClaimError": "Error claiming node:",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "powerNode": "Power Node",
+    "powerNodeSubtitle": "Unlock the power of decentralization with your very own Power Node",
+    "powerNodeDescription": "Get ready to become a part of our decentralized network by claiming your Power Node NFT. Each Node plays a crucial role in maintaining network security and earns rewards for its contribution.",
+    "powerNodeOperationDescription": "Required for node operation and connectivity to the network",
+    "readyToMint": "Ready to Mint",
+    "notAvailable": "Not Available",
+    "stake": "Stake",
+    "lockedIntoNFT": "locked into NFT",
+    "claimPowerNodeNFT": "Claim Power Node NFT"
   }
 }

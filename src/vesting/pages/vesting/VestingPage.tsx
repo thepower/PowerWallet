@@ -75,13 +75,8 @@ export const VestingPage: React.FC = () => {
           </div>
         ) : (
           <div className={styles.noVestings}>
-            <h3>{t('noVestingsTitle', 'No Vesting Tokens')}</h3>
-            <p>
-              {t(
-                'noVestingsDescription',
-                'You currently have no vesting tokens in your wallet.'
-              )}
-            </p>
+            <h3>{t('noVestingsTitle')}</h3>
+            <p>{t('noVestingsDescription')}</p>
           </div>
         )}
       </div>

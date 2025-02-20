@@ -272,11 +272,20 @@
     "nodesAvailable": "โหนดที่มี",
     "claiming": "กำลังรับ...",
     "yourEligibility": "สิทธิ์ของคุณ",
-    "availableForClaim": "พร้อมสำหรับการรับ",
+    "availableForClaim": "พร้อมรับ",
     "alreadyClaimed": "รับแล้ว",
     "nodeClaimSuccess": "รับโหนดสำเร็จ",
     "nodeClaimError": "ข้อผิดพลาดในการรับโหนด:",
     "yes": "ใช่",
-    "no": "ไม่"
+    "no": "ไม่",
+    "powerNode": "Power Node",
+    "powerNodeSubtitle": "ปลดล็อกพลังการกระจายศูนย์ด้วย Power Node ของคุณ",
+    "powerNodeDescription": "เตรียมพร้อมเป็นส่วนหนึ่งของเครือข่ายกระจายศูนย์ด้วยการรับ Power Node NFT ของคุณ แต่ละโหนดมีบทบาทสำคัญในการรักษาความปลอดภัยของเครือข่ายและได้รับรางวัลจากการมีส่วนร่วม",
+    "powerNodeOperationDescription": "จำเป็นสำหรับการดำเนินการโหนดและการเชื่อมต่อกับเครือข่าย",
+    "readyToMint": "พร้อมสร้าง",
+    "notAvailable": "ไม่พร้อมใช้งาน",
+    "stake": "สเทค",
+    "lockedIntoNFT": "ล็อคอยู่ใน NFT",
+    "claimPowerNodeNFT": "รับ Power Node NFT"
   }
 }
