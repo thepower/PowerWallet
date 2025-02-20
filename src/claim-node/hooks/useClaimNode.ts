@@ -7,11 +7,12 @@ import appEnvs from 'appEnvs';
 import { useNetworkApi } from 'application/hooks';
 import { appQueryKeys } from 'application/queryKeys';
 import { useWalletsStore } from 'application/utils/localStorageUtils';
+import { useAddToken } from 'myAssets/hooks';
 
 export const useClaimNode = () => {
   const { t } = useTranslation();
   const { activeWallet } = useWalletsStore();
-
+  const { addTokenMutation } = useAddToken({ throwOnError: true });
   const { networkApi } = useNetworkApi({
     chainId: activeWallet?.chainId
   });
@@ -58,6 +59,16 @@ export const useClaimNode = () => {
           }, 1000);
 
           toast.success(t('nodeClaimSuccess'));
+        }
+
+        const nftCollection = await contract.scGet({
+          abi: abis.claimNode.abi,
+          functionName: 'nftCollection',
+          args: []
+        });
+
+        if (nftCollection) {
+          addTokenMutation({ address: nftCollection, withoutRedirect: true });
         }
       } catch (error: any) {
         console.error('Error claiming node:', error);
