@@ -25,13 +25,18 @@
 .linksGroup {
   display: flex;
   justify-content: center;
-  grid-gap: 12px;
+  gap: 12px;
   margin-bottom: 28px;
+
+  > * {
+    flex: 1;
+    min-width: 0; 
+  }
 
   @include mobile {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-gap: 8px;
+    gap: 8px;
   }
 }
 
