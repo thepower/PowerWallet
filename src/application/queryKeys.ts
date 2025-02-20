@@ -28,10 +28,10 @@ class QueryKeys {
     address?: string | null,
     tokenAddress?: string
   ) => [
-    'tokenTransactionsHistory',
-    ...(address ? [address] : []),
-    ...(tokenAddress ? [tokenAddress] : [])
-  ];
+      'tokenTransactionsHistory',
+      ...(address ? [address] : []),
+      ...(tokenAddress ? [tokenAddress] : [])
+    ];
   ERC721Tokens = (address?: string | null, tokenAddress?: string) => [
     'ERC721Tokens',
     ...(address ? [address] : []),
@@ -55,6 +55,7 @@ class QueryKeys {
     ...(address ? [address] : []),
     ...(id ? [id] : [])
   ];
+  claimNodeStatus = (address: string) => ['claimNode', 'status', address];
 }
 
 export const appQueryKeys = new QueryKeys();

@@ -266,6 +266,17 @@
     "noVestingsTitle": "Нет токенов в вестинге",
     "noVestingsDescription": "В вашем кошельке нет токенов в вестинге",
     "copiedToClipboard": "Скопировано в буфер обмена",
-    "tokenAlreadyAdded": "Токен уже добавлен"
+    "tokenAlreadyAdded": "Токен уже добавлен",
+    "claimNode": "Получить ноду",
+    "claimStatus": "Статус получения",
+    "nodesAvailable": "Доступные ноды",
+    "claiming": "Получение...",
+    "yourEligibility": "Ваше право на получение",
+    "availableForClaim": "Доступно для получения",
+    "alreadyClaimed": "Уже получено",
+    "nodeClaimSuccess": "Нода успешно получена",
+    "nodeClaimError": "Ошибка при получении ноды:",
+    "yes": "Да",
+    "no": "Нет"
   }
 }

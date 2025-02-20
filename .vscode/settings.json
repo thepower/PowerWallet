@@ -4,7 +4,10 @@
     "source.fixAll.eslint": "always"
   },
   "prettier.requireConfig": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "eslint.enable": true,
   "biome.enabled": false,
+  "[svg]": {
+    "editor.defaultFormatter": "jock.svg"
+  },
 }

@@ -266,6 +266,17 @@
     "noVestingsTitle": "ไม่มีโทเค็นที่ล็อกไว้",
     "noVestingsDescription": "ขณะนี้คุณไม่มีโทเค็นที่ล็อกไว้ในกระเป๋าเงิน",
     "copiedToClipboard": "คัดลอกไปยังคลิปบอร์ดแล้ว",
-    "tokenAlreadyAdded": "มีโทเค็นนี้อยู่แล้ว"
+    "tokenAlreadyAdded": "มีโทเค็นนี้อยู่แล้ว",
+    "claimNode": "รับโหนด",
+    "claimStatus": "สถานะการรับ",
+    "nodesAvailable": "โหนดที่มี",
+    "claiming": "กำลังรับ...",
+    "yourEligibility": "สิทธิ์ของคุณ",
+    "availableForClaim": "พร้อมสำหรับการรับ",
+    "alreadyClaimed": "รับแล้ว",
+    "nodeClaimSuccess": "รับโหนดสำเร็จ",
+    "nodeClaimError": "ข้อผิดพลาดในการรับโหนด:",
+    "yes": "ใช่",
+    "no": "ไม่"
   }
 }

@@ -7,6 +7,7 @@ import { useWalletsStore } from 'application/utils/localStorageUtils';
 // import { BuyCryptoPage } from 'buy/pages/BuyCrypto/BuyCrypto';
 // import { BuyFiatPage } from 'buy/pages/BuyFiat/BuyFiat';
 // import { BuyPage } from 'buy/pages/BuyPage/BuyPage';
+import { ClaimNodePage } from 'claim-node/pages/ClaimNodePage';
 import { FullScreenLoader } from 'common';
 import { AddTokenPage } from 'myAssets/pages/AddToken/AddTokenPage';
 import { MainPage } from 'myAssets/pages/Main/MainPage';
@@ -88,6 +89,7 @@ const AppRoutesComponent: React.FC = () => {
         element={<TokenTransactionsPage />}
       />
       <Route path={RoutesEnum.vesting} element={<VestingPage />} />
+      <Route path={RoutesEnum.claimNode} element={<ClaimNodePage />} />
     </Routes>
   );
 };

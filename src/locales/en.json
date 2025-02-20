@@ -266,6 +266,17 @@
     "noVestingsTitle": "No Vesting Tokens",
     "noVestingsDescription": "You currently have no vesting tokens in your wallet",
     "copiedToClipboard": "Copied to clipboard",
-    "tokenAlreadyAdded": "Token already added"
+    "tokenAlreadyAdded": "Token already added",
+    "claimNode": "Claim Node",
+    "claimStatus": "Claim Status",
+    "nodesAvailable": "Nodes Available",
+    "claiming": "Claiming...",
+    "yourEligibility": "Your Eligibility",
+    "availableForClaim": "Available for Claim",
+    "alreadyClaimed": "Already Claimed",
+    "nodeClaimSuccess": "Node claimed successfully",
+    "nodeClaimError": "Error claiming node:",
+    "yes": "Yes",
+    "no": "No"
   }
 }

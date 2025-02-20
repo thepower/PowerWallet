@@ -25,6 +25,7 @@ import LogoIcon from './logo.svg?react';
 import MenuIcon from './menu.svg?react';
 import MetamaskSvg from './metamask.svg?react';
 import MoneyBugIcon from './money-bug.svg?react';
+import NodeNftSvg from './node-nft.svg?react';
 import OneLayersIcon from './one-layer.svg?react';
 import RefreshIcon from './refresh.svg?react';
 import RenameIcon from './rename.svg?react';
@@ -32,6 +33,7 @@ import ResetIcon from './reset.svg?react';
 import SearchIcon from './searchIcon.svg?react';
 import CheckedIcon from './select.svg?react';
 import SendSvg from './send.svg?react';
+import ServerCogIcon from './server-cog.svg?react';
 import ShareIcon from './share.svg?react';
 import SponsorSvg from './sponsor.svg?react';
 import SupportIcon from './support.svg?react';
@@ -83,5 +85,7 @@ export {
   CryptoSvg,
   FiatSvg,
   MetamaskSvg,
-  VestingSvg
+  VestingSvg,
+  NodeNftSvg,
+  ServerCogIcon
 };
