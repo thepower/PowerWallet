@@ -73,8 +73,7 @@ export const useUserVestings = () => {
         throw error;
       }
     },
-    staleTime: 2 * 60 * 60 * 1000,
-    gcTime: 24 * 60 * 60 * 1000,
+    staleTime: Infinity,
     enabled: !!activeWallet && !!networkApi,
     retry: false
   });

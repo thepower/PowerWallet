@@ -52,7 +52,7 @@ const VESTING_CONTRACT_ADDRESS = import.meta.env.VITE_VESTING_CONTRACT_ADDRESS;
 const CLAIM_NODE_CONTRACT_ADDRESS = import.meta.env
   .VITE_CLAIM_NODE_CONTRACT_ADDRESS;
 
-export default {
+const envs = {
   DEFAULT_CHAIN_ID,
 
   C97_C3_BRIDGE_EVM_CONTRACT_ADDRESS,
@@ -90,3 +90,5 @@ export default {
 
   CLAIM_NODE_CONTRACT_ADDRESS
 };
+
+export default envs;

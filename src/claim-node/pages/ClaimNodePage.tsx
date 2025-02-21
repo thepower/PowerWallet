@@ -112,8 +112,7 @@ export const ClaimNodePage: React.FC = () => {
             </div>
             {!claimStatus?.isEligible ||
               !claimStatus?.isAvailable ||
-              availableNodes <= 0 ||
-              (isClaimPending && (
+              availableNodes <= 0 || (
                 <Button
                   loading={isClaimPending}
                   variant='contained'
@@ -121,7 +120,7 @@ export const ClaimNodePage: React.FC = () => {
                 >
                   {isClaimPending ? t('claiming') : t('claimPowerNodeNFT')}
                 </Button>
-              ))}
+              )}
           </div>
         </div>
       </div>

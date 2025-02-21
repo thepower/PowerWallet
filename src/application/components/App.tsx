@@ -7,8 +7,8 @@ import { StylesProvider } from '@mui/styles';
 import { bsc, bscTestnet } from '@reown/appkit/networks';
 import { createAppKit } from '@reown/appkit/react';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import { BrowserRouter } from 'react-router-dom';
 import { WagmiProvider } from 'wagmi';
 import appEnvs from 'appEnvs';

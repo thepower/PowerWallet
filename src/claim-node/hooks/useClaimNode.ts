@@ -68,7 +68,10 @@ export const useClaimNode = () => {
         });
 
         if (nftCollection) {
-          addTokenMutation({ address: nftCollection, withoutRedirect: true });
+          await addTokenMutation({
+            address: nftCollection,
+            withoutRedirect: true
+          });
         }
       } catch (error: any) {
         console.error('Error claiming node:', error);
