@@ -140,7 +140,7 @@ export const useSignAndSendTx = ({
     Args
   >({
     mutationFn: signAndSendTx,
-    onSuccess: async () => { },
+    onSuccess: async () => {},
     onError: (e) => {
       console.error('loginToWalletSaga', e);
 

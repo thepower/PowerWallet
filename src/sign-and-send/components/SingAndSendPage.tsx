@@ -6,7 +6,7 @@ import isObject from 'lodash/isObject';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
-import { bytesToString, formatUnits } from 'viem/utils';
+import { bytesToString, formatUnits, hexToBytes, isAddress } from 'viem/utils';
 
 import { useConfirmModalPromise } from 'application/hooks';
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
@@ -116,7 +116,11 @@ const SignAndSendPageComponent: FC = () => {
       txBody.t = BigInt(Date.now());
 
       if (sponsor) {
-        txBody.e.sponsor = [Buffer.from(AddressApi.parseTextAddress(sponsor))];
+        txBody.e.sponsor = [
+          isAddress(sponsor)
+            ? Buffer.from(hexToBytes(sponsor))
+            : Buffer.from(AddressApi.parseTextAddress(sponsor))
+        ];
       }
 
       if (!gas) {
