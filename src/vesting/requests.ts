@@ -33,8 +33,7 @@ export const fetchTokenDetails = (
       const details = { decimals, symbol };
       return details;
     },
-    staleTime: 4 * 60 * 60 * 1000,
-    gcTime: 24 * 60 * 60 * 1000
+    staleTime: Infinity
   });
 
 export const fetchUserVesting = (
@@ -120,8 +119,7 @@ export const fetchUserVesting = (
         vestedPayoutAtTime: formattedVestedPayoutAtTime
       };
     },
-    staleTime: 2 * 60 * 60 * 1000, // 2 часа для вестинга
-    gcTime: 24 * 60 * 60 * 1000
+    staleTime: Infinity
   });
 
 export const fetchVestingDetails = (
@@ -178,6 +176,5 @@ export const fetchVestingDetails = (
         throw error;
       }
     },
-    staleTime: 2 * 60 * 60 * 1000,
-    gcTime: 24 * 60 * 60 * 1000
+    staleTime: Infinity
   });

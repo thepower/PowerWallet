@@ -266,6 +266,26 @@
     "noVestingsTitle": "Нет токенов в вестинге",
     "noVestingsDescription": "В вашем кошельке нет токенов в вестинге",
     "copiedToClipboard": "Скопировано в буфер обмена",
-    "tokenAlreadyAdded": "Токен уже добавлен"
+    "tokenAlreadyAdded": "Токен уже добавлен",
+    "claimNode": "Получить ноду",
+    "claimStatus": "Статус получения",
+    "nodesAvailable": "Доступные ноды",
+    "claiming": "Получение...",
+    "yourEligibility": "Ваше право",
+    "availableForClaim": "Доступно для получения",
+    "alreadyClaimed": "Уже получено",
+    "nodeClaimSuccess": "Нода успешно получена",
+    "nodeClaimError": "Ошибка при получении ноды:",
+    "yes": "Да",
+    "no": "Нет",
+    "powerNode": "Power Node",
+    "powerNodeSubtitle": "Раскройте силу децентрализации с вашей собственной Power Node",
+    "powerNodeDescription": "Станьте частью нашей децентрализованной сети, получив свой Power Node NFT. Каждая нода играет важную роль в обеспечении безопасности сети и получает вознаграждение за свой вклад.",
+    "powerNodeOperationDescription": "Необходим для работы узла и подключения к сети",
+    "readyToMint": "Готово к созданию",
+    "notAvailable": "Недоступно",
+    "stake": "Стейк",
+    "lockedIntoNFT": "заблокировано в NFT",
+    "claimPowerNodeNFT": "Получить Power Node NFT"
   }
 }

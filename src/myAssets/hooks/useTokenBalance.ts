@@ -81,7 +81,8 @@ export const useTokenBalance = ({
       !!activeWallet?.address &&
       !!networkApi &&
       !!tokenAddress &&
-      (type === TokenKind.Erc721 || type === TokenKind.Erc20)
+      (type === TokenKind.Erc721 || type === TokenKind.Erc20),
+    staleTime: Infinity
   });
 
   return {

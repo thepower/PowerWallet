@@ -266,6 +266,26 @@
     "noVestingsTitle": "No Vesting Tokens",
     "noVestingsDescription": "You currently have no vesting tokens in your wallet",
     "copiedToClipboard": "Copied to clipboard",
-    "tokenAlreadyAdded": "Token already added"
+    "tokenAlreadyAdded": "Token already added",
+    "claimNode": "Claim Node",
+    "claimStatus": "Claim Status",
+    "nodesAvailable": "Nodes Available",
+    "claiming": "Claiming...",
+    "yourEligibility": "Your Eligibility",
+    "availableForClaim": "Available for Claim",
+    "alreadyClaimed": "Already Claimed",
+    "nodeClaimSuccess": "Node claimed successfully",
+    "nodeClaimError": "Error claiming node:",
+    "yes": "Yes",
+    "no": "No",
+    "powerNode": "Power Node",
+    "powerNodeSubtitle": "Unlock the power of decentralization with your very own Power Node",
+    "powerNodeDescription": "Get ready to become a part of our decentralized network by claiming your Power Node NFT. Each Node plays a crucial role in maintaining network security and earns rewards for its contribution.",
+    "powerNodeOperationDescription": "Required for node operation and connectivity to the network",
+    "readyToMint": "Ready to Mint",
+    "notAvailable": "Not Available",
+    "stake": "Stake",
+    "lockedIntoNFT": "locked into NFT",
+    "claimPowerNodeNFT": "Claim Power Node NFT"
   }
 }
