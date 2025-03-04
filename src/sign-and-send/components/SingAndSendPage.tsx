@@ -63,7 +63,8 @@ const SignAndSendPageComponent: FC = () => {
 
   const fromAddress = useMemo(() => {
     try {
-      return AddressApi.encodeAddress(decodedMessage.body.f)?.txt;
+      return AddressApi.encodeAddress(Uint8Array.from(decodedMessage.body.f))
+        ?.txt;
     } catch (error) {
       return;
     }
@@ -115,7 +116,7 @@ const SignAndSendPageComponent: FC = () => {
       txBody.t = BigInt(Date.now());
 
       if (sponsor) {
-        txBody.e.sponsor = AddressApi.parseTextAddress(sponsor);
+        txBody.e.sponsor = [Buffer.from(AddressApi.parseTextAddress(sponsor))];
       }
 
       if (!gas) {
@@ -249,7 +250,10 @@ const SignAndSendPageComponent: FC = () => {
       } else {
         return {
           key,
-          value: typeof value === 'string' ? value : bytesToString(value)
+          value:
+            typeof value === 'string'
+              ? value
+              : bytesToString(Uint8Array.from(value[0]))
         };
       }
     });
@@ -262,9 +266,7 @@ const SignAndSendPageComponent: FC = () => {
     const txKindName = txKind && txKindMap[txKind];
     const to =
       decodedTxBody?.to &&
-      AddressApi.hexToTextAddress(
-        Buffer.from(decodedTxBody?.to).toString('hex')
-      );
+      AddressApi.hexToTextAddress(decodedTxBody?.to.toString('hex'));
 
     const transfer = decodedTxBody?.p?.find(
       (item) => item?.[0] === TxPurpose.TRANSFER

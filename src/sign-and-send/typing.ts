@@ -34,14 +34,14 @@ export enum TxKind {
 export interface TxBody {
   k: TxKind;
   t: bigint;
-  f: Uint8Array;
-  to: Uint8Array;
+  f: Buffer;
+  to: Buffer;
   s: bigint;
   p: Array<[TxPurpose, string, bigint]>;
   e?: {
-    sponsor?: Uint8Array;
+    sponsor?: Buffer[];
     msg?: string;
   };
-  c?: [string, Uint8Array];
-  pa?: Uint8Array;
+  c?: [string, Buffer];
+  pa?: Buffer;
 }

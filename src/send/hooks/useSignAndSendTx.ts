@@ -94,9 +94,7 @@ export const useSignAndSendTx = ({
 
       const to =
         newDecodedTxBody?.to &&
-        AddressApi.hexToTextAddress(
-          Buffer.from(newDecodedTxBody.to).toString('hex')
-        );
+        AddressApi.hexToTextAddress(newDecodedTxBody.to.toString('hex'));
 
       const comment = newDecodedTxBody?.e?.msg;
       const sequence = await getWalletSequence(activeWallet.address);
@@ -104,7 +102,10 @@ export const useSignAndSendTx = ({
 
       newDecodedTxBody.s = newSequence;
 
-      newDecodedTxBody.f = AddressApi.parseTextAddress(activeWallet.address);
+      if (!newDecodedTxBody.f)
+        newDecodedTxBody.f = Buffer.from(
+          AddressApi.parseTextAddress(activeWallet.address)
+        );
 
       const response = await networkApi.sendTxAndWaitForResponse(
         packAndSignTX(newDecodedTxBody, wif)
@@ -139,7 +140,7 @@ export const useSignAndSendTx = ({
     Args
   >({
     mutationFn: signAndSendTx,
-    onSuccess: async () => {},
+    onSuccess: async () => { },
     onError: (e) => {
       console.error('loginToWalletSaga', e);
 

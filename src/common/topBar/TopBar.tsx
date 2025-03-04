@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import cn from 'classnames';
 
 import { useStore } from 'application/store';
-import { BellIcon, MenuIcon } from 'assets/icons';
+import { MenuIcon } from 'assets/icons';
 import i18n from 'locales/initTranslation';
 import styles from './TopBar.module.scss';
 import ArrowLink from '../arrowLink/ArrowLink';
@@ -24,12 +24,12 @@ const TopBar: React.FC<TopBarProps> = ({
 }) => {
   const {
     isAccountMenuOpened,
-    setIsShowUnderConstruction,
+    // setIsShowUnderConstruction,
     setIsAccountMenuOpened
   } = useStore();
-  const handleShowUnderConstruction = useCallback(() => {
-    setIsShowUnderConstruction(true);
-  }, []);
+  // const handleShowUnderConstruction = useCallback(() => {
+  //   setIsShowUnderConstruction(true);
+  // }, []);
 
   const toggleAccountMenu = useCallback(() => {
     setIsAccountMenuOpened(!isAccountMenuOpened);
