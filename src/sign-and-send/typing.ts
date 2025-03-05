@@ -41,6 +41,7 @@ export interface TxBody {
   e?: {
     sponsor?: Buffer[];
     msg?: string;
+    callcode?: Buffer;
   };
   c?: [string, Buffer];
   pa?: Buffer;

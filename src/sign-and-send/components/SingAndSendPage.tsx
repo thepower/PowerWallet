@@ -6,7 +6,7 @@ import isObject from 'lodash/isObject';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
-import { bytesToString, formatUnits, hexToBytes, isAddress } from 'viem/utils';
+import { bytesToHex, formatUnits, hexToBytes, isAddress } from 'viem/utils';
 
 import { useConfirmModalPromise } from 'application/hooks';
 import { useNetworkApi } from 'application/hooks/useNetworkApi';
@@ -243,26 +243,55 @@ const SignAndSendPageComponent: FC = () => {
   );
 
   const renderExtraDataTable = () => {
-    if (!decodedTxBody?.e || isEmpty(decodedTxBody?.e)) return null;
+    try {
+      if (!decodedTxBody?.e || isEmpty(decodedTxBody?.e)) return null;
 
-    const items = Object.entries(decodedTxBody?.e).map(([key, value]) => {
-      if (key === 'sponsor' && value instanceof Uint8Array) {
-        return {
-          key,
-          value: AddressApi.encodeAddress(value)?.txt
-        };
-      } else {
-        return {
-          key,
-          value:
-            typeof value === 'string'
-              ? value
-              : bytesToString(Uint8Array.from(value[0]))
-        };
-      }
-    });
+      const items = Object.entries(decodedTxBody.e).map(([key, value]) => {
+        if (key === 'sponsor' && Array.isArray(value)) {
+          // Handle sponsor as Buffer[]
+          return {
+            key,
+            value: value
+              .map((buf) => {
+                const evmAddresss = bytesToHex(Uint8Array.from(buf));
 
-    return <CardTable items={items} />;
+                if (isAddress(evmAddresss)) {
+                  return evmAddresss;
+                } else {
+                  return AddressApi.encodeAddress(Uint8Array.from(buf))?.txt;
+                }
+              })
+              .join(', ')
+          };
+        } else if (key === 'msg' && typeof value === 'string') {
+          // Handle msg as string
+          return {
+            key,
+            value
+          };
+        } else if (key === 'callcode' && Buffer.isBuffer(value)) {
+          // Handle callCode as Buffer
+          return {
+            key,
+            value: bytesToHex(Uint8Array.from(value))
+          };
+        } else if (Buffer.isBuffer(value)) {
+          return {
+            key,
+            value: bytesToHex(Uint8Array.from(value))
+          };
+        } else {
+          return {
+            key,
+            value: String(value)
+          };
+        }
+      });
+
+      return <CardTable items={items} />;
+    } catch (error) {
+      return null;
+    }
   };
 
   const renderContent = () => {
