@@ -1,10 +1,7 @@
 import React, { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
 
-import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { RootState } from 'application/store';
-
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { CopyButton, PageTemplate, Tabs } from 'common';
 import {
   ReferralProgramTabs,
@@ -12,22 +9,11 @@ import {
 } from 'referral-program/types';
 import styles from './ReferralProgramPage.module.scss';
 
-const mapDispatchToProps = {};
-
-const mapStateToProps = (state: RootState) => ({
-  walletAddress: getWalletAddress(state)
-});
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-type ReferralProgramPageProps = ConnectedProps<typeof connector>;
-
-const ReferralProgramPageComponent: FC<ReferralProgramPageProps> = ({
-  walletAddress
-}) => {
+const ReferralProgramPageComponent: FC = () => {
   const { t } = useTranslation();
 
   const [tab, setTab] = useState(ReferralProgramTabs.referralLink);
+  const { activeWallet } = useWalletsStore();
 
   const onChangeTab = (
     _event: React.SyntheticEvent,
@@ -37,9 +23,10 @@ const ReferralProgramPageComponent: FC<ReferralProgramPageProps> = ({
   };
 
   const referralLink = useMemo(() => {
-    if (walletAddress) return `${window.location.origin}/${walletAddress}`;
+    if (activeWallet?.address)
+      return `${window.location.origin}/${activeWallet.address}`;
     return '';
-  }, [walletAddress]);
+  }, [activeWallet]);
 
   return (
     <PageTemplate backUrl='/' backUrlText={t('home')!}>
@@ -80,4 +67,4 @@ const ReferralProgramPageComponent: FC<ReferralProgramPageProps> = ({
   );
 };
 
-export const ReferralProgramPage = connector(ReferralProgramPageComponent);
+export const ReferralProgramPage = ReferralProgramPageComponent;

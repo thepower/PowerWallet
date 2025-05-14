@@ -34,12 +34,7 @@
 }
 
 .addAssetsPageFormInput {
-  padding: 4px 16px;
   margin-bottom: 40px;
-  background: linear-gradient(102.53deg,
-  rgba(226, 226, 226, 0.2) -7.97%,
-  rgba(226, 226, 226, 0.190323) -0.7%,
-  rgba(226, 226, 226, 0.05) 104.73%);
 }
 
 .addAssetsPageFormButton {
@@ -51,6 +46,8 @@
 }
 
 .noTokens {
-  margin: 24px 0;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
 }

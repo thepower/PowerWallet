@@ -3,10 +3,10 @@ import cn from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import appEnvs from 'appEnvs';
-import { getNetworkChainID } from 'application/selectors';
-import { useAppSelector } from 'application/store';
+import { SentData } from 'application/store';
+import { sliceString } from 'application/utils/applicationUtils';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
 import { Button } from 'common';
-import { SentData } from 'send/slices/sendSlice';
 import { SuccessSvg } from './icons';
 import styles from './TxResult.module.scss';
 
@@ -15,19 +15,11 @@ type TxResultProps = {
   className?: string;
 };
 
-// const socialLinks = [
-//   { Icon: TelegramSvg, url: '' },
-//   { Icon: DiscordSvg, url: '' },
-//   { Icon: FbMessengerSvg, url: '' },
-//   { Icon: TwitterSvg, url: '' },
-//   { Icon: WechatSvg, url: '' },
-//   { Icon: WhatsappSvg, url: '' },
-// ];
-
 const TxResult: React.FC<TxResultProps> = ({ sentData, className }) => {
   const { t } = useTranslation();
-  const chainID = useAppSelector(getNetworkChainID);
-  const txExplorerLink = `${appEnvs.EXPLORER_THEPOWER_URL}/${chainID}/transaction/${sentData.txId}`;
+  const { activeWallet } = useWalletsStore();
+
+  const txExplorerLink = `${appEnvs.EXPLORER_THEPOWER_URL}/${activeWallet?.chainId}/transaction/${sentData.txId}`;
 
   const onClickClose = () => {
     if (sentData.returnURL) {
@@ -52,11 +44,19 @@ const TxResult: React.FC<TxResultProps> = ({ sentData, className }) => {
         </div>
         <div>
           <div className={styles.resultKey}>{t('from')}</div>
-          <div className={styles.resultValue}>{sentData?.from}</div>
+          <div className={styles.resultValue}>
+            {sentData?.from?.length && sentData?.from.length > 20
+              ? sliceString(sentData?.from, 10)
+              : sentData?.from}
+          </div>
         </div>
         <div>
           <div className={styles.resultKey}>{t('to')}</div>
-          <div className={styles.resultValue}>{sentData?.to}</div>
+          <div className={styles.resultValue}>
+            {sentData?.to?.length && sentData?.to.length > 20
+              ? sliceString(sentData?.to, 10)
+              : sentData?.to}
+          </div>
         </div>
         <div>
           <div className={styles.resultKey}>{t('tx')}</div>

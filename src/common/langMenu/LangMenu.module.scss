@@ -1,4 +1,4 @@
-@import 'src/styles/mixins';
+@use '@/styles/mixins' as *;
 
 .menuRoot {
   z-index: 99999999;

@@ -1,40 +1,33 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Button } from '@mui/material';
 import classnames from 'classnames';
 import { FormikHelpers, useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { connect, ConnectedProps } from 'react-redux';
+import { useResetWallet } from 'account/hooks';
 import { Modal, OutlinedInput } from 'common';
-import styles from '../../registration/components/pages/registration/RegistrationPage.module.scss';
-import { resetAccount } from '../slice/accountSlice';
+import styles from 'registration/components/pages/registration/RegistrationPage.module.scss';
 
 const initialValues = { password: '' };
 type Values = typeof initialValues;
 
-const mapDispatchToProps = {
-  resetAccount
-};
-
-const connector = connect(null, mapDispatchToProps);
-type ResetAccountModalProps = ConnectedProps<typeof connector> & {
+type ResetAccountModalProps = {
   open: boolean;
   onClose: () => void;
 };
 
 const ResetAccountModalComponent: FC<ResetAccountModalProps> = ({
-  resetAccount,
   onClose,
   open
 }) => {
   const { t } = useTranslation();
-
+  const { resetWallet } = useResetWallet();
   const handleSubmitImportModal = async (
     values: Values,
     formikHelpers: FormikHelpers<Values>
   ) => {
     const { password } = values;
 
-    resetAccount({ password });
+    resetWallet({ password, additionalActionOnSuccess: onClose });
 
     formikHelpers.setFieldValue('password', '');
     onClose();
@@ -51,32 +44,26 @@ const ResetAccountModalComponent: FC<ResetAccountModalProps> = ({
       onClose={onClose}
       open={open}
     >
-      <form className={styles.resetModalForm} onSubmit={formik.handleSubmit}>
-        <div className={styles.exportModalTitleHolder}>
-          <div className={styles.exportModalTitle}>{t('resetAccount')}</div>
-          <div className={styles.exportModalTitle}>
-            {t('areYouSureYouWantResetYourAccount')}
-          </div>
-          <div className={styles.exportModalTitle}>
-            {t('enterYourPasswordConfirmAccountReset')}
-          </div>
+      <div className={styles.exportModalTitleHolder}>
+        <div className={styles.exportModalTitle}>{t('resetAccount')}</div>
+        <div className={styles.exportModalTitle}>
+          {t('areYouSureYouWantResetYourAccount')}
         </div>
+        <div className={styles.exportModalTitle}>
+          {t('enterYourPasswordConfirmAccountReset')}
+        </div>
+      </div>
+      <form className={styles.resetModalForm} onSubmit={formik.handleSubmit}>
         <OutlinedInput
           inputRef={(input) => input && input.focus()}
           placeholder={t('password')!}
-          className={classnames(
-            styles.passwordInput,
-            styles.importModalPasswordInput
-          )}
-          name='password'
-          value={formik.values.password}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
           type={'password'}
           autoComplete='new-password'
           autoFocus
+          size='small'
           errorMessage={formik.errors.password}
           error={formik.touched.password && Boolean(formik.errors.password)}
+          {...formik.getFieldProps('password')}
         />
         <Button
           className={classnames(
@@ -86,12 +73,15 @@ const ResetAccountModalComponent: FC<ResetAccountModalProps> = ({
           variant='outlined'
           size='large'
           type='submit'
+          disabled={!formik.isValid || formik.isSubmitting || !formik.dirty}
         >
-          <span className={styles.registrationNextButtonText}>{t('next')}</span>
+          <span className={styles.registrationNextButtonText}>
+            {t('confirm')}
+          </span>
         </Button>
       </form>
     </Modal>
   );
 };
 
-export const ResetAccountModal = connector(ResetAccountModalComponent);
+export const ResetAccountModal = ResetAccountModalComponent;

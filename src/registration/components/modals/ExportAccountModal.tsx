@@ -1,137 +1,114 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@mui/material';
 import classnames from 'classnames';
-import { WithTranslation, withTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
-import { exportAccount } from '../../../account/slice/accountSlice';
+import { FormikHelpers, useFormik } from 'formik';
+import { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
+import * as yup from 'yup';
+import { useExportAccount } from 'account/hooks';
 import { Modal, OutlinedInput } from '../../../common';
-import { compareTwoStrings } from '../../utils/registrationUtils';
 import styles from '../pages/registration/RegistrationPage.module.scss';
 
-const mapDispatchToProps = {
-  exportAccount
+const initialValues = {
+  password: '',
+  confirmedPassword: '',
+  hint: ''
 };
 
-const connector = connect(null, mapDispatchToProps);
-type ExportAccountModalProps = ConnectedProps<typeof connector> &
-  WithTranslation & {
-    open: boolean;
-    onClose: () => void;
-  };
+type Values = typeof initialValues;
 
-interface ExportAccountModalState {
-  password: string;
-  confirmedPassword: string;
-  hint: string;
-  passwordsNotEqual: boolean;
-}
+type ExportAccountModalProps = {
+  open: boolean;
+  onClose: () => void;
+};
 
-class ExportAccountModalComponent extends React.PureComponent<
-  ExportAccountModalProps,
-  ExportAccountModalState
-> {
-  private initialState = {
-    password: '',
-    confirmedPassword: '',
-    hint: '',
-    passwordsNotEqual: false
-  };
+const validationSchema = (t: TFunction) =>
+  yup.object().shape({
+    password: yup.string().required(t('required')),
+    confirmedPassword: yup
+      .string()
+      .required(t('required'))
+      .oneOf([yup.ref('password'), null], t('oopsPasswordsDidntMatch'))
+  });
 
-  constructor(props: ExportAccountModalProps) {
-    super(props);
+const ExportAccountModalComponent: React.FC<ExportAccountModalProps> = ({
+  open,
+  onClose
+}) => {
+  const { t } = useTranslation();
 
-    this.state = this.initialState;
-  }
+  const { exportAccountMutation } = useExportAccount();
 
-  onChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      password: event.target.value,
-      passwordsNotEqual: false
+  const handleSubmitExportModal = async (
+    { password, hint }: Values,
+    formikHelpers: FormikHelpers<Values>
+  ) => {
+    exportAccountMutation({
+      password,
+      hint,
+      additionalActionOnSuccess: () => {
+        formikHelpers.resetForm();
+
+        onClose();
+      }
     });
   };
 
-  onChangeConfirmedPassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      confirmedPassword: event.target.value,
-      passwordsNotEqual: false
-    });
-  };
+  const formik = useFormik({
+    initialValues: {
+      password: '',
+      confirmedPassword: '',
+      hint: ''
+    },
+    onSubmit: handleSubmitExportModal,
+    validationSchema: validationSchema(t)
+  });
 
-  onChangeHint = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      hint: event.target.value
-    });
-  };
+  useEffect(() => {
+    formik.resetForm();
+  }, []);
 
-  handleSubmitExportModal = () => {
-    const { password, confirmedPassword, hint } = this.state;
-    const { exportAccount, onClose } = this.props;
-
-    const passwordsNotEqual = !compareTwoStrings(password!, confirmedPassword!);
-
-    if (passwordsNotEqual) {
-      this.setState({ passwordsNotEqual });
-      return;
-    }
-
-    exportAccount({ password, hint });
-
-    this.setState({ ...this.initialState });
-
-    onClose();
-  };
-
-  render() {
-    const { open, onClose } = this.props;
-
-    const { password, confirmedPassword, hint, passwordsNotEqual } = this.state;
-
-    return (
-      <Modal
-        contentClassName={styles.exportModalContent}
-        onClose={onClose}
-        open={open}
-      >
-        <div className={styles.exportModalTitleHolder}>
-          <div className={styles.exportModalTitle}>
-            {this.props.t('exportWallet')}
-          </div>
-          <div className={styles.exportModalTitle}>
-            {this.props.t('exportYourWallet')}
-          </div>
-          <div className={styles.exportModalTitle}>
-            {this.props.t('exportFileEncrypted')}
-          </div>
+  return (
+    <Modal
+      contentClassName={styles.exportModalContent}
+      onClose={onClose}
+      open={open}
+    >
+      <div className={styles.exportModalTitleHolder}>
+        <div className={styles.exportModalTitle}>{t('exportWallet')}</div>
+        <div className={styles.exportModalTitle}>{t('exportYourWallet')}</div>
+        <div className={styles.exportModalTitle}>
+          {t('exportFileEncrypted')}
         </div>
+      </div>
+      <form className={styles.exportModalForm} onSubmit={formik.handleSubmit}>
         <OutlinedInput
-          placeholder={this.props.t('password')!}
-          className={classnames(
-            styles.passwordInput,
-            styles.passwordInputPadded
-          )}
-          value={password}
-          onChange={this.onChangePassword}
-          type={'password'}
+          size='small'
+          placeholder={t('password')}
+          error={formik.touched.password && Boolean(formik.errors.password)}
+          errorMessage={formik.errors.password}
+          type='password'
           autoFocus
+          fullWidth
+          {...formik.getFieldProps('password')}
         />
         <OutlinedInput
-          placeholder={this.props.t('repeatedPassword')!}
-          className={styles.passwordInput}
-          value={confirmedPassword}
-          onChange={this.onChangeConfirmedPassword}
-          error={passwordsNotEqual}
-          errorMessage={this.props.t('oopsPasswordsDidntMatch')!}
-          type={'password'}
+          size='small'
+          placeholder={t('repeatedPassword')}
+          error={
+            formik.touched.confirmedPassword &&
+            Boolean(formik.errors.confirmedPassword)
+          }
+          fullWidth
+          errorMessage={formik.errors.confirmedPassword}
+          type='password'
+          {...formik.getFieldProps('confirmedPassword')}
         />
-        <div className={styles.exportModalHintDesc}>
-          {this.props.t('hintForPassword')}
-        </div>
         <OutlinedInput
-          placeholder={this.props.t('hint')!}
-          className={styles.exportModalHintTextArea}
-          value={hint}
-          onChange={this.onChangeHint}
-          multiline
+          size='small'
+          placeholder={t('hint')}
+          fullWidth
+          {...formik.getFieldProps('hint')}
         />
         <Button
           className={classnames(
@@ -140,17 +117,16 @@ class ExportAccountModalComponent extends React.PureComponent<
           )}
           variant='outlined'
           size='large'
-          onClick={this.handleSubmitExportModal}
+          type='submit'
+          disabled={!formik.isValid || formik.isSubmitting || !formik.dirty}
         >
           <span className={styles.registrationNextButtonText}>
-            {this.props.t('next')}
+            {t('confirm')}
           </span>
         </Button>
-      </Modal>
-    );
-  }
-}
+      </form>
+    </Modal>
+  );
+};
 
-export const ExportAccountModal = withTranslation()(
-  connector(ExportAccountModalComponent)
-);
+export const ExportAccountModal = ExportAccountModalComponent;

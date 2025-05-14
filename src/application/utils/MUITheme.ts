@@ -51,10 +51,9 @@ const MUITheme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          color: '#F5F5F7',
-          padding: '8px 16px',
+          color: '#6b798f',
           borderRadius: 5,
-          background: '#252B35',
+          background: '#121923',
           '&:hover': {
             background: '#2E353D'
           },
@@ -71,7 +70,7 @@ const MUITheme = createTheme({
             }
           },
           '&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline': {
-            border: '1px solid #F5F5F7'
+            border: '1px solid transparent'
           }
         },
         input: {
@@ -80,7 +79,10 @@ const MUITheme = createTheme({
           }
         },
         notchedOutline: {
-          border: '1px solid #252B35'
+          border: '1px solid transparent'
+        },
+        sizeSmall: {
+          height: '48px'
         }
       }
     },

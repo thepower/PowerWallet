@@ -1,4 +1,4 @@
-@import 'src/styles/utils';
+@use '@/styles/mixins' as *;
 
 .asset {
   display: block;

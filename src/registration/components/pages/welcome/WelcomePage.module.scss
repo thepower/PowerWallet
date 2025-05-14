@@ -1,5 +1,5 @@
-@import 'src/styles/variables';
-@import 'src/styles/mixins';
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
 
 .registrationPage {
   position: relative;
@@ -12,11 +12,15 @@
   justify-content: center;
 }
 
-.langSelect {
+.controlsHolder {
   position: absolute;
   z-index: 100001;
   top: 16px;
   right: calc(10vw + 32px);
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
   @include mobile {
     top: 40px;
@@ -53,7 +57,6 @@
     line-height: 32px;
   }
 }
-
 
 .buttonsHolder {
   z-index: 10000;

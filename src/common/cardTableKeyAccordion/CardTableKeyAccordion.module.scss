@@ -1,5 +1,3 @@
-@import 'src/styles/variables';
-
 .accordionWrapper {
   position: relative;
   grid-column: 1/-1;
@@ -33,7 +31,6 @@
 }
 
 .accordionSummaryRoot {
-
   width: max-content;
 
   min-height: 24px;

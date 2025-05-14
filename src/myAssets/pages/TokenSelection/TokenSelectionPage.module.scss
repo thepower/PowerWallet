@@ -16,7 +16,22 @@
   transform: translateX(50%);
 }
 
-
 .myAssetsTabsRoot {
   padding: 0 20px;
+}
+
+.addressButton {
+  margin: 16px auto 0 auto;
+}
+
+.noTokens {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.form {
+  display: flex;
+  gap: 16px;
 }

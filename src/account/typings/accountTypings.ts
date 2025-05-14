@@ -7,22 +7,6 @@ export type GetChainResultType = {
   txtaddress: string;
 };
 
-export type LoginToWalletSagaInput = {
-  address?: string;
-  encryptedWif?: string;
-};
-
-export type ExportAccountInputType = {
-  password: string;
-  hint?: string;
-  isWithoutGoHome?: boolean;
-};
-
-export type ImportAccountInputType = {
-  accountFile: File;
-  password: string;
-};
-
 export type AccountActionType = {
   title: string;
   action: (data?: any) => void;

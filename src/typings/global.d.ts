@@ -1,5 +1,3 @@
-declare module '@thepowereco/msgpack';
-
 declare module '*.svg' {
   import * as React from 'react';
 
@@ -16,4 +14,8 @@ declare module '*.scss' {
 declare module '*.module.scss' {
   const styles: { [className: string]: string };
   export default styles;
+}
+
+interface Window {
+  ItezWidget: any;
 }

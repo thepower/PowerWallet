@@ -1,91 +1,102 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Skeleton } from '@mui/material';
-import { push } from 'connected-react-router';
+import { useFormik } from 'formik';
 import range from 'lodash/range';
 import { useTranslation } from 'react-i18next';
-import { connect, ConnectedProps } from 'react-redux';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { getNetworkChainID } from 'application/selectors';
-import { RootState } from 'application/store';
-import { WalletRoutesEnum } from 'application/typings/routes';
-import { Button, Divider, PageTemplate, Tabs } from 'common';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { RoutesEnum } from 'application/typings/routes';
+import {
+  useTokensStore,
+  useWalletsStore
+} from 'application/utils/localStorageUtils';
+import {
+  Button,
+  CopyButton,
+  Divider,
+  OutlinedInput,
+  PageTemplate,
+  Tabs
+} from 'common';
 import { Erc721Token } from 'myAssets/components/Erc721Token';
 import { Token } from 'myAssets/components/Token';
-import {
-  getErc721Tokens,
-  getTokenByID,
-  getTokens
-} from 'myAssets/selectors/tokensSelectors';
-import {
-  getWalletNativeTokens,
-  getWalletNativeTokensAmountBySymbol
-} from 'myAssets/selectors/walletSelectors';
-import {
-  getErc721TokensTrigger,
-  toggleTokenShow,
-  updateTokensAmountsTrigger
-} from 'myAssets/slices/tokensSlice';
+import { useERC721Tokens } from 'myAssets/hooks/useERC721Tokens';
+import { useWalletData } from 'myAssets/hooks/useWalletData';
 
 import { MyAssetsTabs, TokenKind, getMyAssetsTabsLabels } from 'myAssets/types';
-import { checkIfLoading } from 'network/selectors';
 import styles from './TokenSelectionPage.module.scss';
 
-type OwnProps = RouteComponentProps<{ address: string }>;
-
-const mapDispatchToProps = {
-  toggleTokenShow,
-  updateTokensAmountsTrigger,
-  pushTo: push,
-  getErc721TokensTrigger
+type InitialValues = {
+  tokenId: string;
 };
 
-const mapStateToProps = (state: RootState, props: OwnProps) => ({
-  collectionAddress: props?.match?.params?.address,
-  nativeTokens: getWalletNativeTokens(state),
-  tokens: getTokens(state),
-  erc721Tokens: getErc721Tokens(state),
-  isGetErc721TokensLoading: checkIfLoading(state, getErc721TokensTrigger.type),
-  getTokenByID: (address: string) => getTokenByID(state, address),
-  getWalletNativeTokensAmountBySymbol: (address: string) =>
-    getWalletNativeTokensAmountBySymbol(state, address),
-  chainId: getNetworkChainID(state)
-});
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type TokenSelectionPageProps = ConnectedProps<typeof connector>;
-
-const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
-  tokens,
-  getTokenByID,
-  getWalletNativeTokensAmountBySymbol,
-  nativeTokens,
-  updateTokensAmountsTrigger,
-  collectionAddress,
-  erc721Tokens,
-  isGetErc721TokensLoading,
-  getErc721TokensTrigger,
-  chainId
-}) => {
+const TokenSelectionPageComponent: React.FC = () => {
   const [tab, setTab] = useState<MyAssetsTabs>(MyAssetsTabs.Erc20);
   const [selectedToken, setSelectedToken] = useState<string>('');
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { address: collectionAddress } = useParams<{ address: string }>();
 
-  useEffect(() => {
-    updateTokensAmountsTrigger();
-  }, []);
+  const { activeWallet } = useWalletsStore();
 
-  useEffect(() => {
-    if (collectionAddress) {
-      getErc721TokensTrigger({ address: collectionAddress });
-    }
-  }, [collectionAddress, getErc721TokensTrigger]);
+  const { nativeTokens, getNativeTokenAmountBySymbol } =
+    useWalletData(activeWallet);
+
+  const { erc721Tokens, isLoading: isGetErc721TokensLoading } = useERC721Tokens(
+    { tokenAddress: collectionAddress, enabled: !!collectionAddress }
+  );
+
+  const { tokens, getTokenByAddress } = useTokensStore();
 
   const collection = useMemo(() => {
     if (collectionAddress) {
-      return getTokenByID(collectionAddress);
+      return getTokenByAddress(collectionAddress);
     }
     return null;
-  }, [collectionAddress, getTokenByID]);
+  }, [collectionAddress, getTokenByAddress]);
+
+  const nativeAssetAmount = getNativeTokenAmountBySymbol(selectedToken);
+  const token = getTokenByAddress(selectedToken);
+
+  const assetIdentifier = useMemo(() => {
+    if (collectionAddress) {
+      return collection?.address;
+    }
+    if (nativeAssetAmount) {
+      return selectedToken;
+    }
+    return token?.address || '';
+  }, [
+    collectionAddress,
+    collection?.address,
+    nativeAssetAmount,
+    selectedToken,
+    token?.address
+  ]);
+
+  const tokenType = nativeAssetAmount
+    ? TokenKind.Native
+    : token?.type || collection?.type || '';
+
+  const nextLink =
+    tokenType === TokenKind.Erc721
+      ? `/${tokenType}/${assetIdentifier}/${selectedToken}${RoutesEnum.send}`
+      : `/${tokenType}/${assetIdentifier}${RoutesEnum.send}`;
+
+  async function handleSubmit({ tokenId }: InitialValues) {
+    navigate(`/${tokenType}/${assetIdentifier}/${tokenId}${RoutesEnum.send}`);
+  }
+
+  const initialValues = useMemo<InitialValues>(
+    () => ({
+      tokenId: ''
+    }),
+    []
+  );
+
+  const formik = useFormik({
+    initialValues,
+    onSubmit: handleSubmit
+  });
 
   const onClickCheckBox = useCallback(
     (token: string) => {
@@ -98,13 +109,14 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     (token) =>
       token.isShow &&
       token.type === TokenKind.Erc20 &&
-      token?.chainId === chainId
+      token?.chainId === activeWallet?.chainId
   );
+
   const erc721tokens = tokens.filter(
     (token) =>
       token.isShow &&
       token.type === TokenKind.Erc721 &&
-      token?.chainId === chainId
+      token?.chainId === activeWallet?.chainId
   );
 
   const tokensMap = {
@@ -117,6 +129,7 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   const onChangeTab = (_event: React.SyntheticEvent, value: MyAssetsTabs) => {
     setTab(value);
   };
+
   const renderAssetsList = useCallback(() => {
     if (isGetErc721TokensLoading) {
       return (
@@ -142,6 +155,33 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
     }
 
     if (collectionAddress) {
+      if (!erc721Tokens?.length) {
+        return (
+          <form className={styles.form} onSubmit={formik.handleSubmit}>
+            <OutlinedInput
+              id='tokenId'
+              placeholder={t('enterTokenIdPlaceholder')}
+              type='number'
+              size='small'
+              errorMessage={formik.errors.tokenId}
+              error={formik.touched.tokenId && Boolean(formik.errors.tokenId)}
+              disabled={formik.isSubmitting}
+              fullWidth
+              {...formik.getFieldProps('tokenId')}
+            />
+            <Button
+              fullWidth
+              type='submit'
+              variant='contained'
+              loading={formik.isSubmitting}
+              disabled={!formik.isValid}
+            >
+              {t('select')}
+            </Button>
+          </form>
+        );
+      }
+
       return (
         <ul className={styles.tokensList}>
           {erc721Tokens.map((token) => (
@@ -155,6 +195,16 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
             </li>
           ))}
         </ul>
+      );
+    }
+
+    if (!currentTokens.length) {
+      return (
+        <div className={styles.noTokens}>
+          {t(
+            tab === MyAssetsTabs.Erc20 ? 'noTokensAvailable' : 'noNFTsAvailable'
+          )}
+        </div>
       );
     }
 
@@ -177,43 +227,17 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
       </ul>
     );
   }, [
+    isGetErc721TokensLoading,
     collectionAddress,
     currentTokens,
     erc721Tokens,
+    t,
+    formik,
     collection,
     selectedToken,
     onClickCheckBox,
-    tab,
-    isGetErc721TokensLoading
+    tab
   ]);
-
-  const nativeAssetAmount = getWalletNativeTokensAmountBySymbol(selectedToken);
-  const token = getTokenByID(selectedToken);
-
-  const assetIdentifier = useMemo(() => {
-    if (collectionAddress) {
-      return collection?.address;
-    }
-    if (nativeAssetAmount) {
-      return selectedToken;
-    }
-    return token?.address || '';
-  }, [
-    collectionAddress,
-    collection?.address,
-    nativeAssetAmount,
-    selectedToken,
-    token?.address
-  ]);
-
-  const tokenType = nativeAssetAmount
-    ? TokenKind.Native
-    : token?.type || collection?.type || '';
-
-  const nextLink =
-    tokenType === TokenKind.Erc721
-      ? `/${tokenType}/${assetIdentifier}/${selectedToken}${WalletRoutesEnum.send}`
-      : `/${tokenType}/${assetIdentifier}${WalletRoutesEnum.send}`;
 
   return (
     <PageTemplate
@@ -221,6 +245,11 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
       backUrl='/'
       backUrlText={t('home')!}
     >
+      <CopyButton
+        textButton={activeWallet?.address || ''}
+        className={styles.addressButton}
+        iconClassName={styles.copyIcon}
+      />
       <div className={styles.tokenSelection}>
         {!collectionAddress && (
           <Tabs
@@ -248,4 +277,4 @@ const TokenSelectionPageComponent: React.FC<TokenSelectionPageProps> = ({
   );
 };
 
-export const TokenSelectionPage = connector(TokenSelectionPageComponent);
+export const TokenSelectionPage = TokenSelectionPageComponent;

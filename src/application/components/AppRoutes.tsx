@@ -1,88 +1,96 @@
 import React, { useEffect } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
+import { Route, Routes } from 'react-router-dom';
+import appEnvs from 'appEnvs';
+import { useInitApp, useRestoreOldVersionAccount } from 'application/hooks';
+import { useNetworkApi } from 'application/hooks';
+import { useWalletsStore } from 'application/utils/localStorageUtils';
+// import { BuyCryptoPage } from 'buy/pages/BuyCrypto/BuyCrypto';
+// import { BuyFiatPage } from 'buy/pages/BuyFiat/BuyFiat';
+// import { BuyPage } from 'buy/pages/BuyPage/BuyPage';
+import { ClaimNodePage } from 'claim-node/pages/ClaimNodePage';
 import { FullScreenLoader } from 'common';
 import { AddTokenPage } from 'myAssets/pages/AddToken/AddTokenPage';
 import { MainPage } from 'myAssets/pages/Main/MainPage';
 import { TokenSelectionPage } from 'myAssets/pages/TokenSelection/TokenSelectionPage';
 import { TokenTransactionsPage } from 'myAssets/pages/TokenTransactions/TokenTransactionsPage';
-import { checkIfLoading } from 'network/selectors';
-import { ReferralProgramPage } from 'referral-program/components/pages/ReferralProgramPage';
+// import { ReferralProgramPage } from 'referral-program/components/pages/ReferralProgramPage';
 import { LoginPage } from 'registration/components/pages/login/LoginPage';
 import { RegistrationPage } from 'registration/components/pages/registration/RegistrationPage';
 import { WelcomePage } from 'registration/components/pages/welcome/WelcomePage';
 import { SendPage } from 'send/components/SendPage';
-import SignAndSendPage from 'sign-and-send/components/SingAndSendPage';
-import WalletSSOPage from 'sso/components/pages/WalletSSOPage';
-// import { ReferralProgramPage } from 'referral-program/components/pages/ReferralProgramPage';
+import { SignAndSendPage } from 'sign-and-send/components/SingAndSendPage';
+import { SSOPage } from 'sso/pages/sso/SSOPage';
+// import { VestingPage } from 'vesting/pages/vesting/VestingPage';
 
-import { initApplication } from '../slice/applicationSlice';
-import { useAppDispatch, useAppSelector } from '../store';
-import { WalletRoutesEnum } from '../typings/routes';
+import { RoutesEnum } from '../typings/routes';
 
 const AppRoutesComponent: React.FC = () => {
-  const dispatch = useAppDispatch();
+  const { activeWallet } = useWalletsStore();
+  const { isLoading } = useNetworkApi({
+    chainId: activeWallet?.chainId || appEnvs.DEFAULT_CHAIN_ID
+  });
 
-  const networkApi = useAppSelector(
-    (state) => state.applicationData.networkApi
-  );
-  const walletApi = useAppSelector((state) => state.applicationData.walletApi);
-  const loading = useAppSelector((state) =>
-    checkIfLoading(state, initApplication.type)
-  );
-  const walletAddress = useAppSelector(getWalletAddress);
+  const { initApp } = useInitApp();
+
+  const walletAddress = activeWallet?.address;
 
   useEffect(() => {
-    dispatch(initApplication());
-  }, [dispatch]);
+    initApp();
+  }, []);
 
-  if (!walletApi || !networkApi || loading) {
+  const { isMigrating } = useRestoreOldVersionAccount();
+
+  if (isLoading || isMigrating) {
     return <FullScreenLoader />;
   }
 
   return (
-    <Switch>
+    <Routes>
       <Route
-        exact
-        path={`${WalletRoutesEnum.signup}/:dataOrReferrer?`}
-        component={RegistrationPage}
-      />
-      <Route
-        exact
-        path={`${WalletRoutesEnum.login}/:data?`}
-        component={LoginPage}
-      />
-      <Route path={`${WalletRoutesEnum.sso}/:data`} component={WalletSSOPage} />
-      <Route
-        path={`/:type/:address/:id?${WalletRoutesEnum.send}`}
-        component={SendPage}
-      />
-      <Route exact path={`${WalletRoutesEnum.add}`} component={AddTokenPage} />
-      <Route
-        path={`/:type/:address${WalletRoutesEnum.transactions}`}
-        component={TokenTransactionsPage}
-      />
-      <Route
-        path={`${WalletRoutesEnum.tokenSelection}/:address?`}
-        component={TokenSelectionPage}
-        exact
-      />
-      <Route
-        path={`${WalletRoutesEnum.signAndSend}/:message`}
-        component={SignAndSendPage}
-      />
-      <Route
-        exact
-        path={WalletRoutesEnum.referralProgram}
-        component={ReferralProgramPage}
-      />
-      <Route
-        exact
         path={walletAddress ? '/' : '/:referrer?'}
-        component={walletAddress ? MainPage : WelcomePage}
+        element={walletAddress ? <MainPage /> : <WelcomePage />}
       />
-      <Redirect path='*' to={WalletRoutesEnum.root} />
-    </Switch>
+      {/* <Route
+        path={RoutesEnum.referralProgram}
+        element={<ReferralProgramPage />}
+      /> */}
+      <Route path={RoutesEnum.add} element={<AddTokenPage />} />
+      <Route
+        path={`${RoutesEnum.signAndSend}/:message`}
+        element={<SignAndSendPage />}
+      />
+      <Route
+        path={`${RoutesEnum.tokenSelection}/:address?`}
+        element={<TokenSelectionPage />}
+      />
+      <Route path={`${RoutesEnum.sso}/:data`} element={<SSOPage />} />
+      {/* <Route path={`${RoutesEnum.buy}`} element={<BuyPage />} />
+      <Route
+        path={`${RoutesEnum.buy}${RoutesEnum.crypto}`}
+        element={<BuyCryptoPage />}
+      />
+      <Route
+        path={`${RoutesEnum.buy}${RoutesEnum.fiat}`}
+        element={<BuyFiatPage />}
+      /> */}
+      <Route
+        path={`${RoutesEnum.signup}/:dataOrReferrer?`}
+        element={<RegistrationPage />}
+      />
+
+      <Route path={`${RoutesEnum.login}/:data?`} element={<LoginPage />} />
+      <Route
+        path={`/:type/:address/:id?${RoutesEnum.send}`}
+        element={<SendPage />}
+      />
+
+      <Route
+        path={`/:type/:address${RoutesEnum.transactions}`}
+        element={<TokenTransactionsPage />}
+      />
+      {/* <Route path={RoutesEnum.vesting} element={<VestingPage />} /> */}
+      <Route path={RoutesEnum.claimNode} element={<ClaimNodePage />} />
+    </Routes>
   );
 };
 

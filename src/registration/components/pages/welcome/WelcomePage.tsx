@@ -1,50 +1,42 @@
-import React, { FC, useEffect } from 'react';
-import { push } from 'connected-react-router';
+import { FC, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ConnectedProps, connect } from 'react-redux';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { getWalletAddress } from 'account/selectors/accountSelectors';
-import { RootState } from 'application/store';
-import { WalletRoutesEnum } from 'application/typings/routes';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import appEnvs from 'appEnvs';
+import { RoutesEnum } from 'application/typings/routes';
 import { Button, LangMenu } from 'common';
-import {
-  getCurrentBackupStep,
-  getCurrentCreatingStep,
-  getIsWithoutPassword
-} from 'registration/selectors/registrationSelectors';
 
+import { objectToString } from 'sso/utils';
 import styles from './WelcomePage.module.scss';
 
-type OwnProps = RouteComponentProps<{ referrer?: string }>;
-
-const mapStateToProps = (state: RootState, props: OwnProps) => ({
-  referrer: props?.match?.params?.referrer,
-  walletAddress: getWalletAddress(state),
-  creatingStep: getCurrentCreatingStep(state),
-  backupStep: getCurrentBackupStep(state),
-  isWithoutPassword: getIsWithoutPassword(state)
-});
-
-const mapDispatchToProps = {
-  routeTo: push
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type WelcomePageProps = ConnectedProps<typeof connector>;
-
-const WelcomePageComponent: FC<WelcomePageProps> = ({ routeTo, referrer }) => {
+const WelcomePageComponent: FC = () => {
   const { t } = useTranslation();
+  const { referrer } = useParams<{ referrer: string }>();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (referrer) {
-      routeTo(`${WalletRoutesEnum.signup}/${referrer}`);
+      navigate(`${RoutesEnum.signup}/${referrer}`);
     }
-  }, [referrer, routeTo]);
+  }, [navigate, referrer]);
+
+  const stringData = objectToString({
+    chainID: appEnvs.DEFAULT_CHAIN_ID
+  });
 
   return (
     <div className={styles.registrationPage}>
-      <LangMenu className={styles.langSelect} />
-      <Link to={WalletRoutesEnum.root} className={styles.registrationTitle}>
+      <div className={styles.controlsHolder}>
+        <Button
+          size='small'
+          variant='outlined'
+          type='button'
+          to={RoutesEnum.signup}
+        >
+          {t('selectChain')}
+        </Button>
+        <LangMenu />
+      </div>
+      <Link to={RoutesEnum.root} className={styles.registrationTitle}>
         Power Wallet
       </Link>
       <div className={styles.registrationDesc}>{t('registrationPageDesc')}</div>
@@ -53,7 +45,7 @@ const WelcomePageComponent: FC<WelcomePageProps> = ({ routeTo, referrer }) => {
           size='large'
           variant='contained'
           type='button'
-          to={WalletRoutesEnum.signup}
+          to={`${RoutesEnum.signup}/${stringData}`}
         >
           {t('registrationPageJoinButton')}
         </Button>
@@ -61,7 +53,7 @@ const WelcomePageComponent: FC<WelcomePageProps> = ({ routeTo, referrer }) => {
           size='large'
           variant='outlined'
           type='button'
-          to={WalletRoutesEnum.login}
+          to={RoutesEnum.login}
         >
           {t('registrationPageImportAccountButton')}
         </Button>
@@ -70,4 +62,4 @@ const WelcomePageComponent: FC<WelcomePageProps> = ({ routeTo, referrer }) => {
   );
 };
 
-export const WelcomePage = connector(WelcomePageComponent);
+export const WelcomePage = WelcomePageComponent;

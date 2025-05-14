@@ -1,5 +1,5 @@
-@import '../../styles/mixins';
-@import '../../styles/variables';
+@use '@/styles/mixins' as *;
+@use '@/styles/variables' as *;
 
 .bar {
   position: sticky;
@@ -15,10 +15,9 @@
   backdrop-filter: blur(2px);
 
   @include mobile {
-    padding: 8px 15px;
+    padding: 8px 16px;
   }
 }
-
 
 .childrenOutsideBar {
   display: none;
@@ -40,15 +39,12 @@
   line-height: 28px;
 }
 
-
 .controlsSet {
   display: flex;
   align-items: center;
 }
 
-
 .title {
-
   @include text-gradient();
   font-size: 24px;
   font-style: normal;

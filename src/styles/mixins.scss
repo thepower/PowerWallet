@@ -1,10 +1,10 @@
-@import 'variables';
+@use 'variables' as *;
 
 @mixin the-power-color {
   background: $the-power-gradient;
 }
 
-@mixin border-gradient($gradient: $the-power-gradient, $radios: 10px) {
+@mixin border-gradient($gradient: $the-power-gradient, $radios: 5px) {
   position: relative;
 
   &::before {
@@ -22,12 +22,17 @@
   }
 }
 
-@mixin border-gradient-background($background, $gradient: $the-power-gradient) {
+@mixin border-gradient-background(
+  $background,
+  $gradient: $the-power-gradient,
+  $radius: 5px
+) {
   border: 1px solid #0000;
-  border-radius: 5px;
-  background: linear-gradient($background, $background) padding-box, $gradient border-box;
+  border-radius: $radius;
+  background:
+    linear-gradient($background, $background) padding-box,
+    $gradient border-box;
 }
-
 
 @mixin the-power-color-text {
   @include the-power-color;
@@ -49,11 +54,13 @@
   text-fill-color: transparent;
 }
 
-@mixin icon-colors($class,
-$defaultColor: #6b798f,
+@mixin icon-colors(
+  $class,
+  $defaultColor: #6b798f,
   $hoverColor: url('#hover'),
   $activeColor: url('#pressed'),
-  $disabledColor: #79789d) {
+  $disabledColor: #79789d
+) {
   @each $property in 'stroke', 'fill' {
     #{$class} :global(.#{$property}) {
       #{$property}: $defaultColor;
@@ -63,14 +70,14 @@ $defaultColor: #6b798f,
       #{$property}: $hoverColor;
     }
 
-    #{$class}[aria-current="page"] :global(.#{$property}),
-    #{$class}[aria-selected="true"] :global(.#{$property}),
-    #{$class}[aria-pressed="true"] :global(.#{$property}),
+    #{$class}[aria-current='page'] :global(.#{$property}),
+    #{$class}[aria-selected='true'] :global(.#{$property}),
+    #{$class}[aria-pressed='true'] :global(.#{$property}),
     #{$class}:active :global(.#{$property}) {
       #{$property}: $activeColor;
     }
 
-    #{$class}[aria-disabled="true"] :global(.#{$property}),
+    #{$class}[aria-disabled='true'] :global(.#{$property}),
     #{$class}:disabled :global(.#{$property}) {
       #{$property}: $disabledColor;
     }
