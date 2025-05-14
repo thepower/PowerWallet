@@ -8,7 +8,12 @@ import {
   useTokensStore,
   useWalletsStore
 } from 'application/utils/localStorageUtils';
-import { FaucetSvg, SendSvg, ServerCogIcon, VestingSvg } from 'assets/icons';
+import {
+  FaucetSvg,
+  SendSvg,
+  ServerCogIcon
+  // VestingSvg
+} from 'assets/icons';
 import { CardLink, PageTemplate, Tabs, SearchInput } from 'common';
 import hooks from 'hooks';
 import WalletCard from 'myAssets/components/WalletCard/WalletCard';
@@ -179,14 +184,14 @@ const MainPageComponent: FC = () => {
           >
             <SendSvg />
           </CardLink>
-          <CardLink
+          {/* <CardLink
             to={RoutesEnum.vesting}
             label={t('vesting')}
             target={'_self'}
             rel='noreferrer'
           >
             <VestingSvg />
-          </CardLink>
+          </CardLink> */}
           <CardLink
             to={RoutesEnum.claimNode}
             label={t('claimNode')}
